@@ -1,0 +1,24 @@
+apply plugin: 'io.spring.convention.spring-module'
+
+dependencies {
+    compile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.0.RELEASE'
+    compile group: 'org.springframework', name: 'spring-aspects', version: '5.1.0.RELEASE'
+
+    compile group: 'org.springframework.data', name: 'spring-data-commons', version: '2.0.10.RELEASE'
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.0.10.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.0.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.0.RELEASE'
+
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.3.6.Final'
+    compile group: 'javax.transaction', name: 'javax.transaction-api', version: '1.2'
+    compile group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.3.RELEASE'
+}

@@ -1,0 +1,32 @@
+# See authenticator module for example configuration
+sdvc.admin.username=test
+sdvc.admin.password=test
+
+jwt.secret=abc123
+jwt.expiration=86400
+jwt.header=Authorization
+
+# See ldap module for example configuration
+ldap.provider.base=ou=something,dc=openmbee,dc=org
+ldap.provider.url=ldaps://ldap.openmbee.org/${ldap.provider.base}
+ldap.provider.userdn=
+ldap.provider.password=
+ldap.user.dn.patterns=uid={0}
+ldap.group.role.attribute=cn
+ldap.group.search.base=
+ldap.group.search.filter=uniqueMember={0}
+
+# See core module for example configuration
+spring.datasource.url=jdbc:postgresql://db-server-bar:5432
+spring.datasource.database=bar
+spring.datasource.username=fooadmin
+spring.datasource.password=foo123
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# The SQL dialect makes Hibernate generate better SQL for the chosen database
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL94Dialect
+
+# Hibernate ddl auto (create, create-drop, validate, update)
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+spring.jpa.open-in-view=false

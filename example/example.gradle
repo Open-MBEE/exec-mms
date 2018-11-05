@@ -1,0 +1,30 @@
+buildscript {
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+plugins { id "io.spring.dependency-management" }
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile(
+        project(':ldap'),
+        project(':crud'),
+        'org.springframework.boot:spring-boot-starter-web',
+        'org.postgresql:postgresql:42.2.5',
+        'io.springfox:springfox-swagger2:2.7.0',
+        'io.springfox:springfox-swagger-ui:2.7.0'
+    )
+    testCompile(
+        'org.springframework.boot:spring-boot-starter-test'
+    )
+}

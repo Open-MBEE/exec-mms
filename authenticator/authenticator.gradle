@@ -1,0 +1,12 @@
+apply plugin: 'io.spring.convention.spring-module'
+
+dependencies {
+    compile project(':core')
+
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.0.8.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.0.8.RELEASE'
+
+    compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.5'
+    runtime group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.10.5'
+    runtime group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.10.5'
+}

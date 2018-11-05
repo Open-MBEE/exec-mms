@@ -1,0 +1,12 @@
+spring.datasource.url=jdbc:postgresql://db-server-bar:5432
+spring.datasource.database=bar
+spring.datasource.username=fooadmin
+spring.datasource.password=foo123
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# The SQL dialect makes Hibernate generate better SQL for the chosen database
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# Hibernate ddl auto (create, create-drop, validate, update)
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
