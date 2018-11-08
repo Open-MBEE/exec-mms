@@ -6,6 +6,7 @@ import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.ErrorResponse;
+import org.openmbee.sdvc.crud.services.DatabaseDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectsPost extends BaseController {
 
     private ProjectRepository projectRepository;
-    private ProjectsOperations projectsOperations;
+    private DatabaseDefinitionService projectsOperations;
 
     @Autowired
-    public ProjectsPost(ProjectRepository projectRepository, ProjectsOperations projectsOperations) {
+    public ProjectsPost(ProjectRepository projectRepository, DatabaseDefinitionService projectsOperations) {
         this.projectRepository = projectRepository;
         this.projectsOperations = projectsOperations;
     }

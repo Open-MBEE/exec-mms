@@ -1,0 +1,10 @@
+apply plugin: 'io.spring.convention.spring-module'
+
+dependencies {
+    compile project(':core')
+
+    compile group: 'org.apache.jackrabbit', name: 'oak-core', version: '1.9.9'
+    compile group: 'org.apache.jackrabbit', name: 'oak-store-spi', version: '1.9.9'
+    compile group: 'org.apache.jackrabbit', name: 'oak-api', version: '1.9.9'
+
+}

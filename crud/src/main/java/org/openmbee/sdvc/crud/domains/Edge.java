@@ -4,13 +4,22 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import org.openmbee.sdvc.core.domains.Base;
 
 @Entity
 @Table(name = "edges")
-public class Edge extends Base {
+public class Edge {
+
+    @Id
+    @GeneratedValue(
+        strategy = GenerationType.IDENTITY
+    )
+    @Column(name = "id", updatable = false, nullable = false)
+    Long id;
 
     @ManyToOne(fetch = FetchType.LAZY,
         cascade =  CascadeType.ALL)

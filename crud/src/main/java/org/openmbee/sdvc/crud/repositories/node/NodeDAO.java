@@ -7,6 +7,8 @@ public interface NodeDAO {
 
     public Node save(Node node);
 
+    public Node findById(long id);
+
     public Node findBySysmlId(String sysmlid);
 
     public List<Node> findAll();

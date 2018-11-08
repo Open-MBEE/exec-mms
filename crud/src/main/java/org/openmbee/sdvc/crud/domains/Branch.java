@@ -1,16 +1,26 @@
 package org.openmbee.sdvc.crud.domains;
 
 import java.time.Instant;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.openmbee.sdvc.core.domains.Base;
 
 @Entity
 @Table(name = "branches")
-public class Branch extends Base {
+public class Branch {
+
+    @Id
+    @GeneratedValue(
+        strategy = GenerationType.IDENTITY
+    )
+    @Column(name = "id", updatable = false, nullable = false)
+    Long id;
 
     private String elasticId;
     private String branchId;
@@ -30,8 +40,7 @@ public class Branch extends Base {
     @Transient
     private String parentCommitId;
 
-    private String creator;
-    private String modifier;
+    private Instant timestamp;
 
     private boolean tag;
     private boolean deleted;
@@ -41,19 +50,23 @@ public class Branch extends Base {
     }
 
     public Branch(String elasticId, String branchId, String branchName, Branch parentRef,
-        Commit parentCommit, Instant created, String creator, Instant modified, String modifier,
-        boolean tag, boolean deleted) {
+        Commit parentCommit, Instant timestamp, boolean tag, boolean deleted) {
         setElasticId(elasticId);
         setBranchId(branchId);
         setBranchName(branchName);
         setParentRef(parentRef);
         setParentCommit(parentCommit);
-        setCreated(created);
-        setCreator(creator);
-        setModified(modified);
-        setModifier(modifier);
+        setTimestamp(timestamp);
         setTag(tag);
         setDeleted(deleted);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getElasticId() {
@@ -96,20 +109,12 @@ public class Branch extends Base {
         this.parentCommit = parentCommit;
     }
 
-    public String getCreator() {
-        return creator;
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getModifier() {
-        return modifier;
-    }
-
-    public void setModifier(String modifier) {
-        this.modifier = modifier;
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
 
     public boolean isTag() {
@@ -143,5 +148,4 @@ public class Branch extends Base {
     public void setParentCommitId(String parentCommitId) {
         this.parentCommitId = parentCommitId;
     }
-
 }

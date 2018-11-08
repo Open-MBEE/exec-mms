@@ -77,10 +77,6 @@ public class Element {
         node.setLastCommit("someOtherElasticId");
         node.setInitialCommit("yetAnotherElasticId");
         node.setDeleted(false);
-        node.setCreated(Instant.now());
-        node.setCreatedBy("Someone");
-        node.setModified(Instant.now());
-        node.setModifiedBy("Someone else");
 
         return node;
     }

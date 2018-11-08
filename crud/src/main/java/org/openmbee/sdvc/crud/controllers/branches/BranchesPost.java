@@ -8,6 +8,7 @@ import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAOImpl;
+import org.openmbee.sdvc.crud.services.DatabaseDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,10 +23,10 @@ public class BranchesPost extends BaseController {
 
     private BranchDAOImpl branchRepository;
 
-    private BranchesOperations branchesOperations;
+    private DatabaseDefinitionService branchesOperations;
 
     @Autowired
-    public BranchesPost(BranchDAOImpl branchRepository, BranchesOperations branchesOperations) {
+    public BranchesPost(BranchDAOImpl branchRepository, DatabaseDefinitionService branchesOperations) {
         this.branchRepository = branchRepository;
         this.branchesOperations = branchesOperations;
     }
@@ -45,26 +46,27 @@ public class BranchesPost extends BaseController {
                 logger.info("Saving branch: {}", branch.getBranchId());
 
                 if (branch.getParentRefId() != null) {
-                    branch.setParentRef(branchRepository.findByBranchId(branch.getParentRefId()));
+                    Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
+                    branch.setParentRef(parentRef);
                 } else {
                     branch.setParentRef(branchRepository.findByBranchId("master"));
                 }
 
                 if (branch.getParentCommitId() != null) {
-                    branch.setParentCommit(commitRepository.findByCommitId(branch.getParentCommitId()));
+                    Commit parentCommit = commitRepository.findByCommitId(branch.getParentCommitId());
+                    branch.setParentCommit(parentCommit);
                 } else {
                     branch.setParentCommit(commitRepository.findLatest());
                 }
 
-                branch.setCreated(now);
-                branch.setModified(now);
+                branch.setTimestamp(now);
 
                 Branch saved = branchRepository.save(branch);
                 try {
                     DbContextHolder.setContext(projectId, saved.getBranchId());
-                    branchesOperations.createBranch();
-                    if (branch.getParentCommitId() == null) {
-                        branchesOperations.copyTablesFromParent(branch.getBranchId(), branch.getParentRef().getBranchId());
+                    if (branchesOperations.createBranch()) {
+                        branchesOperations.copyTablesFromParent(branch.getBranchId(),
+                            branch.getParentRef().getBranchId(), branch.getParentCommitId());
                     }
                     response.getBranches().add(saved);
                 } catch (Exception e) {

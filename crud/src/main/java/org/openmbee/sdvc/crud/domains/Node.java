@@ -1,23 +1,29 @@
 package org.openmbee.sdvc.crud.domains;
 
-import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
-import org.openmbee.sdvc.core.domains.Base;
 
 @Entity
 @Table(name = "nodes")
-public class Node extends Base {
+public class Node {
+
+    @Id
+    @GeneratedValue(
+        strategy = GenerationType.IDENTITY
+    )
+    @Column(name = "id", updatable = false, nullable = false)
+    Long id;
 
     private String sysmlId;
     private String elasticId;
     private String lastCommit;
     private String initialCommit;
-    private String createdBy;
-    private String modifiedBy;
     private boolean deleted;
 
     @Column(columnDefinition = "smallint")
@@ -27,34 +33,24 @@ public class Node extends Base {
     }
 
     public Node(long id, String sysmlId, String elasticId, String lastCommit, String initialCommit,
-        boolean deleted, Instant created, String createdBy, Instant modified, String modifiedBy) {
+        boolean deleted) {
         setId(id);
         setSysmlId(sysmlId);
         setElasticId(elasticId);
         setLastCommit(lastCommit);
         setInitialCommit(initialCommit);
         setDeleted(deleted);
-        setCreated(created);
-        setCreatedBy(createdBy);
-        setModified(modified);
-        setModifiedBy(modifiedBy);
     }
-/*
-    public static Node toNode(Map<String, Object> node) {
-        return new Node(
-            node.getOrDefault("id", null).toString(),
-            node.getOrDefault("sysmlid", null).toString(),
-            node.getOrDefault("elasticid", null).toString(),
-            node.getOrDefault("lastcommit", null).toString(),
-            node.getOrDefault("initialcommit", null).toString(),
-            (boolean) node.getOrDefault("deleted", false),
-            node.getOrDefault("created", null),
-            node.getOrDefault("createdby", null).toString(),
-            node.getOrDefault("modified", null),
-            node.getOrDefault("modifiedby", null).toString()
-        );
+
+
+    public Long getId() {
+        return id;
     }
-*/
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getSysmlId() {
         return sysmlId;
     }
@@ -93,22 +89,6 @@ public class Node extends Base {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
     }
 
     @Enumerated(EnumType.ORDINAL)

@@ -1,12 +1,19 @@
 package org.openmbee.sdvc.crud.repositories.branch;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAOImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
 
@@ -18,7 +25,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     }
 
     public Branch save(Branch branch) {
-        String sql = "INSERT INTO branches (elasticId, branchId, branchName, parent, parentCommit, tag, deleted, created, creator, modified, modifier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO branches (elasticId, branchId, branchName, parent, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         if (branch.getParentRefId() != null && branch.getParentRef() == null) {
             Branch parentRef = findByBranchId(branch.getParentRefId());
@@ -36,21 +43,38 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
             branch.setParentCommit(latest);
         }
 
-        getConnection().update(sql,
-            branch.getElasticId(),
-            branch.getBranchId(),
-            branch.getBranchName(),
-            branch.getParentRef() != null ? branch.getParentRef().getId() : null,
-            branch.getParentCommit() != null ? branch.getParentCommit().getId() : null,
-            branch.isTag(),
-            branch.isDeleted(),
-            Timestamp.from(branch.getCreated()),
-            branch.getCreator(),
-            Timestamp.from(branch.getModified()),
-            branch.getModifier()
-        );
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        return branch;
+        getConnection().update(new PreparedStatementCreator() {
+            public PreparedStatement createPreparedStatement(Connection connection)
+                throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(sql);
+                ps.setString(1, branch.getElasticId());
+                ps.setString(2, branch.getBranchId());
+                ps.setString(3, branch.getBranchName());
+                ps.setLong(4, branch.getParentRef().getId());
+                ps.setLong(5, branch.getParentCommit().getId());
+                ps.setTimestamp(6, Timestamp.from(branch.getTimestamp()));
+                ps.setBoolean(7, branch.isTag());
+                ps.setBoolean(8, branch.isDeleted());
+
+                return ps;
+            }
+        }, keyHolder);
+
+        if (keyHolder.getKeyList().isEmpty()) {
+            return null;
+        }
+
+        return findById(keyHolder.getKey().longValue());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public Branch findById(long id) {
+        String sql = "SELECT * FROM branches WHERE id = ?";
+
+        return (Branch) getConnection()
+            .queryForObject(sql, new Object[]{id}, new BranchRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})

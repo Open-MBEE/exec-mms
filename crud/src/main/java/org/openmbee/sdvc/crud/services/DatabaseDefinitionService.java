@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.controllers.projects;
+package org.openmbee.sdvc.crud.services;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,13 +18,15 @@ import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.service.ServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
 import org.openmbee.sdvc.core.domains.Project;
+import org.openmbee.sdvc.crud.config.CurrentTenantIdentifierResolverImpl;
+import org.openmbee.sdvc.crud.config.DataSourceBasedMultiTenantConnectionProviderImpl;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
@@ -44,11 +46,12 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProjectsOperations {
+public class DatabaseDefinitionService {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
     private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
+    private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
 
     private EntityManager entityManager;
     private Map<String, DataSource> crudDataSources;
@@ -70,19 +73,20 @@ public class ProjectsOperations {
         this.entityManager = entityManager;
     }
 
-    boolean createProjectDatabase(Project project) throws SQLException {
+    public boolean createProjectDatabase(Project project) throws SQLException {
         DbContextHolder.setContext(null);
         String queryString = String.format("CREATE DATABASE _%s", project.getProjectId());
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(crudDataSources.get(DbContextHolder.getContext().getKey()));
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(
+            crudDataSources.get(DbContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
         try {
             jdbcTemplate.execute(queryString);
             created.add("Created Database");
-            generateSchemaFromModels(project);
+            generateProjectSchemaFromModels(project);
             created.add("Created Tables");
         } catch (DataAccessException e) {
             if (e.getCause().getLocalizedMessage().toLowerCase().contains("exists")) {
-                generateSchemaFromModels(project);
+                generateProjectSchemaFromModels(project);
                 throw (new SQLException("Database already exists"));
             } else {
                 logger.error(e.getLocalizedMessage());
@@ -92,7 +96,15 @@ public class ProjectsOperations {
         return !created.isEmpty();
     }
 
-    public void generateSchemaFromModels(Project project) {
+    public boolean createBranch() {
+        logger.error(
+            "Current Context is: {} on ref {}", DbContextHolder.getContext().getProjectId(),
+            DbContextHolder.getContext().getBranchId());
+        generateBranchSchemaFromModels();
+        return true;
+    }
+
+    public void generateProjectSchemaFromModels(Project project) {
 
         DataSource ds = PersistenceJPAConfig
             .buildDatasource(project.getConnectionString(),
@@ -170,14 +182,78 @@ public class ProjectsOperations {
         }
     }
 
-    public static String substituteVariables(String template, Map<String, String> variables) {
+    public void generateBranchSchemaFromModels() {
+        MetadataSources metadata = new MetadataSources(
+            new StandardServiceRegistryBuilder()
+                .applySettings(getSchemaProperties())
+                .build()
+        );
+
+        metadata.addAnnotatedClass(Edge.class);
+        metadata.addAnnotatedClass(Node.class);
+
+        new SchemaExport()
+            .setHaltOnError(false)
+            .setFormat(true)
+            .setDelimiter(";")
+            .createOnly(EnumSet.of(TargetType.DATABASE),
+                metadata.getMetadataBuilder().build());
+    }
+
+    public void copyTablesFromParent(String target, String parent, String parentCommit) {
+        if (parentCommit != null) {
+            return;
+        }
+
+        final String targetNodeTable = String.format("nodes_%s", target);
+        final String targetEdgeTable = String.format("edges_%s", target);
+        StringBuilder parentNodeTable = new StringBuilder("nodes");
+        StringBuilder parentEdgeTable = new StringBuilder("edges");
+
+        if (parent != null && !parent.equalsIgnoreCase("master")) {
+            parentNodeTable.append(String.format("_%s", parent));
+            parentEdgeTable.append(String.format("_%s", parent));
+        }
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(
+            crudDataSources.get(DbContextHolder.getContext().getKey()));
+        jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
+        jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
+    }
+
+    private Map<String, Object> getSchemaProperties() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("hibernate.hbm2ddl.auto", "none");
+        properties
+            .put("hibernate.dialect", env.getProperty("spring.jpa.properties.hibernate.dialect",
+                "org.hibernate.dialect.PostgreSQL94Dialect"));
+
+        properties.put("hibernate.jdbc.lob.non_contextual_creation", true);
+        properties.put("hibernate.current_session_context_class", "thread");
+        properties.put("hibernate.multiTenancy", MultiTenancyStrategy.DATABASE);
+
+        DataSourceBasedMultiTenantConnectionProviderImpl dataSourceProvider = new DataSourceBasedMultiTenantConnectionProviderImpl();
+        dataSourceProvider.setCrudDataSources(crudDataSources);
+        properties.put("hibernate.multi_tenant_connection_provider", dataSourceProvider);
+
+        CurrentTenantIdentifierResolverImpl identifierResolver = new CurrentTenantIdentifierResolverImpl();
+        properties.put("hibernate.tenant_identifier_resolver", identifierResolver);
+
+        properties.put("hibernate.physical_naming_strategy",
+            "org.openmbee.sdvc.crud.config.SuffixedPhysicalNamingStrategy");
+
+        return properties;
+    }
+
+    private static String substituteVariables(String template, Map<String, String> variables) {
         StringBuffer buffer = new StringBuffer();
         Matcher matcher = pattern.matcher(template);
 
         while (matcher.find()) {
             if (variables.containsKey(matcher.group(1))) {
                 String replacement = variables.get(matcher.group(1));
-                matcher.appendReplacement(buffer, replacement != null ? Matcher.quoteReplacement(replacement) : "null");
+                matcher.appendReplacement(buffer,
+                    replacement != null ? Matcher.quoteReplacement(replacement) : "null");
             }
         }
         matcher.appendTail(buffer);

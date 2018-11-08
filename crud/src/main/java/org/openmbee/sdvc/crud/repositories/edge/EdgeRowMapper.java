@@ -14,11 +14,7 @@ public class EdgeRowMapper implements RowMapper {
             rs.getString("elasticid"),
             rs.getString("lastcommit"),
             rs.getString("initialcommit"),
-            rs.getBoolean("deleted"),
-            rs.getTimestamp("created").toInstant(),
-            rs.getString("createdby"),
-            rs.getTimestamp("modified").toInstant(),
-            rs.getString("modifiedby")
+            rs.getBoolean("deleted")
         );
     }
 }

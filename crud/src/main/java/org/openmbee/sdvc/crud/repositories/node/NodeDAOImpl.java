@@ -2,33 +2,55 @@ package org.openmbee.sdvc.crud.repositories.node;
 
 import static org.openmbee.sdvc.crud.config.ContextObject.MASTER_BRANCH;
 
-import java.sql.Timestamp;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     public Node save(Node node) {
         String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format(
-            "INSERT INTO nodes%s (sysmlid, elasticid, lastcommit, initialcommit, deleted, created, createdby, modified, modifiedby) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO nodes%s (sysmlid, elasticid, lastcommit, initialcommit, deleted) VALUES (?, ?, ?, ?, ?)",
             !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        getConnection().update(sql,
-            node.getSysmlId(),
-            node.getElasticId(),
-            node.getLastCommit(),
-            node.getInitialCommit(),
-            node.isDeleted(),
-            Timestamp.from(node.getCreated()),
-            node.getCreatedBy(),
-            Timestamp.from(node.getModified()),
-            node.getModifiedBy()
-        );
+        getConnection().update(new PreparedStatementCreator() {
+            public PreparedStatement createPreparedStatement(Connection connection)
+                throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(sql);
+                ps.setString(1, node.getSysmlId());
+                ps.setString(2, node.getElasticId());
+                ps.setString(3, node.getLastCommit());
+                ps.setString(4, node.getInitialCommit());
+                ps.setBoolean(5, node.isDeleted());
 
-        return node;
+                return ps;
+            }
+        }, keyHolder);
+
+        if (keyHolder.getKeyList().isEmpty()) {
+            return null;
+        }
+
+        return findById(keyHolder.getKey().longValue());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public Node findById(long id) {
+        String refId = DbContextHolder.getContext().getBranchId();
+        String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
+            refId != null && !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+
+        return (Node) getConnection()
+            .queryForObject(sql, new Object[]{id}, new NodeRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})
