@@ -1,31 +1,35 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.controllers.Constants;
 import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.crud.controllers.projects.ProjectJson;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.domains.CommitType;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAOImpl;
+import org.openmbee.sdvc.crud.services.NodeService;
+import org.openmbee.sdvc.crud.services.NodeServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
 public class ElementsPost extends BaseController {
 
-    private NodeDAOImpl nodeRepository;
+    private NodeServiceFactory nodeServiceFactory;
 
     @Autowired
-    public ElementsPost(NodeDAOImpl nodeRepository) {
-        this.nodeRepository = nodeRepository;
+    public ElementsPost(NodeServiceFactory nodeServiceFactory) {
+        this.nodeServiceFactory = nodeServiceFactory;
     }
 
     @PostMapping
@@ -34,28 +38,14 @@ public class ElementsPost extends BaseController {
             String projectId,
         @PathVariable
             String refId,
-        @RequestBody ElementsPostRequest elementsPost) {
+        @RequestBody ElementsPostRequest elementsPost,
+        @RequestParam Map<String, String> params) {
+        elementsPost.setElements(om.convertValue(elementsPost.get(Constants.ELEMENT_KEY), new TypeReference<List<ElementJson>>() {}));
         if (!elementsPost.getElements().isEmpty()) {
+            String type = "sysml";
+            NodeService nodeService = nodeServiceFactory.getNodeService(type);
             logger.info("JSON parsed properly");
-            DbContextHolder.setContext(projectId, refId);
-            ElementsResponse response = new ElementsResponse();
-
-            for (Element element : elementsPost.getElements()) {
-                logger.info("Saving element with id: {}", element.getId());
-                Node node = element.toNode();
-                this.nodeRepository.save(node);
-                response.getElements().add(node);
-            }
-
-            Commit commit = new Commit();
-            commit.setBranchId(DbContextHolder.getContext().getBranchId());
-            commit.setCommitType(CommitType.COMMIT);
-            commit.setCreator("admin");
-            commit.setElasticId("test");
-            commit.setTimestamp(Instant.now());
-
-            this.commitRepository.save(commit);
-
+            ElementsResponse response = nodeService.post(projectId, refId, elementsPost, params);
             return ResponseEntity.ok(response);
         }
         logger.debug("Bad Request");

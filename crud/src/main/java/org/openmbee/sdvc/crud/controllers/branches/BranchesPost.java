@@ -1,13 +1,18 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.time.Instant;
+import java.util.List;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.controllers.Constants;
 import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
-import org.openmbee.sdvc.crud.repositories.branch.BranchDAOImpl;
+import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.services.DatabaseDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +26,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects/{projectId}/refs")
 public class BranchesPost extends BaseController {
 
-    private BranchDAOImpl branchRepository;
+    private BranchDAO branchRepository;
 
     private DatabaseDefinitionService branchesOperations;
 
+    private CommitDAO commitRepository;
+
     @Autowired
-    public BranchesPost(BranchDAOImpl branchRepository, DatabaseDefinitionService branchesOperations) {
+    public BranchesPost(BranchDAO branchRepository, DatabaseDefinitionService branchesOperations, CommitDAO commitRepository) {
         this.branchRepository = branchRepository;
         this.branchesOperations = branchesOperations;
+        this.commitRepository = commitRepository;
     }
 
     @PostMapping
@@ -39,39 +47,44 @@ public class BranchesPost extends BaseController {
             logger.info("JSON parsed properly");
             BranchesResponse response = new BranchesResponse();
             Instant now = Instant.now();
+            projectsPost.setBranches(om.convertValue(projectsPost.get(Constants.BRANCH_KEY), new TypeReference<List<RefJson>>() {}));
 
-            for (Branch branch : projectsPost.getBranches()) {
+            for (RefJson branch : projectsPost.getBranches()) {
                 DbContextHolder.setContext(projectId);
-
-                logger.info("Saving branch: {}", branch.getBranchId());
+                Branch b = new Branch();
+                b.setBranchId(branch.getId());
+                b.setBranchName(branch.getName());
+                b.setElasticId("blah");
+                b.setTimestamp(Instant.now());
+                logger.info("Saving branch: {}", branch.getId());
 
                 if (branch.getParentRefId() != null) {
                     Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
-                    branch.setParentRef(parentRef);
+                    b.setParentRef(parentRef);
                 } else {
-                    branch.setParentRef(branchRepository.findByBranchId("master"));
+                    b.setParentRef(branchRepository.findByBranchId("master"));
                 }
 
                 if (branch.getParentCommitId() != null) {
                     Commit parentCommit = commitRepository.findByCommitId(branch.getParentCommitId());
-                    branch.setParentCommit(parentCommit);
+                    b.setParentCommit(parentCommit);
                 } else {
-                    branch.setParentCommit(commitRepository.findLatest());
+                    b.setParentCommit(commitRepository.findLatest());
                 }
 
-                branch.setTimestamp(now);
+                b.setTimestamp(now);
 
-                Branch saved = branchRepository.save(branch);
+                Branch saved = branchRepository.save(b);
                 try {
                     DbContextHolder.setContext(projectId, saved.getBranchId());
                     if (branchesOperations.createBranch()) {
-                        branchesOperations.copyTablesFromParent(branch.getBranchId(),
-                            branch.getParentRef().getBranchId(), branch.getParentCommitId());
+                        branchesOperations.copyTablesFromParent(saved.getBranchId(),
+                            b.getParentRef().getBranchId(), branch.getParentCommitId());
                     }
-                    response.getBranches().add(saved);
+                    response.getBranches().add(branch);
                 } catch (Exception e) {
                     branchRepository.delete(saved);
-                    logger.error("Couldn't create branch: {}", branch.getBranchId());
+                    logger.error("Couldn't create branch: {}", branch.getId());
                     logger.error(e);
                 }
 

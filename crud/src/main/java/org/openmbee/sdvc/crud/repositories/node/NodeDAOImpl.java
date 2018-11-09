@@ -16,10 +16,9 @@ import org.springframework.jdbc.support.KeyHolder;
 public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     public Node save(Node node) {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format(
             "INSERT INTO nodes%s (sysmlid, elasticid, lastcommit, initialcommit, deleted) VALUES (?, ?, ?, ?, ?)",
-            !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         getConnection().update(new PreparedStatementCreator() {
@@ -45,9 +44,8 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     @SuppressWarnings({"unchecked"})
     public Node findById(long id) {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
-            refId != null && !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
 
         return (Node) getConnection()
             .queryForObject(sql, new Object[]{id}, new NodeRowMapper());
@@ -55,9 +53,8 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     @SuppressWarnings({"unchecked"})
     public Node findBySysmlId(String sysmlId) {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
-            refId != null && !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
 
         return (Node) getConnection()
             .queryForObject(sql, new Object[]{sysmlId}, new NodeRowMapper());
@@ -65,9 +62,8 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     @SuppressWarnings({"unchecked"})
     public List<Node> findAll() {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format("SELECT * FROM nodes%s WHERE deleted = false",
-            !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
 
         return getConnection().query(sql, new NodeRowMapper());
     }

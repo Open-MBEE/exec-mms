@@ -106,8 +106,13 @@ public class DatabaseDefinitionService {
 
     public void generateProjectSchemaFromModels(Project project) {
 
+        String connectionString = project.getConnectionString();
+        if (connectionString == null || connectionString.equals("")) {
+            connectionString = env.getProperty("spring.datasource.url") + "/_" + project.getProjectId();
+        }
+
         DataSource ds = PersistenceJPAConfig
-            .buildDatasource(project.getConnectionString(),
+            .buildDatasource(connectionString,
                 env.getProperty("spring.datasource.username"),
                 env.getProperty("spring.datasource.password"),
                 env.getProperty("spring.datasource.driver-class-name",
@@ -201,18 +206,19 @@ public class DatabaseDefinitionService {
     }
 
     public void copyTablesFromParent(String target, String parent, String parentCommit) {
+        //TODO target and parent are not sanitized
         if (parentCommit != null) {
             return;
         }
 
-        final String targetNodeTable = String.format("nodes_%s", target);
-        final String targetEdgeTable = String.format("edges_%s", target);
+        final String targetNodeTable = String.format("nodes%s", target);
+        final String targetEdgeTable = String.format("edges%s", target);
         StringBuilder parentNodeTable = new StringBuilder("nodes");
         StringBuilder parentEdgeTable = new StringBuilder("edges");
 
         if (parent != null && !parent.equalsIgnoreCase("master")) {
-            parentNodeTable.append(String.format("_%s", parent));
-            parentEdgeTable.append(String.format("_%s", parent));
+            parentNodeTable.append(String.format("%s", parent));
+            parentEdgeTable.append(String.format("%s", parent));
         }
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(

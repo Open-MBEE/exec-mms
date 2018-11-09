@@ -20,4 +20,8 @@ public abstract class BaseDAOImpl {
     public JdbcTemplate getConnection() {
         return new JdbcTemplate(crudDataSources.get(DbContextHolder.getContext().getKey()));
     }
+
+    public String getSuffix() {
+        return DbContextHolder.getContext().getDbTableSuffix();
+    }
 }

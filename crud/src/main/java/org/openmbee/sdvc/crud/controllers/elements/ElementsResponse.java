@@ -3,29 +3,20 @@ package org.openmbee.sdvc.crud.controllers.elements;
 import java.util.ArrayList;
 import java.util.List;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.crud.controllers.Constants;
 
 public class ElementsResponse extends BaseResponse {
 
-    private List<Node> elements = new ArrayList<>();
-
     public ElementsResponse() {
+        this.put(Constants.ELEMENT_KEY, new ArrayList<ElementJson>());
     }
 
-    public ElementsResponse(Node element) {
-        elements.add(element);
+    public List<ElementJson> getElements() {
+        return (List<ElementJson>) this.get(Constants.ELEMENT_KEY);
     }
 
-    public ElementsResponse(List<Node> elements) {
-        setElements(elements);
-    }
-
-    public List<Node> getElements() {
-        return elements;
-    }
-
-    public void setElements(List<Node> elements) {
-        this.elements.addAll(elements);
+    public void setElements(List<ElementJson> elements) {
+        this.put(Constants.ELEMENT_KEY, elements);
     }
 
 }

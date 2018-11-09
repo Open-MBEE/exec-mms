@@ -9,6 +9,7 @@ import java.util.List;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
+import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAOImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -17,10 +18,10 @@ import org.springframework.jdbc.support.KeyHolder;
 
 public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
 
-    private CommitDAOImpl commitRepository;
+    private CommitDAO commitRepository;
 
     @Autowired
-    public void setCommitRepository(CommitDAOImpl commitRepository) {
+    public void setCommitRepository(CommitDAO commitRepository) {
         this.commitRepository = commitRepository;
     }
 

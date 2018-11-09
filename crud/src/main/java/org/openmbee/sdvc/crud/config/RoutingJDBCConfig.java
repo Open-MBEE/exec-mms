@@ -9,8 +9,11 @@ import javax.sql.DataSource;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
+import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAOImpl;
+import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAOImpl;
+import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAOImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -34,17 +37,17 @@ public class RoutingJDBCConfig {
     }
 
     @Bean
-    public NodeDAOImpl nodeDAOImpl() {
+    public NodeDAO nodeDAOImpl() {
         return new NodeDAOImpl();
     }
 
     @Bean
-    public BranchDAOImpl branchDAOImpl() {
+    public BranchDAO branchDAOImpl() {
         return new BranchDAOImpl();
     }
 
     @Bean
-    public CommitDAOImpl commitDAOImpl() {
+    public CommitDAO commitDAOImpl() {
         return new CommitDAOImpl();
     }
 
@@ -65,14 +68,16 @@ public class RoutingJDBCConfig {
         List<Project> projects = projectRepository.findAll();
 
         for (Project project : projects) {
-            if (!project.getConnectionString().isEmpty()) {
-                targetDataSources.put(project.getProjectId(), PersistenceJPAConfig
-                    .buildDatasource(project.getConnectionString(),
-                        env.getProperty("spring.datasource.username"),
-                        env.getProperty("spring.datasource.password"),
-                        env.getProperty("spring.datasource.driver-class-name",
-                            "org.postgresql.Driver")));
+            String url = project.getConnectionString();
+            if (url == null || url.isEmpty()) {
+                url = env.getProperty("spring.datasource.url") + "/_" + project.getProjectId();
             }
+            targetDataSources.put(project.getProjectId(), PersistenceJPAConfig
+                .buildDatasource(url,
+                    env.getProperty("spring.datasource.username"),
+                    env.getProperty("spring.datasource.password"),
+                    env.getProperty("spring.datasource.driver-class-name",
+                        "org.postgresql.Driver")));
         }
 
         return targetDataSources;

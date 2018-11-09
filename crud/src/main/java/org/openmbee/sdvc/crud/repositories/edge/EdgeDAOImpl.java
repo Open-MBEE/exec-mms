@@ -11,10 +11,9 @@ import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     public Edge save(Edge edge) {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format(
             "INSERT INTO edges%s (edgeType, child_id, parent_id) VALUES (?, ?, ?)",
-            !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
 
         getConnection().update(sql,
             edge.getEdgeType(),
@@ -27,9 +26,8 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     @SuppressWarnings({"unchecked"})
     public Edge findParents(String sysmlId, EdgeType et) {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
-            refId != null && !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
 
         return (Edge) getConnection()
             .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
@@ -37,9 +35,8 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     @SuppressWarnings({"unchecked"})
     public Edge findChildren(String sysmlId, EdgeType et) {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
-            refId != null && !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
 
         return (Edge) getConnection()
             .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
@@ -47,9 +44,8 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     @SuppressWarnings({"unchecked"})
     public List<Edge> findAll() {
-        String refId = DbContextHolder.getContext().getBranchId();
         String sql = String.format("SELECT * FROM nodes%s WHERE deleted = false",
-            !refId.equalsIgnoreCase(MASTER_BRANCH) ? "_" + refId : "");
+            getSuffix());
 
         return getConnection().query(sql, new EdgeRowMapper());
     }

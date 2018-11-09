@@ -1,22 +1,17 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
-import java.util.ArrayList;
 import java.util.List;
+
 import org.openmbee.sdvc.crud.controllers.BaseRequest;
+import org.openmbee.sdvc.crud.controllers.Constants;
 
 public class ElementsPostRequest extends BaseRequest {
 
-    private List<Element> elements = new ArrayList<>();
-
-    public ElementsPostRequest() {
+    public List<ElementJson> getElements() {
+        return (List<ElementJson>) this.get(Constants.ELEMENT_KEY);
     }
 
-    public List<Element> getElements() {
-        return elements;
+    public void setElements(List<ElementJson> elements) {
+        this.put(Constants.ELEMENT_KEY, elements);
     }
-
-    public void setElements(List<Element> elements) {
-        this.elements = elements;
-    }
-
 }
