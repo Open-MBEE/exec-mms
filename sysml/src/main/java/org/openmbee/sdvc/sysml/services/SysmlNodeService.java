@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.services;
+package org.openmbee.sdvc.sysml.services;
 
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.elements.ElementJson;
@@ -7,6 +7,7 @@ import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.domains.CommitType;
 import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
