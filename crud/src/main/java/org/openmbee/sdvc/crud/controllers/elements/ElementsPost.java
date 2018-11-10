@@ -40,7 +40,6 @@ public class ElementsPost extends BaseController {
             String refId,
         @RequestBody ElementsPostRequest elementsPost,
         @RequestParam Map<String, String> params) {
-        elementsPost.setElements(om.convertValue(elementsPost.get(Constants.ELEMENT_KEY), new TypeReference<List<ElementJson>>() {}));
         if (!elementsPost.getElements().isEmpty()) {
             String type = "sysml";
             NodeService nodeService = nodeServiceFactory.getNodeService(type);

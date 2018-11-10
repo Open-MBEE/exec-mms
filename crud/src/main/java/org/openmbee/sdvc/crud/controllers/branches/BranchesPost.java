@@ -47,7 +47,6 @@ public class BranchesPost extends BaseController {
             logger.info("JSON parsed properly");
             BranchesResponse response = new BranchesResponse();
             Instant now = Instant.now();
-            projectsPost.setBranches(om.convertValue(projectsPost.get(Constants.BRANCH_KEY), new TypeReference<List<RefJson>>() {}));
 
             for (RefJson branch : projectsPost.getBranches()) {
                 DbContextHolder.setContext(projectId);

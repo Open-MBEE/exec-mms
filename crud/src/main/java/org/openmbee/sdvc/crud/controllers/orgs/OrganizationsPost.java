@@ -27,7 +27,6 @@ public class OrganizationsPost extends BaseController {
     @PostMapping
     public ResponseEntity<? extends BaseResponse> handleRequest(
         @RequestBody OrganizationsRequest orgPost) {
-        orgPost.setOrgs(om.convertValue(orgPost.get(Constants.ORGANIZATION_KEY), new TypeReference<List<OrgJson>>() { }));
 
         if (!orgPost.getOrgs().isEmpty()) {
             logger.info("JSON parsed properly");

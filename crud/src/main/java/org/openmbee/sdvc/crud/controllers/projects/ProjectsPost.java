@@ -37,8 +37,7 @@ public class ProjectsPost extends BaseController {
         if (!projectsPost.getProjects().isEmpty()) {
             logger.info("JSON parsed properly");
             ProjectsResponse response = new ProjectsResponse();
-            List<ProjectJson> projects = om.convertValue(projectsPost.get(Constants.PROJECT_KEY), new TypeReference<List<ProjectJson>>() { });
-            for (ProjectJson project : projects) {
+            for (ProjectJson project : projectsPost.getProjects()) {
                 logger.info("Saving project: {}", project.getId());
                 Project proj = new Project();
                 proj.setProjectId(project.getId());

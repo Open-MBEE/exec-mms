@@ -1,15 +1,24 @@
 package org.openmbee.sdvc.crud.controllers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public abstract class BaseRequest {
 
-import java.util.HashMap;
+    private String source;
 
-public abstract class BaseRequest extends HashMap<String, Object> {
-
-    protected final Logger logger = LogManager.getLogger(getClass());
+    private String comment;
 
     public String getSource() {
-        return (String) this.get("source");
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
