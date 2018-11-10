@@ -4,7 +4,7 @@ import org.openmbee.sdvc.crud.controllers.BaseRequest;
 
 import java.util.List;
 
-public class ElementsPostRequest extends BaseRequest {
+public class ElementsRequest extends BaseRequest {
 
     private List<ElementJson> elements;
 

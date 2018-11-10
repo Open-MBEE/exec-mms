@@ -2,7 +2,7 @@ package org.openmbee.sdvc.crud.services;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsPostRequest;
+import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
@@ -34,7 +34,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse post(String projectId, String refId, ElementsPostRequest req, Map<String, String> params) {
+    public ElementsResponse post(String projectId, String refId, ElementsRequest req, Map<String, String> params) {
         return null;
     }
 

@@ -1,13 +1,10 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.time.Instant;
-import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.Constants;
 import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;

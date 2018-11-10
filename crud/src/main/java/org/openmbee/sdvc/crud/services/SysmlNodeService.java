@@ -2,7 +2,7 @@ package org.openmbee.sdvc.crud.services;
 
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.elements.ElementJson;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsPostRequest;
+import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.domains.CommitType;
@@ -42,7 +42,7 @@ public class SysmlNodeService extends DefaultNodeService {
     }
 
     @Override
-    public ElementsResponse post(String projectId, String refId, ElementsPostRequest req, Map<String, String> params) {
+    public ElementsResponse post(String projectId, String refId, ElementsRequest req, Map<String, String> params) {
         DbContextHolder.setContext(projectId, refId);
         ElementsResponse response = new ElementsResponse();
         response.put("extraKey", "blah");
