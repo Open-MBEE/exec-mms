@@ -5,13 +5,13 @@ import org.openmbee.sdvc.crud.controllers.BaseRequest;
 
 public class BranchesRequest extends BaseRequest {
 
-    private List<RefJson> branches;
+    private List<RefJson> refs;
 
-    public List<RefJson> getBranches() {
-        return branches;
+    public List<RefJson> getRefs() {
+        return refs;
     }
-    public void setBranches(List<RefJson> branches) {
-        this.branches = branches;
+    public void setRefs(List<RefJson> refs) {
+        this.refs = refs;
     }
 
 

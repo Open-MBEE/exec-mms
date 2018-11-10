@@ -21,7 +21,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         getConnection().update(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sql);
+                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
                 ps.setInt(1, commit.getCommitType().getId());
                 ps.setString(2, commit.getCreator());
                 ps.setString(3, commit.getElasticId());
@@ -35,8 +35,8 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         if (keyHolder.getKeyList().isEmpty()) {
             return null;
         }
-
-        return findById(keyHolder.getKey().longValue());
+        commit.setId(keyHolder.getKey().longValue());
+        return commit;//findById(keyHolder.getKey().longValue());
     }
 
     @SuppressWarnings({"unchecked"})

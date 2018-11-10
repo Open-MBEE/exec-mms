@@ -49,7 +49,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         getConnection().update(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sql);
+                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
                 ps.setString(1, branch.getElasticId());
                 ps.setString(2, branch.getBranchId());
                 ps.setString(3, branch.getBranchName());
@@ -58,7 +58,6 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
                 ps.setTimestamp(6, Timestamp.from(branch.getTimestamp()));
                 ps.setBoolean(7, branch.isTag());
                 ps.setBoolean(8, branch.isDeleted());
-
                 return ps;
             }
         }, keyHolder);
@@ -66,8 +65,8 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         if (keyHolder.getKeyList().isEmpty()) {
             return null;
         }
-
-        return findById(keyHolder.getKey().longValue());
+        branch.setId(keyHolder.getKey().longValue());
+        return branch;//findById(keyHolder.getKey().longValue());
     }
 
     @SuppressWarnings({"unchecked"})

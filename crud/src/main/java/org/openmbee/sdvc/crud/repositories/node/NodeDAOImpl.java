@@ -24,7 +24,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         getConnection().update(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sql);
+                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
                 ps.setString(1, node.getSysmlId());
                 ps.setString(2, node.getElasticId());
                 ps.setString(3, node.getLastCommit());
@@ -38,8 +38,8 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         if (keyHolder.getKeyList().isEmpty()) {
             return null;
         }
-
-        return findById(keyHolder.getKey().longValue());
+        node.setId(keyHolder.getKey().longValue());
+        return node;//findById(keyHolder.getKey().longValue());
     }
 
     @SuppressWarnings({"unchecked"})

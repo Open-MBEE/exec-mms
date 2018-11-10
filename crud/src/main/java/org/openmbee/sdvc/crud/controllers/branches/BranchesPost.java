@@ -40,12 +40,12 @@ public class BranchesPost extends BaseController {
     public ResponseEntity<? extends BaseResponse> handleRequest(
         @PathVariable String projectId,
         @RequestBody BranchesRequest projectsPost) {
-        if (!projectsPost.getBranches().isEmpty()) {
+        if (!projectsPost.getRefs().isEmpty()) {
             logger.info("JSON parsed properly");
             BranchesResponse response = new BranchesResponse();
             Instant now = Instant.now();
 
-            for (RefJson branch : projectsPost.getBranches()) {
+            for (RefJson branch : projectsPost.getRefs()) {
                 DbContextHolder.setContext(projectId);
                 Branch b = new Branch();
                 b.setBranchId(branch.getId());
