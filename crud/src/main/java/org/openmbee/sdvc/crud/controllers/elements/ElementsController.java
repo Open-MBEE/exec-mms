@@ -5,7 +5,7 @@ import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.services.NodeService;
-import org.openmbee.sdvc.crud.services.NodeServiceFactory;
+import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
 public class ElementsController extends BaseController {
 
-    private NodeServiceFactory nodeServiceFactory;
+    private ServiceFactory serviceFactory;
 
     @Autowired
-    public ElementsController(NodeServiceFactory nodeServiceFactory) {
-        this.nodeServiceFactory = nodeServiceFactory;
+    public ElementsController(ServiceFactory serviceFactory) {
+        this.serviceFactory = serviceFactory;
     }
 
     @GetMapping(value = {"", "/{elementId}"})
@@ -62,10 +62,27 @@ public class ElementsController extends BaseController {
         NodeService nodeService = getNodeService(projectId);
         ErrorResponse err = new ErrorResponse();
         return ResponseEntity.badRequest().body(err);
+    }
 
+    @DeleteMapping(value = "/{elementId}")
+    public ResponseEntity<?> handleDelete(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @PathVariable String elementId) {
+
+        return ResponseEntity.ok(new ElementsResponse());
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> handleBulkDelete(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @RequestBody ElementsRequest req) {
+
+        return ResponseEntity.ok(new ElementsResponse());
     }
 
     private NodeService getNodeService(String projectId) {
-        return nodeServiceFactory.getNodeService("sysml");
+        return serviceFactory.getNodeService("sysml");
     }
 }

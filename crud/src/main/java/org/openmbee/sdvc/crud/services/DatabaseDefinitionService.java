@@ -198,7 +198,7 @@ public class DatabaseDefinitionService {
         metadata.addAnnotatedClass(Node.class);
 
         new SchemaExport()
-            .setHaltOnError(false)
+            .setHaltOnError(true)
             .setFormat(true)
             .setDelimiter(";")
             .createOnly(EnumSet.of(TargetType.DATABASE),
