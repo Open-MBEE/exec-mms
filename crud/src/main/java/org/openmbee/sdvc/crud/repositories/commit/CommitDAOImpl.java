@@ -11,7 +11,9 @@ import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
 
     public Commit save(Commit commit) {

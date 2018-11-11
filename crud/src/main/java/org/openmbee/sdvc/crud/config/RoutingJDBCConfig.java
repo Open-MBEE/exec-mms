@@ -36,21 +36,6 @@ public class RoutingJDBCConfig {
         this.projectRepository = projectRepository;
     }
 
-    @Bean
-    public NodeDAO nodeDAOImpl() {
-        return new NodeDAOImpl();
-    }
-
-    @Bean
-    public BranchDAO branchDAOImpl() {
-        return new BranchDAOImpl();
-    }
-
-    @Bean
-    public CommitDAO commitDAOImpl() {
-        return new CommitDAOImpl();
-    }
-
     @Bean(name = "crudDataSources")
     public Map<String, DataSource> crudDataSources() {
         Map<String, DataSource> targetDataSources = new HashMap<>();

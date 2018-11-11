@@ -3,84 +3,95 @@ package org.openmbee.sdvc.crud.controllers;
 import java.util.HashMap;
 
 public class BaseJson extends HashMap<String, Object> {
+
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String ELASTICID = "_elasticId";
+    public static final String PROJECTID = "_projectId";
+    public static final String REFID = "_refId";
+    public static final String MODIFIER = "_modifier";
+    public static final String MODIFIED = "_modified";
+    public static final String CREATOR = "_creator";
+    public static final String CREATED = "_created";
+
     public String getId() {
-        return (String) this.get("id");
+        return (String) this.get(ID);
     }
 
     public BaseJson setId(String id) {
-        this.put("id", id);
+        this.put(ID, id);
         return this;
     }
 
     public String getName() {
-        return (String) this.get("name");
+        return (String) this.get(NAME);
     }
 
     public BaseJson setName(String name) {
-        this.put("name", name);
+        this.put(NAME, name);
         return this;
     }
 
     public String getElasticId() {
-        return (String) this.get("_elasticId");
+        return (String) this.get(ELASTICID);
     }
 
     public BaseJson setElasticId(String elasticId) {
-        this.put("_elasticId", elasticId);
+        this.put(ELASTICID, elasticId);
         return this;
     }
 
     public String getProjectId() {
-        return (String) this.get("_projectId");
+        return (String) this.get(PROJECTID);
     }
 
     public BaseJson setProjectId(String projectId) {
-        this.put("_projectId", projectId);
+        this.put(PROJECTID, projectId);
         return this;
     }
 
     public String getRefId() {
-        return (String) this.get("_refId");
+        return (String) this.get(REFID);
     }
 
     public BaseJson setRefId(String refId) {
-        this.put("_refId", refId);
+        this.put(REFID, refId);
         return this;
     }
 
     public String getModifier() {
-        return (String) this.get("_modifier");
+        return (String) this.get(MODIFIER);
     }
 
     public BaseJson setModifier(String modifier) {
-        this.put("_modifier", modifier);
+        this.put(MODIFIER, modifier);
         return this;
     }
 
     public String getCreator() {
-        return (String) this.get("_creator");
+        return (String) this.get(CREATOR);
     }
 
     public BaseJson setCreator(String creator) {
-        this.put("_creator", creator);
+        this.put(CREATOR, creator);
         return this;
     }
 
     public String getCreated() {
-        return (String) this.get("_created");
+        return (String) this.get(CREATED);
     }
 
     public BaseJson setCreated(String created) {
-        this.put("_created", created);
+        this.put(CREATED, created);
         return this;
     }
 
     public String getModified() {
-        return (String) this.get("_modified");
+        return (String) this.get(MODIFIED);
     }
 
     public BaseJson setModified(String modified) {
-        this.put("_modified", modified);
+        this.put(MODIFIED, modified);
         return this;
     }
 }

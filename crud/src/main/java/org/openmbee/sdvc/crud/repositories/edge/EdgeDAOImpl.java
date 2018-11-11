@@ -7,7 +7,9 @@ import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.domains.Edge;
 import org.openmbee.sdvc.crud.domains.EdgeType;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     public Edge save(Edge edge) {

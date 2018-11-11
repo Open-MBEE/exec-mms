@@ -19,17 +19,24 @@ public class CommitsController extends BaseController {
         this.commitService = commitService;
     }
 
-    @GetMapping(value = {"/commits", "/commits/{commitId}"})
+    @GetMapping(value = "commits")
     public ResponseEntity<?> handleGet(
         @PathVariable String projectId,
-        @PathVariable(required = false) String commitId,
         @RequestParam Map<String, String> params) {
 
         return ResponseEntity.ok(null);
     }
 
+    @GetMapping(value = "/commits/{commitId}")
+    public ResponseEntity<?> handleCommitGet(
+        @PathVariable String projectId,
+        @PathVariable String commitId) {
+
+        return ResponseEntity.ok(null);
+    }
+
     @GetMapping(value = "/refs/{refId}/elements/{elementId}/commits")
-    public ResponseEntity<?> handleElementGet(
+    public ResponseEntity<?> handleElementCommitsGet(
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,

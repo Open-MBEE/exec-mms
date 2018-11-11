@@ -12,7 +12,9 @@ import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     public Node save(Node node) {
@@ -42,6 +44,10 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return node;//findById(keyHolder.getKey().longValue());
     }
 
+    public List<Node> saveAll(List<Node> nodes) {
+        return null;
+    }
+
     @SuppressWarnings({"unchecked"})
     public Node findById(long id) {
         String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
@@ -60,6 +66,10 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
             .queryForObject(sql, new Object[]{sysmlId}, new NodeRowMapper());
     }
 
+    public List<Node> findAllBySysmlIds(List<String> ids) {
+        return null;
+    }
+
     @SuppressWarnings({"unchecked"})
     public List<Node> findAll() {
         String sql = String.format("SELECT * FROM nodes%s WHERE deleted = false",
@@ -67,4 +77,5 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
         return getConnection().query(sql, new NodeRowMapper());
     }
+
 }

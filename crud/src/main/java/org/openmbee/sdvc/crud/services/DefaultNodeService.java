@@ -6,6 +6,7 @@ import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
+import org.openmbee.sdvc.crud.repositories.node.NodeElasticDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class DefaultNodeService implements NodeService {
 
     protected NodeDAO nodeRepository;
     protected CommitDAO commitRepository;
+    protected NodeElasticDAO nodeElasticRepository;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -26,6 +28,11 @@ public class DefaultNodeService implements NodeService {
     @Autowired
     public void setCommitRepository(CommitDAO commitRepository) {
         this.commitRepository = commitRepository;
+    }
+
+    @Autowired
+    public void setNodeElasticRepository(NodeElasticDAO nodeElasticRepository) {
+        this.nodeElasticRepository = nodeElasticRepository;
     }
 
     @Override
