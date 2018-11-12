@@ -6,5 +6,6 @@ import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
 public interface ProjectService {
 
     public ProjectsResponse get(String projectId);
+
     public ProjectsResponse post(ProjectsRequest projectsPost);
 }

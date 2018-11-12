@@ -12,9 +12,13 @@ public class CommitService {
     private CommitElasticDAO commitElasticRepository;
 
     @Autowired
-    public void setCommitDao(CommitDAO commitDao) { this.commitRepository = commitDao; }
+    public void setCommitDao(CommitDAO commitDao) {
+        this.commitRepository = commitDao;
+    }
 
     @Autowired
-    public void setCommitElasticDao(CommitElasticDAO commitElasticRepository) { this.commitElasticRepository = commitElasticRepository; }
+    public void setCommitElasticDao(CommitElasticDAO commitElasticRepository) {
+        this.commitElasticRepository = commitElasticRepository;
+    }
 
 }
