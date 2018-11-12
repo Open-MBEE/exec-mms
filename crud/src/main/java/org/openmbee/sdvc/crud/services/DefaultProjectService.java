@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.domains.Project;
@@ -9,8 +10,6 @@ import org.openmbee.sdvc.crud.controllers.projects.ProjectsRequest;
 import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.sql.SQLException;
 
 @Service("defaultProjectService")
 public class DefaultProjectService implements ProjectService {

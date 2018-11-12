@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ServiceFactory implements ApplicationContextAware {
+
     private ApplicationContext context;
 
     public void setApplicationContext(ApplicationContext context) {
@@ -13,11 +14,11 @@ public class ServiceFactory implements ApplicationContextAware {
     }
 
     public NodeService getNodeService(String type) {
-        return (NodeService)context.getBean(type + "NodeService");
+        return (NodeService) context.getBean(type + "NodeService");
     }
 
     public ProjectService getProjectService(String type) {
-        return (ProjectService)context.getBean(type + "ProjectService");
+        return (ProjectService) context.getBean(type + "ProjectService");
     }
 
 }

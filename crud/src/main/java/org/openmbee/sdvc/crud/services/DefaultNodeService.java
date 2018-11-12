@@ -1,5 +1,9 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
@@ -15,13 +19,9 @@ import org.openmbee.sdvc.crud.repositories.node.NodeElasticDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 @Service("defaultNodeService")
 public class DefaultNodeService implements NodeService {
+
     protected final Logger logger = LogManager.getLogger(getClass());
 
     protected NodeDAO nodeRepository;
@@ -44,7 +44,8 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse get(String projectId, String refId, String id, Map<String, String> params) {
+    public ElementsResponse get(String projectId, String refId, String id,
+        Map<String, String> params) {
         DbContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
         if (id != null) {
@@ -67,11 +68,12 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse post(String projectId, String refId, ElementsRequest req, Map<String, String> params) {
+    public ElementsResponse post(String projectId, String refId, ElementsRequest req,
+        Map<String, String> params) {
         DbContextHolder.setContext(projectId, refId);
         ElementsResponse response = new ElementsResponse();
         response.put("extraKey", "blah");
-        logger.info("source: "+ req.getSource());
+        logger.info("source: " + req.getSource());
         for (ElementJson element : req.getElements()) {
             logger.info("Saving element with id: {}", element.getId());
             Node node = element.toNode();

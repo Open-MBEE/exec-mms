@@ -108,7 +108,8 @@ public class DatabaseDefinitionService {
 
         String connectionString = project.getConnectionString();
         if (connectionString == null || connectionString.equals("")) {
-            connectionString = env.getProperty("spring.datasource.url") + "/_" + project.getProjectId();
+            connectionString =
+                env.getProperty("spring.datasource.url") + "/_" + project.getProjectId();
         }
 
         DataSource ds = PersistenceJPAConfig
