@@ -17,4 +17,14 @@ public enum CommitType {
     public int getId() {
         return id;
     }
+
+    public static CommitType getFromValue(int id) {
+        for (CommitType commitType: CommitType.values()) {
+            if (commitType.getId() == id) {
+                return commitType;
+            }
+        }
+
+        return null;
+    }
 }

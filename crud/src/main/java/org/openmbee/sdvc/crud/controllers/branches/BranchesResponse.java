@@ -2,22 +2,19 @@ package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.controllers.Constants;
 
 public class BranchesResponse extends BaseResponse {
-
-    private List<Branch> branches = new ArrayList<>();
-
     public BranchesResponse() {
+        this.put(Constants.BRANCH_KEY, new ArrayList<RefJson>());
+    }
+    public List<RefJson> getBranches() {
+        return (List<RefJson>) this.get(Constants.BRANCH_KEY);
     }
 
-    public List<Branch> getBranches() {
-        return branches;
-    }
-
-    public void setBranches(List<Branch> branches) {
-        this.branches = branches;
+    public void setBranches(List<RefJson> refs) {
+        this.put(Constants.BRANCH_KEY, refs);
     }
 
 }

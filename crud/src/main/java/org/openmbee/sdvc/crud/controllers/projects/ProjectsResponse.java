@@ -4,20 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.controllers.Constants;
 
 public class ProjectsResponse extends BaseResponse {
 
-    private List<Project> projects = new ArrayList<>();
-
     public ProjectsResponse() {
+        this.put(Constants.PROJECT_KEY, new ArrayList<ProjectJson>());
+    }
+    public List<ProjectJson> getProjects() {
+        return (List<ProjectJson>) this.get(Constants.PROJECT_KEY);
     }
 
-    public List<Project> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(List<Project> projects) {
-        this.projects = projects;
+    public void setProjects(List<ProjectJson> projects) {
+        this.put(Constants.PROJECT_KEY, projects);
     }
 
 }

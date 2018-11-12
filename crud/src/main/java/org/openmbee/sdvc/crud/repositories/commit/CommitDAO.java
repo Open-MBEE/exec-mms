@@ -8,6 +8,8 @@ public interface CommitDAO {
 
     public Commit save(Commit commit);
 
+    public Commit findById(long id);
+
     public Commit findByCommitId(String commitId);
 
     public Commit findByTimestamp(Instant timestamp);

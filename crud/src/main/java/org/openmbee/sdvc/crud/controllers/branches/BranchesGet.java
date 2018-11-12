@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class BranchesGet extends BaseController {
 
     @GetMapping(value = {"", "/{refId}"})
-    public ResponseEntity<?> handleRequest(@PathVariable(required = false) String refId) {
+    public ResponseEntity<?> handleRequest(
+        @PathVariable String projectId,
+        @PathVariable(required = false) String refId) {
+
         if (refId != null) {
             logger.debug("RefId given: ", refId);
             return ResponseEntity.ok(refId);

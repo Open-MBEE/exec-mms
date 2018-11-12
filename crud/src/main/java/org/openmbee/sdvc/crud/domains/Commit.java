@@ -8,8 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Table(name = "commits")
@@ -24,9 +22,6 @@ public class Commit implements Serializable {
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 
-    @CreationTimestamp
-    @Column(name = "timestamp", nullable = false, updatable = false)
-    @CreatedDate
     private Instant timestamp;
 
     private String elasticId;

@@ -1,22 +1,16 @@
 package org.openmbee.sdvc.crud.controllers.orgs;
 
-import java.util.ArrayList;
 import java.util.List;
-import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.crud.controllers.BaseRequest;
 
 public class OrganizationsRequest extends BaseRequest {
 
-    private List<Organization> orgs = new ArrayList<>();
+    private List<OrgJson> orgs;
 
-    public OrganizationsRequest() {
-    }
-
-    public List<Organization> getOrgs() {
+    public List<OrgJson> getOrgs() {
         return orgs;
     }
-
-    public void setOrgs(List<Organization> orgs) {
+    public void setOrgs(List<OrgJson> orgs) {
         this.orgs = orgs;
     }
 

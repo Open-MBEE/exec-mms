@@ -7,6 +7,8 @@ public interface BranchDAO {
 
     public Branch save(Branch branch);
 
+    public Branch findById(long id);
+
     public Branch findByBranchId(String sysmlid);
 
     public List<Branch> findAll();

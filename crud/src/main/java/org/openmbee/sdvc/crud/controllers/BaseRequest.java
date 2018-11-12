@@ -1,9 +1,24 @@
 package org.openmbee.sdvc.crud.controllers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public abstract class BaseRequest {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    private String source;
+
+    private String comment;
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }
