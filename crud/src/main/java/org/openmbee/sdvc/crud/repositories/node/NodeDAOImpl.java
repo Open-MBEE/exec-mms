@@ -1,12 +1,9 @@
 package org.openmbee.sdvc.crud.repositories.node;
 
-import static org.openmbee.sdvc.crud.config.ContextObject.MASTER_BRANCH;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.PreparedStatementCreator;

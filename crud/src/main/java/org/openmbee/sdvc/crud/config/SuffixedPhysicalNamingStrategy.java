@@ -9,9 +9,8 @@ import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 public class SuffixedPhysicalNamingStrategy implements PhysicalNamingStrategy {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     public static final PhysicalNamingStrategyStandardImpl INSTANCE = new PhysicalNamingStrategyStandardImpl();
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     @Override
     public Identifier toPhysicalCatalogName(Identifier name, JdbcEnvironment jdbcEnvironment) {

@@ -1,7 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
 import java.util.List;
-
 import org.openmbee.sdvc.crud.controllers.BaseRequest;
 
 public class ProjectsRequest extends BaseRequest {
@@ -11,6 +10,7 @@ public class ProjectsRequest extends BaseRequest {
     public List<ProjectJson> getProjects() {
         return projects;
     }
+
     public void setProjects(List<ProjectJson> projects) {
         this.projects = projects;
     }

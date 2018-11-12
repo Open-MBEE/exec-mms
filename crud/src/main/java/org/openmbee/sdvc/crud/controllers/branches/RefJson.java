@@ -13,23 +13,41 @@ public class RefJson extends BaseJson {
         return (String) this.get(PARENT_REF_ID);
     }
 
-    public RefJson setParentRefId(String parentRefId) { this.put(PARENT_REF_ID, parentRefId); return this; }
+    public RefJson setParentRefId(String parentRefId) {
+        this.put(PARENT_REF_ID, parentRefId);
+        return this;
+    }
 
     public String getParentCommitId() {
         return (String) this.get(PARENT_COMMIT_ID);
     }
 
-    public RefJson setParentCommitId(int parentCommitId) { this.put(PARENT_COMMIT_ID, parentCommitId); return this; }
+    public RefJson setParentCommitId(int parentCommitId) {
+        this.put(PARENT_COMMIT_ID, parentCommitId);
+        return this;
+    }
 
-    public String getStatus() { return (String) this.get(STATUS); }
+    public String getStatus() {
+        return (String) this.get(STATUS);
+    }
 
-    public RefJson setStatus(String status) { this.put(STATUS, status); return this; }
+    public RefJson setStatus(String status) {
+        this.put(STATUS, status);
+        return this;
+    }
 
-    public String getType() { return (String) this.get(TYPE); }
+    public String getType() {
+        return (String) this.get(TYPE);
+    }
 
-    public RefJson setType(String type) { this.put(TYPE, type); return this; }
+    public RefJson setType(String type) {
+        this.put(TYPE, type);
+        return this;
+    }
 
-    public boolean isTag() { return "Tag".equals(getType()); }
+    public boolean isTag() {
+        return "Tag".equals(getType());
+    }
 
 
 }

@@ -10,6 +10,7 @@ public class BranchesRequest extends BaseRequest {
     public List<RefJson> getRefs() {
         return refs;
     }
+
     public void setRefs(List<RefJson> refs) {
         this.refs = refs;
     }

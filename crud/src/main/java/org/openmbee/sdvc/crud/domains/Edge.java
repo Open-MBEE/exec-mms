@@ -22,11 +22,11 @@ public class Edge {
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY,
-        cascade =  CascadeType.ALL)
+        cascade = CascadeType.ALL)
     private Node parent;
 
     @ManyToOne(fetch = FetchType.LAZY,
-        cascade =  CascadeType.ALL)
+        cascade = CascadeType.ALL)
     private Node child;
 
     @Column(columnDefinition = "smallint")

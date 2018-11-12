@@ -48,14 +48,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class DatabaseDefinitionService {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
     private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
-
+    protected final Logger logger = LogManager.getLogger(getClass());
     private EntityManager entityManager;
     private Map<String, DataSource> crudDataSources;
     private Environment env;
+
+    private static String substituteVariables(String template, Map<String, String> variables) {
+        StringBuffer buffer = new StringBuffer();
+        Matcher matcher = pattern.matcher(template);
+
+        while (matcher.find()) {
+            if (variables.containsKey(matcher.group(1))) {
+                String replacement = variables.get(matcher.group(1));
+                matcher.appendReplacement(buffer,
+                    replacement != null ? Matcher.quoteReplacement(replacement) : "null");
+            }
+        }
+        matcher.appendTail(buffer);
+        return buffer.toString();
+    }
 
     @Autowired
     public void setEnv(Environment env) {
@@ -250,20 +263,5 @@ public class DatabaseDefinitionService {
             "org.openmbee.sdvc.crud.config.SuffixedPhysicalNamingStrategy");
 
         return properties;
-    }
-
-    private static String substituteVariables(String template, Map<String, String> variables) {
-        StringBuffer buffer = new StringBuffer();
-        Matcher matcher = pattern.matcher(template);
-
-        while (matcher.find()) {
-            if (variables.containsKey(matcher.group(1))) {
-                String replacement = variables.get(matcher.group(1));
-                matcher.appendReplacement(buffer,
-                    replacement != null ? Matcher.quoteReplacement(replacement) : "null");
-            }
-        }
-        matcher.appendTail(buffer);
-        return buffer.toString();
     }
 }

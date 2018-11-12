@@ -1,10 +1,9 @@
 package org.openmbee.sdvc.crud.repositories;
 
-import org.openmbee.sdvc.crud.config.DbContextHolder;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.openmbee.sdvc.crud.config.DbContextHolder;
 
 public abstract class BaseElasticDAOImpl implements BaseElasticDAO {
 

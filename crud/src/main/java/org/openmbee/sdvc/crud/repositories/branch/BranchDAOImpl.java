@@ -4,13 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.repositories.commit.CommitDAOImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -68,7 +66,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
             return null;
         }
         branch.setId(keyHolder.getKey().longValue());
-        return branch;//findById(keyHolder.getKey().longValue());
+        return branch;
     }
 
     @SuppressWarnings({"unchecked"})

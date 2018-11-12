@@ -1,9 +1,6 @@
 package org.openmbee.sdvc.crud.repositories.edge;
 
-import static org.openmbee.sdvc.crud.config.ContextObject.MASTER_BRANCH;
-
 import java.util.List;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.domains.Edge;
 import org.openmbee.sdvc.crud.domains.EdgeType;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;

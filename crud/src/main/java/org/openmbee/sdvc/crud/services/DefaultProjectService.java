@@ -14,10 +14,9 @@ import org.springframework.stereotype.Service;
 @Service("defaultProjectService")
 public class DefaultProjectService implements ProjectService {
 
+    protected final Logger logger = LogManager.getLogger(getClass());
     protected ProjectRepository projectRepository;
     protected DatabaseDefinitionService projectOperations;
-
-    protected final Logger logger = LogManager.getLogger(getClass());
 
     @Autowired
     public void setProjectRepository(ProjectRepository projectRepository) {

@@ -16,13 +16,14 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl extends
     private Map<String, DataSource> crudDataSources;
 
     @Autowired
-    public void setCrudDataSources(@Qualifier("crudDataSources") Map<String, DataSource> crudDataSources) {
+    public void setCrudDataSources(
+        @Qualifier("crudDataSources") Map<String, DataSource> crudDataSources) {
         this.crudDataSources = crudDataSources;
     }
 
     @Override
     protected DataSource selectAnyDataSource() {
-        return this.crudDataSources.values().iterator().next();
+        return this.crudDataSources.get(DbContextHolder.getContext().getKey());
     }
 
     @Override

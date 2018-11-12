@@ -1,7 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.time.Instant;
-
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
@@ -30,7 +29,8 @@ public class BranchesPost extends BaseController {
     private CommitDAO commitRepository;
 
     @Autowired
-    public BranchesPost(BranchDAO branchRepository, DatabaseDefinitionService branchesOperations, CommitDAO commitRepository) {
+    public BranchesPost(BranchDAO branchRepository, DatabaseDefinitionService branchesOperations,
+        CommitDAO commitRepository) {
         this.branchRepository = branchRepository;
         this.branchesOperations = branchesOperations;
         this.commitRepository = commitRepository;
@@ -62,7 +62,8 @@ public class BranchesPost extends BaseController {
                 }
 
                 if (branch.getParentCommitId() != null) {
-                    Commit parentCommit = commitRepository.findByCommitId(branch.getParentCommitId());
+                    Commit parentCommit = commitRepository
+                        .findByCommitId(branch.getParentCommitId());
                     b.setParentCommit(parentCommit);
                 } else {
                     b.setParentCommit(commitRepository.findLatest());
