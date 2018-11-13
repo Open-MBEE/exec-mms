@@ -16,9 +16,7 @@ public class Commit implements Serializable {
     private static final long serialVersionUID = -1904568893497416476L;
 
     @Id
-    @GeneratedValue(
-        strategy = GenerationType.IDENTITY
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 

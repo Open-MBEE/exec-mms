@@ -50,6 +50,7 @@ public class DatabaseDefinitionService {
 
     private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
     private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
+    private static final String COPY_IDX = "SELECT setval('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
     protected final Logger logger = LogManager.getLogger(getClass());
     private EntityManager entityManager;
     private Map<String, DataSource> crudDataSources;
@@ -237,8 +238,16 @@ public class DatabaseDefinitionService {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
             crudDataSources.get(DbContextHolder.getContext().getKey()));
+
+        jdbcTemplate.execute("BEGIN");
+
         jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
         jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
+
+        jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
+        jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
+
+        jdbcTemplate.execute("COMMIT");
     }
 
     private Map<String, Object> getSchemaProperties() {
