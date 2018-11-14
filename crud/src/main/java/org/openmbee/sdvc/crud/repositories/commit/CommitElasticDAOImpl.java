@@ -5,4 +5,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitElasticDAO {
+
 }

@@ -15,18 +15,16 @@ import javax.persistence.Table;
 public class Edge {
 
     @Id
-    @GeneratedValue(
-        strategy = GenerationType.IDENTITY
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY,
-        cascade =  CascadeType.ALL)
+        cascade = CascadeType.ALL)
     private Node parent;
 
     @ManyToOne(fetch = FetchType.LAZY,
-        cascade =  CascadeType.ALL)
+        cascade = CascadeType.ALL)
     private Node child;
 
     @Column(columnDefinition = "smallint")

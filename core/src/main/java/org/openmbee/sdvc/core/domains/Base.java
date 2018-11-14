@@ -23,7 +23,7 @@ public abstract class Base implements Serializable {
     private static final long serialVersionUID = 8389104517465359723L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     Long id;
 

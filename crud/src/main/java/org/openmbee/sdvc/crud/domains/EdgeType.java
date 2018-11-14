@@ -15,17 +15,17 @@ public enum EdgeType {
         this.id = id;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public static EdgeType getFromValue(int id) {
-        for (EdgeType edgeType: EdgeType.values()) {
+        for (EdgeType edgeType : EdgeType.values()) {
             if (edgeType.getId() == id) {
                 return edgeType;
             }
         }
 
         return null;
+    }
+
+    public int getId() {
+        return id;
     }
 }

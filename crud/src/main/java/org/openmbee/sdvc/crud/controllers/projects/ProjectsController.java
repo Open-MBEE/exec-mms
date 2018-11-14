@@ -7,7 +7,13 @@ import org.openmbee.sdvc.crud.services.ProjectService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects")
@@ -35,7 +41,8 @@ public class ProjectsController extends BaseController {
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody ProjectsRequest projectsPost) {
         if (!projectsPost.getProjects().isEmpty()) {
-            ProjectsResponse response = serviceFactory.getProjectService("sysml").post(projectsPost);
+            ProjectsResponse response = serviceFactory.getProjectService("sysml")
+                .post(projectsPost);
             return ResponseEntity.ok(response);
         }
         logger.debug("Bad Request");

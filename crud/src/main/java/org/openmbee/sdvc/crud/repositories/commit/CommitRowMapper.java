@@ -45,7 +45,8 @@ public class CommitRowMapper implements RowMapper {
 
             if (rs.getObject(colnum) instanceof Timestamp) {
                 beanMap.put(field, rs.getTimestamp(colnum).toInstant());
-            } else if (rs.getObject(colnum) instanceof Integer && field.equalsIgnoreCase("commitType")) {
+            } else if (rs.getObject(colnum) instanceof Integer && field
+                .equalsIgnoreCase("commitType")) {
                 beanMap.put(field, CommitType.getFromValue(rs.getInt(colnum)));
             } else {
                 beanMap.put(field, rs.getObject(colnum));

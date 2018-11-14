@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.controllers;
 
 public class Constants {
+
     public static final String ORGANIZATION_KEY = "orgs";
     public static final String PROJECT_KEY = "projects";
     public static final String BRANCH_KEY = "refs";

@@ -48,14 +48,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class DatabaseDefinitionService {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
     private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
-
+    private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
+    protected final Logger logger = LogManager.getLogger(getClass());
     private EntityManager entityManager;
     private Map<String, DataSource> crudDataSources;
     private Environment env;
+
+    private static String substituteVariables(String template, Map<String, String> variables) {
+        StringBuffer buffer = new StringBuffer();
+        Matcher matcher = pattern.matcher(template);
+
+        while (matcher.find()) {
+            if (variables.containsKey(matcher.group(1))) {
+                String replacement = variables.get(matcher.group(1));
+                matcher.appendReplacement(buffer,
+                    replacement != null ? Matcher.quoteReplacement(replacement) : "null");
+            }
+        }
+        matcher.appendTail(buffer);
+        return buffer.toString();
+    }
 
     @Autowired
     public void setEnv(Environment env) {
@@ -224,8 +238,16 @@ public class DatabaseDefinitionService {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
             crudDataSources.get(DbContextHolder.getContext().getKey()));
+
+        jdbcTemplate.execute("BEGIN");
+
         jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
         jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
+
+        jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
+        jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
+
+        jdbcTemplate.execute("COMMIT");
     }
 
     private Map<String, Object> getSchemaProperties() {
@@ -250,20 +272,5 @@ public class DatabaseDefinitionService {
             "org.openmbee.sdvc.crud.config.SuffixedPhysicalNamingStrategy");
 
         return properties;
-    }
-
-    private static String substituteVariables(String template, Map<String, String> variables) {
-        StringBuffer buffer = new StringBuffer();
-        Matcher matcher = pattern.matcher(template);
-
-        while (matcher.find()) {
-            if (variables.containsKey(matcher.group(1))) {
-                String replacement = variables.get(matcher.group(1));
-                matcher.appendReplacement(buffer,
-                    replacement != null ? Matcher.quoteReplacement(replacement) : "null");
-            }
-        }
-        matcher.appendTail(buffer);
-        return buffer.toString();
     }
 }

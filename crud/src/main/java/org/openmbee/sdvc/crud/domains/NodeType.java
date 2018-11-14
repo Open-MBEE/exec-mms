@@ -28,10 +28,6 @@ public enum NodeType {
         this.id = id;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public static NodeType getNodeType(int id) {
         for (NodeType nodeType : values()) {
             if (nodeType.getId() == id) {
@@ -39,5 +35,9 @@ public enum NodeType {
             }
         }
         return null;
+    }
+
+    public int getId() {
+        return id;
     }
 }

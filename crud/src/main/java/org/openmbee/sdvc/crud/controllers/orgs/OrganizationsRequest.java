@@ -10,6 +10,7 @@ public class OrganizationsRequest extends BaseRequest {
     public List<OrgJson> getOrgs() {
         return orgs;
     }
+
     public void setOrgs(List<OrgJson> orgs) {
         this.orgs = orgs;
     }

@@ -1,8 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
-import org.openmbee.sdvc.crud.controllers.BaseRequest;
-
 import java.util.List;
+import org.openmbee.sdvc.crud.controllers.BaseRequest;
 
 public class ElementsRequest extends BaseRequest {
 
