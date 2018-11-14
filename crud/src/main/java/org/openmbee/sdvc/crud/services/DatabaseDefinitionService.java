@@ -50,7 +50,7 @@ public class DatabaseDefinitionService {
 
     private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
     private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
-    private static final String COPY_IDX = "SELECT setval('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
+    private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
     protected final Logger logger = LogManager.getLogger(getClass());
     private EntityManager entityManager;
     private Map<String, DataSource> crudDataSources;
