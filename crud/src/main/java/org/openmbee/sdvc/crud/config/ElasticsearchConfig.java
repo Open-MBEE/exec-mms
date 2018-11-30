@@ -14,12 +14,16 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.RestClient;
 
 
-@Configuration public class ElasticsearchConfig {
+@Configuration
+public class ElasticsearchConfig {
 
-    @Value("${elasticsearch.host}") private String elasticsearchHost;
+    @Value("${elasticsearch.host}")
+    private String elasticsearchHost;
 
-    @Bean(destroyMethod = "close") public RestHighLevelClient restClient() {
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost(elasticsearchHost)));
+    @Bean(destroyMethod = "close")
+    public RestHighLevelClient restClient() {
+        RestHighLevelClient client = new RestHighLevelClient(
+            RestClient.builder(new HttpHost(elasticsearchHost)));
         // :TODO can pass other params to config here, like loading the schema..to be over thought later
         return client;
     }

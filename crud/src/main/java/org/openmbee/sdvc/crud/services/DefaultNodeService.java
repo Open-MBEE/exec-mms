@@ -26,6 +26,7 @@ public class DefaultNodeService implements NodeService {
 
     protected NodeDAO nodeRepository;
     protected CommitDAO commitRepository;
+    protected CommitElasticDAO commitElacticRepository;
     protected NodeElasticDAO nodeElasticRepository;
 
     @Autowired
@@ -89,6 +90,7 @@ public class DefaultNodeService implements NodeService {
         commit.setTimestamp(Instant.now());
 
         this.commitRepository.save(commit);
+        this.commitElacticRepository.save();
         return response;
     }
 
