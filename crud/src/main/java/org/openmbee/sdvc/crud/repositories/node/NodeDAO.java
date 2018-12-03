@@ -9,6 +9,10 @@ public interface NodeDAO {
 
     public List<Node> saveAll(List<Node> nodes);
 
+    public List<Node> insertAll(List<Node> nodes);
+
+    public List<Node> updateAll(List<Node> nodes);
+
     public Node findById(long id);
 
     public Node findBySysmlId(String sysmlid);
