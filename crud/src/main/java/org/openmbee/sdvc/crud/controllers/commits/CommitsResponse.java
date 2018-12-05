@@ -15,7 +15,7 @@ public class CommitsResponse extends BaseResponse {
         return (List<CommitJson>) this.get(Constants.COMMIT_KEY);
     }
 
-    public void setElements(List<CommitJson> commits) {
+    public void setCommits(List<CommitJson> commits) {
         this.put(Constants.COMMIT_KEY, commits);
     }
 

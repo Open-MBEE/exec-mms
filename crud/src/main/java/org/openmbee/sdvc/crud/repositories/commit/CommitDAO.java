@@ -12,9 +12,12 @@ public interface CommitDAO {
 
     public Commit findByCommitId(String commitId);
 
-    public Commit findByTimestamp(Instant timestamp);
+    public Commit findByRefAndTimestamp(String refId, Instant timestamp);
 
-    public Commit findLatest();
+    public Commit findLatestByRef(String refId);
 
     public List<Commit> findAll();
+
+    public List<Commit> findByRefAndTimestampAndLimit(String refId, Instant timestamp, int limit);
+
 }
