@@ -55,18 +55,18 @@ public class BranchesPost extends BaseController {
                 logger.info("Saving branch: {}", branch.getId());
 
                 if (branch.getParentRefId() != null) {
-                    Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
-                    b.setParentRef(parentRef);
+                    //Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
+                    b.setParentRefId(branch.getParentRefId());
                 } else {
-                    b.setParentRef(branchRepository.findByBranchId("master"));
+                    b.setParentRefId("master");
                 }
 
                 if (branch.getParentCommitId() != null) {
                     Commit parentCommit = commitRepository
                         .findByCommitId(branch.getParentCommitId());
-                    b.setParentCommit(parentCommit);
+                    b.setParentCommit(parentCommit.getId());
                 } else {
-                    b.setParentCommit(commitRepository.findLatest());
+                    b.setParentCommit(commitRepository.findLatestByRef(b.getParentRefId()).getId());
                 }
 
                 b.setTimestamp(now);
@@ -76,7 +76,7 @@ public class BranchesPost extends BaseController {
                     DbContextHolder.setContext(projectId, saved.getBranchId());
                     if (branchesOperations.createBranch()) {
                         branchesOperations.copyTablesFromParent(saved.getBranchId(),
-                            b.getParentRef().getBranchId(), branch.getParentCommitId());
+                            b.getParentRefId(), branch.getParentCommitId());
                     }
                     response.getBranches().add(branch);
                 } catch (Exception e) {

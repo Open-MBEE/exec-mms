@@ -17,17 +17,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
-
+/*
     private CommitDAO commitRepository;
 
     @Autowired
     public void setCommitRepository(CommitDAO commitRepository) {
         this.commitRepository = commitRepository;
     }
-
+*/
     public Branch save(Branch branch) {
-        String sql = "INSERT INTO branches (elasticId, branchId, branchName, parent, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
+        String sql = "INSERT INTO branches (elasticId, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+/*
         if (branch.getParentRefId() != null && branch.getParentRef() == null) {
             Branch parentRef = findByBranchId(branch.getParentRefId());
             branch.setParentRef(parentRef);
@@ -43,7 +43,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
             Commit latest = commitRepository.findLatest();
             branch.setParentCommit(latest);
         }
-
+*/
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         getConnection().update(new PreparedStatementCreator() {
@@ -53,8 +53,8 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
                 ps.setString(1, branch.getElasticId());
                 ps.setString(2, branch.getBranchId());
                 ps.setString(3, branch.getBranchName());
-                ps.setLong(4, branch.getParentRef().getId());
-                ps.setLong(5, branch.getParentCommit().getId());
+                ps.setString(4, branch.getParentRefId());
+                ps.setLong(5, branch.getParentCommit());
                 ps.setTimestamp(6, Timestamp.from(branch.getTimestamp()));
                 ps.setBoolean(7, branch.isTag());
                 ps.setBoolean(8, branch.isDeleted());
