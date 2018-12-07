@@ -30,3 +30,6 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL94Dialec
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
 spring.jpa.open-in-view=false
+
+#Configuration for Elasticsearch
+elasticsearch.host=localhost:9200

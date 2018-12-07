@@ -35,8 +35,7 @@ public class DefaultNodeService implements NodeService {
     protected NodeElasticDAO nodeElasticRepository;
     //to save to this use base json classes
     protected CommitElasticDAO commitElasticRepository;
-
-
+    
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
         this.nodeRepository = nodeRepository;
@@ -142,7 +141,6 @@ public class DefaultNodeService implements NodeService {
 //            this.commitElasticRepository.save(cmjs);
         }
         response.put("rejected", rejectedList);
-
         return response;
     }
 
