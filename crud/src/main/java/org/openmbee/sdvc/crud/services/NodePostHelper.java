@@ -10,20 +10,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseJson;
-import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.controllers.commits.CommitJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.domains.NodeType;
-import org.openmbee.sdvc.crud.repositories.node.NodeElasticDAO;
 
 public class NodePostHelper {
+
     protected static final Logger logger = LogManager.getLogger(NodePostHelper.class);
     public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
@@ -52,9 +50,12 @@ public class NodePostHelper {
     }
 
     // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
-    public static List<Node> processPostJson(List<ElementJson> elements, Map<String, Object> elasticNodeMap,
-        Set<String> elasticIds,  List<Map<String, Object>> rejectedList, boolean overwriteJson, Instant now,
-        List<Map<String, Object>> commitAdded, List<Map<String, Object>> commitUpdated, List<Map<String, Object>> commitDeleted,
+    public static List<Node> processPostJson(List<ElementJson> elements,
+        Map<String, Object> elasticNodeMap,
+        Set<String> elasticIds, List<Map<String, Object>> rejectedList, boolean overwriteJson,
+        Instant now,
+        List<Map<String, Object>> commitAdded, List<Map<String, Object>> commitUpdated,
+        List<Map<String, Object>> commitDeleted,
         String commitId, ElementsResponse response, Map<String, Object> exisitingNodeMap) {
 
         List<Node> toSave = new ArrayList<>();
@@ -65,7 +66,7 @@ public class NodePostHelper {
             boolean added;
             if (elasticElement == null) {
                 added = true;
-            } else{
+            } else {
                 added = !elasticIds.contains(elasticElement.getElasticId());
             }
             boolean updated = false;
@@ -143,22 +144,13 @@ public class NodePostHelper {
         return toSave;
     }
 
-    public static boolean isUpdated(BaseJson element, Map<String, Object> existing, Map<String, Object> rejection) {
+    public static boolean isUpdated(BaseJson element, Map<String, Object> existing,
+        Map<String, Object> rejection) {
         if (existing == null) {
             return false;
         }
 
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("New Element: " + element);
-//            logger.debug("Old Element: " + existing);
-//        }
-
-//        Map<String, Object> newElement = toMap(element);
-//        Map<String, Object> oldElement = toMap(existing);
-
-//        boolean equiv = isEquivalent(newElement, oldElement);
         boolean equiv = isEquivalent(element, existing);
-//
         if (equiv) {
             rejection.put("message", "Is Equivalent");
             rejection.put("code", 304);
@@ -166,11 +158,13 @@ public class NodePostHelper {
         }
 
         return !equiv;
-//        return true;
     }
 
     private static boolean isEquivalent(Map<String, Object> map1, Map<String, Object> map2) {
         for (Map.Entry<String, Object> entry : map1.entrySet()) {
+            if (!map2.containsKey(entry.getKey())) {
+                return false;
+            }
             Object value1 = entry.getValue();
             Object value2 = map2.get(entry.getKey());
             if (logger.isDebugEnabled()) {
@@ -179,6 +173,9 @@ public class NodePostHelper {
             }
             if (value1 == null && value2 != null) {
                 return false;
+            }
+            if (value1 == value2) {
+                continue;
             }
             if (value1 instanceof Map) {
                 if (!(value2 instanceof Map)) {
@@ -197,7 +194,8 @@ public class NodePostHelper {
                     return false;
                 } else {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Is Equivalent: " + isEquivalent((List<Object>) value1, (List<Object>) value2));
+                        logger.debug("Is Equivalent: " + isEquivalent((List<Object>) value1,
+                            (List<Object>) value2));
                     }
                     if (!isEquivalent((List<Object>) value1, (List<Object>) value2)) {
                         return false;
@@ -211,7 +209,6 @@ public class NodePostHelper {
                     return false;
                 }
             }
-//            only need to chceck value 1 to make sure it's not null - otherwise combine last 4 into one
         }
 
         return true;
@@ -237,7 +234,8 @@ public class NodePostHelper {
         return true;
     }
 
-    public static boolean diffUpdateJson(BaseJson element, Map<String, Object> existing, Map<String, Object> rejection) {
+    public static boolean diffUpdateJson(BaseJson element, Map<String, Object> existing,
+        Map<String, Object> rejection) {
         if (!element.getId().isEmpty() && existing.containsKey(BaseJson.ID)) {
             String jsonModified = element.getModified();
             Object existingModified = existing.get(BaseJson.MODIFIED);

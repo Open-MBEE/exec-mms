@@ -1,22 +1,16 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
-import org.openmbee.sdvc.crud.controllers.BaseJson;
-import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.controllers.commits.CommitJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
@@ -24,7 +18,6 @@ import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.domains.CommitType;
 import org.openmbee.sdvc.crud.domains.Node;
-import org.openmbee.sdvc.crud.domains.NodeType;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitElasticDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
@@ -114,11 +107,14 @@ public class DefaultNodeService implements NodeService {
             exisitingNodeMap.put(node.getSysmlId(), node);
         }
         // bulk get existing elements in elastic
-        List<Map<String, Object>> existingElasticNodes = nodeElasticRepository.findByElasticIds(elasticIds);
+        List<Map<String, Object>> existingElasticNodes = nodeElasticRepository
+            .findByElasticIds(elasticIds);
         Map<String, Object> elasticNodeMap = NodePostHelper.convertListToMap(existingElasticNodes);
         List<Map<String, Object>> rejectedList = new ArrayList<>();
-        List<Node> toSave = NodePostHelper.processPostJson(req.getElements(), elasticNodeMap, elasticIds, rejectedList,
-            overwriteJson, now, commitAdded, commitUpdated, commitDeleted, commitId, response, exisitingNodeMap);
+        List<Node> toSave = NodePostHelper
+            .processPostJson(req.getElements(), elasticNodeMap, elasticIds, rejectedList,
+                overwriteJson, now, commitAdded, commitUpdated, commitDeleted, commitId, response,
+                exisitingNodeMap);
 
         if (toSave.isEmpty()) {
             this.nodeRepository.saveAll(toSave);
@@ -149,9 +145,6 @@ public class DefaultNodeService implements NodeService {
 
         return response;
     }
-
-
-
 
 
 }
