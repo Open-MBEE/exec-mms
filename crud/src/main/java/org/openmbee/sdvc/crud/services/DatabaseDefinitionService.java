@@ -51,6 +51,72 @@ public class DatabaseDefinitionService {
     private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
     private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
     private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
+
+    private static final String GET_CHILDREN = "CREATE OR REPLACE FUNCTION get_children(integer, integer, text, integer)\n"
+        + " RETURNS TABLE(id bigint)\n"
+        + "AS $$\n"
+        + "  begin\n"
+        + "    return query\n"
+        + "    execute '\n"
+        + "    with recursive children(depth, nid, path, cycle, deleted) as (\n"
+        + "      select 0 as depth, node.id, ARRAY[node.id], false, node.deleted from ' || format('nodes%s', $3) || '\n"
+        + "        node where node.id = ' || $1 || ' union\n"
+        + "      select (c.depth + 1) as depth, edge.child as nid, path || cast(edge.child as bigint) as path, edge.child = ANY(path) as cycle, node.deleted as deleted\n"
+        + "        from ' || format('edges%s', $3) || ' edge, children c, ' || format('nodes%s', $3) || ' node where edge.parent = nid and node.id = edge.child and node.deleted = false and\n"
+        + "        edge.edgeType = ' || $2 || ' and not cycle and depth < ' || $4 || '\n"
+        + "      )\n"
+        + "      select distinct nid from children;';\n"
+        + "  end;\n"
+        + "$$ LANGUAGE plpgsql;";
+
+    private static final String GET_PARENTS = "CREATE OR REPLACE FUNCTION get_parents(integer, integer, text)\n"
+        + " RETURNS TABLE(id bigint, height integer, root boolean)\n"
+        + "AS $$\n"
+        + "  begin\n"
+        + "    return query\n"
+        + "    execute '\n"
+        + "    with recursive parents(height, nid, path, cycle) as (\n"
+        + "    select 0, node.id, ARRAY[node.id], false from ' || format('nodes%s', $3) || ' node where node.id = ' || $1 || '\n"
+        + "    union\n"
+        + "      select (c.height + 1), edge.parent, path || cast(edge.parent as bigint),\n"
+        + "        edge.parent = ANY(path) from ' || format('edges%s', $3) || '\n"
+        + "        edge, parents c where edge.child = nid and edge.edgeType = ' || $2 || '\n"
+        + "        and not cycle\n"
+        + "      )\n"
+        + "      select nid,height,(not exists (select true from edges where child = nid and edgetype = ' || $2 || '))\n"
+        + "        from parents order by height desc;';\n"
+        + "  end;\n"
+        + "$$ LANGUAGE plpgsql;";
+
+    private static final String GET_DOC_GROUPS = "CREATE OR REPLACE FUNCTION get_group_docs(integer, integer, text, integer, integer, integer)\n"
+        + " RETURNS TABLE(id bigint)\n"
+        + "AS $$\n"
+        + "  begin\n"
+        + "    return query\n"
+        + "    execute '\n"
+        + "    with recursive children(depth, nid, path, cycle, deleted, ntype) as (\n"
+        + "      select 0 as depth, node.id, ARRAY[node.id], false, node.deleted, node.nodetype from ' || format('nodes%s', $3) || '\n"
+        + "        node where node.id = ' || $1 || '  union\n"
+        + "      select (c.depth + 1) as depth, edge.child as nid, path || cast(edge.child as bigint) as path, edge.child = ANY(path) as cycle, node.deleted as deleted, node.nodetype as ntype\n"
+        + "        from ' || format('edges%s', $3) || ' edge, children c, ' || format('nodes%s', $3) || ' node where edge.parent = nid and node.id = edge.child and node.deleted = false and\n"
+        + "        edge.edgeType = ' || $2 || ' and not cycle and depth < ' || $4 || ' and (node.nodetype <> '|| $5 ||' or nid = ' || $1 || ')\n"
+        + "      )\n"
+        + "      select distinct nid from children where ntype = ' || $6 || ';';\n"
+        + "  end;\n"
+        + "$$ LANGUAGE plpgsql;";
+
+    private static final String GET_IMMEDIATE_PARENTS = "CREATE OR REPLACE FUNCTION get_immediate_parents(integer, integer, text)\n"
+        + " RETURNS TABLE(sysmlid text, elasticid text)\n"
+        + "AS $$\n"
+        + "  begin\n"
+        + "    return query\n"
+        + "    execute '\n"
+        + "    select sysmlid, elasticid from nodes' || $3 || ' where id in\n"
+        + "      (select id from get_parents(' || $1 || ',' || $2 || ',''' || format('%s',$3) ||\n"
+        + "      ''') where height = 1);';\n"
+        + "  end;\n"
+        + "$$ LANGUAGE plpgsql;";
+
     protected final Logger logger = LogManager.getLogger(getClass());
     private EntityManager entityManager;
     private Map<String, DataSource> crudDataSources;
@@ -96,8 +162,16 @@ public class DatabaseDefinitionService {
         try {
             jdbcTemplate.execute(queryString);
             created.add("Created Database");
+
             generateProjectSchemaFromModels(project);
             created.add("Created Tables");
+
+            jdbcTemplate = new JdbcTemplate(crudDataSources.get(project.getProjectId()));
+            jdbcTemplate.execute(GET_CHILDREN);
+            jdbcTemplate.execute(GET_PARENTS);
+            jdbcTemplate.execute(GET_IMMEDIATE_PARENTS);
+            jdbcTemplate.execute(GET_DOC_GROUPS);
+
         } catch (DataAccessException e) {
             if (e.getCause().getLocalizedMessage().toLowerCase().contains("exists")) {
                 generateProjectSchemaFromModels(project);
@@ -192,6 +266,7 @@ public class DatabaseDefinitionService {
 
             ResourceDatabasePopulator populator = new ResourceDatabasePopulator(schemaResource,
                 new ByteArrayResource(projectData.getBytes()));
+
             populator.execute(ds);
         } catch (IOException e) {
 

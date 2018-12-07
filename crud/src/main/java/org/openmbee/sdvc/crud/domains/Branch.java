@@ -6,10 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "branches")
@@ -24,19 +21,8 @@ public class Branch {
     private String branchId;
     private String branchName;
 
-    @ManyToOne
-    @JoinColumn(name = "parent")
-    private Branch parentRef;
-
-    @Transient
     private String parentRefId;
-
-    @ManyToOne
-    @JoinColumn(name = "parentCommit")
-    private Commit parentCommit;
-
-    @Transient
-    private String parentCommitId;
+    private Long parentCommit;
 
     private Instant timestamp;
 
@@ -47,12 +33,12 @@ public class Branch {
 
     }
 
-    public Branch(String elasticId, String branchId, String branchName, Branch parentRef,
-        Commit parentCommit, Instant timestamp, boolean tag, boolean deleted) {
+    public Branch(String elasticId, String branchId, String branchName, String parentRef,
+        Long parentCommit, Instant timestamp, boolean tag, boolean deleted) {
         setElasticId(elasticId);
         setBranchId(branchId);
         setBranchName(branchName);
-        setParentRef(parentRef);
+        setParentRefId(parentRef);
         setParentCommit(parentCommit);
         setTimestamp(timestamp);
         setTag(tag);
@@ -91,22 +77,6 @@ public class Branch {
         this.branchName = branchName;
     }
 
-    public Branch getParentRef() {
-        return parentRef;
-    }
-
-    public void setParentRef(Branch parentRef) {
-        this.parentRef = parentRef;
-    }
-
-    public Commit getParentCommit() {
-        return parentCommit;
-    }
-
-    public void setParentCommit(Commit parentCommit) {
-        this.parentCommit = parentCommit;
-    }
-
     public Instant getTimestamp() {
         return timestamp;
     }
@@ -139,11 +109,11 @@ public class Branch {
         this.parentRefId = parentRefId;
     }
 
-    public String getParentCommitId() {
-        return parentCommitId;
+    public Long getParentCommit() {
+        return parentCommit;
     }
 
-    public void setParentCommitId(String parentCommitId) {
-        this.parentCommitId = parentCommitId;
+    public void setParentCommit(Long parentCommit) {
+        this.parentCommit = parentCommit;
     }
 }
