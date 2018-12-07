@@ -14,6 +14,7 @@ import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.domains.CommitType;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
+import org.openmbee.sdvc.crud.repositories.commit.CommitElasticDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeElasticDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class DefaultNodeService implements NodeService {
 
     protected NodeDAO nodeRepository;
     protected CommitDAO commitRepository;
-    protected CommitElasticDAO commitElacticRepository;
+    protected CommitElasticDAO commitElasticRepository;
     protected NodeElasticDAO nodeElasticRepository;
 
     @Autowired
@@ -90,7 +91,7 @@ public class DefaultNodeService implements NodeService {
         commit.setTimestamp(Instant.now());
 
         this.commitRepository.save(commit);
-        this.commitElacticRepository.save();
+        //this.commitElasticRepository.save();
         return response;
     }
 
