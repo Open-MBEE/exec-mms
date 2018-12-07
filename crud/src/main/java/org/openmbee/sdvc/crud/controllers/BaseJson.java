@@ -13,6 +13,8 @@ public class BaseJson extends HashMap<String, Object> {
     public static final String MODIFIED = "_modified";
     public static final String CREATOR = "_creator";
     public static final String CREATED = "_created";
+    public static final String COMMITID = "_commitId";
+
 
     public String getId() {
         return (String) this.get(ID);
@@ -68,6 +70,15 @@ public class BaseJson extends HashMap<String, Object> {
         return this;
     }
 
+    public String getModified() {
+        return (String) this.get(MODIFIED);
+    }
+
+    public BaseJson setModified(String modified) {
+        this.put(MODIFIED, modified);
+        return this;
+    }
+
     public String getCreator() {
         return (String) this.get(CREATOR);
     }
@@ -86,12 +97,12 @@ public class BaseJson extends HashMap<String, Object> {
         return this;
     }
 
-    public String getModified() {
-        return (String) this.get(MODIFIED);
+    public String getCommitId() {
+        return(String) this.get(COMMITID);
     }
 
-    public BaseJson setModified(String modified) {
-        this.put(MODIFIED, modified);
+    public BaseJson setCommitId(String commitId) {
+        this.put(COMMITID, commitId);
         return this;
     }
 }

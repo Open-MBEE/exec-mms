@@ -43,7 +43,6 @@ public class DefaultNodeService implements NodeService {
     //to save to this use base json classes
     protected CommitElasticDAO commitElasticRepository;
 
-    public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -117,198 +116,42 @@ public class DefaultNodeService implements NodeService {
         // bulk get existing elements in elastic
         List<Map<String, Object>> existingElasticNodes = nodeElasticRepository.findByElasticIds(elasticIds);
         Map<String, Object> elasticNodeMap = NodePostHelper.convertListToMap(existingElasticNodes);
+        List<Map<String, Object>> rejectedList = new ArrayList<>();
+        List<Node> toSave = NodePostHelper.processPostJson(req.getElements(), elasticNodeMap, elasticIds, rejectedList,
+            overwriteJson, now, commitAdded, commitUpdated, commitDeleted, commitId, response, exisitingNodeMap);
 
-        // Logic for update/add
-        for (ElementJson element : req.getElements()) {
+        if (toSave.isEmpty()) {
+            this.nodeRepository.saveAll(toSave);
 
-            BaseJson elasticElement = (BaseJson) elasticNodeMap.get(element.getId());
-            boolean added;
-            if (elasticElement == null) {
-                added = true;
-            } else{
-                added = !elasticIds.contains(elasticElement.getElasticId());
-            }
-            boolean updated = false;
-            Map<Integer, String> rejected = new HashMap<>();
-            if (!added) {
+//            DB Commit
+            Commit commit = new Commit();
+            commit.setBranchId(DbContextHolder.getContext().getBranchId());
+            commit.setCommitType(CommitType.COMMIT);
+            commit.setCreator("admin");
+            commit.setElasticId(commitId);
+            commit.setTimestamp(now);
 
-                // Check the overwrite flag - True = do not merge
-                if (!overwriteJson) {
-// See if element exists
-//   check modified time is present in posted json and posted modified time < existing modified time, reject the posted element
-//   merge existing json with posted json
-//                    existingElasticNodes.indexOf(element.getId());
-                    if (NodePostHelper.isUpdated(element, elasticElement, rejected)) {
-                        updated = diffUpdateJson(element, elasticElement, rejected);
-                    }
-                } else {
-                    updated = true;
-                }
-            }
+            this.commitRepository.save(commit);
 
-// create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
-            element.setProjectId(DbContextHolder.getContext().getProjectId());
-            element.setRefId(DbContextHolder.getContext().getBranchId());
-            String elasticId = UUID.randomUUID().toString();
-            element.setElasticId(elasticId);
-//            element.setCommitId????
-//          Should match time on commit object and db table
-            element.setModified(now.toString());
-            element.setModifier("admin");
+//            Index Commit
+            cmjs.setCreator("admin");
+            cmjs.setComment("this is a commit");
+            cmjs.setAdded(commitAdded);
+            cmjs.setDeleted(commitDeleted);
+            cmjs.setUpdated(commitUpdated);
+            cmjs.setSource(source);
+            cmjs.setElasticId(commitId);
+            cmjs.setId(commitId);
 
-            if (added) {
-                logger.debug("ELEMENT ADDED!");
-
-                element.setCreator("coolkid"); //Only set on creation of new element
-                element.setCreated(now.toString());
-//                addedElements.add(o);
-
-//                Commit object
-                Map<String, Object> newObj = new HashMap<>();
-                newObj.put(CommitJson.TYPE, NodeType.ELEMENT);
-                newObj.put(BaseJson.ELASTICID, elasticId); // FIXME correct id?
-                newObj.put(BaseJson.ID, element.getId());
-
-                commitAdded.add(newObj);
-//                newElements.add(o);
-                Node node = element.toNode();
-                node.setLastCommit(commitId);
-                node.setInitialCommit(elasticId);
-                node.setNodeType(NodeType.ELEMENT);
-                this.nodeRepository.save(node);
-                response.getElements().add(element);
-            } else if (updated) {
-                logger.debug("ELEMENT UPDATED!");
-
-//                Commit object
-                Map<String, Object> newObj = new HashMap<>();
-                newObj.put(CommitJson.PREVIOUS, elasticElement.getElasticId());
-                newObj.put(CommitJson.TYPE, NodeType.ELEMENT);
-                newObj.put(BaseJson.ELASTICID, elasticId);
-                newObj.put(BaseJson.ID, element.getId());
-                commitUpdated.add(newObj);
-
-                Node node = (Node) exisitingNodeMap.get(element.getId());
-                node.setElasticId(element.getElasticId());
-                node.setLastCommit(commitId);
-                node.setNodeType(NodeType.ELEMENT);
-                node.setDeleted(false);
-                this.nodeRepository.save(node);
-                response.getElements().add(element);
-            } else {
-                for (Map.Entry<Integer, String> message : rejected.entrySet()) {
-                    ErrorResponse errorPayload = new ErrorResponse();
-                    errorPayload.setCode(message.getKey());
-                    errorPayload.setError(message.getValue());
-//                    errorPayload.add("element", o);
-//                    errorPayload.addProperty("severity", Sjm.WARN);
-//                    rejectedElements.add(errorPayload);
-                }
-                logger.debug("ELEMENT REJECTED!");
-            }
+//            this.commitElasticRepository.save(cmjs);
         }
-
-//        response.put("addedElements", addedElements);
-//        response.put("updatedElements", updatedElements);
-//        response.put("newElements", newElements);
-//        response.put("deletedElements", deletedElements);
-//        response.put("rejectedElements", rejectedElements);
-
-//        TODO do not make a commit if nothing has been updated
-//        do we still want to push anything to commit table? i assume no
-        Commit commit = new Commit();
-        commit.setBranchId(DbContextHolder.getContext().getBranchId());
-        commit.setCommitType(CommitType.COMMIT);
-        commit.setCreator("admin");
-        commit.setElasticId(commitId);
-        commit.setTimestamp(now);
-
-        this.commitRepository.save(commit);
-
-        cmjs.setCreator("admin");
-        cmjs.setComment("this is a commit");
-        cmjs.setAdded(commitAdded);
-        cmjs.setDeleted(commitDeleted);
-        cmjs.setUpdated(commitUpdated);
-        cmjs.setSource(source);
-        cmjs.setElasticId(commitId);
-        cmjs.setId(commitId);
-
-//        this.commitElasticRepository.save(cmjs);
-
-        response.put("commit", cmjs);
+        response.put("rejected", rejectedList);
 
         return response;
     }
 
 
-    // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
-//    private Node processPostJson(List<ElementJson> elements, Map<String, Object> existingElt, Map<Integer, String> rejected) {
-//
-//
-//
-//    }
 
-    protected boolean isUpdated(BaseJson element, Map<String, Object> existing, Map<Integer, String> rejected) {
-        if (existing == null) {
-            return false;
-        }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("New Element: " + element);
-            logger.debug("Old Element: " + existing);
-        }
 
-//        Map<String, Object> newElement = toMap(element);
-//        Map<String, Object> oldElement = toMap(existing);
-
-//        boolean equiv = isEquivalent(newElement, oldElement);
-//
-//        if (equiv) {
-//            rejection.put(HttpServletResponse.SC_NOT_MODIFIED, "Is Equivalent");
-//        }
-//
-//        return !equiv;
-        return true;
-    }
-
-    private boolean diffUpdateJson(BaseJson element, Map<String, Object> existing, Map<Integer, String> rejection) {
-        if (!element.getId().isEmpty() && existing.containsKey(BaseJson.ID)) {
-            String jsonModified = element.getModified();
-            Object existingModified = existing.get(BaseJson.MODIFIED);
-            if (!jsonModified.isEmpty()) {
-                try {
-                    Date jsonModDate = df.parse(jsonModified);
-                    Date existingModDate = df.parse(existingModified.toString());
-                    if (jsonModDate.before(existingModDate)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Conflict Detected");
-                        }
-                        rejection.put(HttpServletResponse.SC_CONFLICT, "Conflict Detected");
-                        return false;
-                    }
-                } catch (ParseException e) {
-                    if (logger.isDebugEnabled()) {
-//                        logger.debug(String.format("%s", LogUtil.getStackTrace(e)));
-                    }
-                }
-            }
-            return mergeJson(element, existing);
-        }
-        return false;
-    }
-
-    private boolean mergeJson(BaseJson partial, Map<String, Object> original) {
-        if (original == null) {
-            return false;
-        }
-
-        for (Map.Entry<String, Object> entry : original.entrySet()) {
-            String attr = entry.getKey();
-            if (!partial.containsKey(attr)) {
-                partial.put(attr, original.get(attr));
-            }
-        }
-        return true;
-    }
 }
