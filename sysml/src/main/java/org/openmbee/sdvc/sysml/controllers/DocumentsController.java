@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.sysml.controllers;
 
-import org.openmbee.sdvc.sysml.services.SysmlNodeService;
+import org.openmbee.sdvc.sysml.services.CameoNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +11,10 @@ import java.util.Map;
 @RequestMapping("/projects/{projectId}/refs/{refId}/documents")
 public class DocumentsController {
 
-    private SysmlNodeService nodeService;
+    private CameoNodeService nodeService;
 
     @Autowired
-    public DocumentsController(SysmlNodeService nodeService) {
+    public DocumentsController(CameoNodeService nodeService) {
         this.nodeService = nodeService;
     }
 

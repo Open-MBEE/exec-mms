@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.crud.repositories;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +19,18 @@ public abstract class BaseElasticDAOImpl implements BaseElasticDAO {
     }
 
     public List<Map<String, Object>> findByElasticIds(Set<String> elasticIds) {
+        List<Map<String, Object>> maps = new ArrayList<>();
+        int i = 97;
+        for (String eid : elasticIds) {
+            BaseJson json = new BaseJson();
+            json.setElasticId(eid);
+            json.setModified("2018-12-08T01:25:00.117-0700");
+            json.setId(Character.toString((char) i));
+            json.setName(json.getId());
+            maps.add(json);
+            i++;
+        }
+        /*
         BaseJson baseJson = new BaseJson();
         baseJson.setId("testing");
         baseJson.setName("element1");
@@ -27,7 +39,15 @@ public abstract class BaseElasticDAOImpl implements BaseElasticDAO {
 
         List<Map<String, Object>> maps = new ArrayList<>();
         maps.add(baseJson);
-
+        */
         return maps;
+    }
+
+    public void indexAll(Collection<? extends Map> jsons) {
+
+    }
+
+    public void index(Map<String, Object> json) {
+
     }
 }

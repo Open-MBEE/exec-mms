@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,264 +17,250 @@ import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseJson;
 import org.openmbee.sdvc.crud.controllers.commits.CommitJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementJson;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.crud.domains.Edge;
+import org.openmbee.sdvc.crud.domains.EdgeType;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.domains.NodeType;
+import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
+import org.openmbee.sdvc.crud.repositories.node.NodeElasticDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NodePostHelper {
 
     protected static final Logger logger = LogManager.getLogger(NodePostHelper.class);
     public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    protected NodeDAO nodeRepository;
+    protected NodeElasticDAO nodeElasticRepository;
 
-    public static Map<String, Object> convertToMap(List<ElementJson> elements) {
-        Map<String, Object> result = new HashMap<>();
-        for (int i = 0; i < elements.size(); i++) {
-            ElementJson elem = elements.get(i);
-            if (!elem.getId().equals("")) {
-                result.put(elem.getId(), elem);
-            }
-        }
+    public static void processElementAdded(ElementJson e, Node n, CommitJson cmjs) {
+        processElementAddedOrUpdated(e, n, cmjs);
 
-        return result;
+        e.setCreator(cmjs.getCreator()); //Only set on creation of new element
+        e.setCreated(cmjs.getCreated());
+
+        Map<String, Object> newObj = new HashMap<>();
+        newObj.put(CommitJson.TYPE, "Element");
+        newObj.put(BaseJson.ELASTICID, e.getElasticId());
+        newObj.put(BaseJson.ID, e.getId());
+        cmjs.getAdded().add(newObj);
+
+        n.setSysmlId(e.getId());
+        n.setElasticId(e.getElasticId());
+        n.setLastCommit(cmjs.getId());
+        n.setInitialCommit(e.getElasticId());
+        n.setNodeType(NodeType.ELEMENT);
+        n.setDeleted(false);
     }
 
-    public static Map<String, Object> convertListToMap(List<Map<String, Object>> elements) {
-        Map<String, Object> result = new HashMap<>();
-        for (int i = 0; i < elements.size(); i++) {
-            BaseJson elem = (BaseJson) elements.get(i);
-            if (!elem.getId().equals("")) {
-                result.put(elem.getId(), elem);
-            }
-        }
+    public static void processElementUpdated(ElementJson e, Node n, CommitJson cmjs) {
+        processElementAddedOrUpdated(e, n, cmjs);
 
-        return result;
+        Map<String, Object> newObj = new HashMap<>();
+        newObj.put(CommitJson.PREVIOUS, n.getElasticId());
+        newObj.put(CommitJson.TYPE, "Element");
+        newObj.put(BaseJson.ELASTICID, e.getElasticId());
+        newObj.put(BaseJson.ID, e.getId());
+        cmjs.getUpdated().add(newObj);
+
+        n.setElasticId(e.getElasticId());
+        n.setLastCommit(cmjs.getId());
+        n.setNodeType(NodeType.ELEMENT);
+        n.setDeleted(false);
     }
 
-    // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
-    public static List<Node> processPostJson(List<ElementJson> elements,
-        Map<String, Object> elasticNodeMap,
-        Set<String> elasticIds, List<Map<String, Object>> rejectedList, boolean overwriteJson,
-        Instant now,
-        List<Map<String, Object>> commitAdded, List<Map<String, Object>> commitUpdated,
-        List<Map<String, Object>> commitDeleted,
-        String commitId, ElementsResponse response, Map<String, Object> exisitingNodeMap) {
+    public static void processElementDeleted(ElementJson e, Node n, CommitJson cmjs) {
+        Map<String, Object> newObj = new HashMap<>();
+        newObj.put(CommitJson.PREVIOUS, n.getElasticId());
+        newObj.put(CommitJson.TYPE, "Element");
+        newObj.put(BaseJson.ID, e.getId());
+        cmjs.getDeleted().add(newObj);
 
-        List<Node> toSave = new ArrayList<>();
-        // Logic for update/add
-        for (ElementJson element : elements) {
+        n.setDeleted(true);
+    }
 
-            BaseJson elasticElement = (BaseJson) elasticNodeMap.get(element.getId());
-            boolean added;
-            if (elasticElement == null) {
-                added = true;
-            } else {
-                added = !elasticIds.contains(elasticElement.getElasticId());
-            }
-            boolean updated = false;
-            Map<String, Object> rejected = new HashMap<>();
-            if (!added) {
-
-                // Check the overwrite flag - True = do not merge
-                if (!overwriteJson) {
-// See if element exists
-//   check modified time is present in posted json and posted modified time < existing modified time, reject the posted element
-//   merge existing json with posted json
-//                    existingElasticNodes.indexOf(element.getId());
-                    if (NodePostHelper.isUpdated(element, elasticElement, rejected)) {
-                        updated = NodePostHelper.diffUpdateJson(element, elasticElement, rejected);
-                    }
-                } else {
-                    updated = true;
-                }
-            }
-
-// create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
-            element.setProjectId(DbContextHolder.getContext().getProjectId());
-            element.setRefId(DbContextHolder.getContext().getBranchId());
-            String elasticId = UUID.randomUUID().toString();
-            element.setElasticId(elasticId);
-            element.setCommitId(commitId);
-//          Should match time on commit object and db table
-            element.setModified(now.toString());
-            element.setModifier("admin");
-
-            if (added) {
-                logger.debug("ELEMENT ADDED!");
-
-                element.setCreator("coolkid"); //Only set on creation of new element
-                element.setCreated(now.toString());
-
-//                Commit object
-                Map<String, Object> newObj = new HashMap<>();
-                newObj.put(CommitJson.TYPE, NodeType.ELEMENT);
-                newObj.put(BaseJson.ELASTICID, elasticId); // FIXME correct id?
-                newObj.put(BaseJson.ID, element.getId());
-
-                commitAdded.add(newObj);
-                Node node = new Node();
-                node.setSysmlId(element.getId());
-                node.setElasticId(elasticId);
-                node.setLastCommit(commitId);
-                node.setInitialCommit(elasticId);
-                node.setNodeType(NodeType.ELEMENT);
-                toSave.add(node);
-                response.getElements().add(element);
-            } else if (updated) {
-                logger.debug("ELEMENT UPDATED!");
-
-//                Commit object
-                Map<String, Object> newObj = new HashMap<>();
-                newObj.put(CommitJson.PREVIOUS, elasticElement.getElasticId());
-                newObj.put(CommitJson.TYPE, NodeType.ELEMENT);
-                newObj.put(BaseJson.ELASTICID, elasticId);
-                newObj.put(BaseJson.ID, element.getId());
-                commitUpdated.add(newObj);
-
-                Node node = (Node) exisitingNodeMap.get(element.getId());
-                node.setElasticId(element.getElasticId());
-                node.setLastCommit(commitId);
-                node.setNodeType(NodeType.ELEMENT);
-                node.setDeleted(false);
-                toSave.add(node);
-                response.getElements().add(element);
-            } else {
-                rejectedList.add(rejected);
-                logger.debug("ELEMENT REJECTED!");
-            }
-        }
-        return toSave;
+    public static void processElementAddedOrUpdated(ElementJson e, Node n, CommitJson cmjs) {
+        e.setProjectId(DbContextHolder.getContext().getProjectId());
+        e.setRefId(DbContextHolder.getContext().getBranchId());
+        String elasticId = UUID.randomUUID().toString();
+        e.setElasticId(elasticId);
+        e.setCommitId(cmjs.getId());
+        e.setModified(cmjs.getCreated());
+        e.setModifier(cmjs.getCreator());
     }
 
     public static boolean isUpdated(BaseJson element, Map<String, Object> existing,
         Map<String, Object> rejection) {
-        if (existing == null) {
-            return false;
-        }
 
-        boolean equiv = isEquivalent(element, existing);
+        boolean equiv = Helper.isEquivalent(element, existing);
         if (equiv) {
             rejection.put("message", "Is Equivalent");
             rejection.put("code", 304);
             rejection.put("element", element);
         }
-
         return !equiv;
-    }
-
-    private static boolean isEquivalent(Map<String, Object> map1, Map<String, Object> map2) {
-        for (Map.Entry<String, Object> entry : map1.entrySet()) {
-            if (!map2.containsKey(entry.getKey())) {
-                return false;
-            }
-            Object value1 = entry.getValue();
-            Object value2 = map2.get(entry.getKey());
-            if (logger.isDebugEnabled()) {
-                logger.debug("Value 1: " + value1);
-                logger.debug("Value 2: " + value2);
-            }
-            if (value1 == null && value2 != null) {
-                return false;
-            }
-            if (value1 == value2) {
-                continue;
-            }
-            if (value1 instanceof Map) {
-                if (!(value2 instanceof Map)) {
-                    return false;
-                } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Is Equivalent: " + isEquivalent((Map<String, Object>) value1,
-                            (Map<String, Object>) value2));
-                    }
-                    if (!isEquivalent((Map<String, Object>) value1, (Map<String, Object>) value2)) {
-                        return false;
-                    }
-                }
-            } else if (value1 instanceof List) {
-                if (!(value2 instanceof List)) {
-                    return false;
-                } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Is Equivalent: " + isEquivalent((List<Object>) value1,
-                            (List<Object>) value2));
-                    }
-                    if (!isEquivalent((List<Object>) value1, (List<Object>) value2)) {
-                        return false;
-                    }
-                }
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Is Equivalent: " + value1.equals(value2));
-                }
-                if (!value1.equals(value2)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean isEquivalent(List<Object> list1, List<Object> list2) {
-        if (list1.size() != list2.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < list1.size(); i++) {
-            Map<String, Object> toTestMap = new HashMap<>();
-            Map<String, Object> testAgainstMap = new HashMap<>();
-
-            toTestMap.put("fromList", list1.get(i));
-            testAgainstMap.put("fromList", list2.get(i));
-
-            if (!isEquivalent(toTestMap, testAgainstMap)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public static boolean diffUpdateJson(BaseJson element, Map<String, Object> existing,
         Map<String, Object> rejection) {
-        if (!element.getId().isEmpty() && existing.containsKey(BaseJson.ID)) {
-            String jsonModified = element.getModified();
-            Object existingModified = existing.get(BaseJson.MODIFIED);
-            if (!jsonModified.isEmpty()) {
-                try {
-                    Date jsonModDate = df.parse(jsonModified);
-                    Date existingModDate = df.parse(existingModified.toString());
-                    if (jsonModDate.before(existingModDate)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Conflict Detected");
-                        }
-                        rejection.put("message", "Conflict Detected");
-                        rejection.put("code", 409);
-                        rejection.put("element", element);
-                        return false;
-                    }
-                } catch (ParseException e) {
-                    if (logger.isDebugEnabled()) {
-//                        logger.debug(String.format("%s", LogUtil.getStackTrace(e)));
-                    }
+
+        String jsonModified = element.getModified();
+        Object existingModified = existing.get(BaseJson.MODIFIED);
+        if (jsonModified != null && !jsonModified.isEmpty()) {
+            try {
+                Date jsonModDate = df.parse(jsonModified);
+                Date existingModDate = df.parse(existingModified.toString());
+                if (jsonModDate.before(existingModDate)) {
+                    rejection.put("message", "Conflict Detected");
+                    rejection.put("code", 409);
+                    rejection.put("element", element);
+                    return false;
                 }
+            } catch (ParseException e) {
+                logger.info("date parse exception:" + jsonModified + " " + existingModified);
             }
-            return mergeJson(element, existing);
         }
-        return false;
+        mergeJson(element, existing);
+        return true;
     }
 
-    private static boolean mergeJson(BaseJson partial, Map<String, Object> original) {
-        if (original == null) {
-            return false;
-        }
-
+    private static void mergeJson(BaseJson partial, Map<String, Object> original) {
         for (Map.Entry<String, Object> entry : original.entrySet()) {
             String attr = entry.getKey();
             if (!partial.containsKey(attr)) {
                 partial.put(attr, original.get(attr));
             }
         }
-        return true;
+    }
+
+    @Autowired
+    public void setNodeRepository(NodeDAO nodeRepository) {
+        this.nodeRepository = nodeRepository;
+    }
+
+    @Autowired
+    public void setNodeElasticRepository(NodeElasticDAO nodeElasticRepository) {
+        this.nodeElasticRepository = nodeElasticRepository;
+    }
+
+    // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
+    public Map<String, Node> processPostJson(List<ElementJson> elements, boolean overwriteJson,
+        Instant now, CommitJson cmjs, Map<String, ElementJson> response, List<Map> rejectedList,
+        NodeService service) {
+
+        Set<String> elasticIds = new HashSet<>();
+        Map<String, ElementJson> reqElementMap = (Map<String, ElementJson>) Helper
+            .convertJsonToMap(elements);
+        List<Node> existingNodes = nodeRepository.findAllBySysmlIds(reqElementMap.keySet());
+        Map<String, Node> existingNodeMap = new HashMap<>();
+        Set<String> oldElasticIds = new HashSet<>();
+        for (Node node : existingNodes) {
+            logger.info("Got element with id: {}", node.getId());
+            elasticIds.add(node.getElasticId());
+            existingNodeMap.put(node.getSysmlId(), node);
+        }
+        // bulk get existing elements in elastic
+        List<Map<String, Object>> existingElasticNodes = nodeElasticRepository
+            .findByElasticIds(elasticIds);
+        Map<String, Object> elasticNodeMap = Helper
+            .convertToMap(existingElasticNodes, ElementJson.ID);
+
+        Map<String, Node> toSave = new HashMap<>();
+        cmjs.setId(UUID.randomUUID().toString());
+        cmjs.setElasticId(cmjs.getId());
+        cmjs.setCreated(now.toString());
+        cmjs.setAdded(new ArrayList<>());
+        cmjs.setDeleted(new ArrayList<>());
+        cmjs.setUpdated(new ArrayList<>());
+
+        // Logic for update/add
+        for (ElementJson element : elements) {
+            if (element == null) {
+                continue;
+            }
+            Map<String, Object> rejected = new HashMap<>();
+            boolean added = false;
+            boolean updated = false;
+            if (element.getId() == null || element.getId().isEmpty()) {
+                rejected.put("message", "missing id");
+                rejected.put("code", 400);
+                rejected.put("element", element);
+            } else {
+                Map<String, Object> elasticElement = (Map<String, Object>) elasticNodeMap
+                    .get(element.getId());
+
+                if (!existingNodeMap.containsKey(element.getId())) {
+                    added = true;
+                } else if (elasticElement == null) {
+                    continue; //TODO this should be an error - the db has entry but elastic doesn't, reject 500?
+                }
+
+                if (!added) {
+                    if (!overwriteJson) {
+                        if (NodePostHelper.isUpdated(element, elasticElement, rejected)) {
+                            updated = diffUpdateJson(element, elasticElement, rejected);
+                        }
+                    } else {
+                        updated = true;
+                    }
+                }
+            }
+
+// create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
+            if (added) {
+                Node node = new Node();
+                processElementAdded(element, node, cmjs);
+                toSave.put(node.getSysmlId(), node);
+                response.put(element.getId(), element);
+                service.extraProcessPostedElement(element, node, oldElasticIds, cmjs, now, toSave,
+                    response);
+            } else if (updated) {
+                Node node = existingNodeMap.get(element.getId());
+                oldElasticIds.add(node.getElasticId());
+                processElementUpdated(element, node, cmjs);
+                toSave.put(node.getSysmlId(), node);
+                response.put(element.getId(), element);
+                service.extraProcessPostedElement(element, node, oldElasticIds, cmjs, now, toSave,
+                    response);
+            } else {
+                rejectedList.add(rejected);
+            }
+        }
+        return toSave;
+    }
+
+    public List<Edge> getEdgesToSave(Map<String, Node> nodes, Map<String, ElementJson> json,
+        NodeService service) {
+
+        Set<String> toFind = new HashSet<>();
+        Map<EdgeType, List<Pair<String, String>>> edges = service.getEdgeInfo(json.values());
+        for (Map.Entry<EdgeType, List<Pair<String, String>>> entry : edges.entrySet()) {
+            for (Pair<String, String> pair : entry.getValue()) {
+                toFind.add(pair.getFirst());
+                toFind.add(pair.getSecond());
+            }
+        }
+        toFind.removeAll(nodes.keySet());
+        Map<String, Node> edgeNodes = Helper
+            .convertNodesToMap(this.nodeRepository.findAllBySysmlIds(toFind));
+        edgeNodes.putAll(nodes);
+        List<Edge> res = new ArrayList<>();
+        for (Map.Entry<EdgeType, List<Pair<String, String>>> entry : edges.entrySet()) {
+            for (Pair<String, String> pair : entry.getValue()) {
+                Node parent = edgeNodes.get(pair.getFirst());
+                Node child = edgeNodes.get(pair.getSecond());
+                if (parent == null || child == null) {
+                    continue; //TODO error or specific remedy?
+                }
+                Edge e = new Edge();
+                e.setParent(parent);
+                e.setChild(child);
+                e.setEdgeType(entry.getKey());
+                res.add(e);
+            }
+        }
+        return res;
     }
 }

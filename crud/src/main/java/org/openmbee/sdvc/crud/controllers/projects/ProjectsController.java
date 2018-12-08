@@ -41,7 +41,7 @@ public class ProjectsController extends BaseController {
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody ProjectsRequest projectsPost) {
         if (!projectsPost.getProjects().isEmpty()) {
-            ProjectsResponse response = serviceFactory.getProjectService("sysml")
+            ProjectsResponse response = serviceFactory.getProjectService("cameo")
                 .post(projectsPost);
             return ResponseEntity.ok(response);
         }
@@ -58,6 +58,6 @@ public class ProjectsController extends BaseController {
     }
 
     private ProjectService getProjectService(String projectId) {
-        return serviceFactory.getProjectService("sysml");
+        return serviceFactory.getProjectService("cameo");
     }
 }
