@@ -40,16 +40,17 @@ public class ProjectsController extends BaseController {
     @PostMapping
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody ProjectsRequest projectsPost) {
-        if (!projectsPost.getProjects().isEmpty()) {
-            ProjectsResponse response = serviceFactory.getProjectService("sysml")
-                .post(projectsPost);
-            return ResponseEntity.ok(response);
+
+        if (projectsPost.getProjects().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ErrorResponse().setError("empty"));
         }
-        logger.debug("Bad Request");
-        ErrorResponse err = new ErrorResponse();
-        err.setCode(400);
-        err.setError("Bad Request");
-        return ResponseEntity.badRequest().body(err);
+        ProjectsResponse response = new ProjectsResponse();
+        for (ProjectJson json: projectsPost.getProjects()) {
+            //TODO check if already exist, or check project type
+            ProjectService ps = serviceFactory.getProjectService("cameo");
+            response.getProjects().add(ps.post(json));
+        }
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping(value = "/{projectId}")
@@ -58,6 +59,6 @@ public class ProjectsController extends BaseController {
     }
 
     private ProjectService getProjectService(String projectId) {
-        return serviceFactory.getProjectService("sysml");
+        return serviceFactory.getProjectService("cameo");
     }
 }

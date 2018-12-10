@@ -49,10 +49,9 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             return null;//TODO error
         }
         commit.setId(keyHolder.getKey().longValue());
-        return commit;//findById(keyHolder.getKey().longValue());
+        return commit;
     }
 
-    @SuppressWarnings({"unchecked"})
     public Commit findById(long id) {
         String sql = "SELECT * FROM commits WHERE id = ?";
 
@@ -60,7 +59,6 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             .queryForObject(sql, new Object[]{id}, new CommitRowMapper());
     }
 
-    @SuppressWarnings({"unchecked"})
     public Commit findByCommitId(String commitId) {
         String sql = "SELECT * FROM commits WHERE elasticId = ?";
 
@@ -68,7 +66,6 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             .queryForObject(sql, new Object[]{commitId}, new CommitRowMapper());
     }
 
-    @SuppressWarnings({"unchecked"})
     public Commit findByRefAndTimestamp(String refId, Instant timestamp) {
         List<Commit> res = findByRefAndTimestampAndLimit(refId, timestamp, 1);
         if (res.size() > 0) {
@@ -77,7 +74,6 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         return null;
     }
 
-    @SuppressWarnings({"unchecked"})
     public Commit findLatestByRef(String refId) {
         List<Commit> res = findByRefAndTimestampAndLimit(refId, null, 1);
         if (res.size() > 0) {
@@ -86,8 +82,6 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         return null;
     }
 
-
-    @SuppressWarnings({"unchecked"})
     public List<Commit> findAll() {
         String sql = "SELECT * FROM commits ORDER BY timestamp DESC";
         return getConnection().query(sql, new CommitRowMapper());

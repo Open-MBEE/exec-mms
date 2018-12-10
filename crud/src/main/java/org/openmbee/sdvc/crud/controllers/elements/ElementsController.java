@@ -90,6 +90,6 @@ public class ElementsController extends BaseController {
     }
 
     private NodeService getNodeService(String projectId) {
-        return serviceFactory.getNodeService("sysml");
+        return serviceFactory.getNodeService("cameo");
     }
 }

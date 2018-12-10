@@ -21,10 +21,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CommitService {
 
+    public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private CommitDAO commitRepository;
     private CommitElasticDAO commitElasticRepository;
-
-    public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     @Autowired
     public void setCommitDao(CommitDAO commitDao) {
@@ -36,7 +35,8 @@ public class CommitService {
         this.commitElasticRepository = commitElasticRepository;
     }
 
-    public CommitsResponse getRefCommits(String projectId, String refId, Map<String, String> params) {
+    public CommitsResponse getRefCommits(String projectId, String refId,
+        Map<String, String> params) {
         DbContextHolder.setContext(projectId, refId);
         int limit = 0;
         Instant timestamp = null;
@@ -50,10 +50,11 @@ public class CommitService {
                 e.printStackTrace();
             }
         }
-        List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(refId, timestamp, limit);
+        List<Commit> commits = commitRepository
+            .findByRefAndTimestampAndLimit(refId, timestamp, limit);
         CommitsResponse res = new CommitsResponse();
         List<CommitJson> resJson = new ArrayList<>();
-        for (Commit c: commits) {
+        for (Commit c : commits) {
             CommitJson json = new CommitJson();
             json.setCreated(c.getTimestamp().toString());
             json.setCreator(c.getCreator());
@@ -76,7 +77,8 @@ public class CommitService {
         return res;
     }
 
-    public CommitsResponse getElementCommits(String projectId, String refId, String elementId, Map<String, Object> params) {
+    public CommitsResponse getElementCommits(String projectId, String refId, String elementId,
+        Map<String, Object> params) {
         DbContextHolder.setContext(projectId);
         List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(refId, null, 0);
         //TODO either search elastic using the commit ids or get all elements from elastic first and filter by the ref's commit ids
@@ -87,7 +89,7 @@ public class CommitService {
     public CommitsResponse getCommits(String projectId, CommitsRequest req) {
         DbContextHolder.setContext(projectId);
         Set<String> ids = new HashSet<>();
-        for (CommitJson j: req.getCommits()) {
+        for (CommitJson j : req.getCommits()) {
             ids.add(j.getId());
         }
         List<Map<String, Object>> jsons = commitElasticRepository.findByElasticIds(ids);

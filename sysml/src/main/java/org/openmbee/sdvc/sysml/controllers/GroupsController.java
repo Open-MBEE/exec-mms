@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.sysml.controllers;
 
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.sysml.services.SysmlNodeService;
+import org.openmbee.sdvc.sysml.services.CameoNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +12,10 @@ import java.util.Map;
 @RequestMapping("/projects/{projectId}/refs/{refId}/groups")
 public class GroupsController extends BaseController {
 
-    private SysmlNodeService nodeService;
+    private CameoNodeService nodeService;
 
     @Autowired
-    public GroupsController(SysmlNodeService nodeService) {
+    public GroupsController(CameoNodeService nodeService) {
         this.nodeService = nodeService;
     }
 
