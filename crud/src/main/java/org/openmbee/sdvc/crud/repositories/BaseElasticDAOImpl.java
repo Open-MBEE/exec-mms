@@ -43,11 +43,11 @@ public abstract class BaseElasticDAOImpl implements BaseElasticDAO {
         return maps;
     }
 
-    public void indexAll(Collection<? extends Map> jsons) {
+    public void indexAll(Collection<? extends BaseJson> jsons) {
 
     }
 
-    public void index(Map<String, Object> json) {
+    public void index(BaseJson json) {
 
     }
 }

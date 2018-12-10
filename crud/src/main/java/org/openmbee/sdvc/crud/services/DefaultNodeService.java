@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,6 +75,7 @@ public class DefaultNodeService implements NodeService {
     @Override
     public ElementsResponse get(String projectId, String refId, String id,
         Map<String, String> params) {
+
         DbContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
         if (id != null) {
@@ -112,12 +114,13 @@ public class DefaultNodeService implements NodeService {
 
         List<Map> rejectedList = new ArrayList<>();
         Map<String, ElementJson> responses = new HashMap<>();
+        Set<String> oldElasticIds = new HashSet<>();
         Map<String, Node> toSave = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson, now, cmjs, responses, rejectedList,
-                this);
+                this, oldElasticIds);
 
         try {
-            commitChanges(toSave, responses, cmjs, now);
+            commitChanges(toSave, responses, cmjs, now, oldElasticIds);
         } catch (Exception e) {
             //TODO db transaction
         }
@@ -128,7 +131,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     protected void commitChanges(Map<String, Node> nodes, Map<String, ElementJson> json,
-        CommitJson cmjs, Instant now) {
+        CommitJson cmjs, Instant now, Set<String> oldElasticIds) {
         if (!nodes.isEmpty()) {
             this.nodeElasticRepository.indexAll(json.values());
             this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
@@ -136,6 +139,7 @@ public class DefaultNodeService implements NodeService {
             List<Edge> edges = nodePostHelper.getEdgesToSave(nodes, json, this);
             this.edgeRepository.saveAll(edges);
 
+            //TODO update old elastic ids to remove ref from inRefIds
 //            DB Commit
             Commit commit = new Commit();
             commit.setBranchId(cmjs.getRefId());

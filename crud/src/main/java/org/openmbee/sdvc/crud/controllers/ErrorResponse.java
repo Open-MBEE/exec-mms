@@ -9,15 +9,17 @@ public class ErrorResponse extends BaseResponse {
         return error;
     }
 
-    public void setError(String error) {
+    public ErrorResponse setError(String error) {
         this.error = error;
+        return this;
     }
 
     public int getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public ErrorResponse setCode(int code) {
         this.code = code;
+        return this;
     }
 }

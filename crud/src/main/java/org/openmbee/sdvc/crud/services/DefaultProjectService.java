@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.projects.ProjectJson;
-import org.openmbee.sdvc.crud.controllers.projects.ProjectsRequest;
 import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,30 +27,26 @@ public class DefaultProjectService implements ProjectService {
         this.projectOperations = projectOperations;
     }
 
-    public ProjectsResponse post(ProjectsRequest projectsPost) {
-        logger.info("JSON parsed properly");
-        ProjectsResponse response = new ProjectsResponse();
-        for (ProjectJson project : projectsPost.getProjects()) {
-            logger.info("Saving project: {}", project.getId());
-            Project proj = new Project();
-            proj.setProjectId(project.getId());
-            proj.setProjectName(project.getName());
-            Project saved = projectRepository.save(proj);
+    public ProjectJson post(ProjectJson project) {
+        Project proj = new Project();
+        proj.setProjectId(project.getId());
+        proj.setProjectName(project.getName());
+        Project saved = projectRepository.save(proj);
 
-            try {
-                if (projectOperations.createProjectDatabase(proj)) {
-                    response.getProjects().add(project);
-                }
-            } catch (SQLException sqlException) {
-                // Database already exists
-                response.getProjects().add(project);
-            } catch (Exception e) {
-                projectRepository.delete(saved);
-                logger.error("Couldn't create database: {}", project.getProjectId());
-                logger.error(e);
+        try {
+            if (projectOperations.createProjectDatabase(proj)) {
+                //TODO create elastic indexes and mappings
+                return project;
             }
+        } catch (SQLException sqlException) {
+            // Database already exists
+            return project;
+        } catch (Exception e) {
+            projectRepository.delete(saved);
+            logger.error("Couldn't create database: {}", project.getProjectId());
+            logger.error(e);
         }
-        return response;
+        return null; //throw exception
     }
 
     public ProjectsResponse get(String projectId) {

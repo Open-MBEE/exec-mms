@@ -82,8 +82,11 @@ public class NodePostHelper {
     }
 
     public static void processElementAddedOrUpdated(ElementJson e, Node n, CommitJson cmjs) {
-        e.setProjectId(DbContextHolder.getContext().getProjectId());
-        e.setRefId(DbContextHolder.getContext().getBranchId());
+        e.setProjectId(cmjs.getProjectId());
+        e.setRefId(cmjs.getRefId());
+        List<String> inRefIds = new ArrayList<>();
+        inRefIds.add(cmjs.getRefId());
+        e.setInRefIds(inRefIds);
         String elasticId = UUID.randomUUID().toString();
         e.setElasticId(elasticId);
         e.setCommitId(cmjs.getId());
@@ -148,14 +151,13 @@ public class NodePostHelper {
     // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
     public Map<String, Node> processPostJson(List<ElementJson> elements, boolean overwriteJson,
         Instant now, CommitJson cmjs, Map<String, ElementJson> response, List<Map> rejectedList,
-        NodeService service) {
+        NodeService service, Set<String> oldElasticIds) {
 
         Set<String> elasticIds = new HashSet<>();
         Map<String, ElementJson> reqElementMap = (Map<String, ElementJson>) Helper
             .convertJsonToMap(elements);
         List<Node> existingNodes = nodeRepository.findAllBySysmlIds(reqElementMap.keySet());
         Map<String, Node> existingNodeMap = new HashMap<>();
-        Set<String> oldElasticIds = new HashSet<>();
         for (Node node : existingNodes) {
             logger.info("Got element with id: {}", node.getId());
             elasticIds.add(node.getElasticId());
@@ -235,7 +237,11 @@ public class NodePostHelper {
         NodeService service) {
 
         Set<String> toFind = new HashSet<>();
+        List<Edge> res = new ArrayList<>();
         Map<EdgeType, List<Pair<String, String>>> edges = service.getEdgeInfo(json.values());
+        if (edges.isEmpty()) {
+            return res;
+        }
         for (Map.Entry<EdgeType, List<Pair<String, String>>> entry : edges.entrySet()) {
             for (Pair<String, String> pair : entry.getValue()) {
                 toFind.add(pair.getFirst());
@@ -246,7 +252,7 @@ public class NodePostHelper {
         Map<String, Node> edgeNodes = Helper
             .convertNodesToMap(this.nodeRepository.findAllBySysmlIds(toFind));
         edgeNodes.putAll(nodes);
-        List<Edge> res = new ArrayList<>();
+
         for (Map.Entry<EdgeType, List<Pair<String, String>>> entry : edges.entrySet()) {
             for (Pair<String, String> pair : entry.getValue()) {
                 Node parent = edgeNodes.get(pair.getFirst());

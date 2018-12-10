@@ -158,6 +158,9 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     public List<Node> findAllBySysmlIds(Collection<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid IN (%s)",
             getSuffix(), "'" + String.join("','", ids) + "'");
         return getConnection().query(sql, new NodeRowMapper());

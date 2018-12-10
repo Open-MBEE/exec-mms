@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.openmbee.sdvc.crud.controllers.BaseJson;
 
 public interface BaseElasticDAO {
 
@@ -11,9 +12,9 @@ public interface BaseElasticDAO {
 
     List<Map<String, Object>> findByElasticIds(Set<String> elasticIds);
 
-    void indexAll(Collection<? extends Map> jsons);
+    void indexAll(Collection<? extends BaseJson> jsons);
 
-    void index(Map<String, Object> json);
+    void index(BaseJson json);
 
 
 }

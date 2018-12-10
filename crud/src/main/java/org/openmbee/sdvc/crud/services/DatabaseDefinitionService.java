@@ -240,7 +240,7 @@ public class DatabaseDefinitionService {
 
             String projectData = "";
             BufferedReader br = null;
-
+            //TODO remove use of dummy data file
             FileSystemResource schemaResource = new FileSystemResource(tempFile);
             ClassPathResource dataResource = new ClassPathResource("project-data.sql");
 
