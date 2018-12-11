@@ -6,9 +6,9 @@ import java.util.Map;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class NodeDeleteHelper extends NodeOperation {
 
     public NodeChangeInfo processDeleteJson(List<ElementJson> elements, CommitJson cmjs,

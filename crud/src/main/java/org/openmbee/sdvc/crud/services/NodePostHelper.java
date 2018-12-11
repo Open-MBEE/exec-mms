@@ -12,9 +12,9 @@ import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.domains.Node;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class NodePostHelper extends NodeOperation {
 
     protected static final Logger logger = LogManager.getLogger(NodeOperation.class);
