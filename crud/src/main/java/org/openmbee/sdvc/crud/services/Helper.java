@@ -35,8 +35,8 @@ public class Helper {
         return result;
     }
 
-    public static Map<String, Object> convertToMap(List<Map<String, Object>> elements, String key) {
-        Map<String, Object> result = new HashMap<>();
+    public static Map<String, Map<String, Object>> convertToMap(List<Map<String, Object>> elements, String key) {
+        Map<String, Map<String, Object>> result = new HashMap<>();
         for (Map<String, Object> elem : elements) {
             if (elem == null) {
                 continue;
