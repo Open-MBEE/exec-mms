@@ -106,12 +106,12 @@ public class DatabaseDefinitionService {
         + "$$ LANGUAGE plpgsql;";
 
     private static final String GET_IMMEDIATE_PARENTS = "CREATE OR REPLACE FUNCTION get_immediate_parents(integer, integer, text)\n"
-        + " RETURNS TABLE(sysmlid text, elasticid text)\n"
+        + " RETURNS TABLE(nodeid text, indexid text)\n"
         + "AS $$\n"
         + "  begin\n"
         + "    return query\n"
         + "    execute '\n"
-        + "    select sysmlid, elasticid from nodes' || $3 || ' where id in\n"
+        + "    select nodeid, indexid from nodes' || $3 || ' where id in\n"
         + "      (select id from get_parents(' || $1 || ',' || $2 || ',''' || format('%s',$3) ||\n"
         + "      ''') where height = 1);';\n"
         + "  end;\n"

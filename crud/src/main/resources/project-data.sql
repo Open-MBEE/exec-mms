@@ -1,4 +1,4 @@
-INSERT INTO nodes (id, elasticid, initialcommit, lastcommit, nodetype, sysmlid, deleted)
+INSERT INTO nodes (id, indexid, initialcommit, lastcommit, nodetype, nodeid, deleted)
     VALUES (0, 'test', 'test', 'test', 1, '${projectId}', false);
 
 INSERT INTO branches (id, branchid, branchname, tag, deleted, timestamp)

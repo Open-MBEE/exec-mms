@@ -4,6 +4,6 @@ import org.openmbee.sdvc.crud.repositories.BaseElasticDAOImpl;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeElasticDAO {
+public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexDAO {
 
 }

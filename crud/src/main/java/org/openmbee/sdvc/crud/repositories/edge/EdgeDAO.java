@@ -6,17 +6,17 @@ import org.openmbee.sdvc.crud.domains.EdgeType;
 
 public interface EdgeDAO {
 
-    public Edge save(Edge edge);
+    Edge save(Edge edge);
 
-    public List<Edge> saveAll(List<Edge> nodes);
+    List<Edge> saveAll(List<Edge> nodes);
 
-    public List<Edge> insertAll(List<Edge> nodes);
+    List<Edge> insertAll(List<Edge> nodes);
 
-    public List<Edge> updateAll(List<Edge> nodes);
+    List<Edge> updateAll(List<Edge> nodes);
 
-    public Edge findParents(String child, EdgeType et);
+    Edge findParents(String child, Integer et);
 
-    public Edge findChildren(String parent, EdgeType et);
+    Edge findChildren(String parent, Integer et);
 
-    public List<Edge> findAll();
+    List<Edge> findAll();
 }

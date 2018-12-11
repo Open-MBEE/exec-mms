@@ -11,20 +11,19 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
-import org.openmbee.sdvc.crud.controllers.commits.CommitJson;
-import org.openmbee.sdvc.crud.controllers.elements.ElementJson;
+import org.openmbee.sdvc.json.CommitJson;
+import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.domains.CommitType;
 import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.EdgeType;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.repositories.commit.CommitElasticDAO;
+import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
 import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
-import org.openmbee.sdvc.crud.repositories.node.NodeElasticDAO;
+import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -36,9 +35,9 @@ public class DefaultNodeService implements NodeService {
 
     protected NodeDAO nodeRepository;
     protected CommitDAO commitRepository;
-    protected NodeElasticDAO nodeElasticRepository;
+    protected NodeIndexDAO nodeIndex;
     //to save to this use base json classes
-    protected CommitElasticDAO commitElasticRepository;
+    protected CommitIndexDAO commitIndex;
     protected EdgeDAO edgeRepository;
     protected NodePostHelper nodePostHelper;
 
@@ -53,13 +52,13 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
-    public void setNodeElasticRepository(NodeElasticDAO nodeElasticRepository) {
-        this.nodeElasticRepository = nodeElasticRepository;
+    public void setNodeIndex(NodeIndexDAO nodeIndex) {
+        this.nodeIndex = nodeIndex;
     }
 
     @Autowired
-    public void setCommitElasticRepository(CommitElasticDAO commitElasticRepository) {
-        this.commitElasticRepository = commitElasticRepository;
+    public void setCommitIndex(CommitIndexDAO commitIndex) {
+        this.commitIndex = commitIndex;
     }
 
     @Autowired
@@ -80,9 +79,9 @@ public class DefaultNodeService implements NodeService {
         logger.info("params: " + params);
         if (id != null) {
             logger.debug("ElementId given: ", id);
-            Node node = nodeRepository.findBySysmlId(id);
+            Node node = nodeRepository.findByNodeId(id);
             ElementJson e = new ElementJson();
-            e.setId(node.getSysmlId());
+            e.setId(node.getNodeId());
             //set other stuff
             ElementsResponse res = new ElementsResponse();
             List<ElementJson> list = new ArrayList<>();
@@ -131,9 +130,9 @@ public class DefaultNodeService implements NodeService {
     }
 
     protected void commitChanges(Map<String, Node> nodes, Map<String, ElementJson> json,
-        CommitJson cmjs, Instant now, Set<String> oldElasticIds) {
+        CommitJson cmjs, Instant now, Set<String> oldIndexIds) {
         if (!nodes.isEmpty()) {
-            this.nodeElasticRepository.indexAll(json.values());
+            this.nodeIndex.indexAll(json.values());
             this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
 
             List<Edge> edges = nodePostHelper.getEdgesToSave(nodes, json, this);
@@ -145,10 +144,11 @@ public class DefaultNodeService implements NodeService {
             commit.setBranchId(cmjs.getRefId());
             commit.setCommitType(CommitType.COMMIT);
             commit.setCreator(cmjs.getCreator());
-            commit.setElasticId(cmjs.getId());
+            commit.setIndexId(cmjs.getId());
             commit.setTimestamp(now);
+            commit.setComment(cmjs.getComment());
 
-            this.commitElasticRepository.index(cmjs);
+            this.commitIndex.index(cmjs);
             this.commitRepository.save(commit);
         }
     }
@@ -160,7 +160,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public Map<EdgeType, List<Pair<String, String>>> getEdgeInfo(Collection<ElementJson> elements) {
+    public Map<Integer, List<Pair<String, String>>> getEdgeInfo(Collection<ElementJson> elements) {
         return new HashMap<>();
     }
 }

@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
-    private final String INSERT_SQL = "INSERT INTO nodes%s (sysmlid, elasticid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
-    private final String UPDATE_SQL = "UPDATE nodes%s SET sysmlid = ?, elasticid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
+    private final String INSERT_SQL = "INSERT INTO nodes%s (nodeid, indexid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
+    private final String UPDATE_SQL = "UPDATE nodes%s SET nodeid = ?, indexid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
 
     public Node save(Node node) {
         if (node.getId() == null) {
@@ -31,12 +31,12 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
                     PreparedStatement ps = connection
                         .prepareStatement(String.format(INSERT_SQL, getSuffix()),
                             new String[]{"id"});
-                    ps.setString(1, node.getSysmlId());
-                    ps.setString(2, node.getElasticId());
+                    ps.setString(1, node.getNodeId());
+                    ps.setString(2, node.getIndexId());
                     ps.setString(3, node.getLastCommit());
                     ps.setString(4, node.getInitialCommit());
                     ps.setBoolean(5, node.isDeleted());
-                    ps.setInt(6, node.getNodeType().getId());
+                    ps.setInt(6, node.getNodeType());
                     return ps;
                 }
             }, keyHolder);
@@ -51,12 +51,12 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
                     throws SQLException {
                     PreparedStatement ps = connection
                         .prepareStatement(String.format(UPDATE_SQL, getSuffix()));
-                    ps.setString(1, node.getSysmlId());
-                    ps.setString(2, node.getElasticId());
+                    ps.setString(1, node.getNodeId());
+                    ps.setString(2, node.getIndexId());
                     ps.setString(3, node.getLastCommit());
                     ps.setString(4, node.getInitialCommit());
                     ps.setBoolean(5, node.isDeleted());
-                    ps.setInt(6, node.getNodeType().getId());
+                    ps.setInt(6, node.getNodeType());
                     ps.setLong(7, node.getId());
                     return ps;
                 }
@@ -95,12 +95,12 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
             PreparedStatement ps = rawConn
                 .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
             for (Node n : nodes) {
-                ps.setString(1, n.getSysmlId());
-                ps.setString(2, n.getElasticId());
+                ps.setString(1, n.getNodeId());
+                ps.setString(2, n.getIndexId());
                 ps.setString(3, n.getLastCommit());
                 ps.setString(4, n.getInitialCommit());
                 ps.setBoolean(5, n.isDeleted());
-                ps.setInt(6, n.getNodeType().getId());
+                ps.setInt(6, n.getNodeType());
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -122,12 +122,12 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Node n = nodes.get(i);
-                ps.setString(1, n.getSysmlId());
-                ps.setString(2, n.getElasticId());
+                ps.setString(1, n.getNodeId());
+                ps.setString(2, n.getIndexId());
                 ps.setString(3, n.getLastCommit());
                 ps.setString(4, n.getInitialCommit());
                 ps.setBoolean(5, n.isDeleted());
-                ps.setInt(6, n.getNodeType().getId());
+                ps.setInt(6, n.getNodeType());
                 ps.setLong(7, n.getId());
             }
 
@@ -149,19 +149,19 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     @SuppressWarnings({"unchecked"})
-    public Node findBySysmlId(String sysmlId) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
+    public Node findByNodeId(String nodeId) {
+        String sql = String.format("SELECT * FROM nodes%s WHERE nodeid = ?",
             getSuffix());
 
         return (Node) getConnection()
-            .queryForObject(sql, new Object[]{sysmlId}, new NodeRowMapper());
+            .queryForObject(sql, new Object[]{nodeId}, new NodeRowMapper());
     }
 
-    public List<Node> findAllBySysmlIds(Collection<String> ids) {
+    public List<Node> findAllByNodeIds(Collection<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();
         }
-        String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid IN (%s)",
+        String sql = String.format("SELECT * FROM nodes%s WHERE nodeid IN (%s)",
             getSuffix(), "'" + String.join("','", ids) + "'");
         return getConnection().query(sql, new NodeRowMapper());
     }

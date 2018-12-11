@@ -5,6 +5,7 @@ import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.services.ProjectService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
+import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

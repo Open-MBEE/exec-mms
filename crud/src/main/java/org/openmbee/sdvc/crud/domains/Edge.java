@@ -28,7 +28,7 @@ public class Edge {
     private Node child;
 
     @Column(columnDefinition = "smallint")
-    private EdgeType edgeType;
+    private Integer edgeType;
 
     public Long getId() {
         return id;
@@ -54,11 +54,11 @@ public class Edge {
         this.child = child;
     }
 
-    public EdgeType getEdgeType() {
+    public Integer getEdgeType() {
         return edgeType;
     }
 
-    public void setEdgeType(EdgeType edgeType) {
+    public void setEdgeType(Integer edgeType) {
         this.edgeType = edgeType;
     }
 }

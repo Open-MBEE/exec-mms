@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
-import org.openmbee.sdvc.crud.controllers.commits.CommitJson;
+import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.crud.controllers.commits.CommitsRequest;
 import org.openmbee.sdvc.crud.controllers.commits.CommitsResponse;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.repositories.commit.CommitElasticDAO;
+import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class CommitService {
 
     public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private CommitDAO commitRepository;
-    private CommitElasticDAO commitElasticRepository;
+    private CommitIndexDAO commitIndex;
 
     @Autowired
     public void setCommitDao(CommitDAO commitDao) {
@@ -31,8 +31,8 @@ public class CommitService {
     }
 
     @Autowired
-    public void setCommitElasticDao(CommitElasticDAO commitElasticRepository) {
-        this.commitElasticRepository = commitElasticRepository;
+    public void setCommitElasticDao(CommitIndexDAO commitElasticRepository) {
+        this.commitIndex = commitElasticRepository;
     }
 
     public CommitsResponse getRefCommits(String projectId, String refId,
@@ -58,7 +58,8 @@ public class CommitService {
             CommitJson json = new CommitJson();
             json.setCreated(c.getTimestamp().toString());
             json.setCreator(c.getCreator());
-            json.setId(c.getElasticId());
+            json.setId(c.getIndexId());
+            json.setComment(c.getComment());
             resJson.add(json);
         }
         res.setCommits(resJson);
@@ -67,7 +68,7 @@ public class CommitService {
 
     public CommitsResponse getCommit(String projectId, String commitId) {
         DbContextHolder.setContext(projectId);
-        Map<String, Object> commit = commitElasticRepository.findByElasticId(commitId);
+        Map<String, Object> commit = commitIndex.findByIndexId(commitId);
         List<CommitJson> resJson = new ArrayList<>();
         CommitJson c = new CommitJson();
         c.putAll(commit);
@@ -92,7 +93,7 @@ public class CommitService {
         for (CommitJson j : req.getCommits()) {
             ids.add(j.getId());
         }
-        List<Map<String, Object>> jsons = commitElasticRepository.findByElasticIds(ids);
+        List<Map<String, Object>> jsons = commitIndex.findByIndexIds(ids);
         //TODO
         CommitsResponse res = new CommitsResponse();
         return res;

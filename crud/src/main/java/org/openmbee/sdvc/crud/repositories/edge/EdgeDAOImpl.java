@@ -61,7 +61,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
             PreparedStatement ps = rawConn
                 .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
             for (Edge e: edges) {
-                ps.setInt(1, e.getEdgeType().getId());
+                ps.setInt(1, e.getEdgeType());
                 ps.setLong(2, e.getChild().getId());
                 ps.setLong(3, e.getParent().getId());
                 ps.addBatch();
@@ -85,7 +85,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Edge e = edges.get(i);
-                ps.setInt(1, e.getEdgeType().getId());
+                ps.setInt(1, e.getEdgeType());
                 ps.setLong(2, e.getChild().getId());
                 ps.setLong(3, e.getParent().getId());
                 ps.setLong(4, e.getId());
@@ -100,7 +100,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
     }
 
     @SuppressWarnings({"unchecked"})
-    public Edge findParents(String sysmlId, EdgeType et) {
+    public Edge findParents(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
             getSuffix());
 
@@ -109,7 +109,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
     }
 
     @SuppressWarnings({"unchecked"})
-    public Edge findChildren(String sysmlId, EdgeType et) {
+    public Edge findChildren(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
             getSuffix());
 

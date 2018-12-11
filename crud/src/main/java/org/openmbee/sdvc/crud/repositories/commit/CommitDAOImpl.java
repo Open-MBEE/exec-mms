@@ -28,7 +28,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     }
 
     public Commit save(Commit commit) {
-        String sql = "INSERT INTO commits (commitType, creator, elasticId, branchId, timestamp) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO commits (commitType, creator, indexId, branchId, timestamp, comment) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         getConnection().update(new PreparedStatementCreator() {
@@ -37,9 +37,10 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
                 PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
                 ps.setInt(1, commit.getCommitType().getId());
                 ps.setString(2, commit.getCreator());
-                ps.setString(3, commit.getElasticId());
+                ps.setString(3, commit.getIndexId());
                 ps.setString(4, commit.getBranchId());
                 ps.setTimestamp(5, Timestamp.from(commit.getTimestamp()));
+                ps.setString(6, commit.getComment());
 
                 return ps;
             }
@@ -60,7 +61,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     }
 
     public Commit findByCommitId(String commitId) {
-        String sql = "SELECT * FROM commits WHERE elasticId = ?";
+        String sql = "SELECT * FROM commits WHERE indexid = ?";
 
         return (Commit) getConnection()
             .queryForObject(sql, new Object[]{commitId}, new CommitRowMapper());

@@ -17,7 +17,7 @@ public class Branch {
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 
-    private String elasticId;
+    private String description;
     private String branchId;
     private String branchName;
 
@@ -33,9 +33,9 @@ public class Branch {
 
     }
 
-    public Branch(String elasticId, String branchId, String branchName, String parentRef,
+    public Branch(String description, String branchId, String branchName, String parentRef,
         Long parentCommit, Instant timestamp, boolean tag, boolean deleted) {
-        setElasticId(elasticId);
+        setDescription(description);
         setBranchId(branchId);
         setBranchName(branchName);
         setParentRefId(parentRef);
@@ -53,12 +53,12 @@ public class Branch {
         this.id = id;
     }
 
-    public String getElasticId() {
-        return elasticId;
+    public String getDescription() {
+        return description;
     }
 
-    public void setElasticId(String elasticId) {
-        this.elasticId = elasticId;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getBranchId() {
