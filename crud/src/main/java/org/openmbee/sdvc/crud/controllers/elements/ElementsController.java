@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
+import java.util.List;
 import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.ErrorResponse;
@@ -52,10 +53,9 @@ public class ElementsController extends BaseController {
             ElementsResponse response = nodeService.post(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
-        logger.debug("Bad Request");
         ErrorResponse err = new ErrorResponse();
         err.setCode(400);
-        err.setError("Bad Request");
+        err.setError("Empty");
         return ResponseEntity.badRequest().body(err);
     }
 
@@ -77,7 +77,20 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @PathVariable String elementId) {
 
-        return ResponseEntity.ok(new ElementsResponse());
+        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId);
+        if (res.getElements().isEmpty()) {
+            List<Map<String, Object>> rejected = (List<Map<String, Object>>) res.get("rejected");
+            if (res != null && !res.isEmpty()) {
+                Integer code = (Integer) rejected.get(1).get("code");
+                if (code == 304) {
+                    return ResponseEntity.status(304).body(res);
+                }
+                if (code == 404) {
+                    return ResponseEntity.notFound().build();
+                }
+            }
+        }
+        return ResponseEntity.ok(res);
     }
 
     @DeleteMapping
@@ -86,7 +99,8 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @RequestBody ElementsRequest req) {
 
-        return ResponseEntity.ok(new ElementsResponse());
+        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req);
+        return ResponseEntity.ok(res);
     }
 
     private NodeService getNodeService(String projectId) {

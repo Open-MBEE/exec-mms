@@ -19,5 +19,4 @@ public class ElementsResponse extends BaseResponse {
     public void setElements(List<ElementJson> elements) {
         this.put(Constants.ELEMENT_KEY, elements);
     }
-
 }
