@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class NodePostHelper extends NodeOperation {
 
-    protected static final Logger logger = LogManager.getLogger(NodeOperation.class);
     public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public boolean isUpdated(BaseJson element, Map<String, Object> existing,

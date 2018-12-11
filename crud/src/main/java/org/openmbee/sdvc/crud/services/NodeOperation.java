@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.domains.Edge;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
@@ -24,6 +26,8 @@ public class NodeOperation {
 
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
+
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
