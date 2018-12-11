@@ -16,9 +16,9 @@ public interface NodeDAO {
 
     public Node findById(long id);
 
-    public Node findBySysmlId(String sysmlid);
+    public Node findByNodeId(String sysmlid);
 
-    public List<Node> findAllBySysmlIds(Collection<String> ids);
+    public List<Node> findAllByNodeIds(Collection<String> ids);
 
     public List<Node> findAll();
 }

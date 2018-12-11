@@ -22,9 +22,11 @@ public class Commit implements Serializable {
 
     private Instant timestamp;
 
-    private String elasticId;
+    private String indexId;
     private String branchId;
     private String creator;
+
+    private String comment;
 
     @Column(columnDefinition = "smallint")
     private CommitType commitType;
@@ -45,12 +47,12 @@ public class Commit implements Serializable {
         this.timestamp = timestamp;
     }
 
-    public String getElasticId() {
-        return elasticId;
+    public String getIndexId() {
+        return indexId;
     }
 
-    public void setElasticId(String elasticId) {
-        this.elasticId = elasticId;
+    public void setIndexId(String indexId) {
+        this.indexId = indexId;
     }
 
     public String getBranchId() {
@@ -75,6 +77,14 @@ public class Commit implements Serializable {
 
     public void setCommitType(CommitType commitType) {
         this.commitType = commitType;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
 }

@@ -5,7 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
-import org.openmbee.sdvc.crud.controllers.projects.ProjectJson;
+import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

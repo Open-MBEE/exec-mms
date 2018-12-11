@@ -2,8 +2,6 @@ package org.openmbee.sdvc.crud.domains;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,26 +16,27 @@ public class Node {
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 
-    private String sysmlId;
-    private String elasticId;
+    private String nodeId;
+    private String indexId;
     private String lastCommit;
     private String initialCommit;
     private boolean deleted;
 
     @Column(columnDefinition = "smallint")
-    private NodeType nodeType;
+    private Integer nodeType;
 
     public Node() {
     }
 
-    public Node(long id, String sysmlId, String elasticId, String lastCommit, String initialCommit,
-        boolean deleted) {
+    public Node(long id, String nodeId, String indexId, String lastCommit, String initialCommit,
+        boolean deleted, Integer nodeType) {
         setId(id);
-        setSysmlId(sysmlId);
-        setElasticId(elasticId);
+        setNodeId(nodeId);
+        setIndexId(indexId);
         setLastCommit(lastCommit);
         setInitialCommit(initialCommit);
         setDeleted(deleted);
+        setNodeType(nodeType);
     }
 
 
@@ -49,20 +48,20 @@ public class Node {
         this.id = id;
     }
 
-    public String getSysmlId() {
-        return sysmlId;
+    public String getNodeId() {
+        return nodeId;
     }
 
-    public void setSysmlId(String sysmlId) {
-        this.sysmlId = sysmlId;
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
     }
 
-    public String getElasticId() {
-        return elasticId;
+    public String getIndexId() {
+        return indexId;
     }
 
-    public void setElasticId(String elasticId) {
-        this.elasticId = elasticId;
+    public void setIndexId(String indexId) {
+        this.indexId = indexId;
     }
 
     public String getLastCommit() {
@@ -89,12 +88,11 @@ public class Node {
         this.deleted = deleted;
     }
 
-    @Enumerated(EnumType.ORDINAL)
-    public NodeType getNodeType() {
+    public Integer getNodeType() {
         return nodeType;
     }
 
-    public void setNodeType(NodeType nodeType) {
+    public void setNodeType(Integer nodeType) {
         this.nodeType = nodeType;
     }
 

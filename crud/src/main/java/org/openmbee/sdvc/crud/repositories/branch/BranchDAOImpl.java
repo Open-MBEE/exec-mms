@@ -6,10 +6,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.openmbee.sdvc.crud.domains.Branch;
-import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
-import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -26,7 +23,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     }
 */
     public Branch save(Branch branch) {
-        String sql = "INSERT INTO branches (elasticId, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 /*
         if (branch.getParentRefId() != null && branch.getParentRef() == null) {
             Branch parentRef = findByBranchId(branch.getParentRefId());
@@ -50,7 +47,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-                ps.setString(1, branch.getElasticId());
+                ps.setString(1, branch.getDescription());
                 ps.setString(2, branch.getBranchId());
                 ps.setString(3, branch.getBranchName());
                 ps.setString(4, branch.getParentRefId());

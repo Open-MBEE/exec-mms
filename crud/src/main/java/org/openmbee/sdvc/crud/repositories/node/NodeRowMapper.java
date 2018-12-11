@@ -47,8 +47,6 @@ public class NodeRowMapper implements RowMapper {
             if (column != null) {
                 if (column instanceof Timestamp) {
                     beanMap.put(field, ((Timestamp) column).toInstant());
-                } else if (field.equalsIgnoreCase("nodetype")) {
-                    beanMap.put(field, NodeType.getNodeType((int) column));
                 } else {
                     beanMap.put(field, column);
                 }

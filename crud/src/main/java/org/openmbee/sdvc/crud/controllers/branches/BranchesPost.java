@@ -10,6 +10,7 @@ import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.services.DatabaseDefinitionService;
+import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,7 +51,7 @@ public class BranchesPost extends BaseController {
                 Branch b = new Branch();
                 b.setBranchId(branch.getId());
                 b.setBranchName(branch.getName());
-                b.setElasticId("blah");
+                b.setDescription("blah");
                 b.setTimestamp(Instant.now());
                 logger.info("Saving branch: {}", branch.getId());
 

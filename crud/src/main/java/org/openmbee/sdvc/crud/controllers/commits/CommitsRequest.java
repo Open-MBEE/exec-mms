@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.commits;
 
 import java.util.List;
 import org.openmbee.sdvc.crud.controllers.BaseRequest;
+import org.openmbee.sdvc.json.CommitJson;
 
 public class CommitsRequest extends BaseRequest {
 

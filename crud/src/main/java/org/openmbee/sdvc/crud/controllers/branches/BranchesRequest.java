@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.util.List;
 import org.openmbee.sdvc.crud.controllers.BaseRequest;
+import org.openmbee.sdvc.json.RefJson;
 
 public class BranchesRequest extends BaseRequest {
 
