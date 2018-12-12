@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -130,7 +131,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     protected void commitChanges(Map<String, Node> nodes, Map<String, ElementJson> json,
-        CommitJson cmjs, Instant now, Set<String> oldIndexIds) {
+        CommitJson cmjs, Instant now, Set<String> oldIndexIds) throws IOException {
         if (!nodes.isEmpty()) {
             this.nodeIndex.indexAll(json.values());
             this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));

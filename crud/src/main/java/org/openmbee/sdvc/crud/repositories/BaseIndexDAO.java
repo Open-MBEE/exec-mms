@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.repositories;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,10 @@ public interface BaseIndexDAO {
 
     void indexAll(Collection<? extends BaseJson> jsons);
 
-    void index(BaseJson json);
+    void index(BaseJson json) throws IOException ;
 
+    void deleteIndex(BaseJson json)  throws IOException;
+
+    void get(BaseJson json)  throws IOException;
 
 }

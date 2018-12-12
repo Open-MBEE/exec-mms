@@ -1,14 +1,29 @@
 package org.openmbee.sdvc.crud.repositories;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
+import org.elasticsearch.client.RestHighLevelClient;
 
 public abstract class BaseElasticDAOImpl implements BaseIndexDAO {
+
+    private final RestHighLevelClient client;
+
+    public BaseElasticDAOImpl(RestHighLevelClient client) {
+        this.client = client;
+    }
 
     public String getIndex() {
         return DbContextHolder.getContext().getIndex();
@@ -47,7 +62,15 @@ public abstract class BaseElasticDAOImpl implements BaseIndexDAO {
 
     }
 
-    public void index(BaseJson json) {
+    @Override
+    public void index(BaseJson json) throws IOException {
+        CreateIndexRequest request = new CreateIndexRequest(json.getProjectId());
+        client.indices().create(request, RequestOptions.DEFAULT).isAcknowledged();
+    }
 
+    @Override
+    public void deleteIndex(BaseJson json) throws IOException {
+        DeleteIndexRequest request = new DeleteIndexRequest(json.getProjectId());
+        client.indices().delete(request, RequestOptions.DEFAULT).isAcknowledged();
     }
 }
