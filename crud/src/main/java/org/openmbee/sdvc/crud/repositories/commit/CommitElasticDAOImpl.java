@@ -20,21 +20,13 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
         return null;
     }
 
-    public void createAll(Collection<? extends BaseJson> jsons) throws IOException  {
-        this.createAll("projectId_node", jsons);
-
-    }
-
-    public void create(BaseJson json) throws IOException {
-        this.create("projectId_node", json);
-    }
-
-    public void indexAll(Collection<? extends BaseJson> jsons) {
+    public void indexAll(Collection<? extends BaseJson> jsons) throws IOException {
+        this.indexAll("projectId_node", jsons);
 
     }
 
     public void index(BaseJson json) throws IOException {
-
+        this.index("projectId_node", json);
     }
 
 }
