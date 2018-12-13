@@ -7,8 +7,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
-import org.openmbee.sdvc.json.CommitJson;
-import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.domains.Commit;
@@ -20,6 +18,8 @@ import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
 import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
+import org.openmbee.sdvc.json.CommitJson;
+import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -104,15 +104,9 @@ public class DefaultNodeService implements NodeService {
         DbContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
 
-        CommitJson cmjs = new CommitJson();
-        cmjs.setCreator("admin");
-        cmjs.setComment(req.getComment());
-        cmjs.setSource(req.getSource());
-        cmjs.setRefId(refId);
-        cmjs.setProjectId(projectId);
-
         NodeChangeInfo info = nodePostHelper
-            .processPostJson(req.getElements(), overwriteJson, cmjs, this);
+            .processPostJson(req.getElements(), overwriteJson,
+                createCommit("admin", refId, projectId, req), this);
 
         try {
             commitChanges(info);
@@ -176,13 +170,9 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse delete(String projectId, String refId, ElementsRequest req) {
         DbContextHolder.setContext(projectId, refId);
 
-        CommitJson cmjs = new CommitJson();
-        cmjs.setCreator("admin");
-        cmjs.setComment(req.getComment());
-        cmjs.setSource(req.getSource());
-        cmjs.setRefId(refId);
-        cmjs.setProjectId(projectId);
-        NodeChangeInfo info = nodeDeleteHelper.processDeleteJson(req.getElements(), cmjs, this);
+        NodeChangeInfo info = nodeDeleteHelper
+            .processDeleteJson(req.getElements(), createCommit("admin", refId, projectId, req),
+                this);
 
         try {
             commitChanges(info);
@@ -193,5 +183,16 @@ public class DefaultNodeService implements NodeService {
         response.getElements().addAll(info.getDeletedMap().values());
         response.put("rejected", info.getRejected());
         return response;
+    }
+
+    private CommitJson createCommit(String creator, String refId, String projectId,
+        ElementsRequest req) {
+        CommitJson cmjs = new CommitJson();
+        cmjs.setCreator(creator);
+        cmjs.setComment(req.getComment());
+        cmjs.setSource(req.getSource());
+        cmjs.setRefId(refId);
+        cmjs.setProjectId(projectId);
+        return cmjs;
     }
 }

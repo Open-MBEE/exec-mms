@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.commits;
 
 import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.BaseController;
+import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.services.CommitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/commits")
-    public ResponseEntity<?> handleGet(
+    public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestParam Map<String, String> params) {
@@ -35,7 +36,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/commits/{commitId}")
-    public ResponseEntity<?> handleCommitGet(
+    public ResponseEntity<? extends BaseResponse> handleCommitGet(
         @PathVariable String projectId,
         @PathVariable String commitId) {
 
@@ -44,7 +45,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/elements/{elementId}/commits")
-    public ResponseEntity<?> handleElementCommitsGet(
+    public ResponseEntity<? extends BaseResponse> handleElementCommitsGet(
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
@@ -55,7 +56,7 @@ public class CommitsController extends BaseController {
     }
 
     @PutMapping(value = "/commits")
-    public ResponseEntity<?> handleBulkGet(
+    public ResponseEntity<? extends BaseResponse> handleBulkGet(
         @PathVariable String projectId,
         @RequestBody CommitsRequest req) {
 

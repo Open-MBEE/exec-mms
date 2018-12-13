@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
 import org.openmbee.sdvc.crud.domains.Node;
-import org.openmbee.sdvc.crud.domains.NodeType;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.jdbc.core.RowMapper;
 

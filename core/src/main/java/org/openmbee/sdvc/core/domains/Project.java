@@ -34,6 +34,10 @@ public class Project extends Base {
     @JoinTable(name = "roles_projects", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "projects_metadata", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "metadata_id", referencedColumnName = "id"))
+    private Collection<Metadata> metadata;
+
     public Project() {
     }
 
