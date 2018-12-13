@@ -6,20 +6,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.RequestOptions;
+
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-public abstract class BaseElasticDAOImpl implements BaseIndexDAO {
+public abstract class BaseElasticDAOImpl {
 
     protected RestHighLevelClient client;
 
@@ -32,11 +26,11 @@ public abstract class BaseElasticDAOImpl implements BaseIndexDAO {
         return DbContextHolder.getContext().getIndex();
     }
 
-    public Map<String, Object> findByIndexId(String indexId) {
+    public Map<String, Object> findByIndexId(String index, String indexId) {
         return null;
     }
 
-    public List<Map<String, Object>> findByIndexIds(Set<String> indexIds) {
+    public List<Map<String, Object>> findByIndexIds(String index, Set<String> indexIds) {
         List<Map<String, Object>> maps = new ArrayList<>();
         int i = 97;
         for (String eid : indexIds) {
@@ -61,19 +55,11 @@ public abstract class BaseElasticDAOImpl implements BaseIndexDAO {
         return maps;
     }
 
-    public void indexAll(Collection<? extends BaseJson> jsons) {
+    public void indexAll(String index, Collection<? extends BaseJson> jsons) {
 
     }
 
-    @Override
-    public void index(BaseJson json) throws IOException {
-        CreateIndexRequest request = new CreateIndexRequest(json.getProjectId());
-        client.indices().create(request, RequestOptions.DEFAULT).isAcknowledged();
-    }
+    public void index(String index, BaseJson json) throws IOException {
 
-    @Override
-    public void deleteIndex(BaseJson json) throws IOException {
-        DeleteIndexRequest request = new DeleteIndexRequest(json.getProjectId());
-        client.indices().delete(request, RequestOptions.DEFAULT).isAcknowledged();
     }
 }
