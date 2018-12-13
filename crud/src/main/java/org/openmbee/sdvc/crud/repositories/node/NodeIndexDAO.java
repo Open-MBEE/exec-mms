@@ -13,7 +13,7 @@ public interface NodeIndexDAO {
 
     List<Map<String, Object>> findByIndexIds(Set<String> indexIds);
 
-    void indexAll(Collection<? extends BaseJson> jsons);
+    void indexAll(Collection<? extends BaseJson> jsons) throws IOException;
 
     void index(BaseJson json) throws IOException;
 

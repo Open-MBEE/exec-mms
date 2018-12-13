@@ -21,11 +21,20 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         return null;
     }
 
-    public void indexAll(Collection<? extends BaseJson> jsons) {
+    public void createAll(Collection<? extends BaseJson> jsons) throws IOException  {
+        this.createAll("projectId_node", jsons);
 
     }
 
-    public void index(BaseJson json) throws IOException {
+    public void create(BaseJson json) throws IOException {
+        this.create("projectId_node", json);
+    }
+
+    public void indexAll(Collection<? extends BaseJson> jsons) throws IOException{
+
+    }
+
+    public void index(BaseJson json) throws IOException{
 
     }
 

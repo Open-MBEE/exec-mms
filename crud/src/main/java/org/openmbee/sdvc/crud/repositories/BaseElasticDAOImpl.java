@@ -5,8 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -55,11 +60,15 @@ public abstract class BaseElasticDAOImpl {
         return maps;
     }
 
-    public void indexAll(String index, Collection<? extends BaseJson> jsons) {
-
+    public void createAll(String index, Collection<? extends BaseJson> jsons) throws IOException {
+        BulkRequest bulkIndex = new BulkRequest();
+        for (BaseJson json : jsons) {
+            bulkIndex.add(new IndexRequest((index)).source(json));
+        }
+        client.bulk(bulkIndex, RequestOptions.DEFAULT);
     }
 
-    public void index(String index, BaseJson json) throws IOException {
-
+    public void create(String index, BaseJson json) throws IOException {
+        client.index(new IndexRequest(index).source(json), RequestOptions.DEFAULT);
     }
 }
