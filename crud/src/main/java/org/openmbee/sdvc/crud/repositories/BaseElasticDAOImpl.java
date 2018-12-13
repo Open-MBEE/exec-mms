@@ -16,12 +16,15 @@ import org.elasticsearch.client.RequestOptions;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public abstract class BaseElasticDAOImpl implements BaseIndexDAO {
 
-    private final RestHighLevelClient client;
+    protected RestHighLevelClient client;
 
-    public BaseElasticDAOImpl(RestHighLevelClient client) {
+    @Autowired
+    public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
         this.client = client;
     }
 

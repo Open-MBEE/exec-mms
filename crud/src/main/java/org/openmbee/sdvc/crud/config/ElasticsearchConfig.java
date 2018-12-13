@@ -13,7 +13,7 @@ public class ElasticsearchConfig {
     @Value("${elasticsearch.host}")
     private String elasticsearchHost;
 
-    @Bean(destroyMethod = "close")
+    @Bean(name = "clientElastic", destroyMethod = "close")
     public RestHighLevelClient restClient() {
         RestHighLevelClient client = new RestHighLevelClient(
             RestClient.builder(new HttpHost(elasticsearchHost)));

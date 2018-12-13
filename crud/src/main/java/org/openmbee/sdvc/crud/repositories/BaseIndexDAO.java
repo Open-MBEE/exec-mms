@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.openmbee.sdvc.json.BaseJson;
 
 public interface BaseIndexDAO {
@@ -19,6 +20,5 @@ public interface BaseIndexDAO {
 
     void deleteIndex(BaseJson json)  throws IOException;
 
-    void get(BaseJson json)  throws IOException;
 
 }

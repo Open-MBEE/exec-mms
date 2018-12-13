@@ -3,14 +3,11 @@ package org.openmbee.sdvc.crud.services;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -26,8 +23,9 @@ import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
 
 @Service("defaultNodeService")
 public class DefaultNodeService implements NodeService {
@@ -41,6 +39,8 @@ public class DefaultNodeService implements NodeService {
     protected CommitIndexDAO commitIndex;
     protected EdgeDAO edgeRepository;
     protected NodePostHelper nodePostHelper;
+    protected NodeDeleteHelper nodeDeleteHelper;
+
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -70,6 +70,11 @@ public class DefaultNodeService implements NodeService {
     @Autowired
     public void setNodePostHelper(NodePostHelper nodePostHelper) {
         this.nodePostHelper = nodePostHelper;
+    }
+
+    @Autowired
+    public void setNodeDeleteHelper(NodeDeleteHelper nodeDeleteHelper) {
+        this.nodeDeleteHelper = nodeDeleteHelper;
     }
 
     @Override
@@ -103,7 +108,6 @@ public class DefaultNodeService implements NodeService {
 
         DbContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
-        Instant now = Instant.now();
 
         CommitJson cmjs = new CommitJson();
         cmjs.setCreator("admin");
@@ -112,32 +116,33 @@ public class DefaultNodeService implements NodeService {
         cmjs.setRefId(refId);
         cmjs.setProjectId(projectId);
 
-        List<Map> rejectedList = new ArrayList<>();
-        Map<String, ElementJson> responses = new HashMap<>();
-        Set<String> oldElasticIds = new HashSet<>();
-        Map<String, Node> toSave = nodePostHelper
-            .processPostJson(req.getElements(), overwriteJson, now, cmjs, responses, rejectedList,
-                this, oldElasticIds);
+        NodeChangeInfo info = nodePostHelper
+            .processPostJson(req.getElements(), overwriteJson, cmjs, this);
 
         try {
-            commitChanges(toSave, responses, cmjs, now, oldElasticIds);
+            commitChanges(info);
         } catch (Exception e) {
             //TODO db transaction
         }
         ElementsResponse response = new ElementsResponse();
-        response.getElements().addAll(responses.values());
-        response.put("rejected", rejectedList);
+        response.getElements().addAll(info.getUpdatedMap().values());
+        response.put("rejected", info.getRejected());
         return response;
     }
 
-    protected void commitChanges(Map<String, Node> nodes, Map<String, ElementJson> json,
-        CommitJson cmjs, Instant now, Set<String> oldIndexIds) throws IOException {
-        if (!nodes.isEmpty()) {
-            this.nodeIndex.indexAll(json.values());
-            this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
+    protected void commitChanges(NodeChangeInfo info) throws IOException {
+        Map<String, Node> nodes = info.getToSaveNodeMap();
+        Map<String, ElementJson> json = info.getUpdatedMap();
+        CommitJson cmjs = info.getCommitJson();
+        Instant now = info.getNow();
 
-            List<Edge> edges = nodePostHelper.getEdgesToSave(nodes, json, this);
-            this.edgeRepository.saveAll(edges);
+        if (!nodes.isEmpty()) {
+            this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
+            if (json != null && !json.isEmpty()) {
+                this.nodeIndex.indexAll(json.values());
+                List<Edge> edges = nodePostHelper.getEdgesToSave(info);
+                this.edgeRepository.saveAll(edges);
+            }
 
             //TODO update old elastic ids to remove ref from inRefIds
 //            DB Commit
@@ -155,13 +160,44 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public void extraProcessPostedElement(ElementJson element, Node node,
-        Set<String> oldElasticIds, CommitJson cmjs, Instant now, Map<String, Node> toSave,
-        Map<String, ElementJson> response) {
+    public void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info) {
     }
 
     @Override
-    public Map<Integer, List<Pair<String, String>>> getEdgeInfo(Collection<ElementJson> elements) {
-        return new HashMap<>();
+    public void extraProcessDeletedElement(ElementJson element, Node node, NodeChangeInfo info) {
+    }
+
+    @Override
+    public ElementsResponse delete(String projectId, String refId, String id) {
+        ElementJson json = new ElementJson();
+        json.setId(id);
+        ElementsRequest req = new ElementsRequest();
+        List<ElementJson> list = new ArrayList<>();
+        list.add(json);
+        req.setElements(list);
+        return delete(projectId, refId, req);
+    }
+
+    @Override
+    public ElementsResponse delete(String projectId, String refId, ElementsRequest req) {
+        DbContextHolder.setContext(projectId, refId);
+
+        CommitJson cmjs = new CommitJson();
+        cmjs.setCreator("admin");
+        cmjs.setComment(req.getComment());
+        cmjs.setSource(req.getSource());
+        cmjs.setRefId(refId);
+        cmjs.setProjectId(projectId);
+        NodeChangeInfo info = nodeDeleteHelper.processDeleteJson(req.getElements(), cmjs, this);
+
+        try {
+            commitChanges(info);
+        } catch (Exception e) {
+            //TODO db transaction
+        }
+        ElementsResponse response = new ElementsResponse();
+        response.getElements().addAll(info.getDeletedMap().values());
+        response.put("rejected", info.getRejected());
+        return response;
     }
 }
