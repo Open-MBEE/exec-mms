@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.repositories;
 
+import com.sun.xml.internal.org.jvnet.fastinfoset.sax.EncodingAlgorithmContentHandler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,13 +40,13 @@ public abstract class BaseElasticDAOImpl {
         return DbContextHolder.getContext().getIndex();
     }
 
-    public Map<String, Object> get(String index, String elasticId) throws IOException {
+    public Map<String, Object> findById(String index, String elasticId) throws IOException {
         Map<String, Object> sourceAsMap = client
             .get(new GetRequest(index, null, elasticId), RequestOptions.DEFAULT).getSourceAsMap();
         return sourceAsMap;
     }
 
-    public List<Map<String, Object>> getAll(String index, Set<String> elasticIds)
+    public List<Map<String, Object>> findAllById(String index, Set<String> elasticIds)
         throws IOException {
         List<Map<String, Object>> listOfResponses = new ArrayList<>();
 
@@ -90,6 +91,9 @@ public abstract class BaseElasticDAOImpl {
         maps.add(baseJson);
         */
         return maps;
+    }
+    public Map<String, Object> findByIndexId(String indexId) {
+        return null;
     }
 
     public void indexAll(String index, Collection<? extends BaseJson> jsons) throws IOException {

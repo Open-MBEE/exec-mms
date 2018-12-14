@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexDAO {
 
     public Map<String, Object> findByIndexId(String indexId) {
-        return this.findByIndexId("projectid_node", indexId);
+        return null;
     }
 
     public List<Map<String, Object>> findByIndexIds(Set<String> indexIds) {
@@ -28,5 +28,13 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
 
     public void index(BaseJson json) throws IOException {
         this.index("projectId_node", json);
+    }
+
+    public Map<String, Object> findById(String elasticId) throws IOException  {
+        return this.findById("projectId_node", elasticId);
+    }
+
+    public List<Map<String, Object>> findAllById(Set<String> elasticIds) throws IOException {
+        return this.findAllById("projectId_node", elasticIds);
     }
 }

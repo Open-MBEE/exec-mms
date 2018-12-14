@@ -17,4 +17,8 @@ public interface NodeIndexDAO {
 
     void index(BaseJson json) throws IOException;
 
+    Map<String, Object> findById(String elasticId) throws IOException;
+
+    List<Map<String, Object>> findAllById(Set<String> elasticIds) throws IOException;
+
 }
