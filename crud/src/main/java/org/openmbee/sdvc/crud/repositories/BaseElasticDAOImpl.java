@@ -3,15 +3,23 @@ package org.openmbee.sdvc.crud.repositories;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.MultiGetItemResponse;
+import org.elasticsearch.action.get.MultiGetRequest;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -31,8 +39,32 @@ public abstract class BaseElasticDAOImpl {
         return DbContextHolder.getContext().getIndex();
     }
 
-    public Map<String, Object> findByIndexId(String index, String indexId) {
-        return null;
+    public Map<String, Object> get(String index, String elasticId) throws IOException {
+        Map<String, Object> sourceAsMap = client
+            .get(new GetRequest(index, null, elasticId), RequestOptions.DEFAULT).getSourceAsMap();
+        return sourceAsMap;
+    }
+
+    public List<Map<String, Object>> getAll(String index, Set<String> elasticIds)
+        throws IOException {
+        List<Map<String, Object>> listOfResponses = new ArrayList<>();
+
+        MultiGetRequest request = new MultiGetRequest();
+        for (String eid : elasticIds) {
+            request.add(index, null, eid);
+        }
+        MultiGetResponse response = client.mget(request, RequestOptions.DEFAULT);
+
+        for (MultiGetItemResponse res : response.getResponses()) {
+            GetResponse item = res.getResponse();
+            if (item.isExists()) {
+                listOfResponses.add(item.getSourceAsMap());
+            } else {
+                //:TODO what do we want to do for missing ids?
+                continue;
+            }
+        }
+        return listOfResponses;
     }
 
     public List<Map<String, Object>> findByIndexIds(String index, Set<String> indexIds) {

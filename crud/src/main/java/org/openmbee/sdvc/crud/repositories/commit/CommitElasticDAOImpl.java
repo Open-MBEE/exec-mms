@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIndexDAO {
 
-    public Map<String, Object> findByIndexId(String indexId) {
-        return this.findByIndexId("projectid_node", indexId);
+    public Map<String, Object> get(String indexId) throws IOException {
+        return this.get("projectid_node", indexId);
     }
 
     public List<Map<String, Object>> findByIndexIds(Set<String> indexIds) {
@@ -22,7 +22,6 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
 
     public void indexAll(Collection<? extends BaseJson> jsons) throws IOException {
         this.indexAll("projectId_node", jsons);
-
     }
 
     public void index(BaseJson json) throws IOException {

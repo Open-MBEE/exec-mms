@@ -9,7 +9,7 @@ import org.openmbee.sdvc.json.BaseJson;
 
 public interface CommitIndexDAO {
 
-    Map<String, Object> findByIndexId(String indexId);
+    Map<String, Object> get(String indexId) throws IOException ;
 
     List<Map<String, Object>> findByIndexIds(Set<String> indexIds);
 
