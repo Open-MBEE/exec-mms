@@ -27,7 +27,7 @@ public class DefaultProjectService implements ProjectService {
         this.projectOperations = projectOperations;
     }
 
-    public ProjectJson post(ProjectJson project) {
+    public ProjectJson create(ProjectJson project) {
         Project proj = new Project();
         proj.setProjectId(project.getId());
         proj.setProjectName(project.getName());
@@ -49,7 +49,23 @@ public class DefaultProjectService implements ProjectService {
         return null; //throw exception
     }
 
-    public ProjectsResponse get(String projectId) {
+    public ProjectJson update(ProjectJson project) {
+        Project proj = projectRepository.findByProjectId(project.getProjectId());
+        if (proj != null && !project.getId().isEmpty()) {
+            proj.setProjectId(project.getProjectId());
+            proj.setProjectName(project.getName());
+            projectRepository.save(proj);
+            return project;
+        }
         return null;
+    }
+
+    public ProjectsResponse read(String projectId) {
+        return null;
+    }
+
+    public boolean exists(String projectId) {
+        Project project = this.projectRepository.findByProjectId(projectId);
+        return project != null && project.getProjectId().equals(projectId);
     }
 }

@@ -3,9 +3,10 @@ package org.openmbee.sdvc.crud.services;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class NodePostHelper extends NodeOperation {
 
-    public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    public static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public boolean isUpdated(BaseJson element, Map<String, Object> existing,
         Map<String, Object> rejection) {
@@ -63,12 +64,12 @@ public class NodePostHelper extends NodeOperation {
             if (element == null) {
                 continue;
             }
-            Map<String, Object> rejected = new HashMap<>();
+            ElementsResponse rejected = new ElementsResponse();
             boolean added = false;
             boolean updated = false;
             if (element.getId() == null || element.getId().isEmpty()) {
-                rejected.put("message", "missing id");
-                rejected.put("code", 400);
+                rejected.addMessage("Missing ID");
+                rejected.setCode(400);
                 rejected.put("element", element);
             } else {
                 Map<String, Object> elasticElement = info.getExistingElementMap()

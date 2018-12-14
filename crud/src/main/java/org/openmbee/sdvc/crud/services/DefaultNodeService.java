@@ -73,7 +73,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse get(String projectId, String refId, String id,
+    public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
         DbContextHolder.setContext(projectId, refId);
@@ -98,7 +98,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse post(String projectId, String refId, ElementsRequest req,
+    public ElementsResponse create(String projectId, String refId, ElementsRequest req,
         Map<String, String> params) {
 
         DbContextHolder.setContext(projectId, refId);
@@ -115,7 +115,7 @@ public class DefaultNodeService implements NodeService {
         }
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
-        response.put("rejected", info.getRejected());
+        response.setRejected(info.getRejected());
         return response;
     }
 
@@ -133,7 +133,6 @@ public class DefaultNodeService implements NodeService {
             }
 
             //TODO update old elastic ids to remove ref from inRefIds
-//            DB Commit
             Commit commit = new Commit();
             commit.setBranchId(cmjs.getRefId());
             commit.setCommitType(CommitType.COMMIT);
@@ -181,7 +180,7 @@ public class DefaultNodeService implements NodeService {
         }
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getDeletedMap().values());
-        response.put("rejected", info.getRejected());
+        response.setRejected(info.getRejected());
         return response;
     }
 

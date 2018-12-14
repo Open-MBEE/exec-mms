@@ -1,8 +1,6 @@
 package org.openmbee.sdvc.cameo.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.openmbee.sdvc.crud.services.NodeChangeInfo;
@@ -27,11 +25,11 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
     }
 
     @Override
-    public ElementsResponse get(String projectId, String refId, String id,
+    public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
         //need to use mount search to accommodate depth param and project mounts
         //add childviews and extended info
-        return super.get(projectId, refId, id, params);
+        return super.read(projectId, refId, id, params);
     }
 
     @Override

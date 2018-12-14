@@ -56,7 +56,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     public List<Edge> insertAll(List<Edge> edges) {
         try {
-            //jdbctemplate doesn't have get generated keys for batch, need to use raw jdbc, depends on driver
+            //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
             Connection rawConn = getConnection().getDataSource().getConnection();
             PreparedStatement ps = rawConn
                 .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});

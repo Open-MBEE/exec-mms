@@ -2,7 +2,6 @@ package org.openmbee.sdvc.crud.controllers.projects;
 
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.services.ProjectService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.openmbee.sdvc.json.ProjectJson;
@@ -43,13 +42,18 @@ public class ProjectsController extends BaseController {
         @RequestBody ProjectsRequest projectsPost) {
 
         if (projectsPost.getProjects().isEmpty()) {
-            return ResponseEntity.badRequest().body(new ErrorResponse().setError("empty"));
+            ProjectsResponse pr = new ProjectsResponse();
+            pr.addMessage("empty");
+            return ResponseEntity.badRequest().body(pr);
         }
         ProjectsResponse response = new ProjectsResponse();
         for (ProjectJson json: projectsPost.getProjects()) {
-            //TODO check if already exist, or check project type
-            ProjectService ps = serviceFactory.getProjectService("cameo");
-            response.getProjects().add(ps.post(json));
+            ProjectService ps = getProjectService(json.getProjectId());
+            if (!ps.exists(json.getProjectId())) {
+                response.getProjects().add(ps.create(json));
+            } else {
+                response.getProjects().add(ps.update(json));
+            }
         }
         return ResponseEntity.ok(response);
     }

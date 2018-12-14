@@ -5,7 +5,11 @@ import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
 
 public interface ProjectService {
 
-    ProjectsResponse get(String projectId);
+    ProjectsResponse read(String projectId);
 
-    ProjectJson post(ProjectJson projectsPost);
+    boolean exists(String projectId);
+
+    ProjectJson create(ProjectJson projectsPost);
+
+    ProjectJson update(ProjectJson projectsPut);
 }

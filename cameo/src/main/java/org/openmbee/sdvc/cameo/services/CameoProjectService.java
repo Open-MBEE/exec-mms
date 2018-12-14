@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 @Service("cameoProjectService")
 public class CameoProjectService extends DefaultProjectService implements ProjectService {
 
-    public ProjectJson post(ProjectJson projectsPost) {
+    public ProjectJson create(ProjectJson projectsPost) {
         //TODO create elastic index with cameo specific mapping
-        return super.post(projectsPost);
+        return super.create(projectsPost);
     }
 }

@@ -4,7 +4,6 @@ import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.json.OrgJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -58,9 +57,9 @@ public class OrgsController extends BaseController {
             return ResponseEntity.ok(response);
         }
         logger.debug("Bad Request");
-        ErrorResponse er = new ErrorResponse();
-        er.setCode(400);
-        er.setError("Bad Request");
-        return ResponseEntity.badRequest().body(er);
+        OrganizationsResponse err = new OrganizationsResponse();
+        err.setCode(400);
+        err.addMessage("Bad Request");
+        return ResponseEntity.badRequest().body(err);
     }
 }

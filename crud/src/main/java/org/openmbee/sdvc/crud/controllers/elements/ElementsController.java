@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.services.NodeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +28,7 @@ public class ElementsController extends BaseController {
         @RequestParam Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        ElementsResponse res = nodeService.get(projectId, refId, elementId, params);
+        ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
         return ResponseEntity.ok(res);
     }
 
@@ -42,12 +41,12 @@ public class ElementsController extends BaseController {
 
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            ElementsResponse response = nodeService.post(projectId, refId, req, params);
+            ElementsResponse response = nodeService.create(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
-        ErrorResponse err = new ErrorResponse();
+        ElementsResponse err = new ElementsResponse();
         err.setCode(400);
-        err.setError("Empty");
+        err.addMessage("Empty");
         return ResponseEntity.badRequest().body(err);
     }
 
@@ -59,7 +58,7 @@ public class ElementsController extends BaseController {
         @RequestParam Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        ErrorResponse err = new ErrorResponse();
+        ElementsResponse err = new ElementsResponse();
         return ResponseEntity.badRequest().body(err);
     }
 
@@ -71,16 +70,14 @@ public class ElementsController extends BaseController {
         @PathVariable String elementId) {
 
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId);
-        if (res.getElements().isEmpty()) {
-            if (res != null && !res.isEmpty()) {
-                List<Map<String, Object>> rejected = (List<Map<String, Object>>) res.get("rejected");
-                Integer code = (Integer) rejected.get(1).get("code");
-                if (code == 304) {
-                    return ResponseEntity.status(304).body(res);
-                }
-                if (code == 404) {
-                    return ResponseEntity.notFound().build();
-                }
+        if (res.getElements().isEmpty() && !res.isEmpty()) {
+            List<Map<String, Object>> rejected = (List<Map<String, Object>>) res.get("rejected");
+            Integer code = (Integer) rejected.get(1).get("code");
+            if (code == 304) {
+                return ResponseEntity.status(304).body(res);
+            }
+            if (code == 404) {
+                return ResponseEntity.notFound().build();
             }
         }
         return ResponseEntity.ok(res);
