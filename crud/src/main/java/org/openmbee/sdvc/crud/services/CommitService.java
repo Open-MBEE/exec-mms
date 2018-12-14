@@ -70,11 +70,9 @@ public class CommitService {
     public CommitsResponse getCommit(String projectId, String commitId) {
         DbContextHolder.setContext(projectId);
         Map<String, Object> commit = null;
-        try {
-            commit = commitIndex.get(commitId);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        commit = commitIndex.findByIndexId(commitId);
+
         List<CommitJson> resJson = new ArrayList<>();
         CommitJson c = new CommitJson();
         c.putAll(commit);
