@@ -29,10 +29,16 @@ import org.openmbee.sdvc.json.BaseJson;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl {
 
     protected RestHighLevelClient client;
+    @Value("${elastic.limit.result}")
+    protected static int resultLimit;
+    @Value("${elastic.limit.term}")
+    protected static int termLimit;
+    protected static int readTimeout = 1000000000;
     // :TODO save, saveAll --> updates have details of upsert method, should break out into helper method for create/update
 
     @Autowired
