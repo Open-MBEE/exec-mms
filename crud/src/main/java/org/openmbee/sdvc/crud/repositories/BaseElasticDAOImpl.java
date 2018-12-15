@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetItemResponse;
@@ -21,6 +23,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -30,6 +33,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public abstract class BaseElasticDAOImpl {
 
     protected RestHighLevelClient client;
+    // :TODO save, saveAll --> updates have details of upsert method, should break out into helper method for create/update
 
     @Autowired
     public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
@@ -39,19 +43,50 @@ public abstract class BaseElasticDAOImpl {
     public String getIndex() {
         return DbContextHolder.getContext().getIndex();
     }
+    public long count(){
+        // Returns the number of entities available.
+        return 0;
+    }
 
-    public Map<String, Object> findById(String index, String elasticId) throws IOException {
+    public void delete(BaseJson json) throws IOException{
+        // :TODO deletes by entity
+    }
+
+    public void deleteById(String index, String indexId) throws IOException{
+        client.delete(new DeleteRequest(index, null, indexId), RequestOptions.DEFAULT);
+    }
+    public void deleteAll(String index, Collection<? extends BaseJson> jsons) throws IOException {
+        BulkRequest bulkIndex = new BulkRequest();
+        for (BaseJson json : jsons) {
+            bulkIndex.add(new DeleteRequest(index, null, json.getId()));
+        }
+        client.bulk(bulkIndex, RequestOptions.DEFAULT);
+    }
+
+    public boolean existsById(String index, String indexId)throws IOException {
+        GetRequest getRequest = new GetRequest(index, null, indexId);
+        getRequest.fetchSourceContext(new FetchSourceContext(false));
+        getRequest.storedFields("_none_");
+        return client.exists(getRequest, RequestOptions.DEFAULT);
+    }
+
+    public List<Map<String, Object>> findAll() {
+        //:TODO Returns all instances of the type.  Returns all entities. So not the elasticID
+        return null;
+    }
+
+    public Map<String, Object> findById(String index, String indexId) throws IOException {
         Map<String, Object> sourceAsMap = client
-            .get(new GetRequest(index, null, elasticId), RequestOptions.DEFAULT).getSourceAsMap();
+            .get(new GetRequest(index, null, indexId), RequestOptions.DEFAULT).getSourceAsMap();
         return sourceAsMap;
     }
 
-    public List<Map<String, Object>> findAllById(String index, Set<String> elasticIds)
+    public List<Map<String, Object>> findAllById(String index, Set<String> indexIds)
         throws IOException {
         List<Map<String, Object>> listOfResponses = new ArrayList<>();
 
         MultiGetRequest request = new MultiGetRequest();
-        for (String eid : elasticIds) {
+        for (String eid : indexIds) {
             request.add(index, null, eid);
         }
         MultiGetResponse response = client.mget(request, RequestOptions.DEFAULT);

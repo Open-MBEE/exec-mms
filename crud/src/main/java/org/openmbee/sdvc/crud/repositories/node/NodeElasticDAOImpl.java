@@ -30,11 +30,23 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         this.index("projectId_node", json);
     }
 
-    public Map<String, Object> findById(String elasticId) throws IOException  {
-        return this.findById("projectId_node", elasticId);
+    public Map<String, Object> findById(String indexId) throws IOException  {
+        return this.findById("projectId_node", indexId);
     }
 
-    public List<Map<String, Object>> findAllById(Set<String> elasticIds) throws IOException {
-        return this.findAllById("projectId_node", elasticIds);
+    public List<Map<String, Object>> findAllById(Set<String> indexIds) throws IOException {
+        return this.findAllById("projectId_node", indexIds);
+    }
+
+    public void deleteById(String indexId) throws IOException{
+        this.deleteById("projectId_node", indexId);
+    }
+
+    public void deleteAll(Collection<? extends BaseJson> jsons) throws IOException{
+        this.deleteAll("projectId_node", jsons);
+    }
+
+    public boolean existsById(String indexId)throws IOException{
+        return this.existsById("projectId_node", indexId);
     }
 }

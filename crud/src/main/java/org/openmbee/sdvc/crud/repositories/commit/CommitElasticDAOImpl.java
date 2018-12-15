@@ -18,18 +18,30 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
     }
 
     public void indexAll(Collection<? extends BaseJson> jsons) throws IOException {
-        this.indexAll("projectId_node", jsons);
+        this.indexAll("projectId_commit", jsons);
     }
 
     public void index(BaseJson json) throws IOException {
-        this.index("projectId_node", json);
+        this.index("projectId_commit", json);
     }
-    public Map<String, Object> findById(String elasticId) throws IOException  {
-        return this.findById("projectId_node", elasticId);
+    public Map<String, Object> findById(String indexId) throws IOException  {
+        return this.findById("projectId_commit", indexId);
     }
 
-    public List<Map<String, Object>> findAllById(Set<String> elasticIds) throws IOException {
-        return this.findAllById("projectId_node", elasticIds);
+    public List<Map<String, Object>> findAllById(Set<String> indexIds) throws IOException {
+        return this.findAllById("projectId_commit", indexIds);
+    }
+    
+    public void deleteById(String indexId) throws IOException{
+        this.deleteById("projectId_commit", indexId);
+    }
+
+    public void deleteAll(Collection<? extends BaseJson> jsons) throws IOException{
+        this.deleteAll("projectId_commit", jsons);
+    }
+
+    public boolean existsById(String indexId)throws IOException{
+        return this.existsById("projectId_commit", indexId);
     }
 
 }

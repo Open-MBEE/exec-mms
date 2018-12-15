@@ -17,8 +17,14 @@ public interface CommitIndexDAO {
 
     void index(BaseJson json) throws IOException;
 
-    Map<String, Object> findById(String elasticId) throws IOException;
+    Map<String, Object> findById(String indexId) throws IOException;
 
-    List<Map<String, Object>> findAllById(Set<String> elasticIds) throws IOException;
+    List<Map<String, Object>> findAllById(Set<String> indexIds) throws IOException;
+
+    void deleteById(String indexId) throws IOException;
+
+    void deleteAll(Collection<? extends BaseJson> jsons) throws IOException;
+
+    boolean existsById(String indexId)throws IOException;
 
 }
