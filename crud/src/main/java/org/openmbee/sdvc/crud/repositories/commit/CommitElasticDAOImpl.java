@@ -71,6 +71,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
         QueryBuilder deletedQuery = QueryBuilders.termQuery("deleted.id", id);
         QueryBuilder query = QueryBuilders.boolQuery().should(addedQuery).should(updatedQuery)
             .should(deletedQuery).filter(QueryBuilders.termsQuery("_uid",commitIds));
+        // :TODO you may need a minimum should match
         return query;
     }
 
@@ -93,6 +94,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
         sourceBuilder.query(query);
         sourceBuilder.size(this.resultLimit);
         sourceBuilder.sort(new FieldSortBuilder("created").order(SortOrder.DESC));
+        // :TODO check query output, public SearchSourceBuilder postFilter​(QueryBuilder postFilter)
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
