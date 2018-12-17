@@ -67,7 +67,6 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
      * @return QueryBuilder q
      */
     private QueryBuilder getCommitHistoryQuery(String id) {
-        QueryBuilder matchQueryBuilder = QueryBuilders.boolQuery();
         QueryBuilder addedQuery = QueryBuilders.termQuery("added.id", id);
         QueryBuilder updatedQuery = QueryBuilders.termQuery("updated.id", id);
         QueryBuilder deletedQuery = QueryBuilders.termQuery("deleted.id", id);
@@ -77,19 +76,16 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
 
     /**
      * Returns the commit history of a element                           (1)
-     * <p> Returns a JSONArray of objects that look this:
-     * {
-     * "id": "commitId",
-     * "_timestamp": "timestamp",
-     * "_creator": "creator"
-     * }                                                                (2)
+     * <p> Returns a list of commit metadata for the specificed id un-filtered by branch
+     *                                                                  (2)
      * <p>
      *
      * @param id sysmlId     (3)
      * @return JSONArray array or empty json array
      */
     @Override
-    public List<Map<String,Object>> getCommitHistory(String index, String id) throws IOException {
+    public List<Map<String,Object>> elementHistory(String index, String id) throws IOException {
+        List<Map<String,Object>> commits = new ArrayList<Map<String, Object>>();
         SearchRequest searchRequest = new SearchRequest();
         QueryBuilder query = getCommitHistoryQuery(id);
         //new FieldSortBuilder("_uid").order(SortOrder.ASC)
@@ -100,33 +96,12 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
         searchRequest.source(sourceBuilder);
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
-        SearchHit[] searchHits = hits.getHits();
+        SearchHit[] searchHits = hits.getHits(); //can be null
         for (SearchHit hit : searchHits) {
-            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-            //:TODO get inner object of source
-//            Map<String, Object> innerObject =
-//                (Map<String, Object>) hit.sourceAsMap("innerObject");
+            Map<String, Object> source = hit.getSourceAsMap();// gets _source
+            commits.add(source);
         }
-//
-//        if (result.isSucceeded() && result.getTotal() > 0) {
-//            JsonArray hits = result.getJsonObject().getAsJsonObject("hits").getAsJsonArray("hits");
-//            for (int i = 0; i < hits.size(); i++) {
-//                JsonObject o = new JsonObject();
-//                JsonObject record = hits.get(i).getAsJsonObject().getAsJsonObject("_source");
-//                o.add(Sjm.SYSMLID, hits.get(i).getAsJsonObject().get("_id"));
-//                o.add(Sjm.CREATED, record.get(Sjm.CREATED));
-//                o.add(Sjm.CREATOR, record.get(Sjm.CREATOR));
-//                if (record.has(Sjm.COMMENT)) {
-//                    o.add(Sjm.COMMENT, record.get(Sjm.COMMENT));
-//                }
-//                array.add(o);
-//            }
-//        } else if (!result.isSucceeded()) {
-//            throw new IOException(String.format("Elasticsearch error[%1$s]:%2$s",
-//                result.getResponseCode(), result.getErrorMessage()));
-//        }
-//        return array;
-        return new ArrayList<Map<String, Object>>();
+        return commits;
     }
 
 }
