@@ -90,7 +90,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
         QueryBuilder query = getCommitHistoryQuery(id);
         //new FieldSortBuilder("_uid").order(SortOrder.ASC)
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(QueryBuilders.termQuery("user", "kimchy"));
+        sourceBuilder.query(query);
         sourceBuilder.size(this.resultLimit);
         sourceBuilder.sort(new FieldSortBuilder("created").order(SortOrder.DESC));
         searchRequest.source(sourceBuilder);
