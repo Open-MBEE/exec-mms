@@ -27,6 +27,6 @@ public interface CommitIndexDAO {
 
     boolean existsById(String indexId)throws IOException;
 
-    List<Map<String,Object>> elementHistory(String index, String id) throws IOException;
+    List<Map<String,Object>> elementHistory(String index, String id, Set<String> commitIds) throws IOException;
 
 }
