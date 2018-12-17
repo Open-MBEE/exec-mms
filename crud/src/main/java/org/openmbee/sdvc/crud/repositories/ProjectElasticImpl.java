@@ -19,7 +19,13 @@ public class ProjectElasticImpl implements ProjectIndex {
 
     @Override
     public void create(String index) throws IOException {
-        CreateIndexRequest request = new CreateIndexRequest(index);
+        CreateIndexRequest commitIndex = new CreateIndexRequest(index+"_node");
+        CreateIndexRequest nodeIndex = new CreateIndexRequest(index+"_commit");
+        createIndex(commitIndex);
+        createIndex(nodeIndex);
+    }
+
+    private void createIndex(CreateIndexRequest request) throws IOException {
         client.indices().create(request, RequestOptions.DEFAULT).isAcknowledged();
     }
 
