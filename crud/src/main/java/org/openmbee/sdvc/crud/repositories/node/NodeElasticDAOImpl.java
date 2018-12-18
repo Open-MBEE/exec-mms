@@ -74,5 +74,10 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         commits = searchResponse.getHits().getAt(0).getSourceAsMap();
         return commits;
     }
+    @Override
+    public List<Map<String,Object>> getElementsLessThanOrEqualTimestamp(String nodeId, String timestamp, List<String> refsCommitIds,
+        String index) throws IOException {
+        return null;
+    }
 }
 

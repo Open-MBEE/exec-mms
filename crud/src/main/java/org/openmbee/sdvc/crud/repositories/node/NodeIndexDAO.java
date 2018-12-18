@@ -25,8 +25,12 @@ public interface NodeIndexDAO {
 
     void deleteAll(Collection<? extends BaseJson> jsons) throws IOException;
 
-    boolean existsById(String indexId)throws IOException;
+    boolean existsById(String indexId) throws IOException;
 
-    Map<String, Object> getByCommitId(String commitIndexId, String nodeId, String index) throws IOException;
+    Map<String, Object> getByCommitId(String commitIndexId, String nodeId, String index)
+        throws IOException;
+
+    List<Map<String, Object>> getElementsLessThanOrEqualTimestamp(String nodeId, String timestamp,
+        List<String> refsCommitIds, String index) throws IOException;
 
 }
