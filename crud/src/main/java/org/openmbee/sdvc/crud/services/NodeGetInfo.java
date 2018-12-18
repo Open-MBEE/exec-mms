@@ -1,16 +1,12 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.openmbee.sdvc.crud.domains.Node;
-import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
-import org.springframework.data.util.Pair;
 
-public class NodeGetInfo{
+public class NodeGetInfo {
 
     Set<String> reqIndexIds;
 
@@ -72,6 +68,5 @@ public class NodeGetInfo{
         this.rejected = rejected;
         return this;
     }
-
 
 }

@@ -2,12 +2,8 @@ package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
@@ -103,7 +99,7 @@ public class DefaultNodeService implements NodeService {
             logger.debug("No ElementId given");
 
             ElementsResponse response = new ElementsResponse();
-            response.getElements().addAll( nodeGetHelper.processGetAll().values() );
+            response.getElements().addAll(nodeGetHelper.processGetAll().values());
             return response;
         }
     }
