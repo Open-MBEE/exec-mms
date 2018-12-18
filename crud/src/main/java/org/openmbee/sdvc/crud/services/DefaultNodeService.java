@@ -117,6 +117,7 @@ public class DefaultNodeService implements NodeService {
         NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements());
 
         ElementsResponse response = new ElementsResponse();
+        response.getElements().addAll(info.getExistingElementMap().values());
         response.put("rejected", info.getRejected());
         return response;
     }
