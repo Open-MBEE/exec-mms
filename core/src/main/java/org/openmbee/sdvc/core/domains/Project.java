@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.core.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
 import java.util.Set;
@@ -29,14 +30,15 @@ public class Project extends Base {
     @OneToMany(mappedBy = "user")
     private Collection<UsersProjects> users;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     private Organization organization;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "roles_projects", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    @JsonIgnore
     private Collection<Role> roles;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "projects_metadata", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "metadata_id", referencedColumnName = "id"))
     private Collection<Metadata> metadata;
 

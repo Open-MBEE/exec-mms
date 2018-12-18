@@ -1,5 +1,8 @@
 package org.openmbee.sdvc.crud.controllers.orgs;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
+import java.util.Map;
 import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -27,12 +30,26 @@ public class OrgsController extends BaseController {
 
     @GetMapping(value = {"", "/{orgId}"})
     public ResponseEntity<?> handleGet(@PathVariable(required = false) String orgId) {
+        OrganizationsResponse response = new OrganizationsResponse();
+
         if (orgId != null) {
             logger.debug("OrgId given: ", orgId);
-            return ResponseEntity.ok(orgId);
+            Organization org = organizationRepository.findByOrganizationId(orgId);
+            OrgJson orgJson = new OrgJson();
+            Map<String, Object> converted = om.convertValue(org, new TypeReference<Map<String, Object>>() {});
+            orgJson.merge(converted);
+            response.getOrgs().add(orgJson);
+            return ResponseEntity.ok(response);
         } else {
             logger.debug("No OrgId given");
-            return ResponseEntity.ok("Requesting all orgs");
+            List<Organization> allOrgs = organizationRepository.findAll();
+            for (Organization org : allOrgs) {
+                OrgJson orgJson = new OrgJson();
+                Map<String, Object> converted = om.convertValue(org, new TypeReference<Map<String, Object>>() {});
+                orgJson.merge(converted);
+                response.getOrgs().add(orgJson);
+            }
+            return ResponseEntity.ok(response);
         }
     }
 

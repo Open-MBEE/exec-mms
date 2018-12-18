@@ -1,9 +1,13 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
+import java.util.Map;
+import org.openmbee.sdvc.core.domains.Project;
+import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.services.ProjectService;
-import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,21 +23,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects")
 public class ProjectsController extends BaseController {
 
-    private ServiceFactory serviceFactory;
+    ProjectRepository projectRepository;
 
     @Autowired
-    public ProjectsController(ServiceFactory serviceFactory) {
-        this.serviceFactory = serviceFactory;
+    public ProjectsController(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
     }
 
     @GetMapping(value = {"", "/{projectId}"})
     public ResponseEntity<?> handleGet(@PathVariable(required = false) String projectId) {
+        ProjectsResponse response = new ProjectsResponse();
+
         if (projectId != null) {
             logger.debug("ProjectId given: ", projectId);
-            return ResponseEntity.ok(projectId);
+            Project org = projectRepository.findByProjectId(projectId);
+            ProjectJson projectJson = new ProjectJson();
+            Map<String, Object> converted = om.convertValue(org, new TypeReference<Map<String, Object>>() {});
+            projectJson.merge(converted);
+            response.getProjects().add(projectJson);
+            return ResponseEntity.ok(response);
         } else {
             logger.debug("No ProjectId given");
-            return ResponseEntity.ok("Requesting all projects");
+            List<Project> allOrgs = projectRepository.findAll();
+            for (Project org : allOrgs) {
+                ProjectJson projectJson = new ProjectJson();
+                Map<String, Object> converted = om.convertValue(org, new TypeReference<Map<String, Object>>() {});
+                projectJson.merge(converted);
+                response.getProjects().add(projectJson);
+            }
+            return ResponseEntity.ok(response);
         }
     }
 
