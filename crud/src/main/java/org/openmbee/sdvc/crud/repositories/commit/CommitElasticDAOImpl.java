@@ -17,6 +17,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.repositories.BaseElasticDAOImpl;
 import org.openmbee.sdvc.json.BaseJson;
 import org.springframework.stereotype.Component;
@@ -30,11 +31,11 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
     }
 
     public void indexAll(Collection<? extends BaseJson> jsons) throws IOException {
-        this.indexAll("projectId_commit", jsons);
+        this.indexAll(DbContextHolder.getContext().getProjectId() + "_commit", jsons);
     }
 
     public void index(BaseJson json) throws IOException {
-        this.index("projectId_commit", json);
+        this.index(DbContextHolder.getContext().getProjectId() + "_commit", json);
     }
 
     public Map<String, Object> findById(String indexId) throws IOException {

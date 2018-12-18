@@ -14,6 +14,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.repositories.BaseElasticDAOImpl;
 import org.openmbee.sdvc.json.BaseJson;
 import org.springframework.stereotype.Component;
@@ -29,16 +30,16 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         return null;
     }
 
-    public void indexAll(Collection<? extends BaseJson> jsons) throws IOException  {
-        this.indexAll("projectId_node", jsons);
+    public void indexAll(Collection<? extends BaseJson> jsons) throws IOException {
+        this.indexAll(DbContextHolder.getContext().getProjectId() + "_node", jsons);
 
     }
 
     public void index(BaseJson json) throws IOException {
-        this.index("projectId_node", json);
+        this.index(DbContextHolder.getContext().getProjectId() + "_node", json);
     }
 
-    public Map<String, Object> findById(String indexId) throws IOException  {
+    public Map<String, Object> findById(String indexId) throws IOException {
         return this.findById("projectId_node", indexId);
     }
 
@@ -46,23 +47,27 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         return this.findAllById("projectId_node", indexIds);
     }
 
-    public void deleteById(String indexId) throws IOException{
+    public void deleteById(String indexId) throws IOException {
         this.deleteById("projectId_node", indexId);
     }
 
-    public void deleteAll(Collection<? extends BaseJson> jsons) throws IOException{
+    public void deleteAll(Collection<? extends BaseJson> jsons) throws IOException {
         this.deleteAll("projectId_node", jsons);
     }
 
-    public boolean existsById(String indexId)throws IOException{
+    public boolean existsById(String indexId) throws IOException {
         return this.existsById("projectId_node", indexId);
     }
+
     @Override
-    public Map<String, Object> getByCommitId(String commitIndexId, String nodeId, String index) throws IOException {
+    public Map<String, Object> getByCommitId(String commitIndexId, String nodeId, String index)
+        throws IOException {
         Map<String, Object> commits;
         SearchRequest searchRequest = new SearchRequest();
         // searches the elements for the reference with the current commitId (elasticId) and sysmlid Id
-        QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("commitId",commitIndexId)).must(QueryBuilders.termQuery("id",nodeId));
+        QueryBuilder query = QueryBuilders.boolQuery()
+            .must(QueryBuilders.termQuery("commitId", commitIndexId))
+            .must(QueryBuilders.termQuery("id", nodeId));
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(query);
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
