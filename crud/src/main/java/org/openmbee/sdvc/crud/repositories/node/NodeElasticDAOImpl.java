@@ -70,3 +70,4 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         return commits;
     }
 }
+
