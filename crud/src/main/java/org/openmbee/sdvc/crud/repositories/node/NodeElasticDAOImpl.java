@@ -6,6 +6,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.openmbee.sdvc.crud.repositories.BaseElasticDAOImpl;
 import org.openmbee.sdvc.json.BaseJson;
 import org.springframework.stereotype.Component;
@@ -48,5 +56,17 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
 
     public boolean existsById(String indexId)throws IOException{
         return this.existsById("projectId_node", indexId);
+    }
+    @Override
+    public Map<String, Object> getByCommitId(String commitIndexId, String nodeId, String index) throws IOException {
+        Map<String, Object> commits;
+        SearchRequest searchRequest = new SearchRequest();
+        // searches the elements for the reference with the current commitId (elasticId) and sysmlid Id
+        QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("commitId",commitIndexId)).must(QueryBuilders.termQuery("id",nodeId));
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(query);
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        commits = searchResponse.getHits().getAt(0).getSourceAsMap();
+        return commits;
     }
 }

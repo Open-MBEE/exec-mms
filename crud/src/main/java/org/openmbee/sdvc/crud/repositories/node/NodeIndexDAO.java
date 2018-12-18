@@ -27,4 +27,6 @@ public interface NodeIndexDAO {
 
     boolean existsById(String indexId)throws IOException;
 
+    Map<String, Object> getByCommitId(String commitIndexId, String nodeId, String index) throws IOException;
+
 }
