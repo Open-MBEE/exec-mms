@@ -64,7 +64,9 @@ public class NodeOperation {
             .convertToMap(existingElements, ElementJson.ID);
 
         Instant now = Instant.now();
-        initCommitJson(cmjs, now);
+        if (cmjs != null) {
+            initCommitJson(cmjs, now);
+        }
 
         NodeChangeInfo info = new NodeChangeInfo();
         info.setCommitJson(cmjs);
@@ -178,5 +180,17 @@ public class NodeOperation {
             }
         }
         return res;
+    }
+
+    public boolean existingNodeContainsNodeId(NodeGetInfo info, String nodeId) {
+        if (!info.getExistingNodeMap().containsKey(nodeId)) {
+            Map<String, Object> reject = new HashMap<>();
+            reject.put("code", 404);
+            reject.put("message", "not found");
+            reject.put("id", nodeId);
+            info.getRejected().add(reject);
+            return false;
+        }
+        return true;
     }
 }
