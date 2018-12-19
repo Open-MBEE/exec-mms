@@ -85,8 +85,14 @@ public abstract class BaseElasticDAOImpl {
         return null;
     }
 
-    public Map<String, Object> findById(String index, String indexId) throws IOException {
-        return client.get(new GetRequest(index, this.type, indexId), RequestOptions.DEFAULT).getSourceAsMap();
+    public Optional<Map<String, Object>> findById(String index, String indexId) throws IOException {
+        GetResponse response = client
+            .get(new GetRequest(index, null, indexId), RequestOptions.DEFAULT);
+        if (response.isExists()) {
+            return Optional.of(response.getSourceAsMap());
+        } else {
+            return Optional.empty();
+        }
     }
 
     public List<Map<String, Object>> findAllById(String index, Set<String> indexIds)
