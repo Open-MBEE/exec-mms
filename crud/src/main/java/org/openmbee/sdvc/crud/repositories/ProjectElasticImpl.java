@@ -23,7 +23,7 @@ public class ProjectElasticImpl implements ProjectIndex {
     @Override
     public void create(String index) throws IOException {
         CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
-        commitIndex.mapping(getCommitMapAsString(), XContentType.JSON);
+        commitIndex.mapping("_doc", getCommitMapAsString(), XContentType.JSON);
         CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
         createIndex(commitIndex);
         createIndex(nodeIndex);

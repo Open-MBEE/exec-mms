@@ -40,6 +40,7 @@ public abstract class BaseElasticDAOImpl {
     @Value("${elastic.limit.term}")
     protected static int termLimit;
     protected static int readTimeout = 1000000000;
+    private final String type = "_doc";
     // :TODO save, saveAll --> updates have details of upsert method, should break out into helper method for create/update
 
     @Autowired
@@ -61,19 +62,19 @@ public abstract class BaseElasticDAOImpl {
     }
 
     public void deleteById(String index, String indexId) throws IOException {
-        client.delete(new DeleteRequest(index, null, indexId), RequestOptions.DEFAULT);
+        client.delete(new DeleteRequest(index, this.type, indexId), RequestOptions.DEFAULT);
     }
 
     public void deleteAll(String index, Collection<? extends BaseJson> jsons) throws IOException {
         BulkRequest bulkIndex = new BulkRequest();
         for (BaseJson json : jsons) {
-            bulkIndex.add(new DeleteRequest(index, null, json.getId()));
+            bulkIndex.add(new DeleteRequest(index, this.type, json.getId()));
         }
         client.bulk(bulkIndex, RequestOptions.DEFAULT);
     }
 
     public boolean existsById(String index, String indexId) throws IOException {
-        GetRequest getRequest = new GetRequest(index, null, indexId);
+        GetRequest getRequest = new GetRequest(index, this.type, indexId);
         getRequest.fetchSourceContext(new FetchSourceContext(false));
         getRequest.storedFields("_none_");
         return client.exists(getRequest, RequestOptions.DEFAULT);
@@ -85,7 +86,7 @@ public abstract class BaseElasticDAOImpl {
     }
 
     public Map<String, Object> findById(String index, String indexId) throws IOException {
-        return client.get(new GetRequest(index, null, indexId), RequestOptions.DEFAULT).getSourceAsMap();
+        return client.get(new GetRequest(index, this.type, indexId), RequestOptions.DEFAULT).getSourceAsMap();
     }
 
     public List<Map<String, Object>> findAllById(String index, Set<String> indexIds)
@@ -94,7 +95,7 @@ public abstract class BaseElasticDAOImpl {
 
         MultiGetRequest request = new MultiGetRequest();
         for (String eid : indexIds) {
-            request.add(index, null, eid);
+            request.add(index, this.type, eid);
         }
         MultiGetResponse response = client.mget(request, RequestOptions.DEFAULT);
 
