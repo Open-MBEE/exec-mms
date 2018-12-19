@@ -1,10 +1,10 @@
 package org.openmbee.sdvc.core.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
 import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -31,6 +31,7 @@ public class Project extends Base {
     private Collection<UsersProjects> users;
 
     @ManyToOne
+    @JsonManagedReference
     private Organization organization;
 
     @ManyToMany
@@ -101,6 +102,10 @@ public class Project extends Base {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    public String getOrgId() {
+        return organization.getOrganizationId();
     }
 
     public Collection<Role> getRoles() {

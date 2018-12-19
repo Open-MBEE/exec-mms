@@ -1,8 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
-import java.util.Map;
+import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -31,31 +30,31 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping(value = {"", "/{projectId}"})
-    public ResponseEntity<?> handleGet(@PathVariable(required = false) String projectId) {
+    @Transactional
+    public ResponseEntity<? extends BaseResponse> handleGet(@PathVariable(required = false) String projectId) {
         ProjectsResponse response = new ProjectsResponse();
 
         if (projectId != null) {
             logger.debug("ProjectId given: ", projectId);
             Project org = projectRepository.findByProjectId(projectId);
             ProjectJson projectJson = new ProjectJson();
-            Map<String, Object> converted = om.convertValue(org, new TypeReference<Map<String, Object>>() {});
-            projectJson.merge(converted);
+            projectJson.merge(convertToMap(org));
             response.getProjects().add(projectJson);
-            return ResponseEntity.ok(response);
         } else {
             logger.debug("No ProjectId given");
             List<Project> allOrgs = projectRepository.findAll();
             for (Project org : allOrgs) {
                 ProjectJson projectJson = new ProjectJson();
-                Map<String, Object> converted = om.convertValue(org, new TypeReference<Map<String, Object>>() {});
-                projectJson.merge(converted);
+                projectJson.merge(convertToMap(org));
                 response.getProjects().add(projectJson);
             }
-            return ResponseEntity.ok(response);
         }
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody ProjectsRequest projectsPost) {
 

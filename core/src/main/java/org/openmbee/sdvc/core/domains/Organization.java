@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.core.domains;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
 import javax.persistence.Entity;
@@ -17,6 +18,7 @@ public class Organization extends Base {
     private String organizationId;
 
     @OneToMany(mappedBy = "organization")
+    @JsonBackReference
     private Collection<Project> projects;
 
     public Organization() {

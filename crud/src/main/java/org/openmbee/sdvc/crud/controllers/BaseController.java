@@ -1,6 +1,8 @@
 package org.openmbee.sdvc.crud.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
@@ -22,5 +24,9 @@ public abstract class BaseController {
     @Autowired
     public void setObjectMapper(ObjectMapper om) {
         this.om = om;
+    }
+
+    public Map<String, Object> convertToMap(Object obj) {
+        return om.convertValue(obj, new TypeReference<Map<String, Object>>() {});
     }
 }

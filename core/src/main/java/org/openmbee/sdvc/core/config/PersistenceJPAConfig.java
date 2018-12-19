@@ -113,7 +113,8 @@ public class PersistenceJPAConfig {
     @Bean(name = "defaultObjectMapper")
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper objectMapper = builder.build();
-        objectMapper.registerModule(new Hibernate5Module());
+        objectMapper.registerModule(
+            new Hibernate5Module().disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION));
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         return objectMapper;
