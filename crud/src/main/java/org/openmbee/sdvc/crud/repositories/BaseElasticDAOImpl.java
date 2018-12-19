@@ -143,12 +143,12 @@ public abstract class BaseElasticDAOImpl {
     public void indexAll(String index, Collection<? extends BaseJson> jsons) throws IOException {
         BulkRequest bulkIndex = new BulkRequest();
         for (BaseJson json : jsons) {
-            bulkIndex.add(new IndexRequest((index)).source(json));
+            bulkIndex.add(new IndexRequest(index, this.type).source(json));
         }
         client.bulk(bulkIndex, RequestOptions.DEFAULT);
     }
 
     public void index(String index, BaseJson json) throws IOException {
-        client.index(new IndexRequest(index).source(json), RequestOptions.DEFAULT);
+        client.index(new IndexRequest(index, this.type).source(json), RequestOptions.DEFAULT);
     }
 }
