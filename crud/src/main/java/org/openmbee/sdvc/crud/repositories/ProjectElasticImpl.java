@@ -8,7 +8,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProjectElasticImpl implements ProjectIndex {
 
     protected RestHighLevelClient client;
@@ -21,7 +23,7 @@ public class ProjectElasticImpl implements ProjectIndex {
     @Override
     public void create(String index) throws IOException {
         CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
-        commitIndex.mapping(getCommitMapAsString(), XContentType.JSON);
+        commitIndex.mapping("_doc", getCommitMapAsString(), XContentType.JSON);
         CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
         createIndex(commitIndex);
         createIndex(nodeIndex);
@@ -38,6 +40,6 @@ public class ProjectElasticImpl implements ProjectIndex {
     }
 
     private String getCommitMapAsString() {
-        return "{\"properties\":{\"added\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"updated\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"deleted\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"id\":{\"type\":\"keyword\"},\"_refId\":{\"type\":\"keyword\"},\"_creator\":{\"type\":\"keyword\"},\"_created\":{\"type\":\"date\",\"format\":\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\"},\"_projectId\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"}}}";
+        return "{\"_doc\"{\"properties\":{\"added\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"updated\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"deleted\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"id\":{\"type\":\"keyword\"},\"_refId\":{\"type\":\"keyword\"},\"_creator\":{\"type\":\"keyword\"},\"_created\":{\"type\":\"date\",\"format\":\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\"},\"_projectId\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"}}}}";
     }
 }

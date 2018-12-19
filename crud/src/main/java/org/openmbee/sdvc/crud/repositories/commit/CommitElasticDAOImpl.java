@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -39,23 +40,23 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
     }
 
     public Map<String, Object> findById(String indexId) throws IOException {
-        return this.findById("projectId_commit", indexId);
+        return this.findById(DbContextHolder.getContext().getProjectId() + "_commit", indexId);
     }
 
     public List<Map<String, Object>> findAllById(Set<String> indexIds) throws IOException {
-        return this.findAllById("projectId_commit", indexIds);
+        return this.findAllById(DbContextHolder.getContext().getProjectId() + "_commit", indexIds);
     }
 
     public void deleteById(String indexId) throws IOException {
-        this.deleteById("projectId_commit", indexId);
+        this.deleteById(DbContextHolder.getContext().getProjectId() + "_commit", indexId);
     }
 
     public void deleteAll(Collection<? extends BaseJson> jsons) throws IOException {
-        this.deleteAll("projectId_commit", jsons);
+        this.deleteAll(DbContextHolder.getContext().getProjectId() + "_commit", jsons);
     }
 
     public boolean existsById(String indexId) throws IOException {
-        return this.existsById("projectId_commit", indexId);
+        return this.existsById(DbContextHolder.getContext().getProjectId() + "_commit", indexId);
     }
 
     /**
