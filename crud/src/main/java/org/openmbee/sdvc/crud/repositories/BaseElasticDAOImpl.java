@@ -7,8 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
+import org.elasticsearch.ElasticsearchParseException;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -48,18 +50,20 @@ public abstract class BaseElasticDAOImpl {
     public String getIndex() {
         return DbContextHolder.getContext().getIndex();
     }
-    public long count(){
+
+    public long count() {
         // Returns the number of entities available.
         return 0;
     }
 
-    public void delete(BaseJson json) throws IOException{
+    public void delete(BaseJson json) throws IOException {
         // :TODO deletes by entity
     }
 
-    public void deleteById(String index, String indexId) throws IOException{
+    public void deleteById(String index, String indexId) throws IOException {
         client.delete(new DeleteRequest(index, null, indexId), RequestOptions.DEFAULT);
     }
+
     public void deleteAll(String index, Collection<? extends BaseJson> jsons) throws IOException {
         BulkRequest bulkIndex = new BulkRequest();
         for (BaseJson json : jsons) {
@@ -68,7 +72,7 @@ public abstract class BaseElasticDAOImpl {
         client.bulk(bulkIndex, RequestOptions.DEFAULT);
     }
 
-    public boolean existsById(String index, String indexId)throws IOException {
+    public boolean existsById(String index, String indexId) throws IOException {
         GetRequest getRequest = new GetRequest(index, null, indexId);
         getRequest.fetchSourceContext(new FetchSourceContext(false));
         getRequest.storedFields("_none_");
@@ -81,9 +85,7 @@ public abstract class BaseElasticDAOImpl {
     }
 
     public Map<String, Object> findById(String index, String indexId) throws IOException {
-        Map<String, Object> sourceAsMap = client
-            .get(new GetRequest(index, null, indexId), RequestOptions.DEFAULT).getSourceAsMap();
-        return sourceAsMap;
+        return client.get(new GetRequest(index, null, indexId), RequestOptions.DEFAULT).getSourceAsMap();
     }
 
     public List<Map<String, Object>> findAllById(String index, Set<String> indexIds)
@@ -132,6 +134,7 @@ public abstract class BaseElasticDAOImpl {
         */
         return maps;
     }
+
     public Map<String, Object> findByIndexId(String indexId) {
         return null;
     }
