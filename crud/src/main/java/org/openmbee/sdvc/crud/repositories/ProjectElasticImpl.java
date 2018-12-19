@@ -40,6 +40,6 @@ public class ProjectElasticImpl implements ProjectIndex {
     }
 
     private String getCommitMapAsString() {
-        return "{\"properties\":{\"added\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"updated\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"deleted\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"id\":{\"type\":\"keyword\"},\"_refId\":{\"type\":\"keyword\"},\"_creator\":{\"type\":\"keyword\"},\"_created\":{\"type\":\"date\",\"format\":\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\"},\"_projectId\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"}}}";
+        return "{\"_doc\"{\"properties\":{\"added\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"updated\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"deleted\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"previousIndexId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"}}},\"id\":{\"type\":\"keyword\"},\"_refId\":{\"type\":\"keyword\"},\"_creator\":{\"type\":\"keyword\"},\"_created\":{\"type\":\"date\",\"format\":\"yyyy-MM-dd'T'HH:mm:ss.SSSZ\"},\"_projectId\":{\"type\":\"keyword\"},\"_indexId\":{\"type\":\"keyword\"}}}}";
     }
 }
