@@ -10,6 +10,8 @@ public interface NodeService {
 
     ElementsResponse get(String projectId, String refId, String id, Map<String, String> params);
 
+    ElementsResponse get(String projectId, String refId, ElementsRequest req, Map<String, String> params);
+
     ElementsResponse post(String projectId, String refId, ElementsRequest req,
         Map<String, String> params);
 

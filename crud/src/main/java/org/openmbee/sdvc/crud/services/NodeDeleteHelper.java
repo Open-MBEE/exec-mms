@@ -16,12 +16,7 @@ public class NodeDeleteHelper extends NodeOperation {
         NodeChangeInfo info = initInfo(elements, cmjs);
 
         for (String nodeId : info.getReqElementMap().keySet()) {
-            if (!info.getExistingNodeMap().containsKey(nodeId)) {
-                Map<String, Object> reject = new HashMap<>();
-                reject.put("code", 404);
-                reject.put("message", "not found");
-                reject.put("id", nodeId);
-                info.getRejected().add(reject);
+            if (!existingNodeContainsNodeId(info, nodeId)) {
                 continue;
             }
             Node node = info.getExistingNodeMap().get(nodeId);
