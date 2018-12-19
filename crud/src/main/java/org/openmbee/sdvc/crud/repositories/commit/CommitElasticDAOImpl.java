@@ -3,7 +3,6 @@ package org.openmbee.sdvc.crud.repositories.commit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,10 +40,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIn
     }
 
     public Map<String, Object> findById(String indexId) throws IOException {
-        Map<String, Object> response = this
-            .findById(DbContextHolder.getContext().getProjectId() + "_commit", indexId)
-            .orElse(new HashMap<>());
-        return response;
+        return this.findById(DbContextHolder.getContext().getProjectId() + "_commit", indexId);
     }
 
     public List<Map<String, Object>> findAllById(Set<String> indexIds) throws IOException {
