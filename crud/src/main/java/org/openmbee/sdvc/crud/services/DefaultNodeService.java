@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -23,7 +22,6 @@ import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 
@@ -87,7 +85,6 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse get(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        DbContextHolder.setContext(projectId, refId);
         if (id != null) {
             logger.debug("ElementId given: ", id);
 
@@ -97,11 +94,12 @@ public class DefaultNodeService implements NodeService {
             List<ElementJson> list = new ArrayList<>();
             list.add(json);
             req.setElements(list);
-            return get(req, params);
+            return get(projectId, refId, req, params);
 
         } else {
 //            If no id is provided, return all
             logger.debug("No ElementId given");
+            DbContextHolder.setContext(projectId, refId);
 
             ElementsResponse response = new ElementsResponse();
             response.getElements().addAll(nodeGetHelper.processGetAll().values());
@@ -109,7 +107,8 @@ public class DefaultNodeService implements NodeService {
         }
     }
 
-    public ElementsResponse get(ElementsRequest req, Map<String, String> params) {
+    @Override
+    public ElementsResponse get(String projectId, String refId, ElementsRequest req, Map<String, String> params) {
 
 //        params commit it get element at a commit id
 //        find a specific element at a commit
@@ -117,6 +116,7 @@ public class DefaultNodeService implements NodeService {
 //        otherwise get timestamp of commit - find element before timestamp
 //        get all the commits in ref and search elastic for all the elements (for that specific) sorted by time and check
 //        check if current state of element and if timestamp is less then pass that version
+        DbContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
 
         NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements());

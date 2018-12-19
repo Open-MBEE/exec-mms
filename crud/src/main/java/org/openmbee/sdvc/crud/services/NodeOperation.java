@@ -1,6 +1,8 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,9 @@ public class NodeOperation {
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
 
+    protected DateTimeFormatter formatter = DateTimeFormatter
+        .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZone(
+            ZoneId.systemDefault());
     protected final Logger logger = LogManager.getLogger(getClass());
 
     @Autowired
@@ -42,48 +47,53 @@ public class NodeOperation {
     public void initCommitJson(CommitJson cmjs, Instant now) {
         cmjs.setId(UUID.randomUUID().toString());
         cmjs.setIndexId(cmjs.getId());
-        cmjs.setCreated(now.toString());
+        cmjs.setCreated(formatter.format(now));
         cmjs.setAdded(new ArrayList<>());
         cmjs.setDeleted(new ArrayList<>());
         cmjs.setUpdated(new ArrayList<>());
     }
 
     public NodeChangeInfo initInfo(List<ElementJson> elements, CommitJson cmjs) {
-        Set<String> indexIds = new HashSet<>();
-        Map<String, ElementJson> reqElementMap = (Map<String, ElementJson>) Helper
-            .convertJsonToMap(elements);
-        List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
-        Map<String, Node> existingNodeMap = new HashMap<>();
-        for (Node node : existingNodes) {
-            indexIds.add(node.getIndexId());
-            existingNodeMap.put(node.getNodeId(), node);
+        try {
+            Set<String> indexIds = new HashSet<>();
+            Map<String, ElementJson> reqElementMap = (Map<String, ElementJson>) Helper
+                .convertJsonToMap(elements);
+            List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
+            Map<String, Node> existingNodeMap = new HashMap<>();
+            for (Node node : existingNodes) {
+                indexIds.add(node.getIndexId());
+                existingNodeMap.put(node.getNodeId(), node);
+            }
+            // bulk get existing elements in elastic
+            List<Map<String, Object>> existingElements = nodeIndex.findAllById(indexIds);
+            Map<String, Map<String, Object>> existingElementMap = Helper
+                .convertToMap(existingElements, ElementJson.ID);
+
+            Instant now = Instant.now();
+            if (cmjs != null) {
+                initCommitJson(cmjs, now);
+            }
+
+            NodeChangeInfo info = new NodeChangeInfo();
+            info.setCommitJson(cmjs);
+            info.setUpdatedMap(new HashMap<>());
+            info.setDeletedMap(new HashMap<>());
+            info.setExistingElementMap(existingElementMap);
+            info.setExistingNodeMap(existingNodeMap);
+            info.setReqElementMap(reqElementMap);
+            info.setReqIndexIds(indexIds);
+            info.setToSaveNodeMap(new HashMap<>());
+            info.setRejected(new ArrayList<>());
+            info.setNow(now);
+            info.setOldIndexIds(new HashSet<>());
+            info.setEdgesToDelete(new HashMap<>());
+            info.setEdgesToSave(new HashMap<>());
+
+            return info;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        // bulk get existing elements in elastic
-        List<Map<String, Object>> existingElements = nodeIndex.findByIndexIds(indexIds);
-        Map<String, Map<String, Object>> existingElementMap = Helper
-            .convertToMap(existingElements, ElementJson.ID);
-
-        Instant now = Instant.now();
-        if (cmjs != null) {
-            initCommitJson(cmjs, now);
-        }
-
-        NodeChangeInfo info = new NodeChangeInfo();
-        info.setCommitJson(cmjs);
-        info.setUpdatedMap(new HashMap<>());
-        info.setDeletedMap(new HashMap<>());
-        info.setExistingElementMap(existingElementMap);
-        info.setExistingNodeMap(existingNodeMap);
-        info.setReqElementMap(reqElementMap);
-        info.setReqIndexIds(indexIds);
-        info.setToSaveNodeMap(new HashMap<>());
-        info.setRejected(new ArrayList<>());
-        info.setNow(now);
-        info.setOldIndexIds(new HashSet<>());
-        info.setEdgesToDelete(new HashMap<>());
-        info.setEdgesToSave(new HashMap<>());
-
-        return info;
     }
 
     public void processElementAdded(ElementJson e, Node n, CommitJson cmjs) {

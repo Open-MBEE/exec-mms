@@ -71,8 +71,14 @@ public class CommitService {
         DbContextHolder.setContext(projectId);
         Map<String, Object> commit = null;
 
-        commit = commitIndex.findByIndexId(commitId);
+        try {
 
+            commit = commitIndex.findById(commitId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
         List<CommitJson> resJson = new ArrayList<>();
         CommitJson c = new CommitJson();
         c.putAll(commit);
@@ -97,9 +103,16 @@ public class CommitService {
         for (CommitJson j : req.getCommits()) {
             ids.add(j.getId());
         }
-        List<Map<String, Object>> jsons = commitIndex.findByIndexIds(ids);
-        //TODO
-        CommitsResponse res = new CommitsResponse();
-        return res;
+        try {
+
+            List<Map<String, Object>> jsons = commitIndex.findAllById(ids);
+            //TODO
+            CommitsResponse res = new CommitsResponse();
+            return res;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

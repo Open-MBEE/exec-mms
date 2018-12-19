@@ -28,17 +28,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexDAO {
 
-    public Map<String, Object> findByIndexId(String indexId) {
-        return null;
-    }
-
-    public List<Map<String, Object>> findByIndexIds(Set<String> indexIds) {
-        return null;
-    }
-
     public void indexAll(Collection<? extends BaseJson> jsons) throws IOException {
         this.indexAll(DbContextHolder.getContext().getProjectId() + "_node", jsons);
-
     }
 
     public void index(BaseJson json) throws IOException {

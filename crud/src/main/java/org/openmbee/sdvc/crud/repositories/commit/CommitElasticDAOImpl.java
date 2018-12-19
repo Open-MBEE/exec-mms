@@ -26,11 +26,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommitElasticDAOImpl extends BaseElasticDAOImpl implements CommitIndexDAO {
 
-
-    public List<Map<String, Object>> findByIndexIds(Set<String> indexIds) {
-        return null;
-    }
-
     public void indexAll(Collection<? extends BaseJson> jsons) throws IOException {
         this.indexAll(DbContextHolder.getContext().getProjectId() + "_commit", jsons);
     }

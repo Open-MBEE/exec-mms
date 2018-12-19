@@ -40,7 +40,7 @@ public abstract class BaseElasticDAOImpl {
     @Value("${elastic.limit.term}")
     protected static int termLimit;
     protected static int readTimeout = 1000000000;
-    private final String type = "_doc";
+    protected final String type = "_doc";
     // :TODO save, saveAll --> updates have details of upsert method, should break out into helper method for create/update
 
     @Autowired
@@ -68,7 +68,7 @@ public abstract class BaseElasticDAOImpl {
     public void deleteAll(String index, Collection<? extends BaseJson> jsons) throws IOException {
         BulkRequest bulkIndex = new BulkRequest();
         for (BaseJson json : jsons) {
-            bulkIndex.add(new DeleteRequest(index, this.type, json.getId()));
+            bulkIndex.add(new DeleteRequest(index, this.type, json.getIndexId()));
         }
         client.bulk(bulkIndex, RequestOptions.DEFAULT);
     }
@@ -93,6 +93,9 @@ public abstract class BaseElasticDAOImpl {
         throws IOException {
         List<Map<String, Object>> listOfResponses = new ArrayList<>();
 
+        if (indexIds.isEmpty()) {
+            return listOfResponses;
+        }
         MultiGetRequest request = new MultiGetRequest();
         for (String eid : indexIds) {
             request.add(index, this.type, eid);
@@ -111,44 +114,15 @@ public abstract class BaseElasticDAOImpl {
         return listOfResponses;
     }
 
-    public List<Map<String, Object>> findByIndexIds(String index, Set<String> indexIds) {
-        List<Map<String, Object>> maps = new ArrayList<>();
-        int i = 97;
-        for (String eid : indexIds) {
-            BaseJson json = new BaseJson();
-            json.setIndexId(eid);
-            json.setModified("2018-12-08T01:25:00.117-0700");
-            json.setId(Character.toString((char) i));
-            json.setName(json.getId());
-            maps.add(json);
-            i++;
-        }
-        /*
-        BaseJson baseJson = new BaseJson();
-        baseJson.setId("testing");
-        baseJson.setName("element1");
-        baseJson.getIndexId("8a1ee2ef-078f-4f3f-ae89-66fb5e9e7bba");
-        baseJson.setModified("2015-07-04T12:08:56.235-0700");
-
-        List<Map<String, Object>> maps = new ArrayList<>();
-        maps.add(baseJson);
-        */
-        return maps;
-    }
-
-    public Map<String, Object> findByIndexId(String indexId) {
-        return null;
-    }
-
     public void indexAll(String index, Collection<? extends BaseJson> jsons) throws IOException {
         BulkRequest bulkIndex = new BulkRequest();
         for (BaseJson json : jsons) {
-            bulkIndex.add(new IndexRequest(index, this.type).source(json));
+            bulkIndex.add(new IndexRequest(index, this.type, json.getIndexId()).source(json));
         }
         client.bulk(bulkIndex, RequestOptions.DEFAULT);
     }
 
     public void index(String index, BaseJson json) throws IOException {
-        client.index(new IndexRequest(index, this.type).source(json), RequestOptions.DEFAULT);
+        client.index(new IndexRequest(index, this.type, json.getIndexId()).source(json), RequestOptions.DEFAULT);
     }
 }

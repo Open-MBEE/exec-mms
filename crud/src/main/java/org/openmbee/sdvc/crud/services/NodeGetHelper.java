@@ -43,10 +43,16 @@ public class NodeGetHelper extends NodeOperation {
             existingNodeMap.put(node.getNodeId(), node);
         }
         // bulk get existing elements in elastic
-        List<Map<String, Object>> existingElements = nodeIndex.findByIndexIds(indexIds);
-        Map<String, Map<String, Object>> existingElementMap = Helper
-            .convertToMap(existingElements, ElementJson.ID);
+        try {
 
-        return existingElementMap;
+            List<Map<String, Object>> existingElements = nodeIndex.findAllById(indexIds);
+            Map<String, Map<String, Object>> existingElementMap = Helper
+                .convertToMap(existingElements, ElementJson.ID);
+            return existingElementMap;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
