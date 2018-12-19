@@ -168,7 +168,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     @SuppressWarnings({"unchecked"})
     public List<Node> findAll() {
-        String sql = String.format("SELECT * FROM nodes%s WHERE deleted = false",
+        String sql = String.format("SELECT * FROM nodes%s WHERE deleted = FALSE",
             getSuffix());
 
         return getConnection().query(sql, new NodeRowMapper());

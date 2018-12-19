@@ -9,10 +9,6 @@ import org.openmbee.sdvc.json.BaseJson;
 
 public interface CommitIndexDAO {
 
-    Map<String, Object> findByIndexId(String indexId);
-
-    List<Map<String, Object>> findByIndexIds(Set<String> indexIds);
-
     void indexAll(Collection<? extends BaseJson> jsons) throws IOException;
 
     void index(BaseJson json) throws IOException;

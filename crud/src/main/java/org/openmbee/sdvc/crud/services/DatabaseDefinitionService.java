@@ -1,20 +1,14 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,12 +31,8 @@ import org.openmbee.sdvc.crud.domains.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -52,90 +42,81 @@ public class DatabaseDefinitionService {
     private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
     private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
 
-    private static final String GET_CHILDREN = "CREATE OR REPLACE FUNCTION get_children(integer, integer, text, integer)\n"
-        + " RETURNS TABLE(id bigint)\n"
-        + "AS $$\n"
-        + "  begin\n"
-        + "    return query\n"
-        + "    execute '\n"
-        + "    with recursive children(depth, nid, path, cycle, deleted) as (\n"
-        + "      select 0 as depth, node.id, ARRAY[node.id], false, node.deleted from ' || format('nodes%s', $3) || '\n"
-        + "        node where node.id = ' || $1 || ' union\n"
-        + "      select (c.depth + 1) as depth, edge.child as nid, path || cast(edge.child as bigint) as path, edge.child = ANY(path) as cycle, node.deleted as deleted\n"
-        + "        from ' || format('edges%s', $3) || ' edge, children c, ' || format('nodes%s', $3) || ' node where edge.parent = nid and node.id = edge.child and node.deleted = false and\n"
-        + "        edge.edgeType = ' || $2 || ' and not cycle and depth < ' || $4 || '\n"
-        + "      )\n"
-        + "      select distinct nid from children;';\n"
-        + "  end;\n"
-        + "$$ LANGUAGE plpgsql;";
+    private static final String INITIAL_PROJECT = "INSERT INTO nodes (id, nodeid, indexid, initialcommit, lastcommit, nodetype, deleted) VALUES (0, ?, ?, ?, ?, ?, false)";
+    private static final String INITIAL_REF = "INSERT INTO branches (id, branchid, branchname, tag, deleted, timestamp) VALUES (0, 'master', 'master', false, false, NOW());";
 
-    private static final String GET_PARENTS = "CREATE OR REPLACE FUNCTION get_parents(integer, integer, text)\n"
-        + " RETURNS TABLE(id bigint, height integer, root boolean)\n"
-        + "AS $$\n"
-        + "  begin\n"
-        + "    return query\n"
-        + "    execute '\n"
-        + "    with recursive parents(height, nid, path, cycle) as (\n"
-        + "    select 0, node.id, ARRAY[node.id], false from ' || format('nodes%s', $3) || ' node where node.id = ' || $1 || '\n"
-        + "    union\n"
-        + "      select (c.height + 1), edge.parent, path || cast(edge.parent as bigint),\n"
-        + "        edge.parent = ANY(path) from ' || format('edges%s', $3) || '\n"
-        + "        edge, parents c where edge.child = nid and edge.edgeType = ' || $2 || '\n"
-        + "        and not cycle\n"
-        + "      )\n"
-        + "      select nid,height,(not exists (select true from edges where child = nid and edgetype = ' || $2 || '))\n"
-        + "        from parents order by height desc;';\n"
-        + "  end;\n"
-        + "$$ LANGUAGE plpgsql;";
+    private static final String GET_CHILDREN =
+        "CREATE OR REPLACE FUNCTION get_children(integer, integer, text, integer)\n"
+            + " RETURNS TABLE(id bigint)\n"
+            + "AS $$\n"
+            + "  begin\n"
+            + "    return query\n"
+            + "    execute '\n"
+            + "    with recursive children(depth, nid, path, cycle, deleted) as (\n"
+            + "      select 0 as depth, node.id, ARRAY[node.id], false, node.deleted from ' || format('nodes%s', $3) || '\n"
+            + "        node where node.id = ' || $1 || ' union\n"
+            + "      select (c.depth + 1) as depth, edge.child as nid, path || cast(edge.child as bigint) as path, edge.child = ANY(path) as cycle, node.deleted as deleted\n"
+            + "        from ' || format('edges%s', $3) || ' edge, children c, ' || format('nodes%s', $3) || ' node where edge.parent = nid and node.id = edge.child and node.deleted = false and\n"
+            + "        edge.edgeType = ' || $2 || ' and not cycle and depth < ' || $4 || '\n"
+            + "      )\n"
+            + "      select distinct nid from children;';\n"
+            + "  end;\n"
+            + "$$ LANGUAGE plpgsql;";
 
-    private static final String GET_DOC_GROUPS = "CREATE OR REPLACE FUNCTION get_group_docs(integer, integer, text, integer, integer, integer)\n"
-        + " RETURNS TABLE(id bigint)\n"
-        + "AS $$\n"
-        + "  begin\n"
-        + "    return query\n"
-        + "    execute '\n"
-        + "    with recursive children(depth, nid, path, cycle, deleted, ntype) as (\n"
-        + "      select 0 as depth, node.id, ARRAY[node.id], false, node.deleted, node.nodetype from ' || format('nodes%s', $3) || '\n"
-        + "        node where node.id = ' || $1 || '  union\n"
-        + "      select (c.depth + 1) as depth, edge.child as nid, path || cast(edge.child as bigint) as path, edge.child = ANY(path) as cycle, node.deleted as deleted, node.nodetype as ntype\n"
-        + "        from ' || format('edges%s', $3) || ' edge, children c, ' || format('nodes%s', $3) || ' node where edge.parent = nid and node.id = edge.child and node.deleted = false and\n"
-        + "        edge.edgeType = ' || $2 || ' and not cycle and depth < ' || $4 || ' and (node.nodetype <> '|| $5 ||' or nid = ' || $1 || ')\n"
-        + "      )\n"
-        + "      select distinct nid from children where ntype = ' || $6 || ';';\n"
-        + "  end;\n"
-        + "$$ LANGUAGE plpgsql;";
+    private static final String GET_PARENTS =
+        "CREATE OR REPLACE FUNCTION get_parents(integer, integer, text)\n"
+            + " RETURNS TABLE(id bigint, height integer, root boolean)\n"
+            + "AS $$\n"
+            + "  begin\n"
+            + "    return query\n"
+            + "    execute '\n"
+            + "    with recursive parents(height, nid, path, cycle) as (\n"
+            + "    select 0, node.id, ARRAY[node.id], false from ' || format('nodes%s', $3) || ' node where node.id = ' || $1 || '\n"
+            + "    union\n"
+            + "      select (c.height + 1), edge.parent, path || cast(edge.parent as bigint),\n"
+            + "        edge.parent = ANY(path) from ' || format('edges%s', $3) || '\n"
+            + "        edge, parents c where edge.child = nid and edge.edgeType = ' || $2 || '\n"
+            + "        and not cycle\n"
+            + "      )\n"
+            + "      select nid,height,(not exists (select true from edges where child = nid and edgetype = ' || $2 || '))\n"
+            + "        from parents order by height desc;';\n"
+            + "  end;\n"
+            + "$$ LANGUAGE plpgsql;";
 
-    private static final String GET_IMMEDIATE_PARENTS = "CREATE OR REPLACE FUNCTION get_immediate_parents(integer, integer, text)\n"
-        + " RETURNS TABLE(nodeid text, indexid text)\n"
-        + "AS $$\n"
-        + "  begin\n"
-        + "    return query\n"
-        + "    execute '\n"
-        + "    select nodeid, indexid from nodes' || $3 || ' where id in\n"
-        + "      (select id from get_parents(' || $1 || ',' || $2 || ',''' || format('%s',$3) ||\n"
-        + "      ''') where height = 1);';\n"
-        + "  end;\n"
-        + "$$ LANGUAGE plpgsql;";
+    private static final String GET_DOC_GROUPS =
+        "CREATE OR REPLACE FUNCTION get_group_docs(integer, integer, text, integer, integer, integer)\n"
+            + " RETURNS TABLE(id bigint)\n"
+            + "AS $$\n"
+            + "  begin\n"
+            + "    return query\n"
+            + "    execute '\n"
+            + "    with recursive children(depth, nid, path, cycle, deleted, ntype) as (\n"
+            + "      select 0 as depth, node.id, ARRAY[node.id], false, node.deleted, node.nodetype from ' || format('nodes%s', $3) || '\n"
+            + "        node where node.id = ' || $1 || '  union\n"
+            + "      select (c.depth + 1) as depth, edge.child as nid, path || cast(edge.child as bigint) as path, edge.child = ANY(path) as cycle, node.deleted as deleted, node.nodetype as ntype\n"
+            + "        from ' || format('edges%s', $3) || ' edge, children c, ' || format('nodes%s', $3) || ' node where edge.parent = nid and node.id = edge.child and node.deleted = false and\n"
+            + "        edge.edgeType = ' || $2 || ' and not cycle and depth < ' || $4 || ' and (node.nodetype <> '|| $5 ||' or nid = ' || $1 || ')\n"
+            + "      )\n"
+            + "      select distinct nid from children where ntype = ' || $6 || ';';\n"
+            + "  end;\n"
+            + "$$ LANGUAGE plpgsql;";
+
+    private static final String GET_IMMEDIATE_PARENTS =
+        "CREATE OR REPLACE FUNCTION get_immediate_parents(integer, integer, text)\n"
+            + " RETURNS TABLE(nodeid text, indexid text)\n"
+            + "AS $$\n"
+            + "  begin\n"
+            + "    return query\n"
+            + "    execute '\n"
+            + "    select nodeid, indexid from nodes' || $3 || ' where id in\n"
+            + "      (select id from get_parents(' || $1 || ',' || $2 || ',''' || format('%s',$3) ||\n"
+            + "      ''') where height = 1);';\n"
+            + "  end;\n"
+            + "$$ LANGUAGE plpgsql;";
 
     protected final Logger logger = LogManager.getLogger(getClass());
-    private EntityManager entityManager;
     private Map<String, DataSource> crudDataSources;
     private Environment env;
-
-    private static String substituteVariables(String template, Map<String, String> variables) {
-        StringBuffer buffer = new StringBuffer();
-        Matcher matcher = pattern.matcher(template);
-
-        while (matcher.find()) {
-            if (variables.containsKey(matcher.group(1))) {
-                String replacement = variables.get(matcher.group(1));
-                matcher.appendReplacement(buffer,
-                    replacement != null ? Matcher.quoteReplacement(replacement) : "null");
-            }
-        }
-        matcher.appendTail(buffer);
-        return buffer.toString();
-    }
 
     @Autowired
     public void setEnv(Environment env) {
@@ -146,11 +127,6 @@ public class DatabaseDefinitionService {
     public void setCrudDataSources(
         @Qualifier("crudDataSources") Map<String, DataSource> crudDataSources) {
         this.crudDataSources = crudDataSources;
-    }
-
-    @Autowired
-    public void setEntityManager(EntityManager entityManager) {
-        this.entityManager = entityManager;
     }
 
     public boolean createProjectDatabase(Project project) throws SQLException {
@@ -211,11 +187,9 @@ public class DatabaseDefinitionService {
 
         DbContextHolder.setContext(project.getProjectId());
 
-        Map<String, Object> props = entityManager.getEntityManagerFactory().getProperties();
-
         MetadataSources metadata = new MetadataSources(
             new StandardServiceRegistryBuilder()
-                .applySettings(props)
+                .applySettings(getSchemaProperties())
                 .build()
         );
 
@@ -226,54 +200,28 @@ public class DatabaseDefinitionService {
         metadata.addAnnotatedClass(Node.class);
         metadata.addAnnotatedClass(NodeType.class);
 
-        File tempFile = null;
-        try {
-            tempFile = File.createTempFile("project-schema", ".sql");
+        new SchemaExport()
+            .setHaltOnError(false)
+            .setFormat(true)
+            .setDelimiter(";")
+            .createOnly(EnumSet.of(TargetType.DATABASE),
+                metadata.getMetadataBuilder().build());
 
-            new SchemaExport()
-                .setOutputFile(tempFile.getAbsolutePath())
-                .setHaltOnError(false)
-                .setFormat(true)
-                .setDelimiter(";")
-                .createOnly(EnumSet.of(TargetType.SCRIPT),
-                    metadata.getMetadataBuilder().build());
-
-            String projectData = "";
-            BufferedReader br = null;
-            //TODO remove use of dummy data file
-            FileSystemResource schemaResource = new FileSystemResource(tempFile);
-            ClassPathResource dataResource = new ClassPathResource("project-data.sql");
-
-            try {
-                br = new BufferedReader(
-                    new InputStreamReader(dataResource.getInputStream(), Charset.defaultCharset()));
-
-                String rawString = br.lines().collect(Collectors.joining(System.lineSeparator()));
-                Map<String, String> substitutions = new HashMap<>();
-                substitutions.put("projectId", project.getProjectId());
-                projectData = substituteVariables(rawString, substitutions);
-            } catch (IOException ioe) {
-                logger.debug(ioe);
-            } finally {
-                if (br != null) {
-                    try {
-                        br.close();
-                    } catch (IOException ioe) {
-                        logger.debug(ioe);
-                    }
-                }
+        try (Connection conn = ds.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(INITIAL_PROJECT)) {
+                ps.setString(1, project.getProjectId());
+                ps.setString(2, "test");
+                ps.setString(3, "test");
+                ps.setString(4, "test");
+                ps.setInt(5, 1);
+                ps.execute();
             }
 
-            ResourceDatabasePopulator populator = new ResourceDatabasePopulator(schemaResource,
-                new ByteArrayResource(projectData.getBytes()));
-
-            populator.execute(ds);
-        } catch (IOException e) {
-
-        } finally {
-            if (tempFile != null) {
-                tempFile.delete();
+            try (PreparedStatement ps = conn.prepareStatement(INITIAL_REF)) {
+                ps.execute();
             }
+        } catch (SQLException e) {
+
         }
     }
 

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -23,7 +22,6 @@ import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 
@@ -38,6 +36,7 @@ public class DefaultNodeService implements NodeService {
     //to save to this use base json classes
     protected CommitIndexDAO commitIndex;
     protected EdgeDAO edgeRepository;
+    protected NodeGetHelper nodeGetHelper;
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
 
@@ -77,29 +76,55 @@ public class DefaultNodeService implements NodeService {
         this.nodeDeleteHelper = nodeDeleteHelper;
     }
 
+    @Autowired
+    public void setNodeGetHelper(NodeGetHelper nodeGetHelper) {
+        this.nodeGetHelper = nodeGetHelper;
+    }
+
     @Override
     public ElementsResponse get(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        DbContextHolder.setContext(projectId, refId);
-        logger.info("params: " + params);
         if (id != null) {
             logger.debug("ElementId given: ", id);
-            Node node = nodeRepository.findByNodeId(id);
-            ElementJson e = new ElementJson();
-            e.setId(node.getNodeId());
-            //set other stuff
-            ElementsResponse res = new ElementsResponse();
+
+            ElementJson json = new ElementJson();
+            json.setId(id);
+            ElementsRequest req = new ElementsRequest();
             List<ElementJson> list = new ArrayList<>();
-            list.add(e);
-            res.setElements(list);
-            return res;
+            list.add(json);
+            req.setElements(list);
+            return get(projectId, refId, req, params);
+
         } else {
+//            If no id is provided, return all
             logger.debug("No ElementId given");
-            List<Node> nodes = nodeRepository.findAll();
-            //return ResponseEntity.ok(new ElementsResponse(nodes));
+            DbContextHolder.setContext(projectId, refId);
+
+            ElementsResponse response = new ElementsResponse();
+            response.getElements().addAll(nodeGetHelper.processGetAll().values());
+            return response;
         }
-        return null;
+    }
+
+    @Override
+    public ElementsResponse get(String projectId, String refId, ElementsRequest req, Map<String, String> params) {
+
+//        params commit it get element at a commit id
+//        find a specific element at a commit
+//        commit DB and if element was actually edited at that commit - get element
+//        otherwise get timestamp of commit - find element before timestamp
+//        get all the commits in ref and search elastic for all the elements (for that specific) sorted by time and check
+//        check if current state of element and if timestamp is less then pass that version
+        DbContextHolder.setContext(projectId, refId);
+        logger.info("params: " + params);
+
+        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements());
+
+        ElementsResponse response = new ElementsResponse();
+        response.getElements().addAll(info.getExistingElementMap().values());
+        response.put("rejected", info.getRejected());
+        return response;
     }
 
     @Override

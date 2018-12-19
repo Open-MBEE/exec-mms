@@ -99,7 +99,7 @@ public class BaseJson extends HashMap<String, Object> {
     }
 
     public String getCommitId() {
-        return(String) this.get(COMMITID);
+        return (String) this.get(COMMITID);
     }
 
     public BaseJson setCommitId(String commitId) {
