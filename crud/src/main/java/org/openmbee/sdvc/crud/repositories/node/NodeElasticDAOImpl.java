@@ -3,6 +3,7 @@ package org.openmbee.sdvc.crud.repositories.node;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +21,8 @@ import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.repositories.BaseElasticDAOImpl;
 import org.openmbee.sdvc.json.BaseJson;
@@ -76,23 +79,26 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
     public List<Map<String, Object>> getElementsLessThanOrEqualTimestamp(String nodeId,
         String timestamp, List<String> refsCommitIds,
         String index) throws IOException {
+        List<Map<String, Object>> elements = new ArrayList<>();
         final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
         SearchRequest searchRequest = new SearchRequest(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-
-        // build query :TODO build range query https://artifacts.elastic.co/javadoc/org/elasticsearch/elasticsearch/6.5.3/org/elasticsearch/index/query/RangeQueryBuilder.html
-        QueryBuilders.rangeQuery("_modified").lte(timestamp);
-        QueryBuilders.termQuery("commitId", refsCommitIds);
-
-
-
-        searchSourceBuilder.query(QueryBuilders.termsQuery("commitId", refsCommitIds));
-        searchSourceBuilder.size(2147483647);
+        // Query
+        QueryBuilder query = QueryBuilders.boolQuery()
+            .filter(QueryBuilders.termsQuery("_commitId", refsCommitIds))
+            .filter(QueryBuilders.termQuery("_uid", nodeId))
+            .filter(QueryBuilders.rangeQuery("_modified").lte(timestamp));
+        searchSourceBuilder.query(query);
+        searchSourceBuilder.sort(new FieldSortBuilder("_modified").order(SortOrder.DESC));
+        searchSourceBuilder.size(1);
+        searchSourceBuilder.size(this.resultLimit);
         searchRequest.source(searchSourceBuilder);
         searchRequest.scroll(scroll);
+
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         String scrollId = searchResponse.getScrollId();
         SearchHit[] searchHits = searchResponse.getHits().getHits();
+        // :TODO going to have to iterate through the inital results I think, have to test.
 
         while (searchHits != null && searchHits.length > 0) {
             SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
@@ -100,7 +106,9 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
             searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
             scrollId = searchResponse.getScrollId();
             searchHits = searchResponse.getHits().getHits();
-
+            for (SearchHit hit : searchHits) {
+                elements.add(hit.getSourceAsMap());
+            }
         }
 
         // Clear the scroll value
@@ -109,7 +117,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         ClearScrollResponse clearScrollResponse = client
             .clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
         boolean succeeded = clearScrollResponse.isSucceeded();
-        return null;
+        return elements;
     }
     // Create filter array
 //    int count = 0;
