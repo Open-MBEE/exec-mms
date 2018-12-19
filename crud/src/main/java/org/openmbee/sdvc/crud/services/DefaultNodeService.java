@@ -1,11 +1,13 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -21,7 +23,9 @@ import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
 
 @Service("defaultNodeService")
 public class DefaultNodeService implements NodeService {
@@ -37,6 +41,7 @@ public class DefaultNodeService implements NodeService {
     protected NodeGetHelper nodeGetHelper;
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
+
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -150,11 +155,12 @@ public class DefaultNodeService implements NodeService {
         return response;
     }
 
-    protected void commitChanges(NodeChangeInfo info) {
+    protected void commitChanges(NodeChangeInfo info) throws IOException {
         Map<String, Node> nodes = info.getToSaveNodeMap();
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
         Instant now = info.getNow();
+
         if (!nodes.isEmpty()) {
             this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
             if (json != null && !json.isEmpty()) {

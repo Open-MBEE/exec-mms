@@ -33,3 +33,7 @@ spring.jpa.open-in-view=false
 
 #Configuration for Elasticsearch
 elasticsearch.host=localhost:9200
+elastic.index.element=mms
+elastic.limit.insert=80
+elastic.limit.result=10000
+elastic.limit.term=1000
