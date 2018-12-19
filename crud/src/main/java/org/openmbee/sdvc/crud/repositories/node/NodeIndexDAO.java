@@ -10,7 +10,7 @@ import org.openmbee.sdvc.json.BaseJson;
 
 public interface NodeIndexDAO {
 
-    Optional<Map<String, Object>> findByIndexId(String indexId);
+    Map<String, Object> findByIndexId(String indexId);
 
     List<Map<String, Object>> findByIndexIds(Set<String> indexIds);
 

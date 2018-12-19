@@ -90,7 +90,12 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
         // build query :TODO build range query https://artifacts.elastic.co/javadoc/org/elasticsearch/elasticsearch/6.5.3/org/elasticsearch/index/query/RangeQueryBuilder.html
-        searchSourceBuilder.query(QueryBuilders.termQuery("commitId", refsCommitIds));
+        QueryBuilders.rangeQuery("_modified").lte(timestamp);
+        QueryBuilders.termQuery("commitId", refsCommitIds);
+
+
+
+        searchSourceBuilder.query(QueryBuilders.termsQuery("commitId", refsCommitIds));
         searchSourceBuilder.size(2147483647);
         searchRequest.source(searchSourceBuilder);
         searchRequest.scroll(scroll);
@@ -107,6 +112,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
 
         }
 
+        // Clear the scroll value
         ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
         clearScrollRequest.addScrollId(scrollId);
         ClearScrollResponse clearScrollResponse = client
