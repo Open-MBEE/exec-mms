@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
@@ -27,7 +28,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         this.branchRepository = branchRepository;
     }
 
-    public Commit save(Commit commit) {
+    public Optional<Commit> save(Commit commit) {
         String sql = "INSERT INTO commits (commitType, creator, indexId, branchId, timestamp, comment) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -50,37 +51,37 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             return null;//TODO error
         }
         commit.setId(keyHolder.getKey().longValue());
-        return commit;
+        return Optional.of(commit);
     }
 
-    public Commit findById(long id) {
+    public Optional<Commit> findById(long id) {
         String sql = "SELECT * FROM commits WHERE id = ?";
 
-        return (Commit) getConnection()
+        return (Optional<Commit>) getConnection()
             .queryForObject(sql, new Object[]{id}, new CommitRowMapper());
     }
 
-    public Commit findByCommitId(String commitId) {
+    public Optional<Commit> findByCommitId(String commitId) {
         String sql = "SELECT * FROM commits WHERE indexid = ?";
 
-        return (Commit) getConnection()
+        return (Optional<Commit>) getConnection()
             .queryForObject(sql, new Object[]{commitId}, new CommitRowMapper());
     }
 
-    public Commit findByRefAndTimestamp(String refId, Instant timestamp) {
+    public Optional<Commit> findByRefAndTimestamp(String refId, Instant timestamp) {
         List<Commit> res = findByRefAndTimestampAndLimit(refId, timestamp, 1);
-        if (res.size() > 0) {
-            return res.get(0);
+        if (!res.isEmpty()) {
+            return Optional.of(res.get(0));
         }
-        return null;
+        return Optional.empty();
     }
 
-    public Commit findLatestByRef(String refId) {
+    public Optional<Commit> findLatestByRef(String refId) {
         List<Commit> res = findByRefAndTimestampAndLimit(refId, null, 1);
-        if (res.size() > 0) {
-            return res.get(0);
+        if (!res.isEmpty()) {
+            return Optional.of(res.get(0));
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<Commit> findAll() {

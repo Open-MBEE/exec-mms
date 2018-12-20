@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -21,7 +22,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     private final String INSERT_SQL = "INSERT INTO nodes%s (nodeid, indexid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
     private final String UPDATE_SQL = "UPDATE nodes%s SET nodeid = ?, indexid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
 
-    public Node save(Node node) {
+    public Optional<Node> save(Node node) {
         if (node.getId() == null) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -62,7 +63,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
                 }
             });
         }
-        return node;
+        return Optional.of(node);
     }
 
     //TODO handle errors
@@ -140,23 +141,24 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     @SuppressWarnings({"unchecked"})
-    public Node findById(long id) {
+    public Optional<Node> findById(long id) {
         String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
             getSuffix());
 
-        return (Node) getConnection()
+        return (Optional<Node>) getConnection()
             .queryForObject(sql, new Object[]{id}, new NodeRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})
-    public Node findByNodeId(String nodeId) {
+    public Optional<Node> findByNodeId(String nodeId) {
         String sql = String.format("SELECT * FROM nodes%s WHERE nodeid = ?",
             getSuffix());
 
-        return (Node) getConnection()
+        return (Optional<Node>) getConnection()
             .queryForObject(sql, new Object[]{nodeId}, new NodeRowMapper());
     }
 
+    @SuppressWarnings({"unchecked"})
     public List<Node> findAllByNodeIds(Collection<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();

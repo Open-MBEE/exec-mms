@@ -5,11 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.EdgeType;
-import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Component;
@@ -20,7 +18,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
     private final String INSERT_SQL = "INSERT INTO edges%s (edgeType, child_id, parent_id) VALUES (?, ?, ?)";
     private final String UPDATE_SQL = "UPDATE edges%s SET edgeType = ?, child_id = ?, parent_id = ? WHERE id = ?";
 
-    public Edge save(Edge edge) {
+    public Optional<Edge> save(Edge edge) {
         String sql = String.format(INSERT_SQL, getSuffix());
 
         getConnection().update(sql,
@@ -29,7 +27,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
             edge.getParent().getId()
         );
 
-        return edge;
+        return Optional.of(edge);
     }
 
     public List<Edge> saveAll(List<Edge> edges) {
@@ -100,20 +98,20 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
     }
 
     @SuppressWarnings({"unchecked"})
-    public Edge findParents(String sysmlId, Integer et) {
+    public Optional<Edge> findParents(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
             getSuffix());
 
-        return (Edge) getConnection()
+        return (Optional<Edge>) getConnection()
             .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})
-    public Edge findChildren(String sysmlId, Integer et) {
+    public Optional<Edge> findChildren(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
             getSuffix());
 
-        return (Edge) getConnection()
+        return (Optional<Edge>) getConnection()
             .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
     }
 

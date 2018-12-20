@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -22,7 +23,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         this.commitRepository = commitRepository;
     }
 */
-    public Branch save(Branch branch) {
+    public Optional<Branch> save(Branch branch) {
         String sql = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 /*
         if (branch.getParentRefId() != null && branch.getParentRef() == null) {
@@ -63,22 +64,22 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
             return null;
         }
         branch.setId(keyHolder.getKey().longValue());
-        return branch;
+        return Optional.of(branch);
     }
 
     @SuppressWarnings({"unchecked"})
-    public Branch findById(long id) {
+    public Optional<Branch> findById(long id) {
         String sql = "SELECT * FROM branches WHERE id = ?";
 
-        return (Branch) getConnection()
+        return (Optional<Branch>) getConnection()
             .queryForObject(sql, new Object[]{id}, new BranchRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})
-    public Branch findByBranchId(String branchId) {
+    public Optional<Branch> findByBranchId(String branchId) {
         String sql = "SELECT * FROM branches WHERE branchId = ?";
 
-        return (Branch) getConnection()
+        return (Optional<Branch>) getConnection()
             .queryForObject(sql, new Object[]{branchId}, new BranchRowMapper());
     }
 
