@@ -32,4 +32,10 @@ spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
 spring.jpa.open-in-view=false
 
 #Configuration for Elasticsearch
-elasticsearch.host=localhost:9200
+elasticsearch.host=localhost
+elasticsearch.port=9200
+elasticsearch.http=http
+elastic.index.element=mms
+elastic.limit.insert=80
+elastic.limit.result=10000
+elastic.limit.term=1000

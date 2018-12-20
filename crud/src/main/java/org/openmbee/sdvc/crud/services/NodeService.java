@@ -10,6 +10,8 @@ public interface NodeService {
 
     ElementsResponse read(String projectId, String refId, String id, Map<String, String> params);
 
+    ElementsResponse read(String projectId, String refId, ElementsRequest req, Map<String, String> params);
+
     ElementsResponse create(String projectId, String refId, ElementsRequest req,
         Map<String, String> params);
 

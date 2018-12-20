@@ -7,6 +7,7 @@ import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
+import org.openmbee.sdvc.crud.repositories.ProjectIndex;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class DefaultProjectService implements ProjectService {
     protected ProjectRepository projectRepository;
     protected OrganizationRepository orgRepository;
     protected DatabaseDefinitionService projectOperations;
+    protected ProjectIndex projectIndex;
 
     @Autowired
     public void setProjectRepository(ProjectRepository projectRepository) {
@@ -33,6 +35,11 @@ public class DefaultProjectService implements ProjectService {
     @Autowired
     public void setDatabaseDefinitionService(DatabaseDefinitionService projectOperations) {
         this.projectOperations = projectOperations;
+    }
+
+    @Autowired
+    public void setProjectIndex(ProjectIndex projectIndex) {
+        this.projectIndex = projectIndex;
     }
 
     public ProjectJson create(ProjectJson project) {
@@ -54,6 +61,7 @@ public class DefaultProjectService implements ProjectService {
         try {
             if (projectOperations.createProjectDatabase(proj)) {
                 //TODO create elastic indexes and mappings
+                projectIndex.create(proj.getProjectId());
                 return project;
             }
         } catch (SQLException sqlException) {

@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -68,7 +69,16 @@ public class CommitService {
 
     public CommitsResponse getCommit(String projectId, String commitId) {
         DbContextHolder.setContext(projectId);
-        Map<String, Object> commit = commitIndex.findByIndexId(commitId);
+        Map<String, Object> commit = null;
+
+        try {
+
+            commit = commitIndex.findById(commitId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
         List<CommitJson> resJson = new ArrayList<>();
         CommitJson c = new CommitJson();
         c.putAll(commit);
@@ -93,9 +103,16 @@ public class CommitService {
         for (CommitJson j : req.getCommits()) {
             ids.add(j.getId());
         }
-        List<Map<String, Object>> jsons = commitIndex.findByIndexIds(ids);
-        //TODO
-        CommitsResponse res = new CommitsResponse();
-        return res;
+        try {
+
+            List<Map<String, Object>> jsons = commitIndex.findAllById(ids);
+            //TODO
+            CommitsResponse res = new CommitsResponse();
+            return res;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

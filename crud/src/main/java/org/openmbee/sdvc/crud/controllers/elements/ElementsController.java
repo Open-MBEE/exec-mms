@@ -57,8 +57,14 @@ public class ElementsController extends BaseController {
         @RequestBody ElementsRequest req,
         @RequestParam Map<String, String> params) {
 
-        NodeService nodeService = getNodeService(projectId);
+        if (!req.getElements().isEmpty()) {
+            NodeService nodeService = getNodeService(projectId);
+            ElementsResponse response = nodeService.read(projectId, refId, req, params);
+            return ResponseEntity.ok(response);
+        }
         ElementsResponse err = new ElementsResponse();
+        err.setCode(400);
+        err.addMessage("Empty");
         return ResponseEntity.badRequest().body(err);
     }
 
