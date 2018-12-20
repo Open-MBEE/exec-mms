@@ -171,7 +171,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl implements NodeIndexD
 //            if (result.getTotal() > 0) {
 //                JsonArray hits = result.getJsonObject().getAsJsonObject("hits").getAsJsonArray("hits");
 //                if (hits.size() > 0) {
-//                    return hits.get(0).getAsJsonObject().getAsJsonObject("_source");
+//                    return hits.read(0).getAsJsonObject().getAsJsonObject("_source");
 //                }
 //            }
 //        } catch (IOException e) {

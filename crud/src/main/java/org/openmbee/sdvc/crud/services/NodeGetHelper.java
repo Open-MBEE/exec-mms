@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.stereotype.Service;
@@ -42,17 +43,31 @@ public class NodeGetHelper extends NodeOperation {
             indexIds.add(node.getIndexId());
             existingNodeMap.put(node.getNodeId(), node);
         }
-        // bulk get existing elements in elastic
+        // bulk read existing elements in elastic
         try {
 
             List<Map<String, Object>> existingElements = nodeIndex.findAllById(indexIds);
-            Map<String, Map<String, Object>> existingElementMap = Helper
-                .convertToMap(existingElements, ElementJson.ID);
+            Map<String, Map<String, Object>> existingElementMap = convertToMap(existingElements, ElementJson.ID);
             return existingElementMap;
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    // TODO: Remove all this
+    public static Map<String, Map<String, Object>> convertToMap(List<Map<String, Object>> elements, String key) {
+        Map<String, Map<String, Object>> result = new HashMap<>();
+        for (Map<String, Object> elem : elements) {
+            if (elem == null) {
+                continue;
+            }
+            String id = (String) elem.get(key);
+            if (id != null && !id.equals("")) {
+                result.put(id, elem);
+            }
+        }
+        return result;
     }
 }

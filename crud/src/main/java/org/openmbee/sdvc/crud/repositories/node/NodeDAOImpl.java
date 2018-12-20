@@ -90,7 +90,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     public List<Node> insertAll(List<Node> nodes) {
         try {
-            //jdbctemplate doesn't have get generated keys for batch, need to use raw jdbc, depends on driver
+            //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
             Connection rawConn = getConnection().getDataSource().getConnection();
             PreparedStatement ps = rawConn
                 .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});

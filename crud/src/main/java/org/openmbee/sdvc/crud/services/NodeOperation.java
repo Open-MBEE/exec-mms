@@ -56,18 +56,16 @@ public class NodeOperation {
     public NodeChangeInfo initInfo(List<ElementJson> elements, CommitJson cmjs) {
         try {
             Set<String> indexIds = new HashSet<>();
-            Map<String, ElementJson> reqElementMap = (Map<String, ElementJson>) Helper
-                .convertJsonToMap(elements);
+            Map<String, ElementJson> reqElementMap = (Map<String, ElementJson>) convertJsonToMap(elements);
             List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
             Map<String, Node> existingNodeMap = new HashMap<>();
             for (Node node : existingNodes) {
                 indexIds.add(node.getIndexId());
                 existingNodeMap.put(node.getNodeId(), node);
             }
-            // bulk get existing elements in elastic
+            // bulk read existing elements in elastic
             List<Map<String, Object>> existingElements = nodeIndex.findAllById(indexIds);
-            Map<String, Map<String, Object>> existingElementMap = Helper
-                .convertToMap(existingElements, ElementJson.ID);
+            Map<String, Map<String, Object>> existingElementMap = convertToMap(existingElements, ElementJson.ID);
 
             Instant now = Instant.now();
             if (cmjs != null) {
@@ -170,8 +168,7 @@ public class NodeOperation {
             }
         }
         toFind.removeAll(nodes.keySet());
-        Map<String, Node> edgeNodes = Helper
-            .convertNodesToMap(nodeRepository.findAllByNodeIds(toFind));
+        Map<String, Node> edgeNodes = convertNodesToMap(nodeRepository.findAllByNodeIds(toFind));
         edgeNodes.putAll(nodes);
 
         for (Map.Entry<Integer, List<Pair<String, String>>> entry : edges.entrySet()) {
@@ -190,6 +187,47 @@ public class NodeOperation {
             }
         }
         return res;
+    }
+
+    public static Map<String, ? extends BaseJson> convertJsonToMap(
+        List<? extends BaseJson> elements) {
+        Map<String, BaseJson> result = new HashMap<>();
+        for (BaseJson elem : elements) {
+            if (elem == null) {
+                continue;
+            }
+            if (elem.getId() != null && !elem.getId().equals("")) {
+                result.put(elem.getId(), elem);
+            }
+        }
+        return result;
+    }
+
+    public static Map<String, Node> convertNodesToMap(List<Node> nodes) {
+        Map<String, Node> result = new HashMap<>();
+        for (Node node : nodes) {
+            if (node == null) {
+                continue;
+            }
+            if (node.getNodeId() != null && !node.getNodeId().equals("")) {
+                result.put(node.getNodeId(), node);
+            }
+        }
+        return result;
+    }
+
+    public static Map<String, Map<String, Object>> convertToMap(List<Map<String, Object>> elements, String key) {
+        Map<String, Map<String, Object>> result = new HashMap<>();
+        for (Map<String, Object> elem : elements) {
+            if (elem == null) {
+                continue;
+            }
+            String id = (String) elem.get(key);
+            if (id != null && !id.equals("")) {
+                result.put(id, elem);
+            }
+        }
+        return result;
     }
 
     public boolean existingNodeContainsNodeId(NodeGetInfo info, String nodeId) {

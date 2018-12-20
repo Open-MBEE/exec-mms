@@ -1,9 +1,11 @@
 package org.openmbee.sdvc.core.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
 import java.util.Set;
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -20,6 +22,7 @@ public class Project extends Base {
     private String projectName;
 
     @JsonProperty("id")
+    @Column(unique = true)
     private String projectId;
 
     private String connectionString;
@@ -27,12 +30,18 @@ public class Project extends Base {
     @OneToMany(mappedBy = "user")
     private Collection<UsersProjects> users;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
+    @JsonManagedReference
     private Organization organization;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "roles_projects", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    @JsonIgnore
     private Collection<Role> roles;
+
+    @ManyToMany
+    @JoinTable(name = "projects_metadata", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "metadata_id", referencedColumnName = "id"))
+    private Collection<Metadata> metadata;
 
     public Project() {
     }
@@ -93,6 +102,10 @@ public class Project extends Base {
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    public String getOrgId() {
+        return organization.getOrganizationId();
     }
 
     public Collection<Role> getRoles() {

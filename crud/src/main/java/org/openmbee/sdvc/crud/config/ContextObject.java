@@ -70,6 +70,6 @@ public class ContextObject {
     }
 
     private void branchIdUpdated() {
-        this.dbTableSuffix = this.branchId.equals("master") ? "" : this.branchId.replace('-', '_');
+        this.dbTableSuffix = this.branchId.equals(MASTER_BRANCH) ? "" : this.branchId.replace('-', '_');
     }
 }

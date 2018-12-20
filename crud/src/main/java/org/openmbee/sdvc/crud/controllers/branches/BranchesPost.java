@@ -4,7 +4,6 @@ import java.time.Instant;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.ErrorResponse;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
@@ -91,9 +90,9 @@ public class BranchesPost extends BaseController {
             return ResponseEntity.ok(response);
         }
         logger.debug("Bad Request");
-        ErrorResponse err = new ErrorResponse();
+        BranchesResponse err = new BranchesResponse();
         err.setCode(400);
-        err.setError("Bad Request");
+        err.addMessage("Bad Request");
         return ResponseEntity.badRequest().body(err);
     }
 }

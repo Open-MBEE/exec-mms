@@ -92,7 +92,7 @@ public class CommitService {
         Map<String, Object> params) {
         DbContextHolder.setContext(projectId);
         List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(refId, null, 0);
-        //TODO either search elastic using the commit ids or get all elements from elastic first and filter by the ref's commit ids
+        //TODO either search elastic using the commit ids or read all elements from elastic first and filter by the ref's commit ids
         CommitsResponse res = new CommitsResponse();
         return res;
     }

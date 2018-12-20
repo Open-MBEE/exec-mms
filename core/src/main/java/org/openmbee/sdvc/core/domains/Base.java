@@ -65,5 +65,4 @@ public abstract class Base implements Serializable {
     public int hashCode() {
         return (id == null) ? -1 : id.hashCode();
     }
-
 }
