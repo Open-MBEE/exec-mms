@@ -41,7 +41,7 @@ public class ElementsController extends BaseController {
 
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            ElementsResponse response = nodeService.create(projectId, refId, req, params);
+            ElementsResponse response = nodeService.createOrUpdate(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
         ElementsResponse err = new ElementsResponse();

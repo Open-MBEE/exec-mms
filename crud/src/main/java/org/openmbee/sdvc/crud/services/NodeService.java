@@ -12,7 +12,7 @@ public interface NodeService {
 
     ElementsResponse read(String projectId, String refId, ElementsRequest req, Map<String, String> params);
 
-    ElementsResponse create(String projectId, String refId, ElementsRequest req,
+    ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
         Map<String, String> params);
 
     void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info);

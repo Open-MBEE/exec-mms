@@ -4,25 +4,27 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.openmbee.sdvc.json.BaseJson;
+import org.openmbee.sdvc.json.CommitJson;
 
 public interface CommitIndexDAO {
 
-    void indexAll(Collection<? extends BaseJson> jsons) throws IOException;
+    void indexAll(Collection<? extends BaseJson> jsons);
 
-    void index(BaseJson json) throws IOException;
+    void index(BaseJson json);
 
-    Map<String, Object> findById(String indexId) throws IOException;
+    Optional<CommitJson> findById(String indexId);
 
-    List<Map<String, Object>> findAllById(Set<String> indexIds) throws IOException;
+    List<CommitJson> findAllById(Set<String> indexIds);
 
-    void deleteById(String indexId) throws IOException;
+    void deleteById(String indexId);
 
-    void deleteAll(Collection<? extends BaseJson> jsons) throws IOException;
+    void deleteAll(Collection<? extends BaseJson> jsons);
 
-    boolean existsById(String indexId)throws IOException;
+    boolean existsById(String indexId);
 
-    List<Map<String,Object>> elementHistory(String index, String id, Set<String> commitIds) throws IOException;
+    List<CommitJson> elementHistory(String id, Set<String> commitIds);
 
 }

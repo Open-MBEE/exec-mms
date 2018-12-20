@@ -1,0 +1,7 @@
+apply plugin: 'io.spring.convention.spring-module'
+
+dependencies {
+    compile project(':crud')
+    compile 'org.elasticsearch:elasticsearch:6.5.1'
+    compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:6.5.1'
+}

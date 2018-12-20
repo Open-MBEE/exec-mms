@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,13 +101,14 @@ public class DefaultNodeService implements NodeService {
             DbContextHolder.setContext(projectId, refId);
 
             ElementsResponse response = new ElementsResponse();
-            response.getElements().addAll(nodeGetHelper.processGetAll().values());
+            response.getElements().addAll(nodeGetHelper.processGetAll());
             return response;
         }
     }
 
     @Override
-    public ElementsResponse read(String projectId, String refId, ElementsRequest req, Map<String, String> params) {
+    public ElementsResponse read(String projectId, String refId, ElementsRequest req,
+        Map<String, String> params) {
 
 //        params commit it read element at a commit id
 //        find a specific element at a commit
@@ -122,13 +122,13 @@ public class DefaultNodeService implements NodeService {
         NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements());
 
         ElementsResponse response = new ElementsResponse();
-        response.getElements().addAll(info.getExistingElementMap().values());
+        response.getElements().addAll(info.getActiveElementMap().values());
         response.put("rejected", info.getRejected());
         return response;
     }
 
     @Override
-    public ElementsResponse create(String projectId, String refId, ElementsRequest req,
+    public ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
         Map<String, String> params) {
 
         DbContextHolder.setContext(projectId, refId);
@@ -149,7 +149,7 @@ public class DefaultNodeService implements NodeService {
         return response;
     }
 
-    protected void commitChanges(NodeChangeInfo info) throws IOException {
+    protected void commitChanges(NodeChangeInfo info) {
         Map<String, Node> nodes = info.getToSaveNodeMap();
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();

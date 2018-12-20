@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.repositories;
+package org.openmbee.sdvc.elastic;
 
 import java.io.IOException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -6,6 +6,7 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.openmbee.sdvc.crud.repositories.ProjectIndex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -21,12 +22,17 @@ public class ProjectElasticImpl implements ProjectIndex {
     }
 
     @Override
-    public void create(String index) throws IOException {
-        CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
-        commitIndex.mapping("_doc", getCommitMapAsString(), XContentType.JSON);
-        CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
-        createIndex(commitIndex);
-        createIndex(nodeIndex);
+    public void create(String index) {
+        try {
+            CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
+            commitIndex.mapping("_doc", getCommitMapAsString(), XContentType.JSON);
+            CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
+            //TODO add mapping function for node
+            createIndex(commitIndex);
+            createIndex(nodeIndex);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void createIndex(CreateIndexRequest request) throws IOException {
@@ -34,9 +40,13 @@ public class ProjectElasticImpl implements ProjectIndex {
     }
 
     @Override
-    public void delete(String index) throws IOException {
-        DeleteIndexRequest request = new DeleteIndexRequest(index);
-        client.indices().delete(request, RequestOptions.DEFAULT).isAcknowledged();
+    public void delete(String index) {
+        try {
+            DeleteIndexRequest request = new DeleteIndexRequest(index);
+            client.indices().delete(request, RequestOptions.DEFAULT).isAcknowledged();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String getCommitMapAsString() {

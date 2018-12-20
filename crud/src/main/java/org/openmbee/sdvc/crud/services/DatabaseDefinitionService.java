@@ -208,6 +208,7 @@ public class DatabaseDefinitionService {
                 metadata.getMetadataBuilder().build());
 
         try (Connection conn = ds.getConnection()) {
+           /* TODO rethink if project itself should be a node
             try (PreparedStatement ps = conn.prepareStatement(INITIAL_PROJECT)) {
                 ps.setString(1, project.getProjectId());
                 ps.setString(2, "test");
@@ -215,7 +216,7 @@ public class DatabaseDefinitionService {
                 ps.setString(4, "test");
                 ps.setInt(5, 1);
                 ps.execute();
-            }
+            }*/
 
             try (PreparedStatement ps = conn.prepareStatement(INITIAL_REF)) {
                 ps.execute();
