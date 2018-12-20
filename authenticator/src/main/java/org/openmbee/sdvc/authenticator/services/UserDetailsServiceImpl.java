@@ -3,6 +3,7 @@ package org.openmbee.sdvc.authenticator.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
 import org.openmbee.sdvc.core.domains.Privilege;
 import org.openmbee.sdvc.core.domains.Role;
@@ -35,13 +36,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsername(username);
 
-        if (user == null) {
+        if (!user.isPresent()) {
             throw new UsernameNotFoundException(
                 String.format("No user found with username '%s'.", username));
         }
-        return new UserDetailsImpl(user);
+        return new UserDetailsImpl(user.get());
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(

@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.ldap;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.naming.ldap.LdapName;
@@ -105,8 +106,8 @@ class LdapSecurityConfig extends SecurityConfig {
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData,
                 String username) {
-                User user = userRepository.findByUsername(username);
-                if (user == null) {
+                Optional<User> user = userRepository.findByUsername(username);
+                if (!user.isPresent()) {
                     User newUser = new User();
                     newUser.setEmail(userData.getStringAttribute(userAttributesEmail));
                     newUser.setUsername(userData.getStringAttribute(userAttributesUsername));

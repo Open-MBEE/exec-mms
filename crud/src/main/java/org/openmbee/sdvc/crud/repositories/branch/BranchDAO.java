@@ -6,7 +6,7 @@ import org.openmbee.sdvc.crud.domains.Branch;
 
 public interface BranchDAO {
 
-    public Optional<Branch> save(Branch branch);
+    public Branch save(Branch branch);
 
     public Optional<Branch> findById(long id);
 

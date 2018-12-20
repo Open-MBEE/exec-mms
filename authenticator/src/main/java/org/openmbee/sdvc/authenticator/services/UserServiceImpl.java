@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.authenticator.services;
 
+import java.util.Optional;
 import org.openmbee.sdvc.core.domains.User;
 import org.openmbee.sdvc.core.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public User findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 

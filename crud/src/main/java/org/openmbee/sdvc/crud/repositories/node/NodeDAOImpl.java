@@ -22,7 +22,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     private final String INSERT_SQL = "INSERT INTO nodes%s (nodeid, indexid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
     private final String UPDATE_SQL = "UPDATE nodes%s SET nodeid = ?, indexid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
 
-    public Optional<Node> save(Node node) {
+    public Node save(Node node) {
         if (node.getId() == null) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -63,7 +63,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
                 }
             });
         }
-        return Optional.of(node);
+        return node;
     }
 
     //TODO handle errors

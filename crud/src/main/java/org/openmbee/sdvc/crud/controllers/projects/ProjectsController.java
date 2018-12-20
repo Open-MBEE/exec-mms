@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
@@ -36,10 +37,12 @@ public class ProjectsController extends BaseController {
 
         if (projectId != null) {
             logger.debug("ProjectId given: ", projectId);
-            Project org = projectRepository.findByProjectId(projectId);
-            ProjectJson projectJson = new ProjectJson();
-            projectJson.merge(convertToMap(org));
-            response.getProjects().add(projectJson);
+            Optional<Project> orgOption = projectRepository.findByProjectId(projectId);
+            if (orgOption.isPresent()) {
+                ProjectJson projectJson = new ProjectJson();
+                projectJson.merge(convertToMap(orgOption.get()));
+                response.getProjects().add(projectJson);
+            }
         } else {
             logger.debug("No ProjectId given");
             List<Project> allOrgs = projectRepository.findAll();

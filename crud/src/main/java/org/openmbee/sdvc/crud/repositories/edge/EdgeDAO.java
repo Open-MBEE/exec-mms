@@ -6,7 +6,7 @@ import org.openmbee.sdvc.crud.domains.Edge;
 
 public interface EdgeDAO {
 
-    Optional<Edge> save(Edge edge);
+    Edge save(Edge edge);
 
     List<Edge> saveAll(List<Edge> nodes);
 

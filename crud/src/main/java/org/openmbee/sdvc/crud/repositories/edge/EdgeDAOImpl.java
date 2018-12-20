@@ -18,7 +18,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
     private final String INSERT_SQL = "INSERT INTO edges%s (edgeType, child_id, parent_id) VALUES (?, ?, ?)";
     private final String UPDATE_SQL = "UPDATE edges%s SET edgeType = ?, child_id = ?, parent_id = ? WHERE id = ?";
 
-    public Optional<Edge> save(Edge edge) {
+    public Edge save(Edge edge) {
         String sql = String.format(INSERT_SQL, getSuffix());
 
         getConnection().update(sql,
@@ -27,7 +27,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
             edge.getParent().getId()
         );
 
-        return Optional.of(edge);
+        return edge;
     }
 
     public List<Edge> saveAll(List<Edge> edges) {

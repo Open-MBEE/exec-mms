@@ -7,7 +7,7 @@ import org.openmbee.sdvc.crud.domains.Commit;
 
 public interface CommitDAO {
 
-    public Optional<Commit> save(Commit commit);
+    public Commit save(Commit commit);
 
     public Optional<Commit> findById(long id);
 

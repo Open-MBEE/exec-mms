@@ -23,7 +23,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         this.commitRepository = commitRepository;
     }
 */
-    public Optional<Branch> save(Branch branch) {
+    public Branch save(Branch branch) {
         String sql = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 /*
         if (branch.getParentRefId() != null && branch.getParentRef() == null) {
@@ -64,7 +64,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
             return null;
         }
         branch.setId(keyHolder.getKey().longValue());
-        return Optional.of(branch);
+        return branch;
     }
 
     @SuppressWarnings({"unchecked"})

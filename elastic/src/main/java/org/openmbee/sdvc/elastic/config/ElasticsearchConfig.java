@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.config;
+package org.openmbee.sdvc.elastic.config;
 
 import org.apache.http.HttpHost;
 import org.springframework.context.annotation.Bean;

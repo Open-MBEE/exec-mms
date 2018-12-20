@@ -28,7 +28,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         this.branchRepository = branchRepository;
     }
 
-    public Optional<Commit> save(Commit commit) {
+    public Commit save(Commit commit) {
         String sql = "INSERT INTO commits (commitType, creator, indexId, branchId, timestamp, comment) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -51,7 +51,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             return null;//TODO error
         }
         commit.setId(keyHolder.getKey().longValue());
-        return Optional.of(commit);
+        return commit;
     }
 
     public Optional<Commit> findById(long id) {
@@ -98,9 +98,12 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             int currentLimit = limit == 0 ? 0 : limit - commits.size();
             List<Commit> next = findByRefAndLimit(currentRef, currentCid, timestamp, currentLimit);
             commits.addAll(next);
-            Branch ref = branchRepository.findByBranchId(currentRef);
-            currentRef = ref.getParentRefId();
-            currentCid = ref.getParentCommit();
+            Optional<Branch> ref = branchRepository.findByBranchId(currentRef);
+            if (ref.isPresent()) {
+                currentRef = ref.get().getParentRefId();
+                currentCid = ref.get().getParentCommit();
+            }
+
             if (currentRef != null && currentRef.equals("")) {
                 currentRef = null;
             }

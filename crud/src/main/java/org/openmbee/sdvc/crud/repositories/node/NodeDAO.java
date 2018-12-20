@@ -7,7 +7,7 @@ import org.openmbee.sdvc.crud.domains.Node;
 
 public interface NodeDAO {
 
-    public Optional<Node> save(Node node);
+    public Node save(Node node);
 
     public List<Node> saveAll(List<Node> nodes);
 

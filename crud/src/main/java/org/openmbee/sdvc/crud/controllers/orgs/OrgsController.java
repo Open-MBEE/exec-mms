@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.orgs;
 
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
@@ -34,10 +35,12 @@ public class OrgsController extends BaseController {
 
         if (orgId != null) {
             logger.debug("OrgId given: ", orgId);
-            Organization org = organizationRepository.findByOrganizationId(orgId);
-            OrgJson orgJson = new OrgJson();
-            orgJson.merge(convertToMap(org));
-            response.getOrgs().add(orgJson);
+            Optional<Organization> orgOption = organizationRepository.findByOrganizationId(orgId);
+            if (orgOption.isPresent()) {
+                OrgJson orgJson = new OrgJson();
+                orgJson.merge(convertToMap(orgOption.get()));
+                response.getOrgs().add(orgJson);
+            }
             return ResponseEntity.ok(response);
         } else {
             logger.debug("No OrgId given");
