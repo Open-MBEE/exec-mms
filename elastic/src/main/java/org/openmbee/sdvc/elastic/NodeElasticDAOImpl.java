@@ -29,37 +29,37 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
     }
 
     public void indexAll(Collection<? extends BaseJson> jsons) {
-        this.indexAll(getIndex() + "_node", jsons);
+        this.indexAll(getIndex(), jsons);
     }
 
     public void index(BaseJson json) {
-        this.index(getIndex() + "_node", json);
+        this.index(getIndex(), json);
     }
 
     public Optional<ElementJson> findById(String indexId) {
-        return this.findById(getIndex() + "_node", indexId);
+        return this.findById(getIndex(), indexId);
     }
 
     public List<ElementJson> findAllById(Set<String> indexIds) {
-        return this.findAllById(getIndex() + "_node", indexIds);
+        return this.findAllById(getIndex(), indexIds);
     }
 
     public void deleteById(String indexId) {
-        this.deleteById(getIndex() + "_node", indexId);
+        this.deleteById(getIndex(), indexId);
     }
 
     public void deleteAll(Collection<? extends BaseJson> jsons) {
-        this.deleteAll(getIndex() + "_node", jsons);
+        this.deleteAll(getIndex(), jsons);
     }
 
     public boolean existsById(String indexId) {
-        return this.existsById(getIndex() + "_node", indexId);
+        return this.existsById(getIndex(), indexId);
     }
 
     @Override
     public Optional<ElementJson> getByCommitId(String commitIndexId, String nodeId) {
         try {
-            SearchRequest searchRequest = new SearchRequest(getIndex() + "_node");
+            SearchRequest searchRequest = new SearchRequest(getIndex());
             // searches the elements for the reference with the current commitId (elasticId) and sysmlid Id
             QueryBuilder query = QueryBuilders.boolQuery()
                 .must(QueryBuilders.termQuery("_commitId", commitIndexId))
@@ -83,7 +83,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         String timestamp, List<String> refsCommitIds) {
         try {
             final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
-            SearchRequest searchRequest = new SearchRequest(getIndex() + "_node");
+            SearchRequest searchRequest = new SearchRequest(getIndex());
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             // Query
             QueryBuilder query = QueryBuilders.boolQuery()
@@ -124,6 +124,11 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected String getIndex() {
+        return super.getIndex() + "_node";
     }
     // Create filter array
 //    int count = 0;

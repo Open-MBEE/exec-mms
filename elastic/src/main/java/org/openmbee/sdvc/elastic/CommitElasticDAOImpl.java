@@ -30,31 +30,31 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     public void indexAll(Collection<? extends BaseJson> jsons) {
-        this.indexAll(getIndex() + "_commit", jsons);
+        this.indexAll(getIndex(), jsons);
     }
 
     public void index(BaseJson json) {
-        this.index(getIndex() + "_commit", json);
+        this.index(getIndex(), json);
     }
 
     public Optional<CommitJson> findById(String indexId) {
-        return this.findById(getIndex() + "_commit", indexId);
+        return this.findById(getIndex(), indexId);
     }
 
     public List<CommitJson> findAllById(Set<String> indexIds) {
-        return this.findAllById(getIndex() + "_commit", indexIds);
+        return this.findAllById(getIndex(), indexIds);
     }
 
     public void deleteById(String indexId) {
-        this.deleteById(getIndex() + "_commit", indexId);
+        this.deleteById(getIndex(), indexId);
     }
 
     public void deleteAll(Collection<? extends BaseJson> jsons) {
-        this.deleteAll(getIndex() + "_commit", jsons);
+        this.deleteAll(getIndex(), jsons);
     }
 
     public boolean existsById(String indexId) {
-        return this.existsById(getIndex() + "_commit", indexId);
+        return this.existsById(getIndex(), indexId);
     }
 
     /**
@@ -91,7 +91,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     public List<CommitJson> elementHistory(String nodeId, Set<String> commitIds) {
         try {
             List<CommitJson> commits = new ArrayList<>();
-            SearchRequest searchRequest = new SearchRequest(getIndex() + "_commit");
+            SearchRequest searchRequest = new SearchRequest(getIndex());
             QueryBuilder query = getCommitHistoryQuery(nodeId, commitIds);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             sourceBuilder.query(query);
@@ -112,5 +112,10 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected String getIndex() {
+        return super.getIndex() + "_commit";
     }
 }

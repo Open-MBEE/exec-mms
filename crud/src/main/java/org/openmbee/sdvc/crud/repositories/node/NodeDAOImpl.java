@@ -140,25 +140,26 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return nodes;
     }
 
-    @SuppressWarnings({"unchecked"})
     public Optional<Node> findById(long id) {
         String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
             getSuffix());
 
-        return (Optional<Node>) getConnection()
-            .queryForObject(sql, new Object[]{id}, new NodeRowMapper());
+        List<Node> l = getConnection()
+            .query(sql, new Object[]{id}, new NodeRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
-    @SuppressWarnings({"unchecked"})
     public Optional<Node> findByNodeId(String nodeId) {
         String sql = String.format("SELECT * FROM nodes%s WHERE nodeid = ?",
             getSuffix());
 
-        return (Optional<Node>) getConnection()
-            .queryForObject(sql, new Object[]{nodeId}, new NodeRowMapper());
+        List<Node> l = getConnection()
+            .query(sql, new Object[]{nodeId}, new NodeRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<Node> findAllByNodeIds(Collection<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();
@@ -168,7 +169,6 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return getConnection().query(sql, new NodeRowMapper());
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<Node> findAll() {
         String sql = String.format("SELECT * FROM nodes%s WHERE deleted = FALSE",
             getSuffix());

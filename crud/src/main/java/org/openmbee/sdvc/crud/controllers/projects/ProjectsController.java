@@ -32,17 +32,19 @@ public class ProjectsController extends BaseController {
 
     @GetMapping(value = {"", "/{projectId}"})
     @Transactional
-    public ResponseEntity<? extends BaseResponse> handleGet(@PathVariable(required = false) String projectId) {
+    public ResponseEntity<? extends BaseResponse> handleGet(
+        @PathVariable(required = false) String projectId) {
         ProjectsResponse response = new ProjectsResponse();
 
         if (projectId != null) {
             logger.debug("ProjectId given: ", projectId);
             Optional<Project> orgOption = projectRepository.findByProjectId(projectId);
-            if (orgOption.isPresent()) {
-                ProjectJson projectJson = new ProjectJson();
-                projectJson.merge(convertToMap(orgOption.get()));
-                response.getProjects().add(projectJson);
+            if (!orgOption.isPresent()) {
+                return ResponseEntity.notFound().build();
             }
+            ProjectJson projectJson = new ProjectJson();
+            projectJson.merge(convertToMap(orgOption.get()));
+            response.getProjects().add(projectJson);
         } else {
             logger.debug("No ProjectId given");
             List<Project> allOrgs = projectRepository.findAll();
@@ -52,7 +54,6 @@ public class ProjectsController extends BaseController {
                 response.getProjects().add(projectJson);
             }
         }
-
         return ResponseEntity.ok(response);
     }
 
@@ -68,6 +69,7 @@ public class ProjectsController extends BaseController {
         }
         ProjectsResponse response = new ProjectsResponse();
         for (ProjectJson json: projectsPost.getProjects()) {
+            //TODO reject if projectId isn't there
             ProjectService ps = getProjectService(json.getProjectId());
             if (!ps.exists(json.getProjectId())) {
                 response.getProjects().add(ps.create(json));

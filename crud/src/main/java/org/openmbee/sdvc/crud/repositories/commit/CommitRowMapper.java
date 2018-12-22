@@ -11,7 +11,7 @@ import org.openmbee.sdvc.crud.domains.CommitType;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.jdbc.core.RowMapper;
 
-public class CommitRowMapper implements RowMapper {
+public class CommitRowMapper implements RowMapper<Commit> {
 
     static final String COMMITS = "commits";
 

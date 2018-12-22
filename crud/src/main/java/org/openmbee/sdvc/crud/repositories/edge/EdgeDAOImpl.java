@@ -97,6 +97,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
         return edges;
     }
 
+    //TODO these are wrong
     @SuppressWarnings({"unchecked"})
     public Optional<Edge> findParents(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",

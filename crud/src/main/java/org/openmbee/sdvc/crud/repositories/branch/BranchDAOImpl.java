@@ -67,23 +67,22 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         return branch;
     }
 
-    @SuppressWarnings({"unchecked"})
     public Optional<Branch> findById(long id) {
         String sql = "SELECT * FROM branches WHERE id = ?";
 
-        return (Optional<Branch>) getConnection()
-            .queryForObject(sql, new Object[]{id}, new BranchRowMapper());
+        List<Branch> l = getConnection()
+            .query(sql, new Object[]{id}, new BranchRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
     }
 
-    @SuppressWarnings({"unchecked"})
     public Optional<Branch> findByBranchId(String branchId) {
         String sql = "SELECT * FROM branches WHERE branchId = ?";
 
-        return (Optional<Branch>) getConnection()
-            .queryForObject(sql, new Object[]{branchId}, new BranchRowMapper());
+        List<Branch> l = getConnection()
+            .query(sql, new Object[]{branchId}, new BranchRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<Branch> findAll() {
         String sql = "SELECT * FROM branches WHERE deleted = false";
 

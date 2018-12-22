@@ -57,15 +57,19 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     public Optional<Commit> findById(long id) {
         String sql = "SELECT * FROM commits WHERE id = ?";
 
-        return (Optional<Commit>) getConnection()
-            .queryForObject(sql, new Object[]{id}, new CommitRowMapper());
+        List<Commit> l = getConnection()
+            .query(sql, new Object[]{id}, new CommitRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
     public Optional<Commit> findByCommitId(String commitId) {
         String sql = "SELECT * FROM commits WHERE indexid = ?";
 
-        return (Optional<Commit>) getConnection()
-            .queryForObject(sql, new Object[]{commitId}, new CommitRowMapper());
+        List<Commit> l = getConnection()
+            .query(sql, new Object[]{commitId}, new CommitRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
     public Optional<Commit> findByRefAndTimestamp(String refId, Instant timestamp) {

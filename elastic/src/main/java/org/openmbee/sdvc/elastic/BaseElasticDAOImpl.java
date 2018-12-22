@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
-    @Value("${elastic.limit.result}")
+    @Value("${elastic.limit.result}") //TODO can't inject static vars
     protected static int resultLimit;
     @Value("${elastic.limit.term}")
     protected static int termLimit;

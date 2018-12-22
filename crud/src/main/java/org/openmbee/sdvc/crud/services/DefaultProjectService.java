@@ -45,11 +45,13 @@ public class DefaultProjectService implements ProjectService {
 
     public ProjectJson create(ProjectJson project) {
         if (project.getOrgId() == null || project.getOrgId().isEmpty()) {
+            //TODO throw exception
             return null;
         }
 
         Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
         if (!org.isPresent() || org.get().getOrganizationId().isEmpty()) {
+            //TODO throw exception
             return null;
         }
 
@@ -61,7 +63,6 @@ public class DefaultProjectService implements ProjectService {
 
         try {
             if (projectOperations.createProjectDatabase(proj)) {
-                //TODO create elastic indexes and mappings
                 projectIndex.create(proj.getProjectId());
                 return project;
             }
@@ -73,7 +74,7 @@ public class DefaultProjectService implements ProjectService {
             logger.error("Couldn't create database: {}", project.getProjectId());
             logger.error(e);
         }
-        return null; //throw exception
+        return null; //TODO throw exception
     }
 
     public ProjectJson update(ProjectJson project) {
@@ -86,7 +87,7 @@ public class DefaultProjectService implements ProjectService {
                 Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
                 if (org.isPresent() && !org.get().getOrganizationId().isEmpty()) {
                     proj.setOrganization(org.get());
-                }
+                } //TODO else reject?
             }
             projectRepository.save(proj);
             return project;
