@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.json.CommitJson;
@@ -69,31 +70,37 @@ public class CommitService {
 
     public CommitsResponse getCommit(String projectId, String commitId) {
         DbContextHolder.setContext(projectId);
-        Map<String, Object> commit = null;
-
+        CommitsResponse res = new CommitsResponse();
         try {
-
-            commit = commitIndex.findById(commitId);
-
+            Optional<CommitJson> commit = commitIndex.findById(commitId);
+            if (commit.isPresent()) {
+                res.getCommits().add(commit.get());
+            } else {
+                res.setCode(404);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            res.setCode(500);
         }
-        List<CommitJson> resJson = new ArrayList<>();
-        CommitJson c = new CommitJson();
-        c.putAll(commit);
-        resJson.add(c);
-        CommitsResponse res = new CommitsResponse();
-        res.setCommits(resJson);
         return res;
     }
 
     public CommitsResponse getElementCommits(String projectId, String refId, String elementId,
         Map<String, Object> params) {
         DbContextHolder.setContext(projectId);
-        List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(refId, null, 0);
-        //TODO either search elastic using the commit ids or read all elements from elastic first and filter by the ref's commit ids
         CommitsResponse res = new CommitsResponse();
+        try {
+            List<Commit> refCommits = commitRepository
+                .findByRefAndTimestampAndLimit(refId, null, 0);
+            Set<String> commitIds = new HashSet<>();
+            for (Commit commit: refCommits) {
+                commitIds.add(commit.getIndexId());
+            }
+            res.getCommits().addAll(commitIndex.elementHistory(elementId, commitIds));
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.setCode(500);
+        }
         return res;
     }
 
@@ -103,16 +110,13 @@ public class CommitService {
         for (CommitJson j : req.getCommits()) {
             ids.add(j.getId());
         }
+        CommitsResponse res = new CommitsResponse();
         try {
-
-            List<Map<String, Object>> jsons = commitIndex.findAllById(ids);
-            //TODO
-            CommitsResponse res = new CommitsResponse();
-            return res;
-
+            res.getCommits().addAll(commitIndex.findAllById(ids));
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            res.setCode(500);
         }
+        return res;
     }
 }

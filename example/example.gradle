@@ -19,6 +19,7 @@ dependencies {
     compile(
         project(':ldap'),
         project(':cameo'),
+        project(':elastic'),
         'org.springframework.boot:spring-boot-starter-web',
         'org.postgresql:postgresql:42.2.5',
         'io.springfox:springfox-swagger2:2.7.0',

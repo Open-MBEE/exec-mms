@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.orgs;
 
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
@@ -34,11 +35,13 @@ public class OrgsController extends BaseController {
 
         if (orgId != null) {
             logger.debug("OrgId given: ", orgId);
-            Organization org = organizationRepository.findByOrganizationId(orgId);
+            Optional<Organization> orgOption = organizationRepository.findByOrganizationId(orgId);
+            if (!orgOption.isPresent()) {
+                return ResponseEntity.notFound().build();
+            }
             OrgJson orgJson = new OrgJson();
-            orgJson.merge(convertToMap(org));
+            orgJson.merge(convertToMap(orgOption.get()));
             response.getOrgs().add(orgJson);
-            return ResponseEntity.ok(response);
         } else {
             logger.debug("No OrgId given");
             List<Organization> allOrgs = organizationRepository.findAll();
@@ -47,8 +50,8 @@ public class OrgsController extends BaseController {
                 orgJson.merge(convertToMap(org));
                 response.getOrgs().add(orgJson);
             }
-            return ResponseEntity.ok(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -61,7 +64,9 @@ public class OrgsController extends BaseController {
             OrganizationsResponse response = new OrganizationsResponse();
 
             for (OrgJson org : orgPost.getOrgs()) {
-                Organization o = new Organization();
+                //TODO reject if orgId isn't there
+                Organization o = organizationRepository.findByOrganizationId(org.getId())
+                    .orElse(new Organization());
                 o.setOrganizationId(org.getId());
                 o.setOrganizationName(org.getName());
                 logger.info("Saving organization: {}", o.getOrganizationId());
@@ -69,10 +74,7 @@ public class OrgsController extends BaseController {
                 org.merge(convertToMap(saved));
                 response.getOrgs().add(org);
             }
-
             return ResponseEntity.ok(response);
-        } else {
-
         }
         logger.debug("Bad Request");
         OrganizationsResponse err = new OrganizationsResponse();

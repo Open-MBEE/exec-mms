@@ -26,13 +26,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class NodeOperation {
 
+    protected final Logger logger = LogManager.getLogger(getClass());
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
-
     protected DateTimeFormatter formatter = DateTimeFormatter
         .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZone(
             ZoneId.systemDefault());
-    protected final Logger logger = LogManager.getLogger(getClass());
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -54,44 +53,40 @@ public class NodeOperation {
     }
 
     public NodeChangeInfo initInfo(List<ElementJson> elements, CommitJson cmjs) {
-        try {
-            Set<String> indexIds = new HashSet<>();
-            Map<String, ElementJson> reqElementMap = (Map<String, ElementJson>) convertJsonToMap(elements);
-            List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
-            Map<String, Node> existingNodeMap = new HashMap<>();
-            for (Node node : existingNodes) {
-                indexIds.add(node.getIndexId());
-                existingNodeMap.put(node.getNodeId(), node);
-            }
-            // bulk read existing elements in elastic
-            List<Map<String, Object>> existingElements = nodeIndex.findAllById(indexIds);
-            Map<String, Map<String, Object>> existingElementMap = convertToMap(existingElements, ElementJson.ID);
 
-            Instant now = Instant.now();
-            if (cmjs != null) {
-                initCommitJson(cmjs, now);
-            }
-
-            NodeChangeInfo info = new NodeChangeInfo();
-            info.setCommitJson(cmjs);
-            info.setUpdatedMap(new HashMap<>());
-            info.setDeletedMap(new HashMap<>());
-            info.setExistingElementMap(existingElementMap);
-            info.setExistingNodeMap(existingNodeMap);
-            info.setReqElementMap(reqElementMap);
-            info.setReqIndexIds(indexIds);
-            info.setToSaveNodeMap(new HashMap<>());
-            info.setRejected(new ArrayList<>());
-            info.setNow(now);
-            info.setOldIndexIds(new HashSet<>());
-            info.setEdgesToDelete(new HashMap<>());
-            info.setEdgesToSave(new HashMap<>());
-
-            return info;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        Set<String> indexIds = new HashSet<>();
+        Map<String, ElementJson> reqElementMap = convertJsonToMap(elements);
+        List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
+        Map<String, Node> existingNodeMap = new HashMap<>();
+        for (Node node : existingNodes) {
+            indexIds.add(node.getIndexId());
+            existingNodeMap.put(node.getNodeId(), node);
         }
+        // bulk read existing elements in elastic
+        List<ElementJson> existingElements = nodeIndex.findAllById(indexIds);
+        Map<String, ElementJson> existingElementMap = convertJsonToMap(existingElements);
+
+        Instant now = Instant.now();
+        if (cmjs != null) {
+            initCommitJson(cmjs, now);
+        }
+
+        NodeChangeInfo info = new NodeChangeInfo();
+        info.setCommitJson(cmjs);
+        info.setUpdatedMap(new HashMap<>());
+        info.setDeletedMap(new HashMap<>());
+        info.setExistingElementMap(existingElementMap);
+        info.setExistingNodeMap(existingNodeMap);
+        info.setReqElementMap(reqElementMap);
+        info.setReqIndexIds(indexIds);
+        info.setToSaveNodeMap(new HashMap<>());
+        info.setRejected(new ArrayList<>());
+        info.setNow(now);
+        info.setOldIndexIds(new HashSet<>());
+        info.setEdgesToDelete(new HashMap<>());
+        info.setEdgesToSave(new HashMap<>());
+        info.setActiveElementMap(new HashMap<>());
+        return info;
     }
 
     public void processElementAdded(ElementJson e, Node n, CommitJson cmjs) {
@@ -189,10 +184,23 @@ public class NodeOperation {
         return res;
     }
 
-    public static Map<String, ? extends BaseJson> convertJsonToMap(
-        List<? extends BaseJson> elements) {
-        Map<String, BaseJson> result = new HashMap<>();
-        for (BaseJson elem : elements) {
+    public boolean existingNodeContainsNodeId(NodeGetInfo info, String nodeId) {
+        if (!info.getExistingNodeMap().containsKey(nodeId)) {
+            Map<String, Object> reject = new HashMap<>();
+            reject.put("code", 404);
+            reject.put("message", "not found");
+            reject.put("id", nodeId);
+            info.getRejected().add(reject);
+            return false;
+        }
+        return true;
+    }
+
+
+    public static Map<String, ElementJson> convertJsonToMap(
+        List<ElementJson> elements) {
+        Map<String, ElementJson> result = new HashMap<>();
+        for (ElementJson elem : elements) {
             if (elem == null) {
                 continue;
             }
@@ -214,31 +222,5 @@ public class NodeOperation {
             }
         }
         return result;
-    }
-
-    public static Map<String, Map<String, Object>> convertToMap(List<Map<String, Object>> elements, String key) {
-        Map<String, Map<String, Object>> result = new HashMap<>();
-        for (Map<String, Object> elem : elements) {
-            if (elem == null) {
-                continue;
-            }
-            String id = (String) elem.get(key);
-            if (id != null && !id.equals("")) {
-                result.put(id, elem);
-            }
-        }
-        return result;
-    }
-
-    public boolean existingNodeContainsNodeId(NodeGetInfo info, String nodeId) {
-        if (!info.getExistingNodeMap().containsKey(nodeId)) {
-            Map<String, Object> reject = new HashMap<>();
-            reject.put("code", 404);
-            reject.put("message", "not found");
-            reject.put("id", nodeId);
-            info.getRejected().add(reject);
-            return false;
-        }
-        return true;
     }
 }

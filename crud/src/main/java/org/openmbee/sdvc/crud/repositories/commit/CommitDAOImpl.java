@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
@@ -53,34 +54,38 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         return commit;
     }
 
-    public Commit findById(long id) {
+    public Optional<Commit> findById(long id) {
         String sql = "SELECT * FROM commits WHERE id = ?";
 
-        return (Commit) getConnection()
-            .queryForObject(sql, new Object[]{id}, new CommitRowMapper());
+        List<Commit> l = getConnection()
+            .query(sql, new Object[]{id}, new CommitRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
-    public Commit findByCommitId(String commitId) {
+    public Optional<Commit> findByCommitId(String commitId) {
         String sql = "SELECT * FROM commits WHERE indexid = ?";
 
-        return (Commit) getConnection()
-            .queryForObject(sql, new Object[]{commitId}, new CommitRowMapper());
+        List<Commit> l = getConnection()
+            .query(sql, new Object[]{commitId}, new CommitRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
-    public Commit findByRefAndTimestamp(String refId, Instant timestamp) {
+    public Optional<Commit> findByRefAndTimestamp(String refId, Instant timestamp) {
         List<Commit> res = findByRefAndTimestampAndLimit(refId, timestamp, 1);
-        if (res.size() > 0) {
-            return res.get(0);
+        if (!res.isEmpty()) {
+            return Optional.of(res.get(0));
         }
-        return null;
+        return Optional.empty();
     }
 
-    public Commit findLatestByRef(String refId) {
+    public Optional<Commit> findLatestByRef(String refId) {
         List<Commit> res = findByRefAndTimestampAndLimit(refId, null, 1);
-        if (res.size() > 0) {
-            return res.get(0);
+        if (!res.isEmpty()) {
+            return Optional.of(res.get(0));
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<Commit> findAll() {
@@ -97,9 +102,12 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             int currentLimit = limit == 0 ? 0 : limit - commits.size();
             List<Commit> next = findByRefAndLimit(currentRef, currentCid, timestamp, currentLimit);
             commits.addAll(next);
-            Branch ref = branchRepository.findByBranchId(currentRef);
-            currentRef = ref.getParentRefId();
-            currentCid = ref.getParentCommit();
+            Optional<Branch> ref = branchRepository.findByBranchId(currentRef);
+            if (ref.isPresent()) {
+                currentRef = ref.get().getParentRefId();
+                currentCid = ref.get().getParentCommit();
+            }
+
             if (currentRef != null && currentRef.equals("")) {
                 currentRef = null;
             }

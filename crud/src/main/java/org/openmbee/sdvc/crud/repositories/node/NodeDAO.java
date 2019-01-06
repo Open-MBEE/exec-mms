@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.repositories.node;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Node;
 
 public interface NodeDAO {
@@ -14,9 +15,9 @@ public interface NodeDAO {
 
     public List<Node> updateAll(List<Node> nodes);
 
-    public Node findById(long id);
+    public Optional<Node> findById(long id);
 
-    public Node findByNodeId(String sysmlid);
+    public Optional<Node> findByNodeId(String sysmlid);
 
     public List<Node> findAllByNodeIds(Collection<String> ids);
 

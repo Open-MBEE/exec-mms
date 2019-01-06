@@ -10,7 +10,7 @@ import org.openmbee.sdvc.crud.domains.Node;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.jdbc.core.RowMapper;
 
-public class NodeRowMapper implements RowMapper {
+public class NodeRowMapper implements RowMapper<Node> {
 
     static final String NODES = "nodes";
 

@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.authenticator.services;
 
+import java.util.Optional;
 import org.openmbee.sdvc.core.domains.User;
 
 public interface UserService {
@@ -8,9 +9,9 @@ public interface UserService {
 
     void delete(User user);
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
     Iterable<User> findAll();
 }

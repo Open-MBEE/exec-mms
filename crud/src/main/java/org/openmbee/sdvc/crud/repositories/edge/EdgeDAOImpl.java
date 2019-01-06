@@ -5,11 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.EdgeType;
-import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Component;
@@ -99,21 +97,22 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
         return edges;
     }
 
+    //TODO these are wrong
     @SuppressWarnings({"unchecked"})
-    public Edge findParents(String sysmlId, Integer et) {
+    public Optional<Edge> findParents(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
             getSuffix());
 
-        return (Edge) getConnection()
+        return (Optional<Edge>) getConnection()
             .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})
-    public Edge findChildren(String sysmlId, Integer et) {
+    public Optional<Edge> findChildren(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
             getSuffix());
 
-        return (Edge) getConnection()
+        return (Optional<Edge>) getConnection()
             .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
     }
 

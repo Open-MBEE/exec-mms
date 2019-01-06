@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -66,23 +67,22 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         return branch;
     }
 
-    @SuppressWarnings({"unchecked"})
-    public Branch findById(long id) {
+    public Optional<Branch> findById(long id) {
         String sql = "SELECT * FROM branches WHERE id = ?";
 
-        return (Branch) getConnection()
-            .queryForObject(sql, new Object[]{id}, new BranchRowMapper());
+        List<Branch> l = getConnection()
+            .query(sql, new Object[]{id}, new BranchRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
     }
 
-    @SuppressWarnings({"unchecked"})
-    public Branch findByBranchId(String branchId) {
+    public Optional<Branch> findByBranchId(String branchId) {
         String sql = "SELECT * FROM branches WHERE branchId = ?";
 
-        return (Branch) getConnection()
-            .queryForObject(sql, new Object[]{branchId}, new BranchRowMapper());
+        List<Branch> l = getConnection()
+            .query(sql, new Object[]{branchId}, new BranchRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<Branch> findAll() {
         String sql = "SELECT * FROM branches WHERE deleted = false";
 

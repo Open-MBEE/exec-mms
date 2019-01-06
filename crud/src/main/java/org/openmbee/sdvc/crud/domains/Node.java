@@ -16,6 +16,7 @@ public class Node {
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 
+    @Column(unique = true)
     private String nodeId;
     private String indexId;
     private String lastCommit;

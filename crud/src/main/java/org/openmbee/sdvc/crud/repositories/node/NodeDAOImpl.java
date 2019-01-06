@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Node;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -139,22 +140,24 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return nodes;
     }
 
-    @SuppressWarnings({"unchecked"})
-    public Node findById(long id) {
+    public Optional<Node> findById(long id) {
         String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
             getSuffix());
 
-        return (Node) getConnection()
-            .queryForObject(sql, new Object[]{id}, new NodeRowMapper());
+        List<Node> l = getConnection()
+            .query(sql, new Object[]{id}, new NodeRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
-    @SuppressWarnings({"unchecked"})
-    public Node findByNodeId(String nodeId) {
+    public Optional<Node> findByNodeId(String nodeId) {
         String sql = String.format("SELECT * FROM nodes%s WHERE nodeid = ?",
             getSuffix());
 
-        return (Node) getConnection()
-            .queryForObject(sql, new Object[]{nodeId}, new NodeRowMapper());
+        List<Node> l = getConnection()
+            .query(sql, new Object[]{nodeId}, new NodeRowMapper());
+        return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
+
     }
 
     public List<Node> findAllByNodeIds(Collection<String> ids) {
@@ -166,7 +169,6 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return getConnection().query(sql, new NodeRowMapper());
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<Node> findAll() {
         String sql = String.format("SELECT * FROM nodes%s WHERE deleted = FALSE",
             getSuffix());

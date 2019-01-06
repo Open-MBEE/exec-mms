@@ -16,9 +16,9 @@ public class NodeGetInfo {
 
     // string is node id
     // map of element json objects
-    Map<String, Map<String, Object>> existingElementMap;
+    Map<String, ElementJson> existingElementMap;
 
-    Map<String, ElementJson> Map;
+    Map<String, ElementJson> activeElementMap;
 
     List<Map> rejected;
 
@@ -50,12 +50,22 @@ public class NodeGetInfo {
         return this;
     }
 
-    public Map<String, Map<String, Object>> getExistingElementMap() {
+    public Map<String, ElementJson> getActiveElementMap() {
+        return activeElementMap;
+    }
+
+    public NodeGetInfo setActiveElementMap(
+        Map<String, ElementJson> activeElementMap) {
+        this.activeElementMap = activeElementMap;
+        return this;
+    }
+
+    public Map<String, ElementJson> getExistingElementMap() {
         return existingElementMap;
     }
 
     public NodeGetInfo setExistingElementMap(
-        Map<String, Map<String, Object>> existingElementMap) {
+        Map<String, ElementJson> existingElementMap) {
         this.existingElementMap = existingElementMap;
         return this;
     }

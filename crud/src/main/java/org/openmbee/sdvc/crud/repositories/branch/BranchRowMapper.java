@@ -10,7 +10,7 @@ import org.openmbee.sdvc.crud.domains.Branch;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.jdbc.core.RowMapper;
 
-public class BranchRowMapper implements RowMapper {
+public class BranchRowMapper implements RowMapper<Branch> {
 
     static final String BRANCHES = "branches";
 

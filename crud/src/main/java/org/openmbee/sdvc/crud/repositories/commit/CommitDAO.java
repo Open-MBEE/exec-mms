@@ -2,19 +2,20 @@ package org.openmbee.sdvc.crud.repositories.commit;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Commit;
 
 public interface CommitDAO {
 
     public Commit save(Commit commit);
 
-    public Commit findById(long id);
+    public Optional<Commit> findById(long id);
 
-    public Commit findByCommitId(String commitId);
+    public Optional<Commit> findByCommitId(String commitId);
 
-    public Commit findByRefAndTimestamp(String refId, Instant timestamp);
+    public Optional<Commit> findByRefAndTimestamp(String refId, Instant timestamp);
 
-    public Commit findLatestByRef(String refId);
+    public Optional<Commit> findLatestByRef(String refId);
 
     public List<Commit> findAll();
 

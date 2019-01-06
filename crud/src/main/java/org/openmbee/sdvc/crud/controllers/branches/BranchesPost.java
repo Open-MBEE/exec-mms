@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.time.Instant;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
@@ -62,11 +63,16 @@ public class BranchesPost extends BaseController {
                 }
 
                 if (branch.getParentCommitId() != null) {
-                    Commit parentCommit = commitRepository
+                    Optional<Commit> parentCommit = commitRepository
                         .findByCommitId(branch.getParentCommitId());
-                    b.setParentCommit(parentCommit.getId());
+                    if (parentCommit.isPresent()) {
+                        b.setParentCommit(parentCommit.get().getId());
+                    }
                 } else {
-                    b.setParentCommit(commitRepository.findLatestByRef(b.getParentRefId()).getId());
+                    Optional<Commit> parentCommit = commitRepository.findLatestByRef(b.getParentRefId());
+                    if (parentCommit.isPresent()) {
+                        b.setParentCommit(parentCommit.get().getId());
+                    }
                 }
 
                 b.setTimestamp(now);

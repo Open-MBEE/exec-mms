@@ -1,8 +1,8 @@
 package org.openmbee.sdvc.crud.repositories.edge;
 
 import java.util.List;
+import java.util.Optional;
 import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.EdgeType;
 
 public interface EdgeDAO {
 
@@ -14,9 +14,9 @@ public interface EdgeDAO {
 
     List<Edge> updateAll(List<Edge> nodes);
 
-    Edge findParents(String child, Integer et);
+    Optional<Edge> findParents(String child, Integer et);
 
-    Edge findChildren(String parent, Integer et);
+    Optional<Edge> findChildren(String parent, Integer et);
 
     List<Edge> findAll();
 }

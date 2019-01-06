@@ -1,33 +1,31 @@
 package org.openmbee.sdvc.crud.repositories.node;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.openmbee.sdvc.json.BaseJson;
+import org.openmbee.sdvc.json.ElementJson;
 
 public interface NodeIndexDAO {
 
-    void indexAll(Collection<? extends BaseJson> jsons) throws IOException;
+    void indexAll(Collection<? extends BaseJson> jsons);
 
-    void index(BaseJson json) throws IOException;
+    void index(BaseJson json);
 
-    Map<String, Object> findById(String indexId) throws IOException;
+    Optional<ElementJson> findById(String indexId);
 
-    List<Map<String, Object>> findAllById(Set<String> indexIds) throws IOException;
+    List<ElementJson> findAllById(Set<String> indexIds);
 
-    void deleteById(String indexId) throws IOException;
+    void deleteById(String indexId);
 
-    void deleteAll(Collection<? extends BaseJson> jsons) throws IOException;
+    void deleteAll(Collection<? extends BaseJson> jsons);
 
-    boolean existsById(String indexId) throws IOException;
+    boolean existsById(String indexId);
 
-    Map<String, Object> getByCommitId(String commitIndexId, String nodeId, String index)
-        throws IOException;
+    Optional<ElementJson> getByCommitId(String commitIndexId, String nodeId);
 
-    List<Map<String, Object>> getElementsLessThanOrEqualTimestamp(String nodeId, String timestamp,
-        List<String> refsCommitIds, String index) throws IOException;
+    Optional<ElementJson> getElementLessThanOrEqualTimestamp(String nodeId, String timestamp,
+        List<String> refsCommitIds);
 
 }

@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.sql.SQLException;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.domains.Organization;
@@ -44,23 +45,24 @@ public class DefaultProjectService implements ProjectService {
 
     public ProjectJson create(ProjectJson project) {
         if (project.getOrgId() == null || project.getOrgId().isEmpty()) {
+            //TODO throw exception
             return null;
         }
 
-        Organization org = orgRepository.findByOrganizationId(project.getOrgId());
-        if (org == null || org.getOrganizationId().isEmpty()) {
+        Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
+        if (!org.isPresent() || org.get().getOrganizationId().isEmpty()) {
+            //TODO throw exception
             return null;
         }
 
         Project proj = new Project();
         proj.setProjectId(project.getId());
         proj.setProjectName(project.getName());
-        proj.setOrganization(org);
+        proj.setOrganization(org.get());
         Project saved = projectRepository.save(proj);
 
         try {
             if (projectOperations.createProjectDatabase(proj)) {
-                //TODO create elastic indexes and mappings
                 projectIndex.create(proj.getProjectId());
                 return project;
             }
@@ -72,19 +74,20 @@ public class DefaultProjectService implements ProjectService {
             logger.error("Couldn't create database: {}", project.getProjectId());
             logger.error(e);
         }
-        return null; //throw exception
+        return null; //TODO throw exception
     }
 
     public ProjectJson update(ProjectJson project) {
-        Project proj = projectRepository.findByProjectId(project.getProjectId());
-        if (proj != null && !project.getId().isEmpty()) {
+        Optional<Project> projOption = projectRepository.findByProjectId(project.getProjectId());
+        if (projOption.isPresent() && !projOption.get().getProjectId().isEmpty()) {
+            Project proj = projOption.get();
             proj.setProjectId(project.getProjectId());
             proj.setProjectName(project.getName());
             if (!project.getOrgId().isEmpty()) {
-                Organization org = orgRepository.findByOrganizationId(project.getOrgId());
-                if (org != null && !org.getOrganizationId().isEmpty()) {
-                    proj.setOrganization(org);
-                }
+                Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
+                if (org.isPresent() && !org.get().getOrganizationId().isEmpty()) {
+                    proj.setOrganization(org.get());
+                } //TODO else reject?
             }
             projectRepository.save(proj);
             return project;
@@ -97,7 +100,7 @@ public class DefaultProjectService implements ProjectService {
     }
 
     public boolean exists(String projectId) {
-        Project project = this.projectRepository.findByProjectId(projectId);
-        return project != null && project.getProjectId().equals(projectId);
+        Optional<Project> project = this.projectRepository.findByProjectId(projectId);
+        return project.isPresent() && project.get().getProjectId().equals(projectId);
     }
 }
