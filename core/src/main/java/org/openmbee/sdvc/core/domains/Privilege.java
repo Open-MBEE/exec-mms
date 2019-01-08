@@ -16,6 +16,9 @@ public class Privilege extends Base {
     @ManyToMany(mappedBy = "privileges")
     private Collection<Role> roles;
 
+    public Privilege() {
+    }
+
     public Privilege(String name, String level) {
         this.name = name;
         this.level = level;

@@ -1,30 +1,24 @@
 package org.openmbee.sdvc.crud.repositories;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.HashMap;
-import org.springframework.cglib.beans.BeanMap;
+import java.util.Set;
 
-public class BaseRowMapper {
+public abstract class BaseRowMapper {
 
-    public HashMap<String, BeanMap> getBeanMapping(ResultSet rs) throws SQLException {
+    protected String getFieldName(String metadata, Set keys) {
+        String[] arr = metadata.split("\\.");
+        if (arr.length < 2) {
+            return getSingleFieldName(arr[0], keys);
+        } else {
+            return getSingleFieldName(arr[1], keys);
+        }
+    }
 
-        HashMap<String, BeanMap> beansByName = new HashMap<>();
-        ResultSetMetaData resultSetMetaData = rs.getMetaData();
-
-        for (int colnum = 1; colnum <= resultSetMetaData.getColumnCount(); colnum++) {
-
-            String table = resultSetMetaData.getColumnName(colnum).split("\\.")[0];
-            String field = resultSetMetaData.getColumnName(colnum).split("\\.")[1];
-
-            BeanMap beanMap = beansByName.get(table);
-
-            if (rs.getObject(colnum) != null) {
-                beanMap.put(field, rs.getObject(colnum));
+    protected String getSingleFieldName(String field, Set keys) {
+        for (Object key : keys) {
+            if (key.toString().equalsIgnoreCase(field)) {
+                return key.toString();
             }
         }
-
-        return beansByName;
+        return null;
     }
 }

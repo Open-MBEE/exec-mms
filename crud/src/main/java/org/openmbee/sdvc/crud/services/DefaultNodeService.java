@@ -87,12 +87,7 @@ public class DefaultNodeService implements NodeService {
         if (id != null) {
             logger.debug("ElementId given: ", id);
 
-            ElementJson json = new ElementJson();
-            json.setId(id);
-            ElementsRequest req = new ElementsRequest();
-            List<ElementJson> list = new ArrayList<>();
-            list.add(json);
-            req.setElements(list);
+            ElementsRequest req = buildRequest(id);
             return read(projectId, refId, req, params);
 
         } else {
@@ -187,13 +182,18 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public ElementsResponse delete(String projectId, String refId, String id) {
+        ElementsRequest req = buildRequest(id);
+        return delete(projectId, refId, req);
+    }
+
+    private ElementsRequest buildRequest(String id) {
         ElementJson json = new ElementJson();
         json.setId(id);
         ElementsRequest req = new ElementsRequest();
         List<ElementJson> list = new ArrayList<>();
         list.add(json);
         req.setElements(list);
-        return delete(projectId, refId, req);
+        return req;
     }
 
     @Override
