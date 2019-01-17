@@ -7,7 +7,7 @@ import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.Constants;
 import org.openmbee.sdvc.json.ElementJson;
 
-public class ElementsResponse extends BaseResponse {
+public class ElementsResponse extends BaseResponse<ElementsResponse> {
 
     public ElementsResponse() {
         this.put(Constants.ELEMENT_KEY, new ArrayList<ElementJson>());

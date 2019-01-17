@@ -6,6 +6,7 @@ public class RefJson extends BaseJson {
     public static final String PARENT_COMMIT_ID = "parentCommitId";
     public static final String STATUS = "status";
     public static final String TYPE = "type";
+    public static final String DESCRIPTION = "description";
 
     public String getParentRefId() {
         return (String) this.get(PARENT_REF_ID);
@@ -47,5 +48,8 @@ public class RefJson extends BaseJson {
         return "Tag".equals(getType());
     }
 
+    public String getDescription() {
+        return (String) this.getOrDefault(DESCRIPTION, "");
+    }
 
 }

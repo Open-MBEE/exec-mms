@@ -2,11 +2,14 @@ package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.time.Instant;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.controllers.Constants;
 import org.openmbee.sdvc.crud.domains.Branch;
 import org.openmbee.sdvc.crud.domains.Commit;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.services.DatabaseDefinitionService;
@@ -38,6 +41,7 @@ public class BranchesPost extends BaseController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handleRequest(
         @PathVariable String projectId,
         @RequestBody BranchesRequest projectsPost) {
@@ -51,7 +55,8 @@ public class BranchesPost extends BaseController {
                 Branch b = new Branch();
                 b.setBranchId(branch.getId());
                 b.setBranchName(branch.getName());
-                b.setDescription("blah");
+                b.setDescription(branch.getDescription());
+                b.setTag(branch.isTag());
                 b.setTimestamp(Instant.now());
                 logger.info("Saving branch: {}", branch.getId());
 
@@ -59,7 +64,7 @@ public class BranchesPost extends BaseController {
                     //Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
                     b.setParentRefId(branch.getParentRefId());
                 } else {
-                    b.setParentRefId("master");
+                    b.setParentRefId(Constants.MASTER_BRANCH);
                 }
 
                 if (branch.getParentCommitId() != null) {
@@ -95,10 +100,8 @@ public class BranchesPost extends BaseController {
 
             return ResponseEntity.ok(response);
         }
-        logger.debug("Bad Request");
         BranchesResponse err = new BranchesResponse();
-        err.setCode(400);
         err.addMessage("Bad Request");
-        return ResponseEntity.badRequest().body(err);
+        throw new BadRequestException(err);
     }
 }

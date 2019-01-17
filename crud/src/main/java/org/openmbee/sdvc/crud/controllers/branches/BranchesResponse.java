@@ -6,7 +6,7 @@ import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.Constants;
 import org.openmbee.sdvc.json.RefJson;
 
-public class BranchesResponse extends BaseResponse {
+public class BranchesResponse extends BaseResponse<BranchesResponse> {
 
     public BranchesResponse() {
         this.put(Constants.BRANCH_KEY, new ArrayList<RefJson>());

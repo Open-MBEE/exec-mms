@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.services.NodeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,15 +41,13 @@ public class ElementsController extends BaseController {
         @RequestBody ElementsRequest req,
         @RequestParam Map<String, String> params) {
 
+        ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            ElementsResponse response = nodeService.createOrUpdate(projectId, refId, req, params);
+            response = nodeService.createOrUpdate(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
-        ElementsResponse err = new ElementsResponse();
-        err.setCode(400);
-        err.addMessage("Empty");
-        return ResponseEntity.badRequest().body(err);
+        throw new BadRequestException(response.addMessage("Empty"));
     }
 
     @PutMapping
@@ -57,15 +57,13 @@ public class ElementsController extends BaseController {
         @RequestBody ElementsRequest req,
         @RequestParam Map<String, String> params) {
 
+        ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            ElementsResponse response = nodeService.read(projectId, refId, req, params);
+            response = nodeService.read(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
-        ElementsResponse err = new ElementsResponse();
-        err.setCode(400);
-        err.addMessage("Empty");
-        return ResponseEntity.badRequest().body(err);
+        throw new BadRequestException(response.addMessage("Empty"));
     }
 
     @DeleteMapping(value = "/{elementId}")
@@ -79,11 +77,13 @@ public class ElementsController extends BaseController {
         if (res.getElements().isEmpty() && !res.isEmpty()) {
             List<Map<String, Object>> rejected = (List<Map<String, Object>>) res.get("rejected");
             Integer code = (Integer) rejected.get(1).get("code");
-            if (code == 304) {
-                return ResponseEntity.status(304).body(res);
-            }
-            if (code == 404) {
-                return ResponseEntity.notFound().build();
+            switch(code) {
+                case 304:
+                    throw new NotFoundException(res);
+                case 404:
+                    throw new NotFoundException(new ElementsResponse().addMessage("Not found."));
+                default:
+                    break;
             }
         }
         return ResponseEntity.ok(res);

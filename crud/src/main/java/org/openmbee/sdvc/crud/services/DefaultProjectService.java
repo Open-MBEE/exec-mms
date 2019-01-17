@@ -8,6 +8,8 @@ import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.repositories.ProjectIndex;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
@@ -45,14 +47,12 @@ public class DefaultProjectService implements ProjectService {
 
     public ProjectJson create(ProjectJson project) {
         if (project.getOrgId() == null || project.getOrgId().isEmpty()) {
-            //TODO throw exception
-            return null;
+            throw new BadRequestException(new ProjectsResponse().addMessage("Project ID not found"));
         }
 
         Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
         if (!org.isPresent() || org.get().getOrganizationId().isEmpty()) {
-            //TODO throw exception
-            return null;
+            throw new BadRequestException(new ProjectsResponse().addMessage("Organization not found"));
         }
 
         Project proj = new Project();
