@@ -10,7 +10,7 @@ The SDVC is a collection of modules built on top of the Spring Framework.
 2. Ensure that you select JDK 10 and search recursively for projects.
 3. The `example` subproject will show you how to include the different modules to run as a Spring Boot application.
 
-###The Example Sub Project:
+### The Example Sub Project:
 1. Setup Run and Debug configurations. The command line run command is `./gradlew bootRun`
 2. Copy the example properties file in `example/src/main/resources/` as `application.properties`
 3. Change values for all the appropriate properties. The example file holds sane values for most properties.
