@@ -3,7 +3,7 @@ package org.openmbee.sdvc.json;
 import java.util.List;
 import java.util.Map;
 
-public class CommitJson extends BaseJson {
+public class CommitJson extends BaseJson<CommitJson> {
 
     public static final String COMMENT = "comment";
     public static final String ADDED = "added";

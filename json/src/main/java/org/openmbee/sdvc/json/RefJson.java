@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.json;
 
-public class RefJson extends BaseJson {
+public class RefJson extends BaseJson<RefJson> {
 
     public static final String PARENT_REF_ID = "parentRefId";
     public static final String PARENT_COMMIT_ID = "parentCommitId";

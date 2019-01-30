@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BaseJson extends HashMap<String, Object> {
+public class BaseJson<T> extends HashMap<String, Object> {
 
     public static final String ID = "id";
     public static final String NAME = "name";
@@ -21,90 +21,100 @@ public class BaseJson extends HashMap<String, Object> {
         return (String) this.get(ID);
     }
 
-    public BaseJson setId(String id) {
+    @SuppressWarnings("unchecked")
+    public T setId(String id) {
         this.put(ID, id);
-        return this;
+        return (T) this;
     }
 
     public String getName() {
         return (String) this.get(NAME);
     }
 
-    public BaseJson setName(String name) {
+    @SuppressWarnings("unchecked")
+    public T setName(String name) {
         this.put(NAME, name);
-        return this;
+        return (T) this;
     }
 
     public String getIndexId() {
         return (String) this.get(INDEXID);
     }
 
-    public BaseJson setIndexId(String indexId) {
+    @SuppressWarnings("unchecked")
+    public T setIndexId(String indexId) {
         this.put(INDEXID, indexId);
-        return this;
+        return (T) this;
     }
 
     public String getProjectId() {
         return (String) this.get(PROJECTID);
     }
 
-    public BaseJson setProjectId(String projectId) {
+    @SuppressWarnings("unchecked")
+    public T setProjectId(String projectId) {
         this.put(PROJECTID, projectId);
-        return this;
+        return (T) this;
     }
 
     public String getRefId() {
         return (String) this.get(REFID);
     }
 
-    public BaseJson setRefId(String refId) {
+    @SuppressWarnings("unchecked")
+    public T setRefId(String refId) {
         this.put(REFID, refId);
-        return this;
+        return (T) this;
     }
 
     public String getModifier() {
         return (String) this.get(MODIFIER);
     }
 
-    public BaseJson setModifier(String modifier) {
+    @SuppressWarnings("unchecked")
+    public T setModifier(String modifier) {
         this.put(MODIFIER, modifier);
-        return this;
+        return (T) this;
     }
 
     public String getModified() {
         return (String) this.get(MODIFIED);
     }
 
-    public BaseJson setModified(String modified) {
+    @SuppressWarnings("unchecked")
+    public T setModified(String modified) {
         this.put(MODIFIED, modified);
-        return this;
+        return (T) this;
     }
 
     public String getCreator() {
         return (String) this.get(CREATOR);
     }
 
-    public BaseJson setCreator(String creator) {
+    @SuppressWarnings("unchecked")
+    public T setCreator(String creator) {
         this.put(CREATOR, creator);
-        return this;
+        return (T) this;
     }
 
     public String getCreated() {
         return (String) this.get(CREATED);
     }
 
-    public BaseJson setCreated(String created) {
+    @SuppressWarnings("unchecked")
+    public T setCreated(String created) {
         this.put(CREATED, created);
-        return this;
+        return (T) this;
     }
 
     public String getCommitId() {
         return (String) this.get(COMMITID);
     }
 
-    public BaseJson setCommitId(String commitId) {
+    @SuppressWarnings("unchecked")
+    public T setCommitId(String commitId) {
         this.put(COMMITID, commitId);
-        return this;
+        return (T) this;
     }
 
     public boolean isPartialOf(Map<String, Object> o) {
