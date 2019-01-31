@@ -47,7 +47,7 @@ public class DefaultProjectService implements ProjectService {
 
     public ProjectJson create(ProjectJson project) {
         if (project.getOrgId() == null || project.getOrgId().isEmpty()) {
-            throw new BadRequestException(new ProjectsResponse().addMessage("Project ID not found"));
+            throw new BadRequestException(new ProjectsResponse().addMessage("Organization ID not provided"));
         }
 
         Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());

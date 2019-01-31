@@ -67,7 +67,8 @@ public class OrgsController extends BaseController {
 
             for (OrgJson org : orgPost.getOrgs()) {
                 if (org.getId() == null || org.getId().isEmpty()) {
-                    throw new BadRequestException(response.addMessage("Organization ID not found"));
+                    response.addMessage("Organization ID not provided");
+                    continue;
                 }
                 Organization o = organizationRepository.findByOrganizationId(org.getId())
                     .orElse(new Organization());

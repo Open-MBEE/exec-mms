@@ -6,6 +6,7 @@ import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
+import org.openmbee.sdvc.crud.exceptions.NotModifiedException;
 import org.openmbee.sdvc.crud.services.NodeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -79,7 +80,7 @@ public class ElementsController extends BaseController {
             Integer code = (Integer) rejected.get(1).get("code");
             switch(code) {
                 case 304:
-                    throw new NotFoundException(res);
+                    throw new NotModifiedException(res);
                 case 404:
                     throw new NotFoundException(new ElementsResponse().addMessage("Not found."));
                 default:

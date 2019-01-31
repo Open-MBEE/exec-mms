@@ -73,7 +73,7 @@ public class ProjectsController extends BaseController {
         for (ProjectJson json: projectsPost.getProjects()) {
             if (json.getProjectId().isEmpty()) {
                 response.addMessage("Project ID is missing");
-                throw new BadRequestException(response);
+                continue;
             }
             ProjectService ps = getProjectService(json.getProjectId());
             if (!ps.exists(json.getProjectId())) {
