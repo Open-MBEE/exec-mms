@@ -6,7 +6,7 @@ import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.Constants;
 import org.openmbee.sdvc.json.OrgJson;
 
-public class OrganizationsResponse extends BaseResponse {
+public class OrganizationsResponse extends BaseResponse<OrganizationsResponse> {
 
     public OrganizationsResponse() {
         this.put(Constants.ORGANIZATION_KEY, new ArrayList<OrgJson>());

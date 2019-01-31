@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.json;
 
-public class ProjectJson extends BaseJson {
+public class ProjectJson extends BaseJson<ProjectJson> {
 
     public static final String ORGID = "orgId";
 

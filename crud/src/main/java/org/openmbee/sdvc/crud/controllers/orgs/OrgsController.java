@@ -7,6 +7,8 @@ import org.openmbee.sdvc.core.domains.Organization;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.json.OrgJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +39,7 @@ public class OrgsController extends BaseController {
             logger.debug("OrgId given: ", orgId);
             Optional<Organization> orgOption = organizationRepository.findByOrganizationId(orgId);
             if (!orgOption.isPresent()) {
-                return ResponseEntity.notFound().build();
+                throw new NotFoundException(response.addMessage("Organization not found."));
             }
             OrgJson orgJson = new OrgJson();
             orgJson.merge(convertToMap(orgOption.get()));
@@ -59,12 +61,15 @@ public class OrgsController extends BaseController {
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody OrganizationsRequest orgPost) {
 
+        OrganizationsResponse response = new OrganizationsResponse();
         if (!orgPost.getOrgs().isEmpty()) {
             logger.info(orgPost.getOrgs().get(0).getId());
-            OrganizationsResponse response = new OrganizationsResponse();
 
             for (OrgJson org : orgPost.getOrgs()) {
-                //TODO reject if orgId isn't there
+                if (org.getId() == null || org.getId().isEmpty()) {
+                    response.addMessage("Organization ID not provided");
+                    continue;
+                }
                 Organization o = organizationRepository.findByOrganizationId(org.getId())
                     .orElse(new Organization());
                 o.setOrganizationId(org.getId());
@@ -76,10 +81,6 @@ public class OrgsController extends BaseController {
             }
             return ResponseEntity.ok(response);
         }
-        logger.debug("Bad Request");
-        OrganizationsResponse err = new OrganizationsResponse();
-        err.setCode(400);
-        err.addMessage("Bad Request");
-        return ResponseEntity.badRequest().body(err);
+        throw new BadRequestException(response.addMessage("Bad Request"));
     }
 }

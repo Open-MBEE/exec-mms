@@ -7,6 +7,8 @@ import org.openmbee.sdvc.core.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.services.ProjectService;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +40,13 @@ public class ProjectsController extends BaseController {
 
         if (projectId != null) {
             logger.debug("ProjectId given: ", projectId);
-            Optional<Project> orgOption = projectRepository.findByProjectId(projectId);
-            if (!orgOption.isPresent()) {
-                return ResponseEntity.notFound().build();
+            Optional<Project> projectOption = projectRepository.findByProjectId(projectId);
+            if (!projectOption.isPresent()) {
+                response.addMessage("Project not found");
+                throw new NotFoundException(response);
             }
             ProjectJson projectJson = new ProjectJson();
-            projectJson.merge(convertToMap(orgOption.get()));
+            projectJson.merge(convertToMap(projectOption.get()));
             response.getProjects().add(projectJson);
         } else {
             logger.debug("No ProjectId given");
@@ -63,13 +66,15 @@ public class ProjectsController extends BaseController {
         @RequestBody ProjectsRequest projectsPost) {
 
         if (projectsPost.getProjects().isEmpty()) {
-            ProjectsResponse pr = new ProjectsResponse();
-            pr.addMessage("empty");
-            return ResponseEntity.badRequest().body(pr);
+            throw new BadRequestException(new ProjectsResponse().addMessage("No projects"));
         }
+
         ProjectsResponse response = new ProjectsResponse();
         for (ProjectJson json: projectsPost.getProjects()) {
-            //TODO reject if projectId isn't there
+            if (json.getProjectId().isEmpty()) {
+                response.addMessage("Project ID is missing");
+                continue;
+            }
             ProjectService ps = getProjectService(json.getProjectId());
             if (!ps.exists(json.getProjectId())) {
                 response.getProjects().add(ps.create(json));

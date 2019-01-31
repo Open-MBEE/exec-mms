@@ -11,4 +11,6 @@ public class Constants {
     public static final String REJECTED = "rejected";
     public static final String MESSAGES = "messages";
     public static final String CODE = "code";
+
+    public static final String MASTER_BRANCH = "master";
 }
