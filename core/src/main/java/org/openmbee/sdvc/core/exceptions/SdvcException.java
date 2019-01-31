@@ -1,9 +1,7 @@
 package org.openmbee.sdvc.core.exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
-@Component
 public abstract class SdvcException extends RuntimeException {
 
     private HttpStatus code;
