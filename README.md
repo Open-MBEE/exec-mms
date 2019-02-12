@@ -5,10 +5,11 @@ The SDVC is a collection of modules built on top of the Spring Framework.
 
 ## Developer Setup
 ### Docker 
-We suggest using Docker to set up Elasticsearch.
+We suggest using Docker to set up PostgreSQL and Elasticsearch.  Installation 
+instructions are found here: [Docker documentation](https://docs.docker.com/)
 
 ### Postgresql
-Install postgres (PostgreSQL) 9.6.2
+Install postgres (PostgreSQL) 9.6, instructions for Docker: [PostgreSQL with Docker](https://hub.docker.com/_/postgres)
 
 ### Elasticsearch
 Install Elasticsearch 6.6.  If you use Docker instructions are available here: [Setting up Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
@@ -67,7 +68,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the Apache License 2.0 - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Structure of Modules 
 ### authenticator
