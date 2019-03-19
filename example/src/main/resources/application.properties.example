@@ -31,6 +31,8 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
 spring.jpa.open-in-view=false
 
+spring.main.allow-bean-definition-overriding=true
+
 #Configuration for Elasticsearch
 elasticsearch.host=localhost
 elasticsearch.port=9200
