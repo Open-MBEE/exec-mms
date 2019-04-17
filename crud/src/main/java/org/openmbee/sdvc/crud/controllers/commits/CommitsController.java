@@ -29,7 +29,7 @@ public class CommitsController extends BaseController {
     public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
-        @RequestParam Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         CommitsResponse res = commitService.getRefCommits(projectId, refId, params);
         return ResponseEntity.ok(res);
@@ -49,7 +49,7 @@ public class CommitsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
-        @RequestParam Map<String, Object> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         CommitsResponse res = commitService.getElementCommits(projectId, refId, elementId, params);
         return ResponseEntity.ok(res);

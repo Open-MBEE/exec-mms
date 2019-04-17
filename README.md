@@ -21,40 +21,21 @@ Install Elasticsearch 6.6.  If you use Docker instructions are available here: [
 ### IntelliJ IDEA
 
 1. Import Gradle Project to IntelliJ IDEA
-2. Ensure that you select JDK 10 and search recursively for projects.
+2. Ensure that you select JDK 10 or above and search recursively for projects.
 3. The `example` subproject will show you how to include the different modules to run as a Spring Boot application.
 
 ### Gradle
 A gradle wrapper is included in the root of this repository and can be called from the command line with `./gradlew [command]`.
 
 ### The Example Sub Project:
+1. Copy the example properties file in `example/src/main/resources/` as `application.properties`
+1. Change values for all the appropriate properties. The example file holds sane values for most properties.
 1. Setup Run and Debug configurations. The command line run command is `./gradlew bootRun`
-2. Copy the example properties file in `example/src/main/resources/` as `application.properties`
-3. Change values for all the appropriate properties. The example file holds sane values for most properties.
+1. Swagger ui at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ## Running tests
 
-Explain how to run the automated tests for this system
-
-### End to End Tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### Unit Tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-How to you deploy this to a server
+TBA
 
 ## Built With
 
@@ -63,7 +44,7 @@ How to you deploy this to a server
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](github.com) for details on our code of conduct, and the process for submitting pull requests to us.
+TBA
 
 ## Versioning
 
@@ -72,17 +53,10 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
 
 ## Structure of Modules 
-### authenticator
-### core
-### crud
-### example 
-### jcr 
-### ldap
-### sysml
-### uml
 
+TBA
 
 

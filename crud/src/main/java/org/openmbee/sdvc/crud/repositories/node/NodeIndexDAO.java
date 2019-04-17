@@ -28,4 +28,8 @@ public interface NodeIndexDAO {
     Optional<ElementJson> getElementLessThanOrEqualTimestamp(String nodeId, String timestamp,
         List<String> refsCommitIds);
 
+    void removeFromRef(Set<String> indexIds);
+
+    void addToRef(Set<String> indexIds);
+
 }

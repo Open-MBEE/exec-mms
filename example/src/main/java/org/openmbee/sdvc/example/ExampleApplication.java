@@ -28,10 +28,10 @@ public class ExampleApplication {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("MMS Authentication API")
-            .description("Documentation for MMS Authentication API").termsOfServiceUrl("")
-            .contact(new Contact("Jason Han", "http://www.openmbee.org",
-                "jason.han@jpl.nasa.gov"))
+        return new ApiInfoBuilder().title("MMS Example API")
+            .description("Documentation for MMS Example API").termsOfServiceUrl("")
+            .contact(new Contact("OpenMBEE", "http://www.openmbee.org",
+                ""))
             .license("Apache License Version 2.0").licenseUrl("").version("2.0").build();
     }
 }

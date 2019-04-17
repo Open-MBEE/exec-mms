@@ -86,7 +86,7 @@ public class CommitService {
     }
 
     public CommitsResponse getElementCommits(String projectId, String refId, String elementId,
-        Map<String, Object> params) {
+        Map<String, String> params) {
         DbContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
