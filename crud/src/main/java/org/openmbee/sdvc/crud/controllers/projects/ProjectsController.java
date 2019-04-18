@@ -87,7 +87,7 @@ public class ProjectsController extends BaseController {
 
     @DeleteMapping(value = "/{projectId}")
     public ResponseEntity<? extends BaseResponse> handleDelete(@PathVariable String projectId) {
-        return ResponseEntity.ok(new ProjectsResponse());
+        return ResponseEntity.ok(new ProjectsResponse()); //TODO
     }
 
     private ProjectService getProjectService(String projectId) {

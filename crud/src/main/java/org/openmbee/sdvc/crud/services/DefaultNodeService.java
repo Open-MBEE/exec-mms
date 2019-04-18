@@ -105,7 +105,8 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, ElementsRequest req,
         Map<String, String> params) {
 
-//        params commit it read element at a commit id
+//        TODO get element at commit
+//         params commit it read element at a commit id
 //        find a specific element at a commit
 //        commit DB and if element was actually edited at that commit - read element
 //        otherwise read timestamp of commit - find element before timestamp
@@ -157,8 +158,8 @@ public class DefaultNodeService implements NodeService {
                 List<Edge> edges = nodePostHelper.getEdgesToSave(info);
                 this.edgeRepository.saveAll(edges);
             }
+            this.nodeIndex.removeFromRef(info.getOldIndexIds());
 
-            //TODO update old elastic ids to remove ref from inRefIds
             Commit commit = new Commit();
             commit.setBranchId(cmjs.getRefId());
             commit.setCommitType(CommitType.COMMIT);

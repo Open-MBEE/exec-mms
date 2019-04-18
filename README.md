@@ -3,14 +3,60 @@
 
 The SDVC is a collection of modules built on top of the Spring Framework.
 
-## Developer Setup
+## Developer Setup for example project
+### Docker 
+We suggest using Docker to set up PostgreSQL and Elasticsearch.  Installation 
+instructions are found here: [Docker documentation](https://docs.docker.com/)
+
+### Postgresql
+Install postgres (PostgreSQL) 9.6, instructions for Docker: [PostgreSQL with Docker](https://hub.docker.com/_/postgres)
+
+    docker run -e POSTGRES_PASSWORD=test123 -e POSTGRES_USER=mmsuser -e POSTGRES_DB=mms -p 5432:5432 postgres:9-alpine
+    
+### Elasticsearch
+Install Elasticsearch 6.6.  If you use Docker instructions are available here: [Setting up Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+
+    docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.6.2
+    
 ### IntelliJ IDEA
 
 1. Import Gradle Project to IntelliJ IDEA
-2. Ensure that you select JDK 10 and search recursively for projects.
+2. Ensure that you select JDK 10 or above and search recursively for projects.
 3. The `example` subproject will show you how to include the different modules to run as a Spring Boot application.
 
+### Gradle
+A gradle wrapper is included in the root of this repository and can be called from the command line with `./gradlew [command]`.
+
 ### The Example Sub Project:
+1. Copy the example properties file in `example/src/main/resources/` as `application.properties`
+1. Change values for all the appropriate properties. The example file holds sane values for most properties.
 1. Setup Run and Debug configurations. The command line run command is `./gradlew bootRun`
-2. Copy the example properties file in `example/src/main/resources/` as `application.properties`
-3. Change values for all the appropriate properties. The example file holds sane values for most properties.
+1. Swagger ui at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+## Running tests
+
+TBA
+
+## Built With
+
+* [SpringBoot](https://spring.io/projects/spring-boot) - The web framework used
+
+
+## Contributing
+
+TBA
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/Open-MBEE/mms-sdvc.git). 
+
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
+
+## Structure of Modules 
+
+TBA
+
+

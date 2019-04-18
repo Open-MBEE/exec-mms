@@ -89,6 +89,7 @@ public class BranchesPost extends BaseController {
                         branchesOperations.copyTablesFromParent(saved.getBranchId(),
                             b.getParentRefId(), branch.getParentCommitId());
                     }
+                    //TODO update docs with new ref
                     response.getBranches().add(branch);
                 } catch (Exception e) {
                     branchRepository.delete(saved);

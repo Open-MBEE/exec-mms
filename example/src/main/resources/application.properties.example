@@ -11,7 +11,9 @@ ldap.provider.base=ou=something,dc=openmbee,dc=org
 ldap.provider.url=ldaps://ldap.openmbee.org/${ldap.provider.base}
 ldap.provider.userdn=
 ldap.provider.password=
-ldap.user.dn.patterns=uid={0}
+ldap.user.dn.pattern=uid={0}
+ldap.user.attributes.username=
+ldap.user.attributes.email=
 ldap.group.role.attribute=cn
 ldap.group.search.base=
 ldap.group.search.filter=uniqueMember={0}

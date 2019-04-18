@@ -28,7 +28,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable(required = false) String elementId,
-        @RequestParam Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
@@ -40,7 +40,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
-        @RequestParam Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
@@ -56,7 +56,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
-        @RequestParam Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {

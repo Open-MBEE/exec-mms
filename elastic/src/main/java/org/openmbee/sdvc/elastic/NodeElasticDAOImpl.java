@@ -16,6 +16,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -76,6 +77,15 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void addToRef(Set<String> indexIds) {
+        //TODO
+        DbContextHolder.getContext().getBranchId(); //TODO rethink use of context holder?
+    }
+
+    public void removeFromRef(Set<String> indexIds) {
+        //TODO
     }
 
     @Override

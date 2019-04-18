@@ -27,7 +27,7 @@ public class ProjectElasticImpl implements ProjectIndex {
             CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
             commitIndex.mapping("_doc", getCommitMapAsString(), XContentType.JSON);
             CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
-            //TODO add mapping function for node
+            //TODO add mapping function for node, better support different mappings
             createIndex(commitIndex);
             createIndex(nodeIndex);
         } catch (IOException e) {
