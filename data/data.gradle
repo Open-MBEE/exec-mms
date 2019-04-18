@@ -1,0 +1,16 @@
+apply plugin: 'io.spring.convention.spring-module'
+
+dependencies {
+    compile group: 'org.springframework.data', name: 'spring-data-commons', version: '2.0.10.RELEASE'
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.0.10.RELEASE'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-hibernate5', version: '2.9.7'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.7'
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.8.RELEASE'
+
+    compile group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+
+    compile 'org.elasticsearch:elasticsearch:6.5.1'
+    compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:6.5.1'
+}

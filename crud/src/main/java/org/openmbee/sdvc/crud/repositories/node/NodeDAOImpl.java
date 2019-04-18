@@ -32,13 +32,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
                     PreparedStatement ps = connection
                         .prepareStatement(String.format(INSERT_SQL, getSuffix()),
                             new String[]{"id"});
-                    ps.setString(1, node.getNodeId());
-                    ps.setString(2, node.getIndexId());
-                    ps.setString(3, node.getLastCommit());
-                    ps.setString(4, node.getInitialCommit());
-                    ps.setBoolean(5, node.isDeleted());
-                    ps.setInt(6, node.getNodeType());
-                    return ps;
+                    return prepareStatement(ps, node);
                 }
             }, keyHolder);
 
@@ -52,14 +46,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
                     throws SQLException {
                     PreparedStatement ps = connection
                         .prepareStatement(String.format(UPDATE_SQL, getSuffix()));
-                    ps.setString(1, node.getNodeId());
-                    ps.setString(2, node.getIndexId());
-                    ps.setString(3, node.getLastCommit());
-                    ps.setString(4, node.getInitialCommit());
-                    ps.setBoolean(5, node.isDeleted());
-                    ps.setInt(6, node.getNodeType());
-                    ps.setLong(7, node.getId());
-                    return ps;
+                    return prepareStatement(ps, node);
                 }
             });
         }
@@ -96,12 +83,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
             PreparedStatement ps = rawConn
                 .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
             for (Node n : nodes) {
-                ps.setString(1, n.getNodeId());
-                ps.setString(2, n.getIndexId());
-                ps.setString(3, n.getLastCommit());
-                ps.setString(4, n.getInitialCommit());
-                ps.setBoolean(5, n.isDeleted());
-                ps.setInt(6, n.getNodeType());
+                prepareStatement(ps, n);
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -123,13 +105,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Node n = nodes.get(i);
-                ps.setString(1, n.getNodeId());
-                ps.setString(2, n.getIndexId());
-                ps.setString(3, n.getLastCommit());
-                ps.setString(4, n.getInitialCommit());
-                ps.setBoolean(5, n.isDeleted());
-                ps.setInt(6, n.getNodeType());
-                ps.setLong(7, n.getId());
+                prepareStatement(ps, n);
             }
 
             @Override
@@ -174,6 +150,18 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
             getSuffix());
 
         return getConnection().query(sql, new NodeRowMapper());
+    }
+
+    private PreparedStatement prepareStatement(PreparedStatement ps, Node n) throws SQLException {
+        ps.setString(1, n.getNodeId());
+        ps.setString(2, n.getIndexId());
+        ps.setString(3, n.getLastCommit());
+        ps.setString(4, n.getInitialCommit());
+        ps.setBoolean(5, n.isDeleted());
+        ps.setInt(6, n.getNodeType());
+        ps.setLong(7, n.getId());
+
+        return ps;
     }
 
 }

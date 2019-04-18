@@ -23,8 +23,8 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
         getConnection().update(sql,
             edge.getEdgeType(),
-            edge.getChild().getId(),
-            edge.getParent().getId()
+            edge.getChild(),
+            edge.getParent()
         );
 
         return edge;
@@ -60,8 +60,8 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
                 .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
             for (Edge e: edges) {
                 ps.setInt(1, e.getEdgeType());
-                ps.setLong(2, e.getChild().getId());
-                ps.setLong(3, e.getParent().getId());
+                ps.setLong(2, e.getChild());
+                ps.setLong(3, e.getParent());
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -84,8 +84,8 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Edge e = edges.get(i);
                 ps.setInt(1, e.getEdgeType());
-                ps.setLong(2, e.getChild().getId());
-                ps.setLong(3, e.getParent().getId());
+                ps.setLong(2, e.getChild());
+                ps.setLong(3, e.getParent());
                 ps.setLong(4, e.getId());
             }
 
@@ -120,6 +120,6 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
         String sql = String.format("SELECT * FROM edges%s",
             getSuffix());
 
-        return getConnection().query(sql, new EdgeRowMapper());
+        return (List<Edge>) getConnection().query(sql, new EdgeRowMapper());
     }
 }
