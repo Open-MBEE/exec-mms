@@ -2,7 +2,7 @@ package org.openmbee.sdvc.crud.repositories.edge;
 
 import java.util.List;
 import java.util.Optional;
-import org.openmbee.sdvc.crud.domains.Edge;
+import org.openmbee.sdvc.data.domains.Edge;
 
 public interface EdgeDAO {
 

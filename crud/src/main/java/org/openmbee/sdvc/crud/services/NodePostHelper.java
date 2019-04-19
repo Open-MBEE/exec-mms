@@ -5,12 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.data.domains.Node;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,7 +20,7 @@ public class NodePostHelper extends NodeOperation {
     public static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public boolean isUpdated(BaseJson element, Map<String, Object> existing,
-        Map<String, Object> rejection) {
+                             Map<String, Object> rejection) {
 
         if (element.isPartialOf(existing)) {
             rejection.put("message", "Is Equivalent");
@@ -31,7 +32,7 @@ public class NodePostHelper extends NodeOperation {
     }
 
     public boolean diffUpdateJson(BaseJson element, Map<String, Object> existing,
-        Map<String, Object> rejection) {
+                                  Map<String, Object> rejection) {
 
         String jsonModified = element.getModified();
         Object existingModified = existing.get(BaseJson.MODIFIED);
@@ -55,7 +56,7 @@ public class NodePostHelper extends NodeOperation {
 
     // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
     public NodeChangeInfo processPostJson(List<ElementJson> elements, boolean overwriteJson,
-        CommitJson cmjs, NodeService service) {
+                                          CommitJson cmjs, NodeService service) {
 
         NodeChangeInfo info = initInfo(elements, cmjs);
 
@@ -92,7 +93,7 @@ public class NodePostHelper extends NodeOperation {
                 }
             }
 
-// create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
+            // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
             if (added) {
                 Node node = new Node();
                 processElementAdded(element, node, info.getCommitJson());

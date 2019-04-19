@@ -3,7 +3,7 @@ package org.openmbee.sdvc.crud.repositories.node;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.data.domains.Node;
 
 public interface NodeDAO {
 

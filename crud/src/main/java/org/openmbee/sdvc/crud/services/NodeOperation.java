@@ -12,8 +12,9 @@ import java.util.Set;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
+import org.openmbee.sdvc.data.domains.Edge;
+import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.openmbee.sdvc.json.BaseJson;
@@ -29,6 +30,7 @@ public class NodeOperation {
     protected final Logger logger = LogManager.getLogger(getClass());
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
+    protected CommitDAO commitRepository;
     protected DateTimeFormatter formatter = DateTimeFormatter
         .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZone(
             ZoneId.systemDefault());
@@ -41,6 +43,11 @@ public class NodeOperation {
     @Autowired
     public void setNodeIndex(NodeIndexDAO nodeIndex) {
         this.nodeIndex = nodeIndex;
+    }
+
+    @Autowired
+    public void setCommitRepository(CommitDAO commitRepository) {
+        this.commitRepository = commitRepository;
     }
 
     public void initCommitJson(CommitJson cmjs, Instant now) {
@@ -195,7 +202,6 @@ public class NodeOperation {
         }
         return true;
     }
-
 
     public static Map<String, ElementJson> convertJsonToMap(
         List<ElementJson> elements) {

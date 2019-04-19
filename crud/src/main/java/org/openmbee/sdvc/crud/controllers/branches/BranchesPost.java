@@ -7,8 +7,9 @@ import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.Constants;
-import org.openmbee.sdvc.crud.domains.Branch;
-import org.openmbee.sdvc.crud.domains.Commit;
+import org.openmbee.sdvc.crud.services.CommitService;
+import org.openmbee.sdvc.data.domains.Branch;
+import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
@@ -32,12 +33,15 @@ public class BranchesPost extends BaseController {
 
     private CommitDAO commitRepository;
 
+    private CommitService commitService;
+
     @Autowired
     public BranchesPost(BranchDAO branchRepository, DatabaseDefinitionService branchesOperations,
-        CommitDAO commitRepository) {
+        CommitDAO commitRepository, CommitService commitService) {
         this.branchRepository = branchRepository;
         this.branchesOperations = branchesOperations;
         this.commitRepository = commitRepository;
+        this.commitService = commitService;
     }
 
     @PostMapping
@@ -74,7 +78,7 @@ public class BranchesPost extends BaseController {
                         b.setParentCommit(parentCommit.get().getId());
                     }
                 } else {
-                    Optional<Commit> parentCommit = commitRepository.findLatestByRef(b.getParentRefId());
+                    Optional<Commit> parentCommit = commitService.findLatestByRef(b.getParentRefId());
                     if (parentCommit.isPresent()) {
                         b.setParentCommit(parentCommit.get().getId());
                     }

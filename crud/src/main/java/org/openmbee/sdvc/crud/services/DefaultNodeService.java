@@ -9,10 +9,10 @@ import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
-import org.openmbee.sdvc.crud.domains.Commit;
-import org.openmbee.sdvc.crud.domains.CommitType;
-import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.data.domains.Commit;
+import org.openmbee.sdvc.data.domains.CommitType;
+import org.openmbee.sdvc.data.domains.Edge;
+import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
 import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
@@ -112,10 +112,11 @@ public class DefaultNodeService implements NodeService {
 //        otherwise read timestamp of commit - find element before timestamp
 //        read all the commits in ref and search elastic for all the elements (for that specific) sorted by time and check
 //        check if current state of element and if timestamp is less then pass that version
+        String commitId = params.getOrDefault("commitId", null);
         DbContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
 
-        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements());
+        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId);
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());

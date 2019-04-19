@@ -3,7 +3,7 @@ package org.openmbee.sdvc.crud.services;
 import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 
 public interface NodeService {

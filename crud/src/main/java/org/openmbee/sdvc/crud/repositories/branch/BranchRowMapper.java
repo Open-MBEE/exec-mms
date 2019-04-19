@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import org.openmbee.sdvc.crud.domains.Branch;
+import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.crud.repositories.BaseRowMapper;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.jdbc.core.RowMapper;
