@@ -59,10 +59,11 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
 
     /**
      * Gets the JSON document of a bool : should commit query result printed as Json looks like: {
-     * "bool":{"should":[{"term":{"added.id":sysmlid}}, {"term":{"updated.id":sysmlid}},
-     * {"term":{"deleted.id":sysmlid}}]} }
+     * "bool":{"should":[{"term":{"added.id":id}}, {"term":{"updated.id":id}},
+     * {"term":{"deleted.id":id}}], "filter": {"terms": {"id": [commitIds]}}} }
      *
-     * @param id the sysmlid to add to the term search
+     * @param id the nodeId to add to the term search
+     * @param commitIds relevant commit ids
      * @return QueryBuilder q
      */
     private QueryBuilder getCommitHistoryQuery(String id, Set<String> commitIds) {
@@ -73,18 +74,19 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             .should(addedQuery)
             .should(updatedQuery)
             .should(deletedQuery)
-            .filter(QueryBuilders.termsQuery("id", commitIds))
+            .filter(QueryBuilders.termsQuery(CommitJson.ID, commitIds))
             .minimumShouldMatch(1);
         return query;
     }
 
     /**
-     * Returns the commit history of a element                           (1)
-     * <p> Returns a list of commit metadata for the specificed id un-filtered by branch
-     * (2)
+     * Returns the commit history of a element
+     * <p> Returns a list of commit metadata for the specificed id
+     *
      * <p>
      *
-     * @param nodeId sysmlId     (3)
+     * @param nodeId sysmlId
+     * @param commitIds list of commitIds for the relevant branch
      * @return JSONArray array or empty json array
      */
     @Override
@@ -95,14 +97,15 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             QueryBuilder query = getCommitHistoryQuery(nodeId, commitIds);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             sourceBuilder.query(query);
-            //sourceBuilder.size(this.resultLimit); //this caused nothing to return
-            sourceBuilder.sort(new FieldSortBuilder("_created").order(SortOrder.DESC));
-            // :TODO check query output, public SearchSourceBuilder postFilter​(QueryBuilder postFilter)
+            //sourceBuilder.size(this.resultLimit); //TODO respect limits
+            sourceBuilder.sort(new FieldSortBuilder(CommitJson.CREATED).order(SortOrder.DESC));
             searchRequest.source(sourceBuilder);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             SearchHits hits = searchResponse.getHits();
-            SearchHit[] searchHits = hits.getHits(); //can be null
-            for (SearchHit hit : searchHits) {
+            if (hits.getTotalHits() == 0) {
+                return commits;
+            }
+            for (SearchHit hit : hits.getHits()) {
                 Map<String, Object> source = hit.getSourceAsMap();// gets "_source"
                 CommitJson ob = newInstance();
                 ob.putAll(source);
