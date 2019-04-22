@@ -2,16 +2,20 @@ package org.openmbee.sdvc.elastic;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.Scroll;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -58,15 +62,16 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
     }
 
     @Override
-    public Optional<ElementJson> getByCommitId(String commitIndexId, String nodeId) {
+    public Optional<ElementJson> getByCommitId(String commitId, String nodeId) {
         try {
             SearchRequest searchRequest = new SearchRequest(getIndex());
-            // searches the elements for the reference with the current commitId (elasticId) and sysmlid Id
+            // searches the elements for the reference with the current commitId and nodeId
             QueryBuilder query = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termQuery("_commitId", commitIndexId))
-                .must(QueryBuilders.termQuery("id", nodeId));
+                .filter(QueryBuilders.termQuery(ElementJson.COMMITID, commitId))
+                .filter(QueryBuilders.termQuery(ElementJson.ID, nodeId));
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             sourceBuilder.query(query);
+            searchRequest.source(sourceBuilder);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             if (searchResponse.getHits().getTotalHits() == 0) {
                 return Optional.empty();
@@ -79,58 +84,64 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         }
     }
 
+    protected static String ADD_TO_REF = "if(ctx._source.containsKey(\"_inRefIds\")){ctx._source._inRefIds.add(params.refId)} else {ctx._source._inRefIds = [params.refId]}";
+
     public void addToRef(Set<String> indexIds) {
-        //TODO
-        DbContextHolder.getContext().getBranchId(); //TODO rethink use of context holder?
+        bulkUpdateRefWithScript(indexIds, ADD_TO_REF);
     }
 
+    protected static String REMOVE_FROM_REF = "if(ctx._source.containsKey(\"_inRefIds\")){ctx._source._inRefIds.removeAll([params.refId])}";
+
     public void removeFromRef(Set<String> indexIds) {
-        //TODO
+        bulkUpdateRefWithScript(indexIds, REMOVE_FROM_REF);
+    }
+
+    private void bulkUpdateRefWithScript(Set<String> indexIds, String script) {
+        if (indexIds.isEmpty()) {
+            return;
+        }
+        BulkRequest bulk = new BulkRequest();
+        Map<String, Object> parameters = Collections.singletonMap("refId",
+            DbContextHolder.getContext().getBranchId());
+        for (String indexId : indexIds) {
+            UpdateRequest request = new UpdateRequest(getIndex(), this.type, indexId);
+            Script inline = new Script(ScriptType.INLINE, "painless", script,
+                parameters);
+            request.script(inline);
+            bulk.add(request);
+        }
+        try {
+            client.bulk(bulk, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Optional<ElementJson> getElementLessThanOrEqualTimestamp(String nodeId,
         String timestamp, List<String> refsCommitIds) {
         try {
-            final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
             SearchRequest searchRequest = new SearchRequest(getIndex());
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             // Query
             QueryBuilder query = QueryBuilders.boolQuery()
-                .filter(QueryBuilders.termsQuery("_commitId", refsCommitIds))
-                .filter(QueryBuilders.termQuery("id", nodeId))
-                .filter(QueryBuilders.rangeQuery("_modified").lte(timestamp));
+                .filter(QueryBuilders
+                    .termsQuery(ElementJson.COMMITID, refsCommitIds)) //TODO respect term limit
+                .filter(QueryBuilders.termQuery(ElementJson.ID, nodeId))
+                .filter(QueryBuilders.rangeQuery(ElementJson.MODIFIED).lte(timestamp));
             searchSourceBuilder.query(query);
             searchSourceBuilder.sort(new FieldSortBuilder("_modified").order(SortOrder.DESC));
             searchSourceBuilder.size(1);
-            //searchSourceBuilder.size(this.resultLimit);
             searchRequest.source(searchSourceBuilder);
-            //searchRequest.scroll(scroll);
 
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            //String scrollId = searchResponse.getScrollId();
             SearchHit[] searchHits = searchResponse.getHits().getHits();
-            // :TODO going to have to iterate through the inital results I think, have to test.
-            // TODO This only returns one element, no need for scroll
-            /*
-            while (searchHits != null && searchHits.length > 0) {
-                SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
-                scrollRequest.scroll(scroll);
-                searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
-                scrollId = searchResponse.getScrollId();
-                searchHits = searchResponse.getHits().getHits();
-                for (SearchHit hit : searchHits) {
-                    elements.add(hit.getSourceAsMap());
-                }
+            if (searchHits == null || searchHits.length < 1) {
+                return Optional.empty();
             }
-
-            // Clear the scroll value
-            ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
-            clearScrollRequest.addScrollId(scrollId);
-            ClearScrollResponse clearScrollResponse = client
-                .clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
-            boolean succeeded = clearScrollResponse.isSucceeded();*/
-            return Optional.empty();
+            ElementJson e = newInstance();
+            e.putAll(searchHits[0].getSourceAsMap());
+            return Optional.of(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -140,66 +151,5 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
     protected String getIndex() {
         return super.getIndex() + "_node";
     }
-    // Create filter array
-//    int count = 0;
-//        while (count < refsCommitIds.size()) {
-//        List<String> sub = refsCommitIds.subList(count, Math.min(refsCommitIds.size(), count + termLimit));
-//
-//        JsonArray filter = new JsonArray();
-//        JsonObject filt1 = new JsonObject();
-//        JsonObject filtv = new JsonObject();
-//        JsonObject filtv1 = new JsonObject();
-//        filter.add(filt1);
-//        filt1.add("range", filtv);
-//        filtv.add("_modified", filtv1);
-//        filtv1.addProperty("lte", timestamp);
-//        JsonObject filt2 = new JsonObject();
-//        JsonObject filt2v = new JsonObject();
-//        filter.add(filt2);
-//        filt2.add("terms", filt2v);
-//        JsonUtil.addStringList(filt2v, Sjm.COMMITID, sub);
-//        JsonObject filt3 = new JsonObject();
-//        JsonObject filt3v = new JsonObject();
-//        filter.add(filt3);
-//        filt3.add("term", filt3v);
-//        filt3v.addProperty(Sjm.SYSMLID, sysmlId);
-//
-//        // Create sort
-//        JsonArray sort = new JsonArray();
-//        JsonObject modified = new JsonObject();
-//        JsonObject modifiedSortOpt = new JsonObject();
-//        sort.add(modified);
-//        modified.add("_modified", modifiedSortOpt);
-//        modifiedSortOpt.addProperty("order", "desc");
-//
-//        // Add filter to bool, then bool to query
-//        JsonObject query = new JsonObject();
-//        JsonObject queryv = new JsonObject();
-//        JsonObject bool = new JsonObject();
-//        query.add("sort", sort);
-//        query.add("query", queryv);
-//        queryv.add("bool", bool);
-//        bool.add("filter", filter);
-//        // Add size limit
-//        query.addProperty("size", "1");
-//
-//        Search search =
-//            new Search.Builder(query.toString()).addIndex(index.toLowerCase().replaceAll("\\s+", "")).build();
-//        SearchResult result;
-//        try {
-//            result = client.execute(search);
-//
-//            if (result.getTotal() > 0) {
-//                JsonArray hits = result.getJsonObject().getAsJsonObject("hits").getAsJsonArray("hits");
-//                if (hits.size() > 0) {
-//                    return hits.read(0).getAsJsonObject().getAsJsonObject("_source");
-//                }
-//            }
-//        } catch (IOException e) {
-//            logger.error(String.format("%s", LogUtil.getStackTrace(e)));
-//        }
-//        count += termLimit;
-//    }
-//        return null;
 }
 
