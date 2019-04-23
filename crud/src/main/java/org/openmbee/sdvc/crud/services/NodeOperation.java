@@ -30,7 +30,9 @@ public class NodeOperation {
     protected final Logger logger = LogManager.getLogger(getClass());
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
+    protected CommitService commitService;
     protected CommitDAO commitRepository;
+
     protected DateTimeFormatter formatter = DateTimeFormatter
         .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZone(
             ZoneId.systemDefault());
@@ -43,6 +45,11 @@ public class NodeOperation {
     @Autowired
     public void setNodeIndex(NodeIndexDAO nodeIndex) {
         this.nodeIndex = nodeIndex;
+    }
+
+    @Autowired
+    public void setCommitService(CommitService commitService) {
+        this.commitService = commitService;
     }
 
     @Autowired
@@ -193,14 +200,18 @@ public class NodeOperation {
 
     public boolean existingNodeContainsNodeId(NodeGetInfo info, String nodeId) {
         if (!info.getExistingNodeMap().containsKey(nodeId)) {
-            Map<String, Object> reject = new HashMap<>();
-            reject.put("code", 404);
-            reject.put("message", "not found");
-            reject.put("id", nodeId);
-            info.getRejected().add(reject);
+            rejectNotFound(info, nodeId);
             return false;
         }
         return true;
+    }
+
+    protected void rejectNotFound(NodeGetInfo info, String nodeId) {
+        Map<String, Object> reject = new HashMap<>();
+        reject.put("code", 404);
+        reject.put("message", "not found");
+        reject.put("id", nodeId);
+        info.getRejected().add(reject);
     }
 
     public static Map<String, ElementJson> convertJsonToMap(

@@ -146,10 +146,14 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     public List<Node> findAll() {
-        String sql = String.format("SELECT * FROM nodes%s WHERE deleted = FALSE",
-            getSuffix());
-
+        String sql = String.format("SELECT * FROM nodes%s", getSuffix());
         return getConnection().query(sql, new NodeRowMapper());
+    }
+
+    public List<Node> findAllByDeleted(boolean deleted) {
+        String sql = String.format("SELECT * FROM nodes%s WHERE deleted = ?",
+            getSuffix());
+        return getConnection().query(sql, new Object[]{deleted}, new NodeRowMapper());
     }
 
     private PreparedStatement prepareStatement(PreparedStatement ps, Node n) throws SQLException {
@@ -159,8 +163,9 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         ps.setString(4, n.getInitialCommit());
         ps.setBoolean(5, n.isDeleted());
         ps.setInt(6, n.getNodeType());
-        ps.setLong(7, n.getId());
-
+        if (n.getId() != null) {
+            ps.setLong(7, n.getId());
+        }
         return ps;
     }
 
