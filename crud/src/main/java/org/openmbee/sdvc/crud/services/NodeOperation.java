@@ -181,8 +181,8 @@ public class NodeOperation {
                     continue; //TODO error or specific remedy?
                 }
                 Edge e = new Edge();
-                e.setParent(parent);
-                e.setChild(child);
+                e.setParent(parent.getId());
+                e.setChild(child.getId());
                 e.setEdgeType(entry.getKey());
                 res.add(e); //TODO there's currently no unique constraint on parent child pair,
                 //TODO duplicate relationships

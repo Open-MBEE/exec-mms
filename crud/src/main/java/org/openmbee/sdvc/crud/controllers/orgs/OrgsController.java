@@ -3,7 +3,7 @@ package org.openmbee.sdvc.crud.controllers.orgs;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
-import org.openmbee.sdvc.core.domains.Organization;
+import org.openmbee.sdvc.data.domains.Organization;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;

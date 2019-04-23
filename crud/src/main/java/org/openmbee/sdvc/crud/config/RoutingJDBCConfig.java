@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
-import org.openmbee.sdvc.core.domains.Project;
+import org.openmbee.sdvc.data.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.openmbee.sdvc.data.domains.Edge;
-import org.openmbee.sdvc.data.domains.Node;
 import org.springframework.jdbc.core.RowMapper;
 
 public class EdgeRowMapper implements RowMapper {

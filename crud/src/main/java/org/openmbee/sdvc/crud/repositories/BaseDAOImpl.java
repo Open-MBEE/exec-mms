@@ -24,4 +24,5 @@ public abstract class BaseDAOImpl {
     public String getSuffix() {
         return DbContextHolder.getContext().getDbTableSuffix();
     }
+
 }

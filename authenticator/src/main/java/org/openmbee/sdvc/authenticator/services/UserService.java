@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.authenticator.services;
 
 import java.util.Optional;
-import org.openmbee.sdvc.core.domains.User;
+import org.openmbee.sdvc.data.domains.User;
 
 public interface UserService {
 
