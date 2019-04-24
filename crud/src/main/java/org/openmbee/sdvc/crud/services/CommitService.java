@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.json.CommitJson;
@@ -59,7 +61,11 @@ public class CommitService {
                 e.printStackTrace();
             }
         }
-        List<Commit> commits = findByRefAndTimestampAndLimit(refId, timestamp, limit);
+        Optional<Branch> ref = branchRepository.findByBranchId(refId);
+        if (!ref.isPresent()) {
+            throw new NotFoundException("Branch not found");
+        }
+        List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), timestamp, limit);
         CommitsResponse res = new CommitsResponse();
         List<CommitJson> resJson = new ArrayList<>();
         for (Commit c : commits) {
@@ -96,7 +102,11 @@ public class CommitService {
         DbContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
-            List<Commit> refCommits = findByRefAndTimestampAndLimit(refId, null, 0);
+            Optional<Branch> ref = branchRepository.findByBranchId(refId);
+            if (!ref.isPresent()) {
+                throw new NotFoundException("Branch not found");
+            }
+            List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
             Set<String> commitIds = new HashSet<>();
             for (Commit commit: refCommits) {
                 commitIds.add(commit.getIndexId());
@@ -123,38 +133,5 @@ public class CommitService {
             res.setCode(500);
         }
         return res;
-    }
-
-    public Optional<Commit> findLatestByRef(String refId) {
-        return findByRefAndTimestamp(refId, null);
-    }
-
-    public Optional<Commit> findByRefAndTimestamp(String refId, Instant timestamp) {
-        List<Commit> res = findByRefAndTimestampAndLimit(refId, timestamp, 1);
-        if (!res.isEmpty()) {
-            return Optional.of(res.get(0));
-        }
-        return Optional.empty();
-    }
-
-    public List<Commit> findByRefAndTimestampAndLimit(String refId, Instant timestamp, int limit) {
-        List<Commit> commits = new ArrayList<>();
-        String currentRef = refId;
-        Long currentCid = 0L;
-        while (currentRef != null && (commits.size() < limit || limit == 0)) {
-            int currentLimit = limit == 0 ? 0 : limit - commits.size();
-            List<Commit> next = commitRepository.findByRefAndLimit(currentRef, currentCid, timestamp, currentLimit);
-            commits.addAll(next);
-            Optional<Branch> ref = branchRepository.findByBranchId(currentRef);
-            if (ref.isPresent()) {
-                currentRef = ref.get().getParentRefId();
-                currentCid = ref.get().getParentCommit();
-            }
-
-            if (currentRef != null && currentRef.equals("")) {
-                currentRef = null;
-            }
-        }
-        return commits;
     }
 }

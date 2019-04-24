@@ -5,8 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -86,7 +89,6 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         if (limit != 0) {
             query.append(" LIMIT ?");
             limitCol = currentExtraCol;
-            currentExtraCol++;
         }
         final int commitColNum = commitCol;
         final int timestampColNum = timestampCol;
@@ -109,5 +111,37 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
                 return ps;
             }
         }, new CommitRowMapper());
+    }
+
+    public Optional<Commit> findLatestByRef(Branch ref) {
+        return findByRefAndTimestamp(ref, null);
+    }
+
+    public Optional<Commit> findByRefAndTimestamp(Branch ref, Instant timestamp) {
+        List<Commit> res = findByRefAndTimestampAndLimit(ref, timestamp, 1);
+        if (!res.isEmpty()) {
+            return Optional.of(res.get(0));
+        }
+        return Optional.empty();
+    }
+
+    public List<Commit> findByRefAndTimestampAndLimit(Branch ref, Instant timestamp, int limit) {
+        List<Commit> commits = new ArrayList<>();
+        String currentRef = ref.getBranchId();
+        Long currentCid = 0L;
+        while (currentRef != null && (commits.size() < limit || limit == 0)) {
+            int currentLimit = limit == 0 ? 0 : limit - commits.size();
+            List<Commit> next = findByRefAndLimit(currentRef, currentCid, timestamp, currentLimit);
+            commits.addAll(next);
+            if (ref.getParentRefId() != null) {
+                currentRef = ref.getParentRefId();
+                currentCid = ref.getParentCommit();
+            }
+
+            if (currentRef != null && currentRef.equals("")) {
+                currentRef = null;
+            }
+        }
+        return commits;
     }
 }
