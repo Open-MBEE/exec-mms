@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
-    private final String INSERT_SQL = "INSERT INTO edges%s (edgeType, child_id, parent_id) VALUES (?, ?, ?)";
-    private final String UPDATE_SQL = "UPDATE edges%s SET edgeType = ?, child_id = ?, parent_id = ? WHERE id = ?";
+    private final String INSERT_SQL = "INSERT INTO edges%s (edgeType, child, parent) VALUES (?, ?, ?)";
+    private final String UPDATE_SQL = "UPDATE edges%s SET edgeType = ?, child = ?, parent = ? WHERE id = ?";
 
     public Edge save(Edge edge) {
         String sql = String.format(INSERT_SQL, getSuffix());
@@ -72,6 +72,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
                 i++;
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             //TODO throw exception to caller
         }
         return edges;

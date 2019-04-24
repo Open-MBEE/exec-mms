@@ -3,6 +3,7 @@ package org.openmbee.sdvc.crud.services;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,18 +66,18 @@ public class NodePostHelper extends NodeOperation {
             if (element == null) {
                 continue;
             }
-            ElementsResponse rejected = new ElementsResponse();
+            Map<String, Object> rejected = new HashMap<>();
             boolean added = false;
             boolean updated = false;
             if (element.getId() == null || element.getId().isEmpty()) {
-                rejected.addMessage("Missing ID");
-                rejected.setCode(400);
+                rejected.put("message", "Missing ID");
+                rejected.put("code", 400);
                 rejected.put("element", element);
             } else {
                 Map<String, Object> elasticElement = info.getExistingElementMap()
                     .get(element.getId());
-
-                if (!info.getExistingNodeMap().containsKey(element.getId())) {
+                Node n = info.getExistingNodeMap().get(element.getId());
+                if (n == null) {
                     added = true;
                 } else if (elasticElement == null) {
                     continue; //TODO this should be an error - the db has entry but elastic doesn't, reject 500?
@@ -84,7 +85,7 @@ public class NodePostHelper extends NodeOperation {
 
                 if (!added) {
                     if (!overwriteJson) {
-                        if (isUpdated(element, elasticElement, rejected)) {
+                        if (n.isDeleted() || isUpdated(element, elasticElement, rejected)) {
                             updated = diffUpdateJson(element, elasticElement, rejected);
                         }
                     } else {

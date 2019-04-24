@@ -268,11 +268,15 @@ public class DatabaseDefinitionService {
 
         jdbcTemplate.execute("BEGIN");
 
-        copyTables(jdbcTemplate, COPY_SQL, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
-        copyTables(jdbcTemplate, COPY_SQL, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
+        jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
+        jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
+        //copyTables(jdbcTemplate, COPY_SQL, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
+        //copyTables(jdbcTemplate, COPY_SQL, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
 
-        copyTables(jdbcTemplate, COPY_IDX, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
-        copyTables(jdbcTemplate, COPY_IDX, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
+        jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
+        jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
+        //copyTables(jdbcTemplate, COPY_IDX, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
+        //copyTables(jdbcTemplate, COPY_IDX, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
 
         jdbcTemplate.execute("COMMIT");
     }

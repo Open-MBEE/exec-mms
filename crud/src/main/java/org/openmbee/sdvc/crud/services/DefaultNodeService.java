@@ -91,12 +91,13 @@ public class DefaultNodeService implements NodeService {
             return read(projectId, refId, req, params);
 
         } else {
-//            If no id is provided, return all
+            // If no id is provided, return all
             logger.debug("No ElementId given");
             DbContextHolder.setContext(projectId, refId);
 
             ElementsResponse response = new ElementsResponse();
-            response.getElements().addAll(nodeGetHelper.processGetAll());
+            String commitId = params.getOrDefault("commitId", null);
+            response.getElements().addAll(nodeGetHelper.processGetAll(commitId));
             return response;
         }
     }
@@ -105,13 +106,6 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, ElementsRequest req,
         Map<String, String> params) {
 
-//        TODO get element at commit
-//         params commit it read element at a commit id
-//        find a specific element at a commit
-//        commit DB and if element was actually edited at that commit - read element
-//        otherwise read timestamp of commit - find element before timestamp
-//        read all the commits in ref and search elastic for all the elements (for that specific) sorted by time and check
-//        check if current state of element and if timestamp is less then pass that version
         String commitId = params.getOrDefault("commitId", null);
         DbContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
@@ -138,6 +132,7 @@ public class DefaultNodeService implements NodeService {
         try {
             commitChanges(info);
         } catch (Exception e) {
+            e.printStackTrace();
             //TODO db transaction
         }
         ElementsResponse response = new ElementsResponse();

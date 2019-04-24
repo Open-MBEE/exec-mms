@@ -22,4 +22,6 @@ public interface NodeDAO {
     public List<Node> findAllByNodeIds(Collection<String> ids);
 
     public List<Node> findAll();
+
+    public List<Node> findAllByDeleted(boolean deleted);
 }

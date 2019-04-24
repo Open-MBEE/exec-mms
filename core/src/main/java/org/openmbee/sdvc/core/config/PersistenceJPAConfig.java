@@ -45,7 +45,7 @@ public class PersistenceJPAConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(getDatasource());
         em.setPackagesToScan(
-            "org.openmbee.sdvc.core.domains",
+            "org.openmbee.sdvc.data.domains",
             "org.openmbee.sdvc.core.repositories"
         );
 
