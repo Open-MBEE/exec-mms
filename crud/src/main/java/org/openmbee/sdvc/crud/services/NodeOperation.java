@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.data.domains.Edge;
 import org.openmbee.sdvc.data.domains.Node;
@@ -30,8 +31,8 @@ public class NodeOperation {
     protected final Logger logger = LogManager.getLogger(getClass());
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
-    protected CommitService commitService;
     protected CommitDAO commitRepository;
+    protected BranchDAO branchRepository;
 
     protected DateTimeFormatter formatter = DateTimeFormatter
         .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZone(
@@ -48,13 +49,13 @@ public class NodeOperation {
     }
 
     @Autowired
-    public void setCommitService(CommitService commitService) {
-        this.commitService = commitService;
+    public void setCommitRepository(CommitDAO commitRepository) {
+        this.commitRepository = commitRepository;
     }
 
     @Autowired
-    public void setCommitRepository(CommitDAO commitRepository) {
-        this.commitRepository = commitRepository;
+    public void setBranchRepository(BranchDAO branchRepository) {
+        this.branchRepository = branchRepository;
     }
 
     public void initCommitJson(CommitJson cmjs, Instant now) {

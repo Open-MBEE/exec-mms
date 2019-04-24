@@ -3,12 +3,14 @@ package org.openmbee.sdvc.crud.services;
 import java.time.Instant;
 import java.util.*;
 
-import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.stereotype.Service;
+
+import static org.openmbee.sdvc.crud.config.DbContextHolder.getContext;
 
 @Service
 public class NodeGetHelper extends NodeOperation {
@@ -84,13 +86,16 @@ public class NodeGetHelper extends NodeOperation {
     }
 
     public NodeGetInfo processGetJson(List<ElementJson> elements, Instant time) {
-        Optional<Commit> c = commitService.findByRefAndTimestamp(
-            DbContextHolder.getContext().getBranchId(), time);
-        if (c.isPresent()) {
-            return processGetJson(elements, c.get().getIndexId());
-        } else {
-            throw new BadRequestException("invalid time");
+        Optional<Branch> ref = branchRepository.findByBranchId(getContext().getBranchId());
+        if (ref.isPresent()) {
+            Optional<Commit> c = commitRepository.findLatestByRef(ref.get());
+            if (c.isPresent()) {
+                return processGetJson(elements, c.get().getIndexId());
+            } else {
+                throw new BadRequestException("invalid time");
+            }
         }
+        return null;
     }
 
     public List<ElementJson> processGetAll() {
@@ -111,13 +116,17 @@ public class NodeGetHelper extends NodeOperation {
     }
 
     public List<ElementJson> processGetAll(Instant time) {
-        Optional<Commit> c = commitService.findByRefAndTimestamp(
-            DbContextHolder.getContext().getBranchId(), time);
-        if (c.isPresent()) {
-            return processGetAll(c.get().getIndexId());
-        } else {
-            throw new BadRequestException("invalid time");
+        List<ElementJson> result = new ArrayList<>();
+        Optional<Branch> ref = branchRepository.findByBranchId(getContext().getBranchId());
+        if (ref.isPresent()) {
+            Optional<Commit> c = commitRepository.findByRefAndTimestamp(ref.get(), time);
+            if (c.isPresent()) {
+                result.addAll(processGetAll(c.get().getIndexId()));
+            } else {
+                throw new BadRequestException("invalid time");
+            }
         }
+        return result;
     }
 
     protected void rejectDeleted(NodeGetInfo info, String nodeId, ElementJson indexElement) {
@@ -130,12 +139,15 @@ public class NodeGetHelper extends NodeOperation {
     }
 
     protected List<String> getRefCommitIds(Instant time) {
-        List<Commit> refCommits = commitService.findByRefAndTimestampAndLimit(
-            DbContextHolder.getContext().getBranchId(), time, 0);
         List<String> commitIds = new ArrayList<>();
-        for (Commit c : refCommits) {
-            commitIds.add(c.getIndexId());
-        }
+
+        Optional<Branch> ref = branchRepository.findByBranchId(getContext().getBranchId());
+        ref.ifPresent(current -> {
+            List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(current, time, 0);
+            for (Commit c : refCommits) {
+                commitIds.add(c.getIndexId());
+            }
+        });
         return commitIds;
     }
 }

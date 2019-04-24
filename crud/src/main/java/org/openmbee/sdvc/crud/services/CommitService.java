@@ -62,20 +62,26 @@ public class CommitService {
             }
         }
         Optional<Branch> ref = branchRepository.findByBranchId(refId);
-        if (!ref.isPresent()) {
-            throw new NotFoundException("Branch not found");
-        }
-        List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), timestamp, limit);
-        CommitsResponse res = new CommitsResponse();
         List<CommitJson> resJson = new ArrayList<>();
-        for (Commit c : commits) {
-            CommitJson json = new CommitJson();
-            json.setCreated(c.getTimestamp().toString());
-            json.setCreator(c.getCreator());
-            json.setId(c.getIndexId());
-            json.setComment(c.getComment());
-            resJson.add(json);
-        }
+        CommitsResponse res = new CommitsResponse();
+
+        int finalLimit = limit;
+        Instant finalTimestamp = timestamp;
+
+        ref.ifPresentOrElse(commit -> {
+            List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(commit, finalTimestamp, finalLimit);
+            for (Commit c : commits) {
+                CommitJson json = new CommitJson();
+                json.setCreated(c.getTimestamp().toString());
+                json.setCreator(c.getCreator());
+                json.setId(c.getIndexId());
+                json.setComment(c.getComment());
+                resJson.add(json);
+            }
+        }, () -> {
+            throw new NotFoundException("Branch not found");
+        });
+
         res.setCommits(resJson);
         return res;
     }

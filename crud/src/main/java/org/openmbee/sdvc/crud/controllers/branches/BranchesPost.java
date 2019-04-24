@@ -78,9 +78,12 @@ public class BranchesPost extends BaseController {
                         b.setParentCommit(parentCommit.get().getId());
                     }
                 } else {
-                    Optional<Commit> parentCommit = commitService.findLatestByRef(b.getParentRefId());
-                    if (parentCommit.isPresent()) {
-                        b.setParentCommit(parentCommit.get().getId());
+                    Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
+                    if (ref.isPresent()) {
+                        Optional<Commit> parentCommit = commitRepository.findLatestByRef(ref.get());
+                        parentCommit.ifPresent(parent -> {
+                            b.setParentCommit(parent.getId());
+                        });
                     }
                 }
 
