@@ -21,7 +21,5 @@ public interface CommitDAO {
 
     public Optional<Commit> findByRefAndTimestamp(Branch ref, Instant timestamp);
 
-    public List<Commit> findByRefAndLimit(String refId, Long cid, Instant timestamp, int limit);
-
     public List<Commit> findByRefAndTimestampAndLimit(Branch ref, Instant timestamp, int limit);
 }
