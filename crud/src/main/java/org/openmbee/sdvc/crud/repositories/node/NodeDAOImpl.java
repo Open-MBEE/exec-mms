@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
 import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
+import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -22,7 +25,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     private final String INSERT_SQL = "INSERT INTO nodes%s (nodeid, indexid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
     private final String UPDATE_SQL = "UPDATE nodes%s SET nodeid = ?, indexid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
 
-    public Node save(Node node) {
+    public Node save(Node node) throws InvalidDataAccessApiUsageException, DataRetrievalFailureException {
         if (node.getId() == null) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -36,9 +39,6 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
                 }
             }, keyHolder);
 
-            if (keyHolder.getKeyList().isEmpty()) {
-                return null; //TODO error?
-            }
             node.setId(keyHolder.getKey().longValue());
         } else {
             getConnection().update(new PreparedStatementCreator() {
@@ -53,8 +53,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return node;
     }
 
-    //TODO handle errors
-    public List<Node> saveAll(List<Node> nodes) {
+    public List<Node> saveAll(List<Node> nodes) throws SQLException {
         List<Node> newNodes = new ArrayList<>();
         List<Node> updateNodes = new ArrayList<>();
 
@@ -76,26 +75,23 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return nodes;
     }
 
-    public List<Node> insertAll(List<Node> nodes) {
-        try {
-            //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
-            Connection rawConn = getConnection().getDataSource().getConnection();
-            PreparedStatement ps = rawConn
-                .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
-            for (Node n : nodes) {
-                prepareStatement(ps, n);
-                ps.addBatch();
-            }
-            ps.executeBatch();
-            ResultSet rs = ps.getGeneratedKeys();
-            int i = 0;
-            while (rs.next()) {
-                nodes.get(i).setId(rs.getLong(1));
-                i++;
-            }
-        } catch (SQLException e) {
-            //TODO throw exception to caller
+    public List<Node> insertAll(List<Node> nodes) throws SQLException {
+        //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
+        Connection rawConn = getConnection().getDataSource().getConnection();
+        PreparedStatement ps = rawConn
+            .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
+        for (Node n : nodes) {
+            prepareStatement(ps, n);
+            ps.addBatch();
         }
+        ps.executeBatch();
+        ResultSet rs = ps.getGeneratedKeys();
+        int i = 0;
+        while (rs.next()) {
+            nodes.get(i).setId(rs.getLong(1));
+            i++;
+        }
+
         return nodes;
     }
 
@@ -114,6 +110,21 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
             }
         });
         return nodes;
+    }
+
+    public void deleteAll(List<Node> nodes) {
+        String deleteSql = String.format("DELETE FROM nodes%s WHERE id = ?", getSuffix());
+        getConnection().batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, nodes.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return nodes.size();
+            }
+        });
     }
 
     public Optional<Node> findById(long id) {
@@ -168,5 +179,4 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         }
         return ps;
     }
-
 }

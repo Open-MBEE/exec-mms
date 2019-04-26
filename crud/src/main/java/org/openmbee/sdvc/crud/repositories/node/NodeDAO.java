@@ -1,19 +1,24 @@
 package org.openmbee.sdvc.crud.repositories.node;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.openmbee.sdvc.data.domains.Node;
+import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 public interface NodeDAO {
 
-    public Node save(Node node);
+    public Node save(Node node) throws InvalidDataAccessApiUsageException, DataRetrievalFailureException;
 
-    public List<Node> saveAll(List<Node> nodes);
+    public List<Node> saveAll(List<Node> nodes) throws SQLException;
 
-    public List<Node> insertAll(List<Node> nodes);
+    public List<Node> insertAll(List<Node> nodes) throws SQLException;
 
-    public List<Node> updateAll(List<Node> nodes);
+    public List<Node> updateAll(List<Node> nodes) throws SQLException;
+
+    public void deleteAll(List<Node> nodes) throws SQLException;
 
     public Optional<Node> findById(long id);
 

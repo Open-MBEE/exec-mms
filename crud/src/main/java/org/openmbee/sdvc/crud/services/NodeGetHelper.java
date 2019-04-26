@@ -22,9 +22,8 @@ public class NodeGetHelper extends NodeOperation {
             if (!existingNodeContainsNodeId(info, nodeId)) {
                 continue;
             }
-            Node node = info.getExistingNodeMap().get(nodeId);
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
-            if (node.isDeleted()) {
+            if (info.getExistingNodeMap().get(nodeId).isDeleted()) {
                 rejectDeleted(info, nodeId, indexElement);
                 continue;
             }
@@ -50,7 +49,6 @@ public class NodeGetHelper extends NodeOperation {
             if (!existingNodeContainsNodeId(info, nodeId)) { // nodeId not found
                 continue;
             }
-            Node node = info.getExistingNodeMap().get(nodeId);
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
             Instant modified = Instant.from(formatter.parse(indexElement.getModified()));
             Instant created = Instant.from(formatter.parse(indexElement.getCreated()));
@@ -76,7 +74,7 @@ public class NodeGetHelper extends NodeOperation {
                 } else {
                     rejectNotFound(info, nodeId); // element not found at commit time
                 }
-            } else if (node.isDeleted()) { // latest element is before commit, but deleted
+            } else if (info.getExistingNodeMap().get(nodeId).isDeleted()) { // latest element is before commit, but deleted
                 rejectDeleted(info, nodeId, indexElement);
             } else { // latest element version is version at commit, not deleted
                 info.getActiveElementMap().put(nodeId, indexElement);

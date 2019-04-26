@@ -1,14 +1,18 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.data.domains.CommitType;
 import org.openmbee.sdvc.data.domains.Edge;
@@ -22,6 +26,8 @@ import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletResponse;
 
 
 @Service("defaultNodeService")
@@ -146,14 +152,26 @@ public class DefaultNodeService implements NodeService {
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
         Instant now = info.getNow();
+        List<Edge> edges = nodePostHelper.getEdgesToSave(info);
 
         if (!nodes.isEmpty()) {
-            this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
-            if (json != null && !json.isEmpty()) {
-                this.nodeIndex.indexAll(json.values());
-                List<Edge> edges = nodePostHelper.getEdgesToSave(info);
-                this.edgeRepository.saveAll(edges);
+            try {
+                this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
+                if (json != null && !json.isEmpty()) {
+                    this.nodeIndex.indexAll(json.values());
+                    this.edgeRepository.saveAll(edges);
+                }
+            } catch (SQLException e) {
+                logger.error("commitChanges error: ", e);
+                try {
+                    this.edgeRepository.deleteAll(edges);
+                    this.nodeRepository.deleteAll(new ArrayList<>(nodes.values()));
+                } catch (SQLException ne) {
+                    logger.error("Error rolling back: ", ne);
+                }
+                throw new InternalErrorException("Error committing transaction");
             }
+
             this.nodeIndex.removeFromRef(info.getOldIndexIds());
 
             Commit commit = new Commit();
@@ -200,13 +218,16 @@ public class DefaultNodeService implements NodeService {
         NodeChangeInfo info = nodeDeleteHelper
             .processDeleteJson(req.getElements(), createCommit("admin", refId, projectId, req),
                 this);
+        ElementsResponse response = new ElementsResponse();
 
         try {
             commitChanges(info);
-        } catch (Exception e) {
-            //TODO db transaction
+        } catch (InternalErrorException e) {
+            response.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getMessages().add(e.getMessage());
+            return response;
         }
-        ElementsResponse response = new ElementsResponse();
+
         response.getElements().addAll(info.getDeletedMap().values());
         response.setRejected(info.getRejected());
         return response;

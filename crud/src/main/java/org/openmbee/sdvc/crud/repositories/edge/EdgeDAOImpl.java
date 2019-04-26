@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 import org.openmbee.sdvc.data.domains.Edge;
 import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -30,7 +30,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
         return edge;
     }
 
-    public List<Edge> saveAll(List<Edge> edges) {
+    public List<Edge> saveAll(List<Edge> edges) throws SQLException {
         List<Edge> newEdges = new ArrayList<>();
         List<Edge> updateEdges = new ArrayList<>();
 
@@ -52,29 +52,25 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
         return edges;
     }
 
-    public List<Edge> insertAll(List<Edge> edges) {
-        try {
-            //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
-            Connection rawConn = getConnection().getDataSource().getConnection();
-            PreparedStatement ps = rawConn
-                .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
-            for (Edge e: edges) {
-                ps.setInt(1, e.getEdgeType());
-                ps.setLong(2, e.getChild());
-                ps.setLong(3, e.getParent());
-                ps.addBatch();
-            }
-            ps.executeBatch();
-            ResultSet rs = ps.getGeneratedKeys();
-            int i = 0;
-            while (rs.next()) {
-                edges.get(i).setId(rs.getLong(1));
-                i++;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //TODO throw exception to caller
+    public List<Edge> insertAll(List<Edge> edges) throws SQLException {
+        //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
+        Connection rawConn = getConnection().getDataSource().getConnection();
+        PreparedStatement ps = rawConn
+            .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
+        for (Edge e : edges) {
+            ps.setInt(1, e.getEdgeType());
+            ps.setLong(2, e.getChild());
+            ps.setLong(3, e.getParent());
+            ps.addBatch();
         }
+        ps.executeBatch();
+        ResultSet rs = ps.getGeneratedKeys();
+        int i = 0;
+        while (rs.next()) {
+            edges.get(i).setId(rs.getLong(1));
+            i++;
+        }
+
         return edges;
     }
 
@@ -98,29 +94,37 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
         return edges;
     }
 
-    //TODO these are wrong
-    @SuppressWarnings({"unchecked"})
-    public Optional<Edge> findParents(String sysmlId, Integer et) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
-            getSuffix());
+    public void deleteAll(List<Edge> edges) {
+        String deleteSql = String.format("DELETE FROM edges%s WHERE id = ?", getSuffix());
+        getConnection().batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Edge e = edges.get(i);
+                ps.setLong(1, e.getId());
+            }
 
-        return (Optional<Edge>) getConnection()
-            .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
+            @Override
+            public int getBatchSize() {
+                return edges.size();
+            }
+        });
     }
 
     @SuppressWarnings({"unchecked"})
-    public Optional<Edge> findChildren(String sysmlId, Integer et) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE sysmlid = ?",
-            getSuffix());
-
-        return (Optional<Edge>) getConnection()
-            .queryForObject(sql, new Object[]{sysmlId}, new EdgeRowMapper());
+    public List<Edge> findParents(String sysmlId, Integer et) {
+        String sql = String.format("SELECT * FROM edges%1$s WHERE child = (SELECT id FROM nodes%1$s WHERE sysmlid = ?)", getSuffix());
+        return (List<Edge>) getConnection().query(sql, new Object[]{sysmlId}, new EdgeRowMapper());
     }
 
+    @SuppressWarnings({"unchecked"})
+    public List<Edge> findChildren(String sysmlId, Integer et) {
+        String sql = String.format("SELECT * FROM edges%1$s WHERE parent = (SELECT id FROM nodes%1$s WHERE sysmlid = ?)", getSuffix());
+        return (List<Edge>) getConnection().query(sql, new Object[]{sysmlId}, new EdgeRowMapper());
+    }
+
+    @SuppressWarnings({"unchecked"})
     public List<Edge> findAll() {
-        String sql = String.format("SELECT * FROM edges%s",
-            getSuffix());
-
+        String sql = String.format("SELECT * FROM edges%s", getSuffix());
         return (List<Edge>) getConnection().query(sql, new EdgeRowMapper());
     }
 }
