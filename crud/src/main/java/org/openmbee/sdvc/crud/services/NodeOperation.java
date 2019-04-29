@@ -117,11 +117,7 @@ public class NodeOperation {
         cmjs.getAdded().add(newObj);
 
         n.setNodeId(e.getId());
-        n.setIndexId(e.getIndexId());
-        n.setLastCommit(cmjs.getId());
         n.setInitialCommit(e.getIndexId());
-        n.setNodeType(0);
-        n.setDeleted(false);
     }
 
     public void processElementUpdated(ElementJson e, Node n, CommitJson cmjs) {
@@ -133,11 +129,6 @@ public class NodeOperation {
         newObj.put(BaseJson.INDEXID, e.getIndexId());
         newObj.put(BaseJson.ID, e.getId());
         cmjs.getUpdated().add(newObj);
-
-        n.setIndexId(e.getIndexId());
-        n.setLastCommit(cmjs.getId());
-        n.setNodeType(0);
-        n.setDeleted(false);
     }
 
     public void processElementAddedOrUpdated(ElementJson e, Node n, CommitJson cmjs) {
@@ -151,6 +142,11 @@ public class NodeOperation {
         e.setCommitId(cmjs.getId());
         e.setModified(cmjs.getCreated());
         e.setModifier(cmjs.getCreator());
+
+        n.setIndexId(e.getIndexId());
+        n.setLastCommit(cmjs.getId());
+        n.setDeleted(false);
+        n.setNodeType(0);
     }
 
     public void processElementDeleted(ElementJson e, Node n, CommitJson cmjs) {
@@ -193,7 +189,6 @@ public class NodeOperation {
                 e.setChild(child.getId());
                 e.setEdgeType(entry.getKey());
                 res.add(e); //TODO there's currently no unique constraint on parent child pair,
-                //TODO duplicate relationships
             }
         }
         return res;

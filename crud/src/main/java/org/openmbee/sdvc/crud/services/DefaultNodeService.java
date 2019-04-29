@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
@@ -26,8 +25,6 @@ import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletResponse;
 
 
 @Service("defaultNodeService")
@@ -135,12 +132,8 @@ public class DefaultNodeService implements NodeService {
             .processPostJson(req.getElements(), overwriteJson,
                 createCommit("admin", refId, projectId, req), this);
 
-        try {
-            commitChanges(info);
-        } catch (Exception e) {
-            e.printStackTrace();
-            //TODO db transaction
-        }
+        commitChanges(info);
+
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
         response.setRejected(info.getRejected());
@@ -148,22 +141,25 @@ public class DefaultNodeService implements NodeService {
     }
 
     protected void commitChanges(NodeChangeInfo info) {
+        //TODO error and transaction handling needs work
         Map<String, Node> nodes = info.getToSaveNodeMap();
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
         Instant now = info.getNow();
-        List<Edge> edges = nodePostHelper.getEdgesToSave(info);
-
+        List<Edge> edges = null;
         if (!nodes.isEmpty()) {
             try {
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
                 if (json != null && !json.isEmpty()) {
+                    //edges needed nodes to save first in order to get id
+                    edges = nodePostHelper.getEdgesToSave(info);
                     this.nodeIndex.indexAll(json.values());
                     this.edgeRepository.saveAll(edges);
                 }
             } catch (SQLException e) {
                 logger.error("commitChanges error: ", e);
-                try {
+                try { //TODO this should not be deleting things, at least not nodes
+                    //the catch should include the commit save
                     this.edgeRepository.deleteAll(edges);
                     this.nodeRepository.deleteAll(new ArrayList<>(nodes.values()));
                 } catch (SQLException ne) {
@@ -220,13 +216,7 @@ public class DefaultNodeService implements NodeService {
                 this);
         ElementsResponse response = new ElementsResponse();
 
-        try {
-            commitChanges(info);
-        } catch (InternalErrorException e) {
-            response.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getMessages().add(e.getMessage());
-            return response;
-        }
+        commitChanges(info);
 
         response.getElements().addAll(info.getDeletedMap().values());
         response.setRejected(info.getRejected());
