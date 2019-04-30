@@ -75,7 +75,7 @@ public class ProjectsController extends BaseController {
                 response.addMessage("Project ID is missing");
                 continue;
             }
-            ProjectService ps = getProjectService(json.getProjectId());
+            ProjectService ps = getProjectService(json);
             if (!ps.exists(json.getProjectId())) {
                 response.getProjects().add(ps.create(json));
             } else {
@@ -90,7 +90,16 @@ public class ProjectsController extends BaseController {
         return ResponseEntity.ok(new ProjectsResponse()); //TODO
     }
 
-    private ProjectService getProjectService(String projectId) {
-        return serviceFactory.getProjectService("cameo");
+    private ProjectService getProjectService(ProjectJson json) {
+        String type = json.getProjectType();
+        if (type == null || type.isEmpty()) {
+            try {
+                type = this.getProjectType(json.getProjectId());
+            } catch (NotFoundException e) {
+                type = "default";
+            }
+            json.setProjectType(type);
+        }
+        return serviceFactory.getProjectService(type);
     }
 }

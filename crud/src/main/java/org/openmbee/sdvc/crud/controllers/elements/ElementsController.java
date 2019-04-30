@@ -94,7 +94,7 @@ public class ElementsController extends BaseController {
     }
 
     private NodeService getNodeService(String projectId) {
-        return serviceFactory.getNodeService("cameo");
+        return serviceFactory.getNodeService(this.getProjectType(projectId));
     }
 
     private void handleSingleResponse(ElementsResponse res) {
