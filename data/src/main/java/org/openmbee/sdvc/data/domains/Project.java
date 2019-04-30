@@ -25,6 +25,9 @@ public class Project extends Base {
     @Column(unique = true)
     private String projectId;
 
+    @JsonProperty("projectType")
+    private String projectType;
+
     private String connectionString;
 
     @OneToMany(mappedBy = "user")
@@ -73,6 +76,14 @@ public class Project extends Base {
 
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    public String getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(String projectType) {
+        this.projectType = projectType;
     }
 
     public Collection<UsersProjects> getUsers() {

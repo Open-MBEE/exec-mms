@@ -16,6 +16,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     public static final String CREATOR = "_creator";
     public static final String CREATED = "_created";
     public static final String COMMITID = "_commitId";
+    public static final String TYPE = "type";
 
     public String getId() {
         return (String) this.get(ID);
@@ -24,6 +25,16 @@ public class BaseJson<T> extends HashMap<String, Object> {
     @SuppressWarnings("unchecked")
     public T setId(String id) {
         this.put(ID, id);
+        return (T) this;
+    }
+
+    public String getType() {
+        return (String) this.get(TYPE);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T setType(String type) {
+        this.put(TYPE, type);
         return (T) this;
     }
 

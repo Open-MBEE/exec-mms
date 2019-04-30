@@ -75,7 +75,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects",
@@ -1314,15 +1314,20 @@
 			"response": []
 		},
 		{
-			"name": "resurrect x on refa Copy",
+			"name": "get resurrected x on refa",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "c4e1dd6d-61b6-4f4a-affe-943e3f7a1c9c",
+						"id": "853ac58c-b184-47cd-929a-83fecb433a9a",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has element\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1337,13 +1342,13 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated7\",\n\t\t\t\"ownerId\": \"z\"\n\t\t}\n\t]\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
@@ -1357,6 +1362,51 @@
 						"refa",
 						"elements",
 						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add ownerId for cameo element on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4e1dd6d-61b6-4f4a-affe-943e3f7a1c9c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated7\",\n\t\t\t\"ownerId\": \"z\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements"
 					]
 				}
 			},

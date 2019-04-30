@@ -59,11 +59,12 @@ public class DefaultProjectService implements ProjectService {
         proj.setProjectId(project.getId());
         proj.setProjectName(project.getName());
         proj.setOrganization(org.get());
+        proj.setProjectType(project.getProjectType());
         Project saved = projectRepository.save(proj);
 
         try {
             if (projectOperations.createProjectDatabase(proj)) {
-                projectIndex.create(proj.getProjectId());
+                projectIndex.create(proj.getProjectId(), project.getProjectType());
                 return project;
             }
         } catch (SQLException sqlException) {
