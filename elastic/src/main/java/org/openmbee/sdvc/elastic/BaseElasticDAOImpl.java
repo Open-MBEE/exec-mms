@@ -26,9 +26,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
-    @Value("${elastic.limit.result}")
+    @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
-    @Value("${elastic.limit.term}")
+    @Value("${elasticsearch.limit.term}")
     protected int termLimit;
     protected static int readTimeout = 1000000000;
     protected final String type = "_doc";
