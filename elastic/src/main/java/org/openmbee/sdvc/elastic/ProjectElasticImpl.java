@@ -61,33 +61,25 @@ public class ProjectElasticImpl implements ProjectIndex {
         }
     }
 
-    private String getCommitMapping() {
-        try {
-            InputStream in = new ClassPathResource("/elastic_mappings/commit.json")
-                .getInputStream();
-            return read(in);
-        } catch (IOException e) {
-            throw new RuntimeException(e); //TODO should have server error exception
-        }
+    private String getCommitMapping() throws IOException {
+        InputStream in = new ClassPathResource("/elastic_mappings/commit.json")
+            .getInputStream();
+        return read(in);
     }
 
-    private String getNodeMapping(String type) {
-        try {
-            InputStream in = new ClassPathResource("/elastic_mappings/" + type + "_node.json")
-                .getInputStream();
-            if (in == null) {
-                in = new ClassPathResource("/elastic_mappings/default_node.json")
-                    .getInputStream();
-            }
-            return read(in);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String read(InputStream in) {
+    private String getNodeMapping(String type) throws IOException {
+        InputStream in = new ClassPathResource("/elastic_mappings/" + type + "_node.json")
+            .getInputStream();
         if (in == null) {
-            //TODO throw server error, no mapping found?
+            in = new ClassPathResource("/elastic_mappings/default_node.json")
+                .getInputStream();
+        }
+        return read(in);
+    }
+
+    private String read(InputStream in) throws IOException {
+        if (in == null) {
+            throw new IOException("Resource not found!");
         }
         String text;
         try (Scanner scanner = new Scanner(in, StandardCharsets.UTF_8.name())) {

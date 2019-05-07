@@ -97,7 +97,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             QueryBuilder query = getCommitHistoryQuery(nodeId, commitIds);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             sourceBuilder.query(query);
-            //sourceBuilder.size(this.resultLimit); //TODO respect limits
+            sourceBuilder.size(this.resultLimit); // TODO handle paging requests
             sourceBuilder.sort(new FieldSortBuilder(CommitJson.CREATED).order(SortOrder.DESC));
             searchRequest.source(sourceBuilder);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);

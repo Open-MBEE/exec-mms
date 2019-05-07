@@ -120,31 +120,35 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
     @Override
     public Optional<ElementJson> getElementLessThanOrEqualTimestamp(String nodeId,
         String timestamp, List<String> refsCommitIds) {
-        try {
-            SearchRequest searchRequest = new SearchRequest(getIndex());
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            // Query
-            QueryBuilder query = QueryBuilders.boolQuery()
-                .filter(QueryBuilders
-                    .termsQuery(ElementJson.COMMITID, refsCommitIds)) //TODO respect term limit
-                .filter(QueryBuilders.termQuery(ElementJson.ID, nodeId))
-                .filter(QueryBuilders.rangeQuery(ElementJson.MODIFIED).lte(timestamp));
-            searchSourceBuilder.query(query);
-            searchSourceBuilder.sort(new FieldSortBuilder("_modified").order(SortOrder.DESC));
-            searchSourceBuilder.size(1);
-            searchRequest.source(searchSourceBuilder);
+        int count = 0;
+        ElementJson elementJson = newInstance();
+        while (count < refsCommitIds.size()) {
+            try {
+                List<String> sub = refsCommitIds.subList(count, Math.min(refsCommitIds.size(), count + this.termLimit));
+                SearchRequest searchRequest = new SearchRequest(getIndex());
+                SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+                // Query
+                QueryBuilder query = QueryBuilders.boolQuery()
+                    .filter(QueryBuilders
+                        .termsQuery(ElementJson.COMMITID, sub))
+                    .filter(QueryBuilders.termQuery(ElementJson.ID, nodeId))
+                    .filter(QueryBuilders.rangeQuery(ElementJson.MODIFIED).lte(timestamp));
+                searchSourceBuilder.query(query);
+                searchSourceBuilder.sort(new FieldSortBuilder("_modified").order(SortOrder.DESC));
+                searchSourceBuilder.size(1);
+                searchRequest.source(searchSourceBuilder);
 
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHit[] searchHits = searchResponse.getHits().getHits();
-            if (searchHits == null || searchHits.length < 1) {
-                return Optional.empty();
+                SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+                SearchHit[] searchHits = searchResponse.getHits().getHits();
+                if (searchHits != null && searchHits.length > 0) {
+                    elementJson.putAll(searchHits[0].getSourceAsMap());
+                }
+                count += this.termLimit;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            ElementJson e = newInstance();
-            e.putAll(searchHits[0].getSourceAsMap());
-            return Optional.of(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+        return Optional.of(elementJson);
     }
 
     @Override
