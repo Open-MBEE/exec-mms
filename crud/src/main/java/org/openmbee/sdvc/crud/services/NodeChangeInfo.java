@@ -10,7 +10,7 @@ import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.data.util.Pair;
 
-public class NodeChangeInfo extends NodeGetInfo{
+public class NodeChangeInfo extends NodeGetInfo {
 
     Map<String, Node> toSaveNodeMap;
 

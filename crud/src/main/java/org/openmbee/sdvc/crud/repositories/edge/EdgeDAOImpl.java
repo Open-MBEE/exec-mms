@@ -21,7 +21,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
     public Edge save(Edge edge) {
         String sql = String.format(INSERT_SQL, getSuffix());
 
-        getConnection().update(sql,
+        getConn().update(sql,
             edge.getEdgeType(),
             edge.getChild(),
             edge.getParent()
@@ -54,7 +54,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     public List<Edge> insertAll(List<Edge> edges) throws SQLException {
         //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
-        Connection rawConn = getConnection().getDataSource().getConnection();
+        Connection rawConn = getConn().getDataSource().getConnection();
         PreparedStatement ps = rawConn
             .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
         for (Edge e : edges) {
@@ -76,7 +76,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     public List<Edge> updateAll(List<Edge> edges) {
         String updateSql = String.format(UPDATE_SQL, getSuffix());
-        getConnection().batchUpdate(updateSql, new BatchPreparedStatementSetter() {
+        getConn().batchUpdate(updateSql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Edge e = edges.get(i);
@@ -96,7 +96,7 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
 
     public void deleteAll(List<Edge> edges) {
         String deleteSql = String.format("DELETE FROM edges%s WHERE id = ?", getSuffix());
-        getConnection().batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
+        getConn().batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Edge e = edges.get(i);
@@ -113,18 +113,18 @@ public class EdgeDAOImpl extends BaseDAOImpl implements EdgeDAO {
     @SuppressWarnings({"unchecked"})
     public List<Edge> findParents(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM edges%1$s WHERE child = (SELECT id FROM nodes%1$s WHERE sysmlid = ?)", getSuffix());
-        return (List<Edge>) getConnection().query(sql, new Object[]{sysmlId}, new EdgeRowMapper());
+        return (List<Edge>) getConn().query(sql, new Object[]{sysmlId}, new EdgeRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})
     public List<Edge> findChildren(String sysmlId, Integer et) {
         String sql = String.format("SELECT * FROM edges%1$s WHERE parent = (SELECT id FROM nodes%1$s WHERE sysmlid = ?)", getSuffix());
-        return (List<Edge>) getConnection().query(sql, new Object[]{sysmlId}, new EdgeRowMapper());
+        return (List<Edge>) getConn().query(sql, new Object[]{sysmlId}, new EdgeRowMapper());
     }
 
     @SuppressWarnings({"unchecked"})
     public List<Edge> findAll() {
         String sql = String.format("SELECT * FROM edges%s", getSuffix());
-        return (List<Edge>) getConnection().query(sql, new EdgeRowMapper());
+        return (List<Edge>) getConn().query(sql, new EdgeRowMapper());
     }
 }

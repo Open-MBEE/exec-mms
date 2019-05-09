@@ -33,7 +33,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         String sql = "INSERT INTO commits (commitType, creator, indexId, branchId, timestamp, comment) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        getConnection().update(new PreparedStatementCreator() {
+        getConn().update(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
@@ -58,7 +58,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     public Optional<Commit> findById(long id) {
         String sql = "SELECT * FROM commits WHERE id = ?";
 
-        List<Commit> l = getConnection()
+        List<Commit> l = getConn()
             .query(sql, new Object[]{id}, new CommitRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
 
@@ -67,7 +67,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     public Optional<Commit> findByCommitId(String commitId) {
         String sql = "SELECT * FROM commits WHERE indexid = ?";
 
-        List<Commit> l = getConnection()
+        List<Commit> l = getConn()
             .query(sql, new Object[]{commitId}, new CommitRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
 
@@ -75,7 +75,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
 
     public List<Commit> findAll() {
         String sql = "SELECT * FROM commits ORDER BY timestamp DESC";
-        return getConnection().query(sql, new CommitRowMapper());
+        return getConn().query(sql, new CommitRowMapper());
     }
 
     private List<Commit> findByRefAndLimit(String refId, Long cid, Instant timestamp, int limit) {
@@ -102,7 +102,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         final int commitColNum = commitCol;
         final int timestampColNum = timestampCol;
         final int limitColNum = limitCol;
-        return getConnection().query(new PreparedStatementCreator() {
+        return getConn().query(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
                 PreparedStatement ps = connection

@@ -25,6 +25,10 @@ import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 
 @Service("defaultNodeService")
@@ -140,8 +144,12 @@ public class DefaultNodeService implements NodeService {
         return response;
     }
 
+    @Transactional
     protected void commitChanges(NodeChangeInfo info) {
-        //TODO error and transaction handling needs work
+        //TODO: Test rollback on IndexDAO failure
+        TransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = this.nodeRepository.getTransactionManager().getTransaction(def);
+
         Map<String, Node> nodes = info.getToSaveNodeMap();
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
@@ -156,15 +164,10 @@ public class DefaultNodeService implements NodeService {
                     this.nodeIndex.indexAll(json.values());
                     this.edgeRepository.saveAll(edges);
                 }
+                this.nodeRepository.getTransactionManager().commit(status);
             } catch (SQLException e) {
                 logger.error("commitChanges error: ", e);
-                try { //TODO this should not be deleting things, at least not nodes
-                    //the catch should include the commit save
-                    this.edgeRepository.deleteAll(edges);
-                    this.nodeRepository.deleteAll(new ArrayList<>(nodes.values()));
-                } catch (SQLException ne) {
-                    logger.error("Error rolling back: ", ne);
-                }
+                this.nodeRepository.getTransactionManager().rollback(status);
                 throw new InternalErrorException("Error committing transaction");
             }
 

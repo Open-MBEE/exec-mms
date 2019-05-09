@@ -29,7 +29,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         if (node.getId() == null) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
-            getConnection().update(new PreparedStatementCreator() {
+            getConn().update(new PreparedStatementCreator() {
                 public PreparedStatement createPreparedStatement(Connection connection)
                     throws SQLException {
                     PreparedStatement ps = connection
@@ -41,7 +41,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
             node.setId(keyHolder.getKey().longValue());
         } else {
-            getConnection().update(new PreparedStatementCreator() {
+            getConn().update(new PreparedStatementCreator() {
                 public PreparedStatement createPreparedStatement(Connection connection)
                     throws SQLException {
                     PreparedStatement ps = connection
@@ -77,7 +77,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     public List<Node> insertAll(List<Node> nodes) throws SQLException {
         //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
-        Connection rawConn = getConnection().getDataSource().getConnection();
+        Connection rawConn = getConn().getDataSource().getConnection();
         PreparedStatement ps = rawConn
             .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
         for (Node n : nodes) {
@@ -97,7 +97,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     public List<Node> updateAll(List<Node> nodes) {
         String updateSql = String.format(UPDATE_SQL, getSuffix());
-        getConnection().batchUpdate(updateSql, new BatchPreparedStatementSetter() {
+        getConn().batchUpdate(updateSql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Node n = nodes.get(i);
@@ -114,7 +114,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     public void deleteAll(List<Node> nodes) {
         String deleteSql = String.format("DELETE FROM nodes%s WHERE id = ?", getSuffix());
-        getConnection().batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
+        getConn().batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setLong(1, nodes.get(i).getId());
@@ -131,7 +131,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
             getSuffix());
 
-        List<Node> l = getConnection()
+        List<Node> l = getConn()
             .query(sql, new Object[]{id}, new NodeRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
 
@@ -141,7 +141,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         String sql = String.format("SELECT * FROM nodes%s WHERE nodeid = ?",
             getSuffix());
 
-        List<Node> l = getConnection()
+        List<Node> l = getConn()
             .query(sql, new Object[]{nodeId}, new NodeRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
 
@@ -153,18 +153,18 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         }
         String sql = String.format("SELECT * FROM nodes%s WHERE nodeid IN (%s)",
             getSuffix(), "'" + String.join("','", ids) + "'");
-        return getConnection().query(sql, new NodeRowMapper());
+        return getConn().query(sql, new NodeRowMapper());
     }
 
     public List<Node> findAll() {
         String sql = String.format("SELECT * FROM nodes%s", getSuffix());
-        return getConnection().query(sql, new NodeRowMapper());
+        return getConn().query(sql, new NodeRowMapper());
     }
 
     public List<Node> findAllByDeleted(boolean deleted) {
         String sql = String.format("SELECT * FROM nodes%s WHERE deleted = ?",
             getSuffix());
-        return getConnection().query(sql, new Object[]{deleted}, new NodeRowMapper());
+        return getConn().query(sql, new Object[]{deleted}, new NodeRowMapper());
     }
 
     private PreparedStatement prepareStatement(PreparedStatement ps, Node n) throws SQLException {

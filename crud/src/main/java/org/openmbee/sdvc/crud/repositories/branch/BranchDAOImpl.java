@@ -44,7 +44,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
 */
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        getConnection().update(new PreparedStatementCreator() {
+        getConn().update(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
@@ -70,7 +70,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     public Optional<Branch> findById(long id) {
         String sql = "SELECT * FROM branches WHERE id = ?";
 
-        List<Branch> l = getConnection()
+        List<Branch> l = getConn()
             .query(sql, new Object[]{id}, new BranchRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
     }
@@ -78,7 +78,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     public Optional<Branch> findByBranchId(String branchId) {
         String sql = "SELECT * FROM branches WHERE branchId = ?";
 
-        List<Branch> l = getConnection()
+        List<Branch> l = getConn()
             .query(sql, new Object[]{branchId}, new BranchRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
     }
@@ -86,12 +86,12 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     public List<Branch> findAll() {
         String sql = "SELECT * FROM branches WHERE deleted = false";
 
-        return getConnection().query(sql, new BranchRowMapper());
+        return getConn().query(sql, new BranchRowMapper());
     }
 
     public void delete(Branch branch) {
         String sql = "UPDATE branches SET deleted = true WHERE branchId = ?";
 
-        getConnection().update(sql, branch.getBranchId());
+        getConn().update(sql, branch.getBranchId());
     }
 }

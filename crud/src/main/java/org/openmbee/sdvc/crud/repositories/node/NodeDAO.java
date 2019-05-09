@@ -4,11 +4,13 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import org.openmbee.sdvc.crud.repositories.BaseDAO;
 import org.openmbee.sdvc.data.domains.Node;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
-public interface NodeDAO {
+public interface NodeDAO extends BaseDAO {
 
     public Node save(Node node) throws InvalidDataAccessApiUsageException, DataRetrievalFailureException;
 

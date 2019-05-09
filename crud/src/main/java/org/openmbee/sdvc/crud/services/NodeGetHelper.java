@@ -3,6 +3,8 @@ package org.openmbee.sdvc.crud.services;
 import java.time.Instant;
 import java.util.*;
 
+import org.openmbee.sdvc.crud.config.ContextObject;
+import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
@@ -38,7 +40,8 @@ public class NodeGetHelper extends NodeOperation {
         }
 
         Optional<Commit> commit = commitRepository.findByCommitId(commitId);
-        if (!commit.isPresent()) { //TODO also if commitId is not part of current branch history?
+        Optional<Branch> currentBranch = branchRepository.findByBranchId(DbContextHolder.getContext().getBranchId());
+        if (!commit.isPresent() ) { //TODO also if commitId is not part of current branch history?
             throw new BadRequestException("commitId is invalid");
         }
         Instant time = commit.get().getTimestamp(); //time of commit
