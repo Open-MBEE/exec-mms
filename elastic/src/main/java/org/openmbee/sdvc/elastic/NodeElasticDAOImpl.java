@@ -121,7 +121,6 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
     public Optional<ElementJson> getElementLessThanOrEqualTimestamp(String nodeId,
         String timestamp, List<String> refsCommitIds) {
         int count = 0;
-        ElementJson elementJson = newInstance();
         while (count < refsCommitIds.size()) {
             try {
                 List<String> sub = refsCommitIds.subList(count, Math.min(refsCommitIds.size(), count + this.termLimit));
@@ -141,14 +140,16 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
                 SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
                 SearchHit[] searchHits = searchResponse.getHits().getHits();
                 if (searchHits != null && searchHits.length > 0) {
+                    ElementJson elementJson = newInstance();
                     elementJson.putAll(searchHits[0].getSourceAsMap());
+                    return Optional.of(elementJson);
                 }
                 count += this.termLimit;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.of(elementJson);
+        return Optional.empty();
     }
 
     @Override
