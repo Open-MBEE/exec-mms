@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableJpaAuditing
 @EnableJpaRepositories(
-    basePackages = {"org.openmbee.sdvc.core.domains", "org.openmbee.sdvc.core.repositories"},
+    basePackages = {"org.openmbee.sdvc.data.domains", "org.openmbee.sdvc.core.repositories"},
     entityManagerFactoryRef = "defaultEntityManager",
     transactionManagerRef = "defaultTransactionManager"
 )
@@ -45,7 +45,7 @@ public class PersistenceJPAConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(getDatasource());
         em.setPackagesToScan(
-            "org.openmbee.sdvc.core.domains",
+            "org.openmbee.sdvc.data.domains",
             "org.openmbee.sdvc.core.repositories"
         );
 

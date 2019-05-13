@@ -21,7 +21,7 @@ public class ElasticsearchConfig {
     public RestHighLevelClient restClient() {
         RestHighLevelClient client = new RestHighLevelClient(
             RestClient.builder(new HttpHost(elasticsearchHost, elasticsearchPort, elasticsearchHttp)));
-        // :TODO can pass other params to config here, like loading the schema..to be over thought later
+        // :TODO can pass other params to config here
         return client;
     }
 

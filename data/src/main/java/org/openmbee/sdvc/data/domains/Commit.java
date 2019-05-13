@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.domains;
+package org.openmbee.sdvc.data.domains;
 
 import java.io.Serializable;
 import java.time.Instant;

@@ -3,14 +3,16 @@ package org.openmbee.sdvc.crud.services;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.data.domains.Node;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,7 +21,7 @@ public class NodePostHelper extends NodeOperation {
     public static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public boolean isUpdated(BaseJson element, Map<String, Object> existing,
-        Map<String, Object> rejection) {
+                             Map<String, Object> rejection) {
 
         if (element.isPartialOf(existing)) {
             rejection.put("message", "Is Equivalent");
@@ -31,7 +33,7 @@ public class NodePostHelper extends NodeOperation {
     }
 
     public boolean diffUpdateJson(BaseJson element, Map<String, Object> existing,
-        Map<String, Object> rejection) {
+                                  Map<String, Object> rejection) {
 
         String jsonModified = element.getModified();
         Object existingModified = existing.get(BaseJson.MODIFIED);
@@ -55,7 +57,7 @@ public class NodePostHelper extends NodeOperation {
 
     // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
     public NodeChangeInfo processPostJson(List<ElementJson> elements, boolean overwriteJson,
-        CommitJson cmjs, NodeService service) {
+                                          CommitJson cmjs, NodeService service) {
 
         NodeChangeInfo info = initInfo(elements, cmjs);
 
@@ -64,18 +66,18 @@ public class NodePostHelper extends NodeOperation {
             if (element == null) {
                 continue;
             }
-            ElementsResponse rejected = new ElementsResponse();
+            Map<String, Object> rejected = new HashMap<>();
             boolean added = false;
             boolean updated = false;
             if (element.getId() == null || element.getId().isEmpty()) {
-                rejected.addMessage("Missing ID");
-                rejected.setCode(400);
+                rejected.put("message", "Missing ID");
+                rejected.put("code", 400);
                 rejected.put("element", element);
             } else {
                 Map<String, Object> elasticElement = info.getExistingElementMap()
                     .get(element.getId());
-
-                if (!info.getExistingNodeMap().containsKey(element.getId())) {
+                Node n = info.getExistingNodeMap().get(element.getId());
+                if (n == null) {
                     added = true;
                 } else if (elasticElement == null) {
                     continue; //TODO this should be an error - the db has entry but elastic doesn't, reject 500?
@@ -83,7 +85,7 @@ public class NodePostHelper extends NodeOperation {
 
                 if (!added) {
                     if (!overwriteJson) {
-                        if (isUpdated(element, elasticElement, rejected)) {
+                        if (n.isDeleted() || isUpdated(element, elasticElement, rejected)) {
                             updated = diffUpdateJson(element, elasticElement, rejected);
                         }
                     } else {
@@ -92,7 +94,7 @@ public class NodePostHelper extends NodeOperation {
                 }
             }
 
-// create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
+            // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
             if (added) {
                 Node node = new Node();
                 processElementAdded(element, node, info.getCommitJson());

@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.domains;
+package org.openmbee.sdvc.data.domains;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

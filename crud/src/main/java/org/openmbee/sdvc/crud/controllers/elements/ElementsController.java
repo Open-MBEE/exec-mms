@@ -5,6 +5,7 @@ import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.crud.exceptions.DeletedException;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.exceptions.NotModifiedException;
 import org.openmbee.sdvc.crud.services.NodeService;
@@ -32,6 +33,9 @@ public class ElementsController extends BaseController {
 
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
+        if (elementId != null) {
+            handleSingleResponse(res);
+        }
         return ResponseEntity.ok(res);
     }
 
@@ -75,18 +79,7 @@ public class ElementsController extends BaseController {
         @PathVariable String elementId) {
 
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId);
-        if (res.getElements().isEmpty() && !res.isEmpty()) {
-            List<Map<String, Object>> rejected = (List<Map<String, Object>>) res.get("rejected");
-            Integer code = (Integer) rejected.get(1).get("code");
-            switch(code) {
-                case 304:
-                    throw new NotModifiedException(res);
-                case 404:
-                    throw new NotFoundException(new ElementsResponse().addMessage("Not found."));
-                default:
-                    break;
-            }
-        }
+        handleSingleResponse(res);
         return ResponseEntity.ok(res);
     }
 
@@ -101,6 +94,23 @@ public class ElementsController extends BaseController {
     }
 
     private NodeService getNodeService(String projectId) {
-        return serviceFactory.getNodeService("cameo");
+        return serviceFactory.getNodeService(this.getProjectType(projectId));
+    }
+
+    private void handleSingleResponse(ElementsResponse res) {
+        if (res.getElements().isEmpty() && !res.isEmpty()) {
+            List<Map<String, Object>> rejected = (List<Map<String, Object>>) res.get("rejected");
+            Integer code = (Integer) rejected.get(0).get("code");
+            switch(code) {
+                case 304:
+                    throw new NotModifiedException(res);
+                case 404:
+                    throw new NotFoundException(res);
+                case 410:
+                    throw new DeletedException(res);
+                default:
+                    break;
+            }
+        }
     }
 }

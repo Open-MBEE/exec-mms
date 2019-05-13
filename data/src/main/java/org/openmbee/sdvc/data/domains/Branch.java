@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.domains;
+package org.openmbee.sdvc.data.domains;
 
 import java.time.Instant;
 import javax.persistence.Column;

@@ -1,0 +1,1416 @@
+{
+	"info": {
+		"_postman_id": "efd8b2a0-797e-4632-acd1-b99b8950b567",
+		"name": "sdvc",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "add org a",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+						"exec": [
+							"pm.test(\"response has org a\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('a');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"a\",\n\t\t\t\"name\": \"a\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add project aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project aa\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add elements to aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId2\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated1\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update x and y",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1a4df438-4092-43c5-b3cf-ce0647140aa8",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(2);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId3\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated2\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\",\n\t\t\t\"name\": \"updated2\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update z",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c9c64c9a-2f97-41aa-9b61-8dfa7df1cee6",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId4\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated3\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check ref commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "08c416fb-fd43-44be-85e9-4ab831b31800",
+						"exec": [
+							"pm.test(\"response has 4 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(4);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId4\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check x commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e06d4d29-5e1a-4dd9-89b4-9dd91e289c5c",
+						"exec": [
+							"pm.test(\"response has 3 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(3);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements/x/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check y commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8f686089-594f-4343-ad14-290b61243afc",
+						"exec": [
+							"pm.test(\"response has 2 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements/y/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements",
+						"y",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check z commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c062a254-95ba-4c37-884a-c4adf8b7c46b",
+						"exec": [
+							"pm.test(\"response has 2 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId4\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements/z/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements",
+						"z",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check first commit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7923d947-3a8f-40c0-8d6b-4d6e69ae7f50",
+						"exec": [
+							"pm.test(\"first commit has 3 added\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].added.length).to.eql(3);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/commits/{{commitId1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"commits",
+						"{{commitId1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get elements at second update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+						"exec": [
+							"pm.test(\"elements have expected names\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    for (var e in jsonData.elements) {",
+							"        var el = jsonData.elements[e];",
+							"        if (el.id == 'x') {",
+							"            pm.expect(el.name == 'updated2');",
+							"        }",
+							"        if (el.id == 'y') {",
+							"            pm.expect(el.name == 'updated2');",
+							"        }",
+							"        if (el.id == 'z') {",
+							"            pm.expect(el.name == 'z');",
+							"        }",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements?commitId={{commitId3}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					],
+					"query": [
+						{
+							"key": "commitId",
+							"value": "{{commitId3}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch a",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+						"exec": [
+							"pm.test(\"branch created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.refs[0].id).to.eql('refa');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"refa\",\n\t\t\t\"name\": \"refa\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check inRefIds",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update x and y on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ca83fd4-0bcb-481d-a1d7-4feab4d6ae3d",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(2);",
+							"});",
+							"",
+							"pm.environment.set(\"commitXYRef\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated4\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\",\n\t\t\t\"name\": \"updated4\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update z on refa and add element q",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "608a9690-7b33-4dda-aa87-9199c02b5a31",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(2);",
+							"});",
+							"",
+							"pm.environment.set(\"commitZQRef\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated5\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"q\",\n\t\t\t\"name\": \"q\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update z on master and add element p",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c004393d-091c-4cd4-bc63-b32ccb3838e9",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(2);",
+							"});",
+							"",
+							"pm.environment.set(\"commitZP\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated6\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"p\",\n\t\t\t\"name\": \"p\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check master commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bf3f6bfe-c4c4-48a5-89e8-9839be53ba2b",
+						"exec": [
+							"pm.test(\"response has 5 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(5);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZP\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId4\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[4].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check refa commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9042a69c-9d45-4878-8dd9-6a7993bb2058",
+						"exec": [
+							"pm.test(\"response has 6 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(6);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZQRef\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitXYRef\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId4\"))",
+							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[4].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[5].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check x commit history on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "af87dbd2-808e-44b7-801b-75d04c79e791",
+						"exec": [
+							"pm.test(\"response has 3 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(4);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitXYRef\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements/x/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements",
+						"x",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check y commit history on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "92012bbb-f303-48bc-8e6a-e7dd3073c999",
+						"exec": [
+							"pm.test(\"response has 3 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(3);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitXYRef\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements/y/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements",
+						"y",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check z commit history on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "294bbde7-b077-44d0-af00-f11588bfec2c",
+						"exec": [
+							"pm.test(\"response has 3 commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(3);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZQRef\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId4\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements/z/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements",
+						"z",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get latest elements at refa",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get latest elements at master",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get mix of elements at master with missing",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get mix of elements at refa with commit",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}, {\n\t\t\t\"id\": \"p\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements?commitId={{commitXYRef}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements"
+					],
+					"query": [
+						{
+							"key": "commitId",
+							"value": "{{commitXYRef}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete x on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b2d1932-f6fc-44d3-a6b4-95ff3e70e133",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get x on refa deleted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b98c448a-1fae-42b9-951d-dc51fddf0647",
+						"exec": [
+							"pm.test(\"Status code is 410\", function () {",
+							"    pm.response.to.have.status(410);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "resurrect x on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "853ac58c-b184-47cd-929a-83fecb433a9a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has element\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated4\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get resurrected x on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "853ac58c-b184-47cd-929a-83fecb433a9a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response has element\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add ownerId for cameo element on refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4e1dd6d-61b6-4f4a-affe-943e3f7a1c9c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated7\",\n\t\t\t\"ownerId\": \"z\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

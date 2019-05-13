@@ -8,10 +8,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.openmbee.sdvc.crud.domains.Branch;
-import org.openmbee.sdvc.crud.domains.Commit;
-import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
+
 import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.data.domains.Branch;
+import org.openmbee.sdvc.data.domains.Commit;
+import org.openmbee.sdvc.crud.repositories.BaseDAOImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -32,7 +33,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         String sql = "INSERT INTO commits (commitType, creator, indexId, branchId, timestamp, comment) VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        getConnection().update(new PreparedStatementCreator() {
+        getConn().update(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
@@ -57,7 +58,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     public Optional<Commit> findById(long id) {
         String sql = "SELECT * FROM commits WHERE id = ?";
 
-        List<Commit> l = getConnection()
+        List<Commit> l = getConn()
             .query(sql, new Object[]{id}, new CommitRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
 
@@ -66,53 +67,15 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     public Optional<Commit> findByCommitId(String commitId) {
         String sql = "SELECT * FROM commits WHERE indexid = ?";
 
-        List<Commit> l = getConnection()
+        List<Commit> l = getConn()
             .query(sql, new Object[]{commitId}, new CommitRowMapper());
         return l.isEmpty() ? Optional.empty() : Optional.of(l.get(0));
 
     }
 
-    public Optional<Commit> findByRefAndTimestamp(String refId, Instant timestamp) {
-        List<Commit> res = findByRefAndTimestampAndLimit(refId, timestamp, 1);
-        if (!res.isEmpty()) {
-            return Optional.of(res.get(0));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<Commit> findLatestByRef(String refId) {
-        List<Commit> res = findByRefAndTimestampAndLimit(refId, null, 1);
-        if (!res.isEmpty()) {
-            return Optional.of(res.get(0));
-        }
-        return Optional.empty();
-    }
-
     public List<Commit> findAll() {
         String sql = "SELECT * FROM commits ORDER BY timestamp DESC";
-        return getConnection().query(sql, new CommitRowMapper());
-    }
-
-    //TODO should this be here or in service instead, this introduces dependency to branch dao
-    public List<Commit> findByRefAndTimestampAndLimit(String refId, Instant timestamp, int limit) {
-        List<Commit> commits = new ArrayList<>();
-        String currentRef = refId;
-        Long currentCid = 0L;
-        while (currentRef != null && (commits.size() < limit || limit == 0)) {
-            int currentLimit = limit == 0 ? 0 : limit - commits.size();
-            List<Commit> next = findByRefAndLimit(currentRef, currentCid, timestamp, currentLimit);
-            commits.addAll(next);
-            Optional<Branch> ref = branchRepository.findByBranchId(currentRef);
-            if (ref.isPresent()) {
-                currentRef = ref.get().getParentRefId();
-                currentCid = ref.get().getParentCommit();
-            }
-
-            if (currentRef != null && currentRef.equals("")) {
-                currentRef = null;
-            }
-        }
-        return commits;
+        return getConn().query(sql, new CommitRowMapper());
     }
 
     private List<Commit> findByRefAndLimit(String refId, Long cid, Instant timestamp, int limit) {
@@ -135,12 +98,11 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         if (limit != 0) {
             query.append(" LIMIT ?");
             limitCol = currentExtraCol;
-            currentExtraCol++;
         }
         final int commitColNum = commitCol;
         final int timestampColNum = timestampCol;
         final int limitColNum = limitCol;
-        return getConnection().query(new PreparedStatementCreator() {
+        return getConn().query(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
                 PreparedStatement ps = connection
@@ -160,4 +122,39 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         }, new CommitRowMapper());
     }
 
+    public Optional<Commit> findLatestByRef(Branch ref) {
+        return findByRefAndTimestamp(ref, null);
+    }
+
+    public Optional<Commit> findByRefAndTimestamp(Branch ref, Instant timestamp) {
+        List<Commit> res = findByRefAndTimestampAndLimit(ref, timestamp, 1);
+        if (!res.isEmpty()) {
+            return Optional.of(res.get(0));
+        }
+        return Optional.empty();
+    }
+
+    public List<Commit> findByRefAndTimestampAndLimit(Branch ref, Instant timestamp, int limit) {
+        List<Commit> commits = new ArrayList<>();
+        String currentRef = ref.getBranchId();
+        Long currentCid = 0L;
+        while (currentRef != null && (commits.size() < limit || limit == 0)) {
+            int currentLimit = limit == 0 ? 0 : limit - commits.size();
+            List<Commit> next = findByRefAndLimit(currentRef, currentCid, timestamp, currentLimit);
+            commits.addAll(next);
+
+            currentRef = ref.getParentRefId();
+            currentCid = ref.getParentCommit();
+
+            if (currentRef == null) {
+                break;
+            }
+            Optional<Branch> parent = branchRepository.findByBranchId(currentRef);
+            if (!parent.isPresent()) {
+                break; //this is actually inconsistent data and should be error?
+            }
+            ref = parent.get();
+        }
+        return commits;
+    }
 }

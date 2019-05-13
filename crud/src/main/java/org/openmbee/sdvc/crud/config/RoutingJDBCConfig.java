@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
-import org.openmbee.sdvc.core.domains.Project;
+import org.openmbee.sdvc.data.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class RoutingJDBCConfig {
@@ -60,5 +62,10 @@ public class RoutingJDBCConfig {
         }
 
         return targetDataSources;
+    }
+
+    @Bean(name = "crudTransactionManager")
+    public PlatformTransactionManager defaultTransactionManager() {
+        return new JpaTransactionManager();
     }
 }

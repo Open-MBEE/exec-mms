@@ -1,18 +1,21 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
-import org.openmbee.sdvc.crud.domains.Commit;
-import org.openmbee.sdvc.crud.domains.CommitType;
-import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
+import org.openmbee.sdvc.data.domains.Commit;
+import org.openmbee.sdvc.data.domains.CommitType;
+import org.openmbee.sdvc.data.domains.Edge;
+import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
 import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
@@ -22,6 +25,10 @@ import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 
 @Service("defaultNodeService")
@@ -91,12 +98,13 @@ public class DefaultNodeService implements NodeService {
             return read(projectId, refId, req, params);
 
         } else {
-//            If no id is provided, return all
+            // If no id is provided, return all
             logger.debug("No ElementId given");
             DbContextHolder.setContext(projectId, refId);
 
             ElementsResponse response = new ElementsResponse();
-            response.getElements().addAll(nodeGetHelper.processGetAll());
+            String commitId = params.getOrDefault("commitId", null);
+            response.getElements().addAll(nodeGetHelper.processGetAll(commitId));
             return response;
         }
     }
@@ -105,17 +113,11 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, ElementsRequest req,
         Map<String, String> params) {
 
-//        TODO get element at commit
-//         params commit it read element at a commit id
-//        find a specific element at a commit
-//        commit DB and if element was actually edited at that commit - read element
-//        otherwise read timestamp of commit - find element before timestamp
-//        read all the commits in ref and search elastic for all the elements (for that specific) sorted by time and check
-//        check if current state of element and if timestamp is less then pass that version
+        String commitId = params.getOrDefault("commitId", null);
         DbContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
 
-        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements());
+        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId);
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
@@ -134,30 +136,41 @@ public class DefaultNodeService implements NodeService {
             .processPostJson(req.getElements(), overwriteJson,
                 createCommit("admin", refId, projectId, req), this);
 
-        try {
-            commitChanges(info);
-        } catch (Exception e) {
-            //TODO db transaction
-        }
+        commitChanges(info);
+
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
         response.setRejected(info.getRejected());
         return response;
     }
 
+    @Transactional
     protected void commitChanges(NodeChangeInfo info) {
+        //TODO: Test rollback on IndexDAO failure
+        TransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = this.nodeRepository.getTransactionManager().getTransaction(def);
+
         Map<String, Node> nodes = info.getToSaveNodeMap();
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
         Instant now = info.getNow();
-
+        List<Edge> edges = null;
         if (!nodes.isEmpty()) {
-            this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
-            if (json != null && !json.isEmpty()) {
-                this.nodeIndex.indexAll(json.values());
-                List<Edge> edges = nodePostHelper.getEdgesToSave(info);
-                this.edgeRepository.saveAll(edges);
+            try {
+                this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
+                if (json != null && !json.isEmpty()) {
+                    //edges needed nodes to save first in order to get id
+                    edges = nodePostHelper.getEdgesToSave(info);
+                    this.nodeIndex.indexAll(json.values());
+                    this.edgeRepository.saveAll(edges);
+                }
+                this.nodeRepository.getTransactionManager().commit(status);
+            } catch (SQLException e) {
+                logger.error("commitChanges error: ", e);
+                this.nodeRepository.getTransactionManager().rollback(status);
+                throw new InternalErrorException("Error committing transaction");
             }
+
             this.nodeIndex.removeFromRef(info.getOldIndexIds());
 
             Commit commit = new Commit();
@@ -204,13 +217,10 @@ public class DefaultNodeService implements NodeService {
         NodeChangeInfo info = nodeDeleteHelper
             .processDeleteJson(req.getElements(), createCommit("admin", refId, projectId, req),
                 this);
-
-        try {
-            commitChanges(info);
-        } catch (Exception e) {
-            //TODO db transaction
-        }
         ElementsResponse response = new ElementsResponse();
+
+        commitChanges(info);
+
         response.getElements().addAll(info.getDeletedMap().values());
         response.setRejected(info.getRejected());
         return response;

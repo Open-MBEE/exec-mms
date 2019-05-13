@@ -26,14 +26,13 @@ import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
-    @Value("${elastic.limit.result}")
+    @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
-    @Value("${elastic.limit.term}")
+    @Value("${elasticsearch.limit.term}")
     protected int termLimit;
     protected static int readTimeout = 1000000000;
     protected final String type = "_doc";
     protected RestHighLevelClient client;
-    // :TODO save, saveAll --> updates have details of upsert method, should break out into helper method for create/update
 
     @Autowired
     public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
@@ -45,15 +44,6 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     }
 
     protected abstract E newInstance();
-
-    public long count() {
-        // Returns the number of entities available.
-        return 0;
-    }
-
-    public void delete(BaseJson json) {
-        // :TODO deletes by entity
-    }
 
     public void deleteById(String index, String indexId) {
         try {
@@ -84,11 +74,6 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public List<E> findAll() {
-        //:TODO Returns all instances of the type.  Returns all entities. So not the elasticID
-        return null;
     }
 
     public Optional<E> findById(String index, String indexId) {

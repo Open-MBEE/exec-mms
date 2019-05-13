@@ -3,7 +3,7 @@ package org.openmbee.sdvc.crud.services;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 
 public class NodeGetInfo {

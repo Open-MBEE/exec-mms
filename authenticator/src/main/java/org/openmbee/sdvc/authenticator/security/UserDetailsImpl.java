@@ -2,9 +2,9 @@ package org.openmbee.sdvc.authenticator.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.openmbee.sdvc.core.domains.Privilege;
-import org.openmbee.sdvc.core.domains.Role;
-import org.openmbee.sdvc.core.domains.User;
+import org.openmbee.sdvc.data.domains.Privilege;
+import org.openmbee.sdvc.data.domains.Role;
+import org.openmbee.sdvc.data.domains.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

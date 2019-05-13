@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -10,11 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
+import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.crud.controllers.commits.CommitsRequest;
 import org.openmbee.sdvc.crud.controllers.commits.CommitsResponse;
-import org.openmbee.sdvc.crud.domains.Commit;
+import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,16 @@ public class CommitService {
     public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private CommitDAO commitRepository;
     private CommitIndexDAO commitIndex;
+    private BranchDAO branchRepository;
 
     @Autowired
     public void setCommitDao(CommitDAO commitDao) {
         this.commitRepository = commitDao;
+    }
+
+    @Autowired
+    public void setBranchRepository(BranchDAO branchRepository) {
+        this.branchRepository = branchRepository;
     }
 
     @Autowired
@@ -52,18 +61,27 @@ public class CommitService {
                 e.printStackTrace();
             }
         }
-        List<Commit> commits = commitRepository
-            .findByRefAndTimestampAndLimit(refId, timestamp, limit);
-        CommitsResponse res = new CommitsResponse();
+        Optional<Branch> ref = branchRepository.findByBranchId(refId);
         List<CommitJson> resJson = new ArrayList<>();
-        for (Commit c : commits) {
-            CommitJson json = new CommitJson();
-            json.setCreated(c.getTimestamp().toString());
-            json.setCreator(c.getCreator());
-            json.setId(c.getIndexId());
-            json.setComment(c.getComment());
-            resJson.add(json);
-        }
+        CommitsResponse res = new CommitsResponse();
+
+        int finalLimit = limit;
+        Instant finalTimestamp = timestamp;
+
+        ref.ifPresentOrElse(commit -> {
+            List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(commit, finalTimestamp, finalLimit);
+            for (Commit c : commits) {
+                CommitJson json = new CommitJson();
+                json.setCreated(c.getTimestamp().toString());
+                json.setCreator(c.getCreator());
+                json.setId(c.getIndexId());
+                json.setComment(c.getComment());
+                resJson.add(json);
+            }
+        }, () -> {
+            throw new NotFoundException("Branch not found");
+        });
+
         res.setCommits(resJson);
         return res;
     }
@@ -90,8 +108,11 @@ public class CommitService {
         DbContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
-            List<Commit> refCommits = commitRepository
-                .findByRefAndTimestampAndLimit(refId, null, 0);
+            Optional<Branch> ref = branchRepository.findByBranchId(refId);
+            if (!ref.isPresent()) {
+                throw new NotFoundException("Branch not found");
+            }
+            List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
             Set<String> commitIds = new HashSet<>();
             for (Commit commit: refCommits) {
                 commitIds.add(commit.getIndexId());

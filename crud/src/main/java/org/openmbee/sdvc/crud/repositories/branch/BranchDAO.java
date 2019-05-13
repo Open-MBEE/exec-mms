@@ -2,7 +2,7 @@ package org.openmbee.sdvc.crud.repositories.branch;
 
 import java.util.List;
 import java.util.Optional;
-import org.openmbee.sdvc.crud.domains.Branch;
+import org.openmbee.sdvc.data.domains.Branch;
 
 public interface BranchDAO {
 

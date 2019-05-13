@@ -39,7 +39,7 @@ TBA
 
 ## Built With
 
-* [SpringBoot](https://spring.io/projects/spring-boot) - The web framework used
+* [Spring](https://spring.io)
 
 
 ## Contributing

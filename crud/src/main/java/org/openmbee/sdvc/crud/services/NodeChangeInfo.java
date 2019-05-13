@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.data.util.Pair;
 
-public class NodeChangeInfo extends NodeGetInfo{
+public class NodeChangeInfo extends NodeGetInfo {
 
     Map<String, Node> toSaveNodeMap;
 

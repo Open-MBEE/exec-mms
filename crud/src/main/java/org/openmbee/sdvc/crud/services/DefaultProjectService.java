@@ -4,8 +4,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.core.domains.Organization;
-import org.openmbee.sdvc.core.domains.Project;
+import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
+import org.openmbee.sdvc.data.domains.Organization;
+import org.openmbee.sdvc.data.domains.Project;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
@@ -59,11 +60,12 @@ public class DefaultProjectService implements ProjectService {
         proj.setProjectId(project.getId());
         proj.setProjectName(project.getName());
         proj.setOrganization(org.get());
+        proj.setProjectType(project.getProjectType());
         Project saved = projectRepository.save(proj);
 
         try {
             if (projectOperations.createProjectDatabase(proj)) {
-                projectIndex.create(proj.getProjectId());
+                projectIndex.create(proj.getProjectId(), project.getProjectType());
                 return project;
             }
         } catch (SQLException sqlException) {
@@ -74,7 +76,7 @@ public class DefaultProjectService implements ProjectService {
             logger.error("Couldn't create database: {}", project.getProjectId());
             logger.error(e);
         }
-        return null; //TODO throw exception
+        throw new InternalErrorException("Could not create project");
     }
 
     public ProjectJson update(ProjectJson project) {
@@ -87,12 +89,14 @@ public class DefaultProjectService implements ProjectService {
                 Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
                 if (org.isPresent() && !org.get().getOrganizationId().isEmpty()) {
                     proj.setOrganization(org.get());
-                } //TODO else reject?
+                } else {
+                    throw new BadRequestException("Invalid organization");
+                }
             }
             projectRepository.save(proj);
             return project;
         }
-        return null;
+        throw new InternalErrorException("Could not update project");
     }
 
     public ProjectsResponse read(String projectId) {

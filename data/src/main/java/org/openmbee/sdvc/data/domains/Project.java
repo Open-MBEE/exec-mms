@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.domains;
+package org.openmbee.sdvc.data.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -24,6 +24,9 @@ public class Project extends Base {
     @JsonProperty("id")
     @Column(unique = true)
     private String projectId;
+
+    @JsonProperty("projectType")
+    private String projectType;
 
     private String connectionString;
 
@@ -73,6 +76,14 @@ public class Project extends Base {
 
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    public String getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(String projectType) {
+        this.projectType = projectType;
     }
 
     public Collection<UsersProjects> getUsers() {

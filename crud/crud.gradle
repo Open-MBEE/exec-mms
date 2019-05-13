@@ -3,5 +3,4 @@ apply plugin: 'io.spring.convention.spring-module'
 dependencies {
     compile project(':core')
     compile project(':json')
-    compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.8.RELEASE'
 }

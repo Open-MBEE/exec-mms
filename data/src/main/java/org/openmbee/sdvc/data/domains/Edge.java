@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.domains;
+package org.openmbee.sdvc.data.domains;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,18 +14,24 @@ import javax.persistence.Table;
 @Table(name = "edges")
 public class Edge {
 
+    public Edge() {
+    }
+
+    public Edge(long id, long parent, long child, int edgeType) {
+        setId(id);
+        setParent(parent);
+        setChild(child);
+        setEdgeType(edgeType);
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL)
-    private Node parent;
+    private Long parent;
 
-    @ManyToOne(fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL)
-    private Node child;
+    private Long child;
 
     @Column(columnDefinition = "smallint")
     private Integer edgeType;
@@ -38,19 +44,19 @@ public class Edge {
         this.id = id;
     }
 
-    public Node getParent() {
+    public Long getParent() {
         return parent;
     }
 
-    public void setParent(Node parent) {
+    public void setParent(Long parent) {
         this.parent = parent;
     }
 
-    public Node getChild() {
+    public Long getChild() {
         return child;
     }
 
-    public void setChild(Node child) {
+    public void setChild(Long child) {
         this.child = child;
     }
 

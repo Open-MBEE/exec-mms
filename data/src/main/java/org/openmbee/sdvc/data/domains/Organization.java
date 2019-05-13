@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.domains;
+package org.openmbee.sdvc.data.domains;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;

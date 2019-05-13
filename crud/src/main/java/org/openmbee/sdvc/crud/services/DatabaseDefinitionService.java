@@ -18,21 +18,25 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
-import org.openmbee.sdvc.core.domains.Project;
+import org.openmbee.sdvc.data.domains.Project;
 import org.openmbee.sdvc.crud.config.CurrentTenantIdentifierResolverImpl;
 import org.openmbee.sdvc.crud.config.DataSourceBasedMultiTenantConnectionProviderImpl;
 import org.openmbee.sdvc.crud.config.DbContextHolder;
-import org.openmbee.sdvc.crud.domains.Branch;
-import org.openmbee.sdvc.crud.domains.Commit;
-import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.EdgeType;
-import org.openmbee.sdvc.crud.domains.Node;
-import org.openmbee.sdvc.crud.domains.NodeType;
+import org.openmbee.sdvc.crud.repositories.edge.EdgeRowMapper;
+import org.openmbee.sdvc.crud.repositories.node.NodeRowMapper;
+import org.openmbee.sdvc.data.domains.Branch;
+import org.openmbee.sdvc.data.domains.Commit;
+import org.openmbee.sdvc.data.domains.Edge;
+import org.openmbee.sdvc.data.domains.EdgeType;
+import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -245,7 +249,6 @@ public class DatabaseDefinitionService {
     }
 
     public void copyTablesFromParent(String target, String parent, String parentCommit) {
-        //TODO target and parent are not sanitized
         if (parentCommit != null) {
             return;
         }
@@ -267,9 +270,13 @@ public class DatabaseDefinitionService {
 
         jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
         jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
+        //copyTables(jdbcTemplate, COPY_SQL, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
+        //copyTables(jdbcTemplate, COPY_SQL, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
 
         jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
         jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
+        //copyTables(jdbcTemplate, COPY_IDX, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
+        //copyTables(jdbcTemplate, COPY_IDX, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
 
         jdbcTemplate.execute("COMMIT");
     }
@@ -296,5 +303,15 @@ public class DatabaseDefinitionService {
             "org.openmbee.sdvc.crud.config.SuffixedPhysicalNamingStrategy");
 
         return properties;
+    }
+
+    private void copyTables(JdbcTemplate jdbcTemplate, String sql, String target, String parent, RowMapper<?> rowMapper) {
+        jdbcTemplate.query(sql, new PreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+                ps.setString(1, target);
+                ps.setString(2, parent);
+            }
+        }, rowMapper);
     }
 }

@@ -12,8 +12,10 @@ import java.util.Set;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.crud.domains.Edge;
-import org.openmbee.sdvc.crud.domains.Node;
+import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
+import org.openmbee.sdvc.data.domains.Edge;
+import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
 import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
 import org.openmbee.sdvc.json.BaseJson;
@@ -29,6 +31,9 @@ public class NodeOperation {
     protected final Logger logger = LogManager.getLogger(getClass());
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
+    protected CommitDAO commitRepository;
+    protected BranchDAO branchRepository;
+
     protected DateTimeFormatter formatter = DateTimeFormatter
         .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZone(
             ZoneId.systemDefault());
@@ -41,6 +46,16 @@ public class NodeOperation {
     @Autowired
     public void setNodeIndex(NodeIndexDAO nodeIndex) {
         this.nodeIndex = nodeIndex;
+    }
+
+    @Autowired
+    public void setCommitRepository(CommitDAO commitRepository) {
+        this.commitRepository = commitRepository;
+    }
+
+    @Autowired
+    public void setBranchRepository(BranchDAO branchRepository) {
+        this.branchRepository = branchRepository;
     }
 
     public void initCommitJson(CommitJson cmjs, Instant now) {
@@ -102,11 +117,7 @@ public class NodeOperation {
         cmjs.getAdded().add(newObj);
 
         n.setNodeId(e.getId());
-        n.setIndexId(e.getIndexId());
-        n.setLastCommit(cmjs.getId());
         n.setInitialCommit(e.getIndexId());
-        n.setNodeType(0);
-        n.setDeleted(false);
     }
 
     public void processElementUpdated(ElementJson e, Node n, CommitJson cmjs) {
@@ -118,11 +129,6 @@ public class NodeOperation {
         newObj.put(BaseJson.INDEXID, e.getIndexId());
         newObj.put(BaseJson.ID, e.getId());
         cmjs.getUpdated().add(newObj);
-
-        n.setIndexId(e.getIndexId());
-        n.setLastCommit(cmjs.getId());
-        n.setNodeType(0);
-        n.setDeleted(false);
     }
 
     public void processElementAddedOrUpdated(ElementJson e, Node n, CommitJson cmjs) {
@@ -136,6 +142,11 @@ public class NodeOperation {
         e.setCommitId(cmjs.getId());
         e.setModified(cmjs.getCreated());
         e.setModifier(cmjs.getCreator());
+
+        n.setIndexId(e.getIndexId());
+        n.setLastCommit(cmjs.getId());
+        n.setDeleted(false);
+        n.setNodeType(0);
     }
 
     public void processElementDeleted(ElementJson e, Node n, CommitJson cmjs) {
@@ -174,11 +185,10 @@ public class NodeOperation {
                     continue; //TODO error or specific remedy?
                 }
                 Edge e = new Edge();
-                e.setParent(parent);
-                e.setChild(child);
+                e.setParent(parent.getId());
+                e.setChild(child.getId());
                 e.setEdgeType(entry.getKey());
                 res.add(e); //TODO there's currently no unique constraint on parent child pair,
-                //TODO duplicate relationships
             }
         }
         return res;
@@ -186,16 +196,19 @@ public class NodeOperation {
 
     public boolean existingNodeContainsNodeId(NodeGetInfo info, String nodeId) {
         if (!info.getExistingNodeMap().containsKey(nodeId)) {
-            Map<String, Object> reject = new HashMap<>();
-            reject.put("code", 404);
-            reject.put("message", "not found");
-            reject.put("id", nodeId);
-            info.getRejected().add(reject);
+            rejectNotFound(info, nodeId);
             return false;
         }
         return true;
     }
 
+    protected void rejectNotFound(NodeGetInfo info, String nodeId) {
+        Map<String, Object> reject = new HashMap<>();
+        reject.put("code", 404);
+        reject.put("message", "not found");
+        reject.put("id", nodeId);
+        info.getRejected().add(reject);
+    }
 
     public static Map<String, ElementJson> convertJsonToMap(
         List<ElementJson> elements) {

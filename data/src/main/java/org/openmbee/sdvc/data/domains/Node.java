@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.domains;
+package org.openmbee.sdvc.data.domains;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
