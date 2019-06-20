@@ -20,6 +20,7 @@ dependencies {
         project(':ldap'),
         project(':cameo'),
         project(':elastic'),
+        project(':jupyter'),
         'org.springframework.boot:spring-boot-starter-web',
         'org.postgresql:postgresql:42.2.5',
         'io.springfox:springfox-swagger2:2.9.2',
