@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.crud.exceptions.DeletedException;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.exceptions.NotModifiedException;
@@ -65,6 +66,8 @@ public abstract class BaseController {
             switch(code) {
                 case 304:
                     throw new NotModifiedException(res);
+                case 400:
+                    throw new BadRequestException(res);
                 case 404:
                     throw new NotFoundException(res);
                 case 410:

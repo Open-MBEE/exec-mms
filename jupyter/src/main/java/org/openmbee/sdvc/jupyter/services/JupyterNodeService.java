@@ -9,6 +9,7 @@ import org.openmbee.sdvc.crud.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.services.NodeChangeInfo;
+import org.openmbee.sdvc.crud.services.NodeOperation;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.crud.services.NodeService;
@@ -68,26 +69,38 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
     public ElementsResponse readNotebooks(String projectId, String refId, ElementsRequest req,
             Map<String, String> params) {
         ElementsResponse res = this.read(projectId, refId, req, new HashMap<>());
+        List<Map> rejected = new ArrayList<>(res.getRejected());
+        List<ElementJson> nonNotebooks = new ArrayList<>();
         for (ElementJson e: res.getElements()) {
-            ElementsRequest req2 = new ElementsRequest();
             List<ElementJson> req2s = new ArrayList<>();
             if (!e.containsKey(JupyterConstants.CELLS) || e.get(JupyterConstants.CELLS) == null) {
-                continue; //no cells; TODO should reject 400 as not a notebook
+                Map<String, Object> reject = new HashMap<>();
+                reject.put("code", 400);
+                reject.put("message", "not a notebook");
+                reject.put("id", e.getId());
+                reject.put("element", e);
+                rejected.add(reject);
+                nonNotebooks.add(e);
+                continue;
             }
             for (String cellId: (List<String>)e.get(JupyterConstants.CELLS)) { //stored notebooks have cells as list of ids, use cellIds?
                 req2s.add((new ElementJson()).setId(cellId));
             }
+            ElementsRequest req2 = new ElementsRequest();
             req2.setElements(req2s);
             ElementsResponse cells = this.read(projectId, refId, req2, params);
-            e.put(JupyterConstants.CELLS, cells.getElements()); //TODO need to check cell order
+            Map<String, ElementJson> cellmap = NodeOperation.convertJsonToMap(cells.getElements());
+            e.put(JupyterConstants.CELLS, order((List<String>)e.get(JupyterConstants.CELLS), cellmap));
         }
+        res.getElements().removeAll(nonNotebooks);
+        res.setRejected(rejected);
         return res;
     }
 
     public NotebooksResponse createOrUpdateNotebooks(String projectId, String refId, NotebooksRequest req,
             Map<String, String> params) {
-        ElementsRequest req2 = new ElementsRequest();
-        List<ElementJson> reqs = new ArrayList<>();
+        List<ElementJson> postReqs = new ArrayList<>();
+        List<ElementJson> resReqs = new ArrayList<>();
         for (ElementJson notebook: req.getNotebooks()) {
             List<String> cells = new ArrayList<>(); //to replace cells with list of cell ids
             for (Map<String, Object> cell: (List<Map<String, Object>>)notebook.get(JupyterConstants.CELLS)) {
@@ -97,21 +110,34 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
                 cells.add((String)cell.get("id"));
                 ElementJson postCell = new ElementJson();
                 postCell.putAll(cell);
-                reqs.add(postCell);
+                postReqs.add(postCell);
             }
             if (!notebook.containsKey("id")) {
                 notebook.setId(UUID.randomUUID().toString());
             }
+            resReqs.add((new ElementJson()).setId(notebook.getId()));
             ElementJson postNotebook = new ElementJson();
-            postNotebook.putAll(notebook); //check for id?
+            postNotebook.putAll(notebook);
             postNotebook.put(JupyterConstants.CELLS, cells); //either replace cells or remove cells and use cellIds
-            reqs.add(postNotebook);
+            postReqs.add(postNotebook);
         }
-        req2.setElements(reqs);
-        ElementsResponse res = this.createOrUpdate(projectId, refId, req2, params);
+        ElementsRequest postReq = new ElementsRequest();
+        postReq.setElements(postReqs);
+        this.createOrUpdate(projectId, refId, postReq, params);
+
+        ElementsRequest resReq = new ElementsRequest();
+        resReq.setElements(resReqs);
+        ElementsResponse res = this.readNotebooks(projectId, refId, resReq, params);
         NotebooksResponse r = new NotebooksResponse();
-        r.setNotebooks(res.getElements()); //TODO fix so returns original notebooks, with updated ids/cells
-        r.setRejected(res.getRejected());
+        r.setNotebooks(res.getElements());
         return r;
+    }
+
+    protected List<ElementJson> order(List<String> ids, Map<String, ElementJson> map) {
+        List<ElementJson> res = new ArrayList<>();
+        for (String id: ids) {
+            res.add(map.get(id));
+        }
+        return res;
     }
 }
