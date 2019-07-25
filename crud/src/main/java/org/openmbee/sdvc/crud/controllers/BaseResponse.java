@@ -3,6 +3,7 @@ package org.openmbee.sdvc.crud.controllers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,8 +16,9 @@ public abstract class BaseResponse<T> extends HashMap<String, Object> {
         return (List<String>) this.get(Constants.MESSAGES);
     }
 
-    public void setMessages(List<String> messages) {
+    public T setMessages(List<String> messages) {
         this.put(Constants.MESSAGES, messages);
+        return (T) this;
     }
 
     @SuppressWarnings("unchecked")
@@ -46,5 +48,14 @@ public abstract class BaseResponse<T> extends HashMap<String, Object> {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    public List<Map> getRejected() {
+        return (List<Map>) this.get(Constants.REJECTED);
+    }
+
+    public T setRejected(List<Map> rejected) {
+        this.put(Constants.REJECTED, rejected);
+        return (T) this;
     }
 }

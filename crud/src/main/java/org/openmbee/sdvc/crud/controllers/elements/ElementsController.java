@@ -92,25 +92,4 @@ public class ElementsController extends BaseController {
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req);
         return ResponseEntity.ok(res);
     }
-
-    private NodeService getNodeService(String projectId) {
-        return serviceFactory.getNodeService(this.getProjectType(projectId));
-    }
-
-    private void handleSingleResponse(ElementsResponse res) {
-        if (res.getElements().isEmpty() && !res.isEmpty()) {
-            List<Map<String, Object>> rejected = (List<Map<String, Object>>) res.get("rejected");
-            Integer code = (Integer) rejected.get(0).get("code");
-            switch(code) {
-                case 304:
-                    throw new NotModifiedException(res);
-                case 404:
-                    throw new NotFoundException(res);
-                case 410:
-                    throw new DeletedException(res);
-                default:
-                    break;
-            }
-        }
-    }
 }

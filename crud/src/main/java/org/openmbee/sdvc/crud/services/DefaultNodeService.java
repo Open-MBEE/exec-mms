@@ -200,7 +200,7 @@ public class DefaultNodeService implements NodeService {
         return delete(projectId, refId, req);
     }
 
-    private ElementsRequest buildRequest(String id) {
+    protected ElementsRequest buildRequest(String id) {
         ElementJson json = new ElementJson();
         json.setId(id);
         ElementsRequest req = new ElementsRequest();

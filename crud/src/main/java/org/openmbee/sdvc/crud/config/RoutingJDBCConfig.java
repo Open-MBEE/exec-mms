@@ -63,9 +63,4 @@ public class RoutingJDBCConfig {
 
         return targetDataSources;
     }
-
-    @Bean(name = "crudTransactionManager")
-    public PlatformTransactionManager defaultTransactionManager() {
-        return new JpaTransactionManager();
-    }
 }

@@ -17,15 +17,10 @@ public class ElementsResponse extends BaseResponse<ElementsResponse> {
         return (List<ElementJson>) this.get(Constants.ELEMENT_KEY);
     }
 
-    public void setElements(List<ElementJson> elements) {
+    public ElementsResponse setElements(List<ElementJson> elements) {
         this.put(Constants.ELEMENT_KEY, elements);
+        return this;
     }
 
-    public List<Map> getRejected() {
-        return (List<Map>) this.get(Constants.REJECTED);
-    }
 
-    public void setRejected(List<Map> rejected) {
-        this.put(Constants.REJECTED, rejected);
-    }
 }

@@ -167,6 +167,12 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return getConn().query(sql, new Object[]{deleted}, new NodeRowMapper());
     }
 
+    public List<Node> findAllByDeletedAndNodeType(boolean deleted, int nodeType) {
+        String sql = String.format("SELECT * FROM nodes%s WHERE deleted = ? AND nodetype = ?",
+            getSuffix());
+        return getConn().query(sql, new Object[]{deleted, nodeType}, new NodeRowMapper());
+    }
+
     private PreparedStatement prepareStatement(PreparedStatement ps, Node n) throws SQLException {
         ps.setString(1, n.getNodeId());
         ps.setString(2, n.getIndexId());

@@ -24,7 +24,7 @@ public abstract class BaseDAOImpl {
 
     @Autowired
     public void setTransactionManager(
-        @Qualifier("crudTransactionManager") PlatformTransactionManager transactionManager) {
+        PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
