@@ -19,11 +19,11 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
 import org.openmbee.sdvc.data.domains.Project;
-import org.openmbee.sdvc.crud.config.CurrentTenantIdentifierResolverImpl;
-import org.openmbee.sdvc.crud.config.DataSourceBasedMultiTenantConnectionProviderImpl;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
-import org.openmbee.sdvc.crud.repositories.edge.EdgeRowMapper;
-import org.openmbee.sdvc.crud.repositories.node.NodeRowMapper;
+import org.openmbee.sdvc.rdb.config.CurrentTenantIdentifierResolverImpl;
+import org.openmbee.sdvc.rdb.config.DataSourceBasedMultiTenantConnectionProviderImpl;
+import org.openmbee.sdvc.rdb.config.DbContextHolder;
+import org.openmbee.sdvc.rdb.repositories.edge.EdgeRowMapper;
+import org.openmbee.sdvc.rdb.repositories.node.NodeRowMapper;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.data.domains.Edge;
@@ -300,7 +300,7 @@ public class DatabaseDefinitionService {
         properties.put("hibernate.tenant_identifier_resolver", identifierResolver);
 
         properties.put("hibernate.physical_naming_strategy",
-            "org.openmbee.sdvc.crud.config.SuffixedPhysicalNamingStrategy");
+            "org.openmbee.sdvc.rdb.config.SuffixedPhysicalNamingStrategy");
 
         return properties;
     }

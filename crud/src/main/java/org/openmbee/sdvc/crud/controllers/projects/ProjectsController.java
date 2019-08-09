@@ -4,14 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 
-import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.Project;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
-import org.openmbee.sdvc.crud.services.ProjectService;
+import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

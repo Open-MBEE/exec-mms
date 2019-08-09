@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.core.services.NodeChangeInfo;
+import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;

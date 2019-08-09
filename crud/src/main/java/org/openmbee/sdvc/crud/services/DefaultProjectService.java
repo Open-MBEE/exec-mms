@@ -4,21 +4,21 @@ import java.sql.SQLException;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.Organization;
 import org.openmbee.sdvc.data.domains.Project;
 import org.openmbee.sdvc.core.repositories.OrganizationRepository;
 import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
-import org.openmbee.sdvc.crud.repositories.ProjectIndex;
+import org.openmbee.sdvc.core.services.ProjectIndex;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("defaultProjectService")
-public class DefaultProjectService implements ProjectService {
+public class DefaultProjectService implements ProjectService<ProjectsResponse> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
     protected ProjectRepository projectRepository;

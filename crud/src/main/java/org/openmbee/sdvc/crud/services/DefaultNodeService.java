@@ -8,7 +8,10 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.core.services.NodeChangeInfo;
+import org.openmbee.sdvc.core.services.NodeGetInfo;
+import org.openmbee.sdvc.core.services.NodeService;
+import org.openmbee.sdvc.rdb.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
@@ -16,11 +19,11 @@ import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.data.domains.CommitType;
 import org.openmbee.sdvc.data.domains.Edge;
 import org.openmbee.sdvc.data.domains.Node;
-import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
-import org.openmbee.sdvc.crud.repositories.edge.EdgeDAO;
-import org.openmbee.sdvc.crud.repositories.node.NodeDAO;
-import org.openmbee.sdvc.crud.repositories.node.NodeIndexDAO;
+import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
+import org.openmbee.sdvc.core.services.CommitIndexDAO;
+import org.openmbee.sdvc.rdb.repositories.edge.EdgeDAO;
+import org.openmbee.sdvc.rdb.repositories.node.NodeDAO;
+import org.openmbee.sdvc.core.services.NodeIndexDAO;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 
 @Service("defaultNodeService")
-public class DefaultNodeService implements NodeService {
+public class DefaultNodeService implements NodeService<ElementsResponse, ElementsRequest> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 

@@ -1,8 +1,8 @@
 package org.openmbee.sdvc.crud.services;
 
-import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.rdb.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.branches.BranchesResponse;
-import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;

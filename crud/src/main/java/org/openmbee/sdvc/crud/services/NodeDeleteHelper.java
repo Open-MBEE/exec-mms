@@ -3,6 +3,9 @@ package org.openmbee.sdvc.crud.services;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.openmbee.sdvc.core.services.NodeChangeInfo;
+import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -11,8 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class NodeDeleteHelper extends NodeOperation {
 
-    public NodeChangeInfo processDeleteJson(List<ElementJson> elements, CommitJson cmjs,
-        NodeService service) {
+    public NodeChangeInfo processDeleteJson(List<ElementJson> elements, CommitJson cmjs, NodeService service) {
         NodeChangeInfo info = initInfo(elements, cmjs);
 
         for (String nodeId : info.getReqElementMap().keySet()) {

@@ -1,14 +1,10 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
-import java.util.List;
 import java.util.Map;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.controllers.BaseResponse;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.DeletedException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
-import org.openmbee.sdvc.crud.exceptions.NotModifiedException;
-import org.openmbee.sdvc.crud.services.NodeService;
+import org.openmbee.sdvc.core.services.NodeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +28,7 @@ public class ElementsController extends BaseController {
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
+        ElementsResponse res = (ElementsResponse) nodeService.read(projectId, refId, elementId, params);
         if (elementId != null) {
             handleSingleResponse(res);
         }
@@ -49,7 +45,7 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            response = nodeService.createOrUpdate(projectId, refId, req, params);
+            response = (ElementsResponse) nodeService.createOrUpdate(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
         throw new BadRequestException(response.addMessage("Empty"));
@@ -65,7 +61,7 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            response = nodeService.read(projectId, refId, req, params);
+            response = (ElementsResponse) nodeService.read(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
         throw new BadRequestException(response.addMessage("Empty"));
@@ -78,7 +74,7 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @PathVariable String elementId) {
 
-        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId);
+        ElementsResponse res = (ElementsResponse) getNodeService(projectId).delete(projectId, refId, elementId);
         handleSingleResponse(res);
         return ResponseEntity.ok(res);
     }
@@ -89,7 +85,7 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @RequestBody ElementsRequest req) {
 
-        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req);
+        ElementsResponse res = (ElementsResponse) getNodeService(projectId).delete(projectId, refId, req);
         return ResponseEntity.ok(res);
     }
 }

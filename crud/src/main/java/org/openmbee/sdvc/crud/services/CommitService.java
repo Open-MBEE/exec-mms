@@ -10,16 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.rdb.config.DbContextHolder;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
-import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.crud.controllers.commits.CommitsRequest;
 import org.openmbee.sdvc.crud.controllers.commits.CommitsResponse;
 import org.openmbee.sdvc.data.domains.Commit;
-import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
+import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
+import org.openmbee.sdvc.core.services.CommitIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
