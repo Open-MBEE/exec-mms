@@ -55,6 +55,10 @@ public class JupyterNodeService implements NodeService<ElementsResponse, Element
         }
     }
 
+    @Override
+    public void extraProcessDeletedElement(ElementJson element, Node node, NodeChangeInfo info) {
+    }
+
     public ElementsResponse read(String projectId, String refId, String elementId,
             Map<String, String> params) {
         ElementsRequest req = new ElementsRequest();
@@ -146,5 +150,34 @@ public class JupyterNodeService implements NodeService<ElementsResponse, Element
             res.add(map.get(id));
         }
         return res;
+    }
+
+    @Override
+    public ElementsResponse delete(String projectId, String refId, String id) {
+        ElementsRequest req = buildRequest(id);
+        return delete(projectId, refId, req);
+    }
+
+    protected ElementsRequest buildRequest(String id) {
+        ElementJson json = new ElementJson();
+        json.setId(id);
+        ElementsRequest req = new ElementsRequest();
+        List<ElementJson> list = new ArrayList<>();
+        list.add(json);
+        req.setElements(list);
+        return req;
+    }
+
+    @Override
+    public ElementsResponse delete(String projectId, String refId, ElementsRequest req) {
+        ElementsResponse response = new ElementsResponse();
+        return response;
+    }
+
+    @Override
+    public ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
+                                           Map<String, String> params) {
+        ElementsResponse response = new ElementsResponse();
+        return response;
     }
 }

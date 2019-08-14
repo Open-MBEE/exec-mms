@@ -27,7 +27,7 @@ public class NotebooksController extends BaseController {
         @PathVariable(required = false) String notebookId,
         @RequestParam Map<String, String> params) {
 
-        ElementsResponse res = nodeService.readNotebooks(projectId, refId, notebookId, params);
+        ElementsResponse res = nodeService.read(projectId, refId, notebookId, params);
         if (notebookId != null) {
             this.handleSingleResponse(res);
         }
@@ -44,7 +44,7 @@ public class NotebooksController extends BaseController {
         @RequestBody NotebooksRequest req,
         @RequestParam Map<String, String> params) {
 
-        ElementsResponse res = nodeService.readNotebooks(projectId, refId, req, params);
+        ElementsResponse res = nodeService.read(projectId, refId, req, params);
         NotebooksResponse resn = new NotebooksResponse();
         resn.setNotebooks(res.getElements());
         resn.setRejected(res.getRejected());
@@ -58,6 +58,6 @@ public class NotebooksController extends BaseController {
         @RequestBody NotebooksRequest req,
         @RequestParam Map<String, String> params) {
 
-        return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params));
+        return ResponseEntity.ok(nodeService.createOrUpdate(projectId, refId, req, params));
     }
 }

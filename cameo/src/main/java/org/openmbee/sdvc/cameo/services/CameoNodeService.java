@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
+import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
 import org.openmbee.sdvc.crud.services.DefaultNodeService;
@@ -15,7 +16,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service("cameoNodeService")
-public class CameoNodeService extends DefaultNodeService implements NodeService {
+public class CameoNodeService extends DefaultNodeService implements NodeService<ElementsResponse, ElementsRequest> {
 
     private CameoHelper cameoHelper;
 
