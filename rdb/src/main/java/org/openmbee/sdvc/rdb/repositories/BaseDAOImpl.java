@@ -2,7 +2,7 @@ package org.openmbee.sdvc.rdb.repositories;
 
 import java.util.Map;
 import javax.sql.DataSource;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,10 +30,10 @@ public abstract class BaseDAOImpl {
     }
 
     public JdbcTemplate getConn() {
-        return new JdbcTemplate(crudDataSources.get(DbContextHolder.getContext().getKey()));
+        return new JdbcTemplate(crudDataSources.get(ContextHolder.getContext().getKey()));
     }
 
     public String getSuffix() {
-        return DbContextHolder.getContext().getDbTableSuffix();
+        return ContextHolder.getContext().getDbTableSuffix();
     }
 }

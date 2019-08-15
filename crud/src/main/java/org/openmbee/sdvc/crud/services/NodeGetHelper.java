@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.*;
 
 import org.openmbee.sdvc.core.services.NodeGetInfo;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
@@ -12,7 +12,7 @@ import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.stereotype.Service;
 
-import static org.openmbee.sdvc.core.config.DbContextHolder.getContext;
+import static org.openmbee.sdvc.core.config.ContextHolder.getContext;
 
 @Service
 public class NodeGetHelper extends NodeOperation {
@@ -40,7 +40,7 @@ public class NodeGetHelper extends NodeOperation {
         }
 
         Optional<Commit> commit = commitRepository.findByCommitId(commitId);
-        Optional<Branch> currentBranch = branchRepository.findByBranchId(DbContextHolder.getContext().getBranchId());
+        Optional<Branch> currentBranch = branchRepository.findByBranchId(ContextHolder.getContext().getBranchId());
         if (!commit.isPresent() ) { //TODO also if commitId is not part of current branch history?
             throw new BadRequestException("commitId is invalid");
         }

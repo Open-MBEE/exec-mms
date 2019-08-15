@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.crud.services.NodeOperation;
 import org.openmbee.sdvc.json.ElementJson;
+import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.jupyter.JupyterConstants;
@@ -18,25 +20,18 @@ import org.openmbee.sdvc.jupyter.JupyterEdgeType;
 import org.openmbee.sdvc.jupyter.JupyterNodeType;
 import org.openmbee.sdvc.jupyter.controllers.NotebooksRequest;
 import org.openmbee.sdvc.jupyter.controllers.NotebooksResponse;
-import org.openmbee.sdvc.rdb.repositories.node.NodeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service("jupyterNodeService")
-public class JupyterNodeService implements NodeService {
+public class JupyterNodeService extends DefaultNodeService implements NodeService {
 
     private JupyterHelper jupyterHelper;
-    protected NodeDAO nodeRepository;
 
     @Autowired
     public void setJupyterHelper(JupyterHelper jupyterHelper) {
         this.jupyterHelper = jupyterHelper;
-    }
-
-    @Autowired
-    public void setNodeRepository(NodeDAO nodeRepository) {
-        this.nodeRepository = nodeRepository;
     }
 
     @Override
@@ -54,16 +49,11 @@ public class JupyterNodeService implements NodeService {
         }
     }
 
-    @Override
-    public void extraProcessDeletedElement(ElementJson element, Node node, NodeChangeInfo info) {
-    }
-
-    public ElementsResponse read(String projectId, String refId, String elementId,
-            Map<String, String> params) {
+    public ElementsResponse readNotebooks(String projectId, String refId, String elementId, Map<String, String> params) {
         ElementsRequest req = new ElementsRequest();
         List<ElementJson> reqs = new ArrayList<>();
         if (elementId == null) {
-            DbContextHolder.setContext(projectId, refId);
+            ContextHolder.setContext(projectId, refId);
             List<Node> notebooks = this.nodeRepository
                 .findAllByDeletedAndNodeType(false, JupyterNodeType.NOTEBOOK.getValue());
             for (Node n : notebooks) {
@@ -73,10 +63,10 @@ public class JupyterNodeService implements NodeService {
             reqs.add((new ElementJson()).setId(elementId));
         }
         req.setElements(reqs);
-        return read(projectId, refId, req, params);
+        return readNotebooks(projectId, refId, req, params);
     }
 
-    public ElementsResponse read(String projectId, String refId, ElementsRequest req,
+    public ElementsResponse readNotebooks(String projectId, String refId, ElementsRequest req,
             Map<String, String> params) {
         ElementsResponse res = this.read(projectId, refId, req, new HashMap<>());
         List<Map> rejected = new ArrayList<>(res.getRejected());
@@ -107,7 +97,7 @@ public class JupyterNodeService implements NodeService {
         return res;
     }
 
-    public NotebooksResponse createOrUpdate(String projectId, String refId, NotebooksRequest req,
+    public NotebooksResponse createOrUpdateNotebooks(String projectId, String refId, NotebooksRequest req,
             Map<String, String> params) {
         List<ElementJson> postReqs = new ArrayList<>();
         List<ElementJson> resReqs = new ArrayList<>();
@@ -137,7 +127,7 @@ public class JupyterNodeService implements NodeService {
 
         ElementsRequest resReq = new ElementsRequest();
         resReq.setElements(resReqs);
-        ElementsResponse res = this.read(projectId, refId, resReq, params);
+        ElementsResponse res = this.readNotebooks(projectId, refId, resReq, params);
         NotebooksResponse r = new NotebooksResponse();
         r.setNotebooks(res.getElements());
         return r;
@@ -149,34 +139,5 @@ public class JupyterNodeService implements NodeService {
             res.add(map.get(id));
         }
         return res;
-    }
-
-    @Override
-    public ElementsResponse delete(String projectId, String refId, String id) {
-        ElementsRequest req = buildRequest(id);
-        return delete(projectId, refId, req);
-    }
-
-    protected ElementsRequest buildRequest(String id) {
-        ElementJson json = new ElementJson();
-        json.setId(id);
-        ElementsRequest req = new ElementsRequest();
-        List<ElementJson> list = new ArrayList<>();
-        list.add(json);
-        req.setElements(list);
-        return req;
-    }
-
-    @Override
-    public ElementsResponse delete(String projectId, String refId, ElementsRequest req) {
-        ElementsResponse response = new ElementsResponse();
-        return response;
-    }
-
-    @Override
-    public ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
-                                           Map<String, String> params) {
-        ElementsResponse response = new ElementsResponse();
-        return response;
     }
 }

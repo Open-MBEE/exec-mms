@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.data.domains.Branch;
@@ -48,7 +48,7 @@ public class CommitService {
 
     public CommitsResponse getRefCommits(String projectId, String refId,
         Map<String, String> params) {
-        DbContextHolder.setContext(projectId, refId);
+        ContextHolder.setContext(projectId, refId);
         int limit = 0;
         Instant timestamp = null;
         if (params.containsKey("limit")) {
@@ -87,7 +87,7 @@ public class CommitService {
     }
 
     public CommitsResponse getCommit(String projectId, String commitId) {
-        DbContextHolder.setContext(projectId);
+        ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
             Optional<CommitJson> commit = commitIndex.findById(commitId);
@@ -105,7 +105,7 @@ public class CommitService {
 
     public CommitsResponse getElementCommits(String projectId, String refId, String elementId,
         Map<String, String> params) {
-        DbContextHolder.setContext(projectId);
+        ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
             Optional<Branch> ref = branchRepository.findByBranchId(refId);
@@ -126,7 +126,7 @@ public class CommitService {
     }
 
     public CommitsResponse getCommits(String projectId, CommitsRequest req) {
-        DbContextHolder.setContext(projectId);
+        ContextHolder.setContext(projectId);
         Set<String> ids = new HashSet<>();
         for (CommitJson j : req.getCommits()) {
             ids.add(j.getId());

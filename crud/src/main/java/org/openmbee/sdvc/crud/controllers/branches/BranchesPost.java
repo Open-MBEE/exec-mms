@@ -6,7 +6,7 @@ import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.objects.BranchesRequest;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.config.Constants;
@@ -58,7 +58,7 @@ public class BranchesPost extends BaseController {
             Instant now = Instant.now();
 
             for (RefJson branch : projectsPost.getRefs()) {
-                DbContextHolder.setContext(projectId);
+                ContextHolder.setContext(projectId);
                 Branch b = new Branch();
                 b.setBranchId(branch.getId());
                 b.setBranchName(branch.getName());
@@ -94,7 +94,7 @@ public class BranchesPost extends BaseController {
 
                 Branch saved = branchRepository.save(b);
                 try {
-                    DbContextHolder.setContext(projectId, saved.getBranchId());
+                    ContextHolder.setContext(projectId, saved.getBranchId());
                     if (branchesOperations.createBranch()) {
                         branchesOperations.copyTablesFromParent(saved.getBranchId(),
                             b.getParentRefId(), branch.getParentCommitId());

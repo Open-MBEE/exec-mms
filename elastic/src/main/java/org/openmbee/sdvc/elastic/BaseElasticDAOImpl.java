@@ -18,7 +18,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,7 +40,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     }
 
     protected String getIndex() {
-        return DbContextHolder.getContext().getProjectId().toLowerCase();
+        return ContextHolder.getContext().getProjectId().toLowerCase();
     }
 
     protected abstract E newInstance();

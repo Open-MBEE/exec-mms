@@ -19,7 +19,7 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
 import org.openmbee.sdvc.data.domains.Project;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.data.domains.Edge;
@@ -130,10 +130,10 @@ public class DatabaseDefinitionService {
     }
 
     public boolean createProjectDatabase(Project project) throws SQLException {
-        DbContextHolder.setContext(null);
+        ContextHolder.setContext(null);
         String queryString = String.format("CREATE DATABASE _%s", project.getProjectId());
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
-            crudDataSources.get(DbContextHolder.getContext().getKey()));
+            crudDataSources.get(ContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
         try {
             jdbcTemplate.execute(queryString);
@@ -162,8 +162,8 @@ public class DatabaseDefinitionService {
 
     public boolean createBranch() {
         logger.error(
-            "Current Context is: {} on ref {}", DbContextHolder.getContext().getProjectId(),
-            DbContextHolder.getContext().getBranchId());
+            "Current Context is: {} on ref {}", ContextHolder.getContext().getProjectId(),
+            ContextHolder.getContext().getBranchId());
         generateBranchSchemaFromModels();
         return true;
     }
@@ -185,7 +185,7 @@ public class DatabaseDefinitionService {
 
         this.crudDataSources.put(project.getProjectId(), ds);
 
-        DbContextHolder.setContext(project.getProjectId());
+        ContextHolder.setContext(project.getProjectId());
 
         MetadataSources metadata = new MetadataSources(
             new StandardServiceRegistryBuilder()
@@ -260,7 +260,7 @@ public class DatabaseDefinitionService {
         }
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
-            crudDataSources.get(DbContextHolder.getContext().getKey()));
+            crudDataSources.get(ContextHolder.getContext().getKey()));
 
         jdbcTemplate.execute("BEGIN");
 

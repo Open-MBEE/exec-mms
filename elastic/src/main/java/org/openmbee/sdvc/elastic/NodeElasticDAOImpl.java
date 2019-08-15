@@ -20,7 +20,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.services.NodeIndexDAO;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -102,7 +102,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         }
         BulkRequest bulk = new BulkRequest();
         Map<String, Object> parameters = Collections.singletonMap("refId",
-            DbContextHolder.getContext().getBranchId());
+            ContextHolder.getContext().getBranchId());
         for (String indexId : indexIds) {
             UpdateRequest request = new UpdateRequest(getIndex(), this.type, indexId);
             Script inline = new Script(ScriptType.INLINE, "painless", script,

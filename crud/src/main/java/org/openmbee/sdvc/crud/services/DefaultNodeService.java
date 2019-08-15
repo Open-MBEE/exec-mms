@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
-import org.openmbee.sdvc.core.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
@@ -103,7 +103,7 @@ public class DefaultNodeService implements NodeService {
         } else {
             // If no id is provided, return all
             logger.debug("No ElementId given");
-            DbContextHolder.setContext(projectId, refId);
+            ContextHolder.setContext(projectId, refId);
 
             ElementsResponse response = new ElementsResponse();
             String commitId = params.getOrDefault("commitId", null);
@@ -117,7 +117,7 @@ public class DefaultNodeService implements NodeService {
         Map<String, String> params) {
 
         String commitId = params.getOrDefault("commitId", null);
-        DbContextHolder.setContext(projectId, refId);
+        ContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
 
         NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId);
@@ -132,7 +132,7 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
         Map<String, String> params) {
 
-        DbContextHolder.setContext(projectId, refId);
+        ContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
 
         NodeChangeInfo info = nodePostHelper
@@ -215,7 +215,7 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public ElementsResponse delete(String projectId, String refId, ElementsRequest req) {
-        DbContextHolder.setContext(projectId, refId);
+        ContextHolder.setContext(projectId, refId);
 
         NodeChangeInfo info = nodeDeleteHelper
             .processDeleteJson(req.getElements(), createCommit("admin", refId, projectId, req),

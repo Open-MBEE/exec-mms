@@ -1,10 +1,10 @@
 package org.openmbee.sdvc.core.config;
 
-public class DbContextHolder {
+public class ContextHolder {
 
     private static final ThreadLocal<ContextObject> contextHolder = new ThreadLocal<>();
 
-    private DbContextHolder() {
+    private ContextHolder() {
     }
 
     public static ContextObject getContext() {
