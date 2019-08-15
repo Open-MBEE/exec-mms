@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
-import org.openmbee.sdvc.rdb.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.DbContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.exceptions.InternalErrorException;

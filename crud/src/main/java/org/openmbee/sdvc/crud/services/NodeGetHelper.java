@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.*;
 
 import org.openmbee.sdvc.core.services.NodeGetInfo;
-import org.openmbee.sdvc.rdb.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.DbContextHolder;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
@@ -12,7 +12,7 @@ import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.stereotype.Service;
 
-import static org.openmbee.sdvc.rdb.config.DbContextHolder.getContext;
+import static org.openmbee.sdvc.core.config.DbContextHolder.getContext;
 
 @Service
 public class NodeGetHelper extends NodeOperation {

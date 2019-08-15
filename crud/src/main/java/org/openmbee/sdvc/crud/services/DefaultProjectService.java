@@ -14,6 +14,7 @@ import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.ProjectIndex;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
+import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

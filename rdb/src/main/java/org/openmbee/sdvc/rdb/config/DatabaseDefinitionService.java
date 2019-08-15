@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.services;
+package org.openmbee.sdvc.rdb.config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,11 +19,7 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
 import org.openmbee.sdvc.data.domains.Project;
-import org.openmbee.sdvc.rdb.config.CurrentTenantIdentifierResolverImpl;
-import org.openmbee.sdvc.rdb.config.DataSourceBasedMultiTenantConnectionProviderImpl;
-import org.openmbee.sdvc.rdb.config.DbContextHolder;
-import org.openmbee.sdvc.rdb.repositories.edge.EdgeRowMapper;
-import org.openmbee.sdvc.rdb.repositories.node.NodeRowMapper;
+import org.openmbee.sdvc.core.config.DbContextHolder;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.data.domains.Edge;

@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.rdb.config;
+package org.openmbee.sdvc.core.config;
 
 public class ContextObject {
 

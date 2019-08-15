@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.crud.services;
 
-import org.openmbee.sdvc.rdb.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.DbContextHolder;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.data.domains.Branch;

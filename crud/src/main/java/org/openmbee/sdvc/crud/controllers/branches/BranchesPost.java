@@ -6,7 +6,7 @@ import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.objects.BranchesRequest;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
-import org.openmbee.sdvc.rdb.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.DbContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.config.Constants;
@@ -16,7 +16,7 @@ import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.services.DatabaseDefinitionService;
+import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

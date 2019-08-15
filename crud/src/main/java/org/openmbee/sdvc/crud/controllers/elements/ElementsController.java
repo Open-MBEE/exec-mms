@@ -31,7 +31,7 @@ public class ElementsController extends BaseController {
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        ElementsResponse res = (ElementsResponse) nodeService.read(projectId, refId, elementId, params);
+        ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
         if (elementId != null) {
             handleSingleResponse(res);
         }
@@ -48,7 +48,7 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            response = (ElementsResponse) nodeService.createOrUpdate(projectId, refId, req, params);
+            response = nodeService.createOrUpdate(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
         throw new BadRequestException(response.addMessage("Empty"));
@@ -64,7 +64,7 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            response = (ElementsResponse) nodeService.read(projectId, refId, req, params);
+            response = nodeService.read(projectId, refId, req, params);
             return ResponseEntity.ok(response);
         }
         throw new BadRequestException(response.addMessage("Empty"));
@@ -77,7 +77,7 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @PathVariable String elementId) {
 
-        ElementsResponse res = (ElementsResponse) getNodeService(projectId).delete(projectId, refId, elementId);
+        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId);
         handleSingleResponse(res);
         return ResponseEntity.ok(res);
     }
@@ -88,7 +88,7 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @RequestBody ElementsRequest req) {
 
-        ElementsResponse res = (ElementsResponse) getNodeService(projectId).delete(projectId, refId, req);
+        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req);
         return ResponseEntity.ok(res);
     }
 }

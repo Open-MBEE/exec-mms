@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.rdb.config;
 
-import static org.openmbee.sdvc.rdb.config.ContextObject.DEFAULT_PROJECT;
+import static org.openmbee.sdvc.core.config.ContextObject.DEFAULT_PROJECT;
 
 import java.util.HashMap;
 import java.util.List;

@@ -14,8 +14,6 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.8.RELEASE'
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.3.6.Final'
 
-    compile group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-
     compile 'org.elasticsearch:elasticsearch:6.5.1'
     compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:6.5.1'
 }
