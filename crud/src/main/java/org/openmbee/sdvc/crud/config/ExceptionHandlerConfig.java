@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.config;
+package org.openmbee.sdvc.crud.config;
 
 import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.springframework.core.Ordered;

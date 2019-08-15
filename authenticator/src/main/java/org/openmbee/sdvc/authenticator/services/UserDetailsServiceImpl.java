@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
-import org.openmbee.sdvc.core.repositories.UserRepository;
+import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.Privilege;
 import org.openmbee.sdvc.data.domains.Role;
 import org.openmbee.sdvc.data.domains.User;

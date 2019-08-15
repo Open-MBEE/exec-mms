@@ -9,7 +9,7 @@ import javax.naming.ldap.Rdn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.config.SecurityConfig;
-import org.openmbee.sdvc.core.repositories.UserRepository;
+import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

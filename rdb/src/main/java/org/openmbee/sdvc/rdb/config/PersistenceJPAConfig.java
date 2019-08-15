@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.config;
+package org.openmbee.sdvc.rdb.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableJpaAuditing
 @EnableJpaRepositories(
-    basePackages = {"org.openmbee.sdvc.data.domains", "org.openmbee.sdvc.core.repositories"},
+    basePackages = {"org.openmbee.sdvc.data.domains", "org.openmbee.sdvc.rdb.repositories"},
     entityManagerFactoryRef = "defaultEntityManager",
     transactionManagerRef = "defaultTransactionManager"
 )
@@ -46,7 +46,7 @@ public class PersistenceJPAConfig {
         em.setDataSource(getDatasource());
         em.setPackagesToScan(
             "org.openmbee.sdvc.data.domains",
-            "org.openmbee.sdvc.core.repositories"
+            "org.openmbee.sdvc.rdb.repositories"
         );
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

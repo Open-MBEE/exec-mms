@@ -3,4 +3,5 @@ apply plugin: 'io.spring.convention.spring-module'
 dependencies {
     compile project(':core')
     compile project(':data')
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.0.10.RELEASE'
 }

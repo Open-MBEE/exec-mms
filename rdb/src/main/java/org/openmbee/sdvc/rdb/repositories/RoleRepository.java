@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.repositories;
+package org.openmbee.sdvc.rdb.repositories;
 
 import java.util.Optional;
 import org.openmbee.sdvc.data.domains.Role;

@@ -17,7 +17,6 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
-import org.openmbee.sdvc.core.config.PersistenceJPAConfig;
 import org.openmbee.sdvc.data.domains.Project;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.data.domains.Branch;

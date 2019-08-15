@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.authenticator.services;
 
 import java.util.Optional;
-import org.openmbee.sdvc.core.repositories.UserRepository;
+import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.core.services.UserService;
 import org.openmbee.sdvc.data.domains.User;
 import org.springframework.beans.factory.annotation.Autowired;
