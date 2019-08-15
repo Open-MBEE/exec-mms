@@ -1,9 +1,9 @@
-package org.openmbee.sdvc.crud.controllers.projects;
+package org.openmbee.sdvc.core.objects;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.Constants;
+
+import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.json.ProjectJson;
 
 public class ProjectsResponse extends BaseResponse<ProjectsResponse> {

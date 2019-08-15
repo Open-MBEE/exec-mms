@@ -1,10 +1,9 @@
-package org.openmbee.sdvc.crud.controllers.elements;
+package org.openmbee.sdvc.core.objects;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.Constants;
+
+import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.json.ElementJson;
 
 public class ElementsResponse extends BaseResponse<ElementsResponse> {

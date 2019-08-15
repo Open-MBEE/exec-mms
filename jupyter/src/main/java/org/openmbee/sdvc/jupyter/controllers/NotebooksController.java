@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

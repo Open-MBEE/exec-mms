@@ -1,10 +1,11 @@
 package org.openmbee.sdvc.core.services;
 
+import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.json.ProjectJson;
 
-public interface ProjectService<T> {
+public interface ProjectService {
 
-    T read(String projectId);
+    ProjectsResponse read(String projectId);
 
     boolean exists(String projectId);
 

@@ -1,8 +1,11 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
 import java.util.Map;
+
+import org.openmbee.sdvc.core.objects.ElementsRequest;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.springframework.http.ResponseEntity;

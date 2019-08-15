@@ -1,23 +1,26 @@
 package org.openmbee.sdvc.core.services;
 
 import java.util.Map;
+
+import org.openmbee.sdvc.core.objects.ElementsRequest;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 
-public interface NodeService<T, U> {
+public interface NodeService {
 
-    T read(String projectId, String refId, String id, Map<String, String> params);
+    ElementsResponse read(String projectId, String refId, String id, Map<String, String> params);
 
-    T read(String projectId, String refId, U req, Map<String, String> params);
+    ElementsResponse read(String projectId, String refId, ElementsRequest req, Map<String, String> params);
 
-    T createOrUpdate(String projectId, String refId, U req,
+    ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
         Map<String, String> params);
 
     void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info);
 
     void extraProcessDeletedElement(ElementJson element, Node node, NodeChangeInfo info);
 
-    T delete(String projectId, String refId, String id);
+    ElementsResponse delete(String projectId, String refId, String id);
 
-    T delete(String projectId, String refId, U req);
+    ElementsResponse delete(String projectId, String refId, ElementsRequest req);
 }

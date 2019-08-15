@@ -1,7 +1,7 @@
-package org.openmbee.sdvc.crud.controllers.orgs;
+package org.openmbee.sdvc.core.objects;
 
 import java.util.List;
-import org.openmbee.sdvc.crud.controllers.BaseRequest;
+
 import org.openmbee.sdvc.json.OrgJson;
 
 public class OrganizationsRequest extends BaseRequest {

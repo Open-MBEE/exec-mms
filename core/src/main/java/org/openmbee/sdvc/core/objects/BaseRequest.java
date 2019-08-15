@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.controllers;
+package org.openmbee.sdvc.core.objects;
 
 public abstract class BaseRequest {
 

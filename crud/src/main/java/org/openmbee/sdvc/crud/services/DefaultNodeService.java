@@ -12,8 +12,8 @@ import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.rdb.config.DbContextHolder;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.core.objects.ElementsRequest;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.data.domains.CommitType;
@@ -35,7 +35,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 
 @Service("defaultNodeService")
-public class DefaultNodeService implements NodeService<ElementsResponse, ElementsRequest> {
+public class DefaultNodeService implements NodeService {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 

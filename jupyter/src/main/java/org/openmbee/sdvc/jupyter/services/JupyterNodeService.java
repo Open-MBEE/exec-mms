@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.openmbee.sdvc.rdb.config.DbContextHolder;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.core.objects.ElementsRequest;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.crud.services.NodeOperation;
 import org.openmbee.sdvc.json.ElementJson;
-import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.jupyter.JupyterConstants;
@@ -25,7 +24,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service("jupyterNodeService")
-public class JupyterNodeService implements NodeService<ElementsResponse, ElementsRequest> {
+public class JupyterNodeService implements NodeService {
 
     private JupyterHelper jupyterHelper;
     protected NodeDAO nodeRepository;

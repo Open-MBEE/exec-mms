@@ -13,12 +13,12 @@ import org.openmbee.sdvc.core.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.ProjectIndex;
 import org.openmbee.sdvc.json.ProjectJson;
-import org.openmbee.sdvc.crud.controllers.projects.ProjectsResponse;
+import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("defaultProjectService")
-public class DefaultProjectService implements ProjectService<ProjectsResponse> {
+public class DefaultProjectService implements ProjectService {
 
     protected final Logger logger = LogManager.getLogger(getClass());
     protected ProjectRepository projectRepository;

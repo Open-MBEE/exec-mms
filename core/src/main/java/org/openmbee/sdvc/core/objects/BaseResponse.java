@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.crud.controllers;
+package org.openmbee.sdvc.core.objects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.config.Constants;
 
 public abstract class BaseResponse<T> extends HashMap<String, Object> {
 
