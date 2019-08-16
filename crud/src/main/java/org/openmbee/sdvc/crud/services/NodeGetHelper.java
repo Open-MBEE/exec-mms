@@ -3,8 +3,8 @@ package org.openmbee.sdvc.crud.services;
 import java.time.Instant;
 import java.util.*;
 
-import org.openmbee.sdvc.crud.config.ContextObject;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.core.services.NodeGetInfo;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
@@ -12,7 +12,7 @@ import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.stereotype.Service;
 
-import static org.openmbee.sdvc.crud.config.DbContextHolder.getContext;
+import static org.openmbee.sdvc.core.config.ContextHolder.getContext;
 
 @Service
 public class NodeGetHelper extends NodeOperation {
@@ -40,7 +40,7 @@ public class NodeGetHelper extends NodeOperation {
         }
 
         Optional<Commit> commit = commitRepository.findByCommitId(commitId);
-        Optional<Branch> currentBranch = branchRepository.findByBranchId(DbContextHolder.getContext().getBranchId());
+        Optional<Branch> currentBranch = branchRepository.findByBranchId(ContextHolder.getContext().getBranchId());
         if (!commit.isPresent() ) { //TODO also if commitId is not part of current branch history?
             throw new BadRequestException("commitId is invalid");
         }
@@ -91,7 +91,7 @@ public class NodeGetHelper extends NodeOperation {
         if (ref.isPresent()) {
             Optional<Commit> c = commitRepository.findLatestByRef(ref.get());
             if (c.isPresent()) {
-                return processGetJson(elements, c.get().getIndexId());
+                return processGetJson(elements, c.get().getDocId());
             } else {
                 throw new BadRequestException("invalid time");
             }
@@ -103,7 +103,7 @@ public class NodeGetHelper extends NodeOperation {
         Set<String> indexIds = new HashSet<>();
         List<Node> existingNodes = nodeRepository.findAllByDeleted(false);
         for (Node node : existingNodes) {
-            indexIds.add(node.getIndexId());
+            indexIds.add(node.getDocId());
         }
         return nodeIndex.findAllById(indexIds);
     }
@@ -122,7 +122,7 @@ public class NodeGetHelper extends NodeOperation {
         if (ref.isPresent()) {
             Optional<Commit> c = commitRepository.findByRefAndTimestamp(ref.get(), time);
             if (c.isPresent()) {
-                result.addAll(processGetAll(c.get().getIndexId()));
+                result.addAll(processGetAll(c.get().getDocId()));
             } else {
                 throw new BadRequestException("invalid time");
             }
@@ -146,7 +146,7 @@ public class NodeGetHelper extends NodeOperation {
         ref.ifPresent(current -> {
             List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(current, time, 0);
             for (Commit c : refCommits) {
-                commitIds.add(c.getIndexId());
+                commitIds.add(c.getDocId());
             }
         });
         return commitIds;

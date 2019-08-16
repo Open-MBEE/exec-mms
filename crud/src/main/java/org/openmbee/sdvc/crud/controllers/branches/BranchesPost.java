@@ -3,17 +3,20 @@ package org.openmbee.sdvc.crud.controllers.branches;
 import java.time.Instant;
 import java.util.Optional;
 import javax.transaction.Transactional;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
+
+import org.openmbee.sdvc.core.objects.BranchesRequest;
+import org.openmbee.sdvc.core.objects.BranchesResponse;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.Constants;
+import org.openmbee.sdvc.core.objects.BaseResponse;
+import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.crud.services.CommitService;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.data.domains.Commit;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
-import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.services.DatabaseDefinitionService;
+import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
+import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +58,7 @@ public class BranchesPost extends BaseController {
             Instant now = Instant.now();
 
             for (RefJson branch : projectsPost.getRefs()) {
-                DbContextHolder.setContext(projectId);
+                ContextHolder.setContext(projectId);
                 Branch b = new Branch();
                 b.setBranchId(branch.getId());
                 b.setBranchName(branch.getName());
@@ -91,7 +94,7 @@ public class BranchesPost extends BaseController {
 
                 Branch saved = branchRepository.save(b);
                 try {
-                    DbContextHolder.setContext(projectId, saved.getBranchId());
+                    ContextHolder.setContext(projectId, saved.getBranchId());
                     if (branchesOperations.createBranch()) {
                         branchesOperations.copyTablesFromParent(saved.getBranchId(),
                             b.getParentRefId(), branch.getParentCommitId());

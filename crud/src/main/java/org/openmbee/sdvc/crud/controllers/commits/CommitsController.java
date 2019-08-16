@@ -1,8 +1,11 @@
 package org.openmbee.sdvc.crud.controllers.commits;
 
 import java.util.Map;
+
+import org.openmbee.sdvc.core.objects.CommitsRequest;
+import org.openmbee.sdvc.core.objects.CommitsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.crud.services.CommitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

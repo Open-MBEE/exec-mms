@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
+import org.openmbee.sdvc.core.services.NodeChangeInfo;
+import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -103,7 +103,7 @@ public class NodePostHelper extends NodeOperation {
                 service.extraProcessPostedElement(element, node, info);
             } else if (updated) {
                 Node node = info.getExistingNodeMap().get(element.getId());
-                info.getOldIndexIds().add(node.getIndexId());
+                info.getOldDocIds().add(node.getDocId());
                 processElementUpdated(element, node, info.getCommitJson());
                 info.getToSaveNodeMap().put(node.getNodeId(), node);
                 info.getUpdatedMap().put(element.getId(), element);

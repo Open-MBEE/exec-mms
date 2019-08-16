@@ -10,16 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
-import org.openmbee.sdvc.crud.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.data.domains.Branch;
 import org.openmbee.sdvc.json.CommitJson;
-import org.openmbee.sdvc.crud.controllers.commits.CommitsRequest;
-import org.openmbee.sdvc.crud.controllers.commits.CommitsResponse;
+import org.openmbee.sdvc.core.objects.CommitsRequest;
+import org.openmbee.sdvc.core.objects.CommitsResponse;
 import org.openmbee.sdvc.data.domains.Commit;
-import org.openmbee.sdvc.crud.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.crud.repositories.commit.CommitIndexDAO;
+import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
+import org.openmbee.sdvc.core.services.CommitIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +48,7 @@ public class CommitService {
 
     public CommitsResponse getRefCommits(String projectId, String refId,
         Map<String, String> params) {
-        DbContextHolder.setContext(projectId, refId);
+        ContextHolder.setContext(projectId, refId);
         int limit = 0;
         Instant timestamp = null;
         if (params.containsKey("limit")) {
@@ -74,7 +74,7 @@ public class CommitService {
                 CommitJson json = new CommitJson();
                 json.setCreated(c.getTimestamp().toString());
                 json.setCreator(c.getCreator());
-                json.setId(c.getIndexId());
+                json.setId(c.getDocId());
                 json.setComment(c.getComment());
                 resJson.add(json);
             }
@@ -87,7 +87,7 @@ public class CommitService {
     }
 
     public CommitsResponse getCommit(String projectId, String commitId) {
-        DbContextHolder.setContext(projectId);
+        ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
             Optional<CommitJson> commit = commitIndex.findById(commitId);
@@ -105,7 +105,7 @@ public class CommitService {
 
     public CommitsResponse getElementCommits(String projectId, String refId, String elementId,
         Map<String, String> params) {
-        DbContextHolder.setContext(projectId);
+        ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
             Optional<Branch> ref = branchRepository.findByBranchId(refId);
@@ -115,7 +115,7 @@ public class CommitService {
             List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
             Set<String> commitIds = new HashSet<>();
             for (Commit commit: refCommits) {
-                commitIds.add(commit.getIndexId());
+                commitIds.add(commit.getDocId());
             }
             res.getCommits().addAll(commitIndex.elementHistory(elementId, commitIds));
         } catch (Exception e) {
@@ -126,7 +126,7 @@ public class CommitService {
     }
 
     public CommitsResponse getCommits(String projectId, CommitsRequest req) {
-        DbContextHolder.setContext(projectId);
+        ContextHolder.setContext(projectId);
         Set<String> ids = new HashSet<>();
         for (CommitJson j : req.getCommits()) {
             ids.add(j.getId());

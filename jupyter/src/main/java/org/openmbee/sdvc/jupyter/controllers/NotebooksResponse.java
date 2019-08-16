@@ -2,7 +2,7 @@ package org.openmbee.sdvc.jupyter.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.openmbee.sdvc.crud.controllers.BaseResponse;
+import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.jupyter.JupyterConstants;
 

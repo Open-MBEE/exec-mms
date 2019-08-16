@@ -18,7 +18,7 @@ public class Node {
 
     @Column(unique = true)
     private String nodeId;
-    private String indexId;
+    private String docId;
     private String lastCommit;
     private String initialCommit;
     private boolean deleted;
@@ -29,11 +29,11 @@ public class Node {
     public Node() {
     }
 
-    public Node(long id, String nodeId, String indexId, String lastCommit, String initialCommit,
+    public Node(long id, String nodeId, String docId, String lastCommit, String initialCommit,
         boolean deleted, Integer nodeType) {
         setId(id);
         setNodeId(nodeId);
-        setIndexId(indexId);
+        setDocId(docId);
         setLastCommit(lastCommit);
         setInitialCommit(initialCommit);
         setDeleted(deleted);
@@ -57,12 +57,12 @@ public class Node {
         this.nodeId = nodeId;
     }
 
-    public String getIndexId() {
-        return indexId;
+    public String getDocId() {
+        return docId;
     }
 
-    public void setIndexId(String indexId) {
-        this.indexId = indexId;
+    public void setDocId(String docId) {
+        this.docId = docId;
     }
 
     public String getLastCommit() {

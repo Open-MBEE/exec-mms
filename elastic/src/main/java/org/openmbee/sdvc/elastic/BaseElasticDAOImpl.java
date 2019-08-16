@@ -18,7 +18,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,14 +40,14 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     }
 
     protected String getIndex() {
-        return DbContextHolder.getContext().getProjectId().toLowerCase();
+        return ContextHolder.getContext().getProjectId().toLowerCase();
     }
 
     protected abstract E newInstance();
 
-    public void deleteById(String index, String indexId) {
+    public void deleteById(String index, String docId) {
         try {
-            client.delete(new DeleteRequest(index, this.type, indexId), RequestOptions.DEFAULT);
+            client.delete(new DeleteRequest(index, this.type, docId), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +57,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         try {
             BulkRequest bulkIndex = new BulkRequest();
             for (BaseJson json : jsons) {
-                bulkIndex.add(new DeleteRequest(index, this.type, json.getIndexId()));
+                bulkIndex.add(new DeleteRequest(index, this.type, json.getDocId()));
             }
             client.bulk(bulkIndex, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -65,9 +65,9 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         }
     }
 
-    public boolean existsById(String index, String indexId) {
+    public boolean existsById(String index, String docId) {
         try {
-            GetRequest getRequest = new GetRequest(index, this.type, indexId);
+            GetRequest getRequest = new GetRequest(index, this.type, docId);
             getRequest.fetchSourceContext(new FetchSourceContext(false));
             getRequest.storedFields("_none_");
             return client.exists(getRequest, RequestOptions.DEFAULT);
@@ -76,10 +76,10 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         }
     }
 
-    public Optional<E> findById(String index, String indexId) {
+    public Optional<E> findById(String index, String docId) {
         try {
             GetResponse res = client
-                .get(new GetRequest(index, type, indexId), RequestOptions.DEFAULT);
+                .get(new GetRequest(index, type, docId), RequestOptions.DEFAULT);
             if (res.isExists()) {
                 E ob = newInstance();
                 ob.putAll(res.getSourceAsMap());
@@ -92,15 +92,15 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         }
     }
 
-    public List<E> findAllById(String index, Set<String> indexIds) {
+    public List<E> findAllById(String index, Set<String> docIds) {
         try {
             List<E> listOfResponses = new ArrayList<>();
 
-            if (indexIds.isEmpty()) {
+            if (docIds.isEmpty()) {
                 return listOfResponses;
             }
             MultiGetRequest request = new MultiGetRequest();
-            for (String eid : indexIds) {
+            for (String eid : docIds) {
                 request.add(index, this.type, eid);
             }
             MultiGetResponse response = client.mget(request, RequestOptions.DEFAULT);
@@ -125,7 +125,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         try {
             BulkRequest bulkIndex = new BulkRequest();
             for (BaseJson json : jsons) {
-                bulkIndex.add(new IndexRequest(index, this.type, json.getIndexId()).source(json));
+                bulkIndex.add(new IndexRequest(index, this.type, json.getDocId()).source(json));
             }
             client.bulk(bulkIndex, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -135,7 +135,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void index(String index, BaseJson json) {
         try {
-            client.index(new IndexRequest(index, this.type, json.getIndexId()).source(json),
+            client.index(new IndexRequest(index, this.type, json.getDocId()).source(json),
                 RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new RuntimeException(e);

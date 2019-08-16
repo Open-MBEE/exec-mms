@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
+import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.services.BranchService;
 import org.springframework.beans.factory.annotation.Autowired;

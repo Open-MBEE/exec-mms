@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.openmbee.sdvc.crud.config.DbContextHolder;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsResponse;
-import org.openmbee.sdvc.crud.services.NodeChangeInfo;
+
+import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.objects.ElementsRequest;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
+import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.crud.services.NodeOperation;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.services.DefaultNodeService;
-import org.openmbee.sdvc.crud.services.NodeService;
+import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.Node;
 import org.openmbee.sdvc.jupyter.JupyterConstants;
 import org.openmbee.sdvc.jupyter.JupyterEdgeType;
@@ -48,12 +49,11 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
         }
     }
 
-    public ElementsResponse readNotebooks(String projectId, String refId, String elementId,
-            Map<String, String> params) {
+    public ElementsResponse readNotebooks(String projectId, String refId, String elementId, Map<String, String> params) {
         ElementsRequest req = new ElementsRequest();
         List<ElementJson> reqs = new ArrayList<>();
         if (elementId == null) {
-            DbContextHolder.setContext(projectId, refId);
+            ContextHolder.setContext(projectId, refId);
             List<Node> notebooks = this.nodeRepository
                 .findAllByDeletedAndNodeType(false, JupyterNodeType.NOTEBOOK.getValue());
             for (Node n : notebooks) {

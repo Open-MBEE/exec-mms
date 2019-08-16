@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
 import java.util.List;
-import org.openmbee.sdvc.crud.controllers.elements.ElementsRequest;
+import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.json.ElementJson;
 
 public class NotebooksRequest extends ElementsRequest {
