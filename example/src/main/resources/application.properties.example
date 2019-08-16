@@ -19,10 +19,10 @@ ldap.group.search.base=
 ldap.group.search.filter=uniqueMember={0}
 
 # See core module for example configuration
-spring.datasource.url=jdbc:postgresql://db-server-bar:5432
-spring.datasource.database=bar
-spring.datasource.username=fooadmin
-spring.datasource.password=foo123
+spring.datasource.url=jdbc:postgresql://localhost:5432
+spring.datasource.database=mms
+spring.datasource.username=mmsuser
+spring.datasource.password=test1234
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 # The SQL dialect makes Hibernate generate better SQL for the chosen database

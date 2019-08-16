@@ -4,8 +4,8 @@ dependencies {
     compile project(':rdb')
     compile project(':core')
 
-    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.0.8.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.0.8.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.6.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.1.6.RELEASE'
 
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
