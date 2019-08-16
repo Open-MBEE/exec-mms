@@ -174,13 +174,13 @@ public class DefaultNodeService implements NodeService {
                 throw new InternalErrorException("Error committing transaction");
             }
 
-            this.nodeIndex.removeFromRef(info.getOldIndexIds());
+            this.nodeIndex.removeFromRef(info.getOldDocIds());
 
             Commit commit = new Commit();
             commit.setBranchId(cmjs.getRefId());
             commit.setCommitType(CommitType.COMMIT);
             commit.setCreator(cmjs.getCreator());
-            commit.setIndexId(cmjs.getId());
+            commit.setDocId(cmjs.getId());
             commit.setTimestamp(now);
             commit.setComment(cmjs.getComment());
 

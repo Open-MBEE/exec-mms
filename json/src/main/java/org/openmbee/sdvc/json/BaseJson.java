@@ -8,7 +8,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
 
     public static final String ID = "id";
     public static final String NAME = "name";
-    public static final String INDEXID = "_indexId";
+    public static final String DOCID = "_docId";
     public static final String PROJECTID = "_projectId";
     public static final String REFID = "_refId";
     public static final String MODIFIER = "_modifier";
@@ -48,13 +48,13 @@ public class BaseJson<T> extends HashMap<String, Object> {
         return (T) this;
     }
 
-    public String getIndexId() {
-        return (String) this.get(INDEXID);
+    public String getDocId() {
+        return (String) this.get(DOCID);
     }
 
     @SuppressWarnings("unchecked")
-    public T setIndexId(String indexId) {
-        this.put(INDEXID, indexId);
+    public T setDocId(String docId) {
+        this.put(DOCID, docId);
         return (T) this;
     }
 

@@ -15,15 +15,15 @@ public interface CommitIndexDAO {
 
     void index(BaseJson json);
 
-    Optional<CommitJson> findById(String indexId);
+    Optional<CommitJson> findById(String docId);
 
-    List<CommitJson> findAllById(Set<String> indexIds);
+    List<CommitJson> findAllById(Set<String> docIds);
 
-    void deleteById(String indexId);
+    void deleteById(String docId);
 
     void deleteAll(Collection<? extends BaseJson> jsons);
 
-    boolean existsById(String indexId);
+    boolean existsById(String docId);
 
     List<CommitJson> elementHistory(String id, Set<String> commitIds);
 

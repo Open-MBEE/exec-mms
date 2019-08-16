@@ -17,7 +17,7 @@ public class NodeChangeInfo extends NodeGetInfo {
 
     Map<String, ElementJson> deletedMap;
 
-    Set<String> oldIndexIds;
+    Set<String> oldDocIds;
 
     CommitJson commitJson;
 
@@ -82,12 +82,12 @@ public class NodeChangeInfo extends NodeGetInfo {
         return this;
     }
 
-    public Set<String> getOldIndexIds() {
-        return oldIndexIds;
+    public Set<String> getOldDocIds() {
+        return oldDocIds;
     }
 
-    public NodeChangeInfo setOldIndexIds(Set<String> oldIndexIds) {
-        this.oldIndexIds = oldIndexIds;
+    public NodeChangeInfo setOldDocIds(Set<String> oldDocIds) {
+        this.oldDocIds = oldDocIds;
         return this;
     }
 

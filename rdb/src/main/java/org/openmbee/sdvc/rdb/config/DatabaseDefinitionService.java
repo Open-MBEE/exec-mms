@@ -41,7 +41,7 @@ public class DatabaseDefinitionService {
     private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
     private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
 
-    private static final String INITIAL_PROJECT = "INSERT INTO nodes (id, nodeid, indexid, initialcommit, lastcommit, nodetype, deleted) VALUES (0, ?, ?, ?, ?, ?, false)";
+    private static final String INITIAL_PROJECT = "INSERT INTO nodes (id, nodeid, docid, initialcommit, lastcommit, nodetype, deleted) VALUES (0, ?, ?, ?, ?, ?, false)";
     private static final String INITIAL_REF = "INSERT INTO branches (id, branchid, branchname, tag, deleted, timestamp) VALUES (0, 'master', 'master', false, false, NOW());";
 
     private static final String GET_CHILDREN =
@@ -102,12 +102,12 @@ public class DatabaseDefinitionService {
 
     private static final String GET_IMMEDIATE_PARENTS =
         "CREATE OR REPLACE FUNCTION get_immediate_parents(integer, integer, text)\n"
-            + " RETURNS TABLE(nodeid text, indexid text)\n"
+            + " RETURNS TABLE(nodeid text, docid text)\n"
             + "AS $$\n"
             + "  begin\n"
             + "    return query\n"
             + "    execute '\n"
-            + "    select nodeid, indexid from nodes' || $3 || ' where id in\n"
+            + "    select nodeid, docid from nodes' || $3 || ' where id in\n"
             + "      (select id from get_parents(' || $1 || ',' || $2 || ',''' || format('%s',$3) ||\n"
             + "      ''') where height = 1);';\n"
             + "  end;\n"

@@ -41,24 +41,24 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         this.index(getIndex(), json);
     }
 
-    public Optional<ElementJson> findById(String indexId) {
-        return this.findById(getIndex(), indexId);
+    public Optional<ElementJson> findById(String docId) {
+        return this.findById(getIndex(), docId);
     }
 
-    public List<ElementJson> findAllById(Set<String> indexIds) {
-        return this.findAllById(getIndex(), indexIds);
+    public List<ElementJson> findAllById(Set<String> docIds) {
+        return this.findAllById(getIndex(), docIds);
     }
 
-    public void deleteById(String indexId) {
-        this.deleteById(getIndex(), indexId);
+    public void deleteById(String docId) {
+        this.deleteById(getIndex(), docId);
     }
 
     public void deleteAll(Collection<? extends BaseJson> jsons) {
         this.deleteAll(getIndex(), jsons);
     }
 
-    public boolean existsById(String indexId) {
-        return this.existsById(getIndex(), indexId);
+    public boolean existsById(String docId) {
+        return this.existsById(getIndex(), docId);
     }
 
     @Override
@@ -86,25 +86,25 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
 
     protected static String ADD_TO_REF = "if(ctx._source.containsKey(\"_inRefIds\")){ctx._source._inRefIds.add(params.refId)} else {ctx._source._inRefIds = [params.refId]}";
 
-    public void addToRef(Set<String> indexIds) {
-        bulkUpdateRefWithScript(indexIds, ADD_TO_REF);
+    public void addToRef(Set<String> docIds) {
+        bulkUpdateRefWithScript(docIds, ADD_TO_REF);
     }
 
     protected static String REMOVE_FROM_REF = "if(ctx._source.containsKey(\"_inRefIds\")){ctx._source._inRefIds.removeAll([params.refId])}";
 
-    public void removeFromRef(Set<String> indexIds) {
-        bulkUpdateRefWithScript(indexIds, REMOVE_FROM_REF);
+    public void removeFromRef(Set<String> docIds) {
+        bulkUpdateRefWithScript(docIds, REMOVE_FROM_REF);
     }
 
-    private void bulkUpdateRefWithScript(Set<String> indexIds, String script) {
-        if (indexIds.isEmpty()) {
+    private void bulkUpdateRefWithScript(Set<String> docIds, String script) {
+        if (docIds.isEmpty()) {
             return;
         }
         BulkRequest bulk = new BulkRequest();
         Map<String, Object> parameters = Collections.singletonMap("refId",
             ContextHolder.getContext().getBranchId());
-        for (String indexId : indexIds) {
-            UpdateRequest request = new UpdateRequest(getIndex(), this.type, indexId);
+        for (String docId : docIds) {
+            UpdateRequest request = new UpdateRequest(getIndex(), this.type, docId);
             Script inline = new Script(ScriptType.INLINE, "painless", script,
                 parameters);
             request.script(inline);

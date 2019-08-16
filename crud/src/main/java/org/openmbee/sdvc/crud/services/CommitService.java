@@ -74,7 +74,7 @@ public class CommitService {
                 CommitJson json = new CommitJson();
                 json.setCreated(c.getTimestamp().toString());
                 json.setCreator(c.getCreator());
-                json.setId(c.getIndexId());
+                json.setId(c.getDocId());
                 json.setComment(c.getComment());
                 resJson.add(json);
             }
@@ -115,7 +115,7 @@ public class CommitService {
             List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
             Set<String> commitIds = new HashSet<>();
             for (Commit commit: refCommits) {
-                commitIds.add(commit.getIndexId());
+                commitIds.add(commit.getDocId());
             }
             res.getCommits().addAll(commitIndex.elementHistory(elementId, commitIds));
         } catch (Exception e) {

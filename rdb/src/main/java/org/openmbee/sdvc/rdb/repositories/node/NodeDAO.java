@@ -24,7 +24,7 @@ public interface NodeDAO extends BaseDAO {
 
     public Optional<Node> findById(long id);
 
-    public Optional<Node> findByNodeId(String sysmlid);
+    public Optional<Node> findByNodeId(String nodeId);
 
     public List<Node> findAllByNodeIds(Collection<String> ids);
 

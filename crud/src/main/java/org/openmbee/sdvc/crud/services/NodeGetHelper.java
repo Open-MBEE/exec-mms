@@ -91,7 +91,7 @@ public class NodeGetHelper extends NodeOperation {
         if (ref.isPresent()) {
             Optional<Commit> c = commitRepository.findLatestByRef(ref.get());
             if (c.isPresent()) {
-                return processGetJson(elements, c.get().getIndexId());
+                return processGetJson(elements, c.get().getDocId());
             } else {
                 throw new BadRequestException("invalid time");
             }
@@ -103,7 +103,7 @@ public class NodeGetHelper extends NodeOperation {
         Set<String> indexIds = new HashSet<>();
         List<Node> existingNodes = nodeRepository.findAllByDeleted(false);
         for (Node node : existingNodes) {
-            indexIds.add(node.getIndexId());
+            indexIds.add(node.getDocId());
         }
         return nodeIndex.findAllById(indexIds);
     }
@@ -122,7 +122,7 @@ public class NodeGetHelper extends NodeOperation {
         if (ref.isPresent()) {
             Optional<Commit> c = commitRepository.findByRefAndTimestamp(ref.get(), time);
             if (c.isPresent()) {
-                result.addAll(processGetAll(c.get().getIndexId()));
+                result.addAll(processGetAll(c.get().getDocId()));
             } else {
                 throw new BadRequestException("invalid time");
             }
@@ -146,7 +146,7 @@ public class NodeGetHelper extends NodeOperation {
         ref.ifPresent(current -> {
             List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(current, time, 0);
             for (Commit c : refCommits) {
-                commitIds.add(c.getIndexId());
+                commitIds.add(c.getDocId());
             }
         });
         return commitIds;

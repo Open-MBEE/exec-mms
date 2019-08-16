@@ -32,7 +32,7 @@ public class NodeDeleteHelper extends NodeOperation {
                 info.getRejected().add(reject);
                 continue;
             }
-            info.getOldIndexIds().add(node.getIndexId());
+            info.getOldDocIds().add(node.getDocId());
             ElementJson request = info.getReqElementMap().get(nodeId);
             request.putAll(indexElement);
             info.getToSaveNodeMap().put(nodeId, node);

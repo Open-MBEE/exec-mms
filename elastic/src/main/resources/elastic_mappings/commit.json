@@ -59,7 +59,7 @@
             "_projectId":{
                 "type":"keyword"
             },
-            "_indexId":{
+            "_docId":{
                 "type":"keyword"
             }
         }

@@ -37,24 +37,24 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         this.index(getIndex(), json);
     }
 
-    public Optional<CommitJson> findById(String indexId) {
-        return this.findById(getIndex(), indexId);
+    public Optional<CommitJson> findById(String docId) {
+        return this.findById(getIndex(), docId);
     }
 
-    public List<CommitJson> findAllById(Set<String> indexIds) {
-        return this.findAllById(getIndex(), indexIds);
+    public List<CommitJson> findAllById(Set<String> docIds) {
+        return this.findAllById(getIndex(), docIds);
     }
 
-    public void deleteById(String indexId) {
-        this.deleteById(getIndex(), indexId);
+    public void deleteById(String docId) {
+        this.deleteById(getIndex(), docId);
     }
 
     public void deleteAll(Collection<? extends BaseJson> jsons) {
         this.deleteAll(getIndex(), jsons);
     }
 
-    public boolean existsById(String indexId) {
-        return this.existsById(getIndex(), indexId);
+    public boolean existsById(String docId) {
+        return this.existsById(getIndex(), docId);
     }
 
     /**

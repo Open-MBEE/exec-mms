@@ -136,7 +136,7 @@
                 "type": "date",
                 "format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
             },
-            "_indexId": {
+            "_docId": {
                 "type": "keyword"
             },
             "_projectId": {

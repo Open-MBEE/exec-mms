@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
-    private final String INSERT_SQL = "INSERT INTO nodes%s (nodeid, indexid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
-    private final String UPDATE_SQL = "UPDATE nodes%s SET nodeid = ?, indexid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
+    private final String INSERT_SQL = "INSERT INTO nodes%s (nodeid, docid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
+    private final String UPDATE_SQL = "UPDATE nodes%s SET nodeid = ?, docid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
 
     public Node save(Node node) throws InvalidDataAccessApiUsageException, DataRetrievalFailureException {
         if (node.getId() == null) {
@@ -175,7 +175,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
     private PreparedStatement prepareStatement(PreparedStatement ps, Node n) throws SQLException {
         ps.setString(1, n.getNodeId());
-        ps.setString(2, n.getIndexId());
+        ps.setString(2, n.getDocId());
         ps.setString(3, n.getLastCommit());
         ps.setString(4, n.getInitialCommit());
         ps.setBoolean(5, n.isDeleted());

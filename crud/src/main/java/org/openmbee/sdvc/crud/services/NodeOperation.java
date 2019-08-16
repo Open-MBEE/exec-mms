@@ -62,7 +62,7 @@ public class NodeOperation {
 
     public void initCommitJson(CommitJson cmjs, Instant now) {
         cmjs.setId(UUID.randomUUID().toString());
-        cmjs.setIndexId(cmjs.getId());
+        cmjs.setDocId(cmjs.getId());
         cmjs.setCreated(formatter.format(now));
         cmjs.setAdded(new ArrayList<>());
         cmjs.setDeleted(new ArrayList<>());
@@ -76,7 +76,7 @@ public class NodeOperation {
         List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
         Map<String, Node> existingNodeMap = new HashMap<>();
         for (Node node : existingNodes) {
-            indexIds.add(node.getIndexId());
+            indexIds.add(node.getDocId());
             existingNodeMap.put(node.getNodeId(), node);
         }
         // bulk read existing elements in elastic
@@ -99,7 +99,7 @@ public class NodeOperation {
         info.setToSaveNodeMap(new HashMap<>());
         info.setRejected(new ArrayList<>());
         info.setNow(now);
-        info.setOldIndexIds(new HashSet<>());
+        info.setOldDocIds(new HashSet<>());
         info.setEdgesToDelete(new HashMap<>());
         info.setEdgesToSave(new HashMap<>());
         info.setActiveElementMap(new HashMap<>());
@@ -114,21 +114,21 @@ public class NodeOperation {
 
         Map<String, Object> newObj = new HashMap<>();
         newObj.put(CommitJson.TYPE, "Element");
-        newObj.put(BaseJson.INDEXID, e.getIndexId());
+        newObj.put(BaseJson.DOCID, e.getDocId());
         newObj.put(BaseJson.ID, e.getId());
         cmjs.getAdded().add(newObj);
 
         n.setNodeId(e.getId());
-        n.setInitialCommit(e.getIndexId());
+        n.setInitialCommit(e.getDocId());
     }
 
     public void processElementUpdated(ElementJson e, Node n, CommitJson cmjs) {
         processElementAddedOrUpdated(e, n, cmjs);
 
         Map<String, Object> newObj = new HashMap<>();
-        newObj.put(CommitJson.PREVIOUS, n.getIndexId());
+        newObj.put(CommitJson.PREVIOUS, n.getDocId());
         newObj.put(CommitJson.TYPE, "Element");
-        newObj.put(BaseJson.INDEXID, e.getIndexId());
+        newObj.put(BaseJson.DOCID, e.getDocId());
         newObj.put(BaseJson.ID, e.getId());
         cmjs.getUpdated().add(newObj);
     }
@@ -140,12 +140,12 @@ public class NodeOperation {
         inRefIds.add(cmjs.getRefId());
         e.setInRefIds(inRefIds);
         String elasticId = UUID.randomUUID().toString();
-        e.setIndexId(elasticId);
+        e.setDocId(elasticId);
         e.setCommitId(cmjs.getId());
         e.setModified(cmjs.getCreated());
         e.setModifier(cmjs.getCreator());
 
-        n.setIndexId(e.getIndexId());
+        n.setDocId(e.getDocId());
         n.setLastCommit(cmjs.getId());
         n.setDeleted(false);
         n.setNodeType(0);
@@ -153,7 +153,7 @@ public class NodeOperation {
 
     public void processElementDeleted(ElementJson e, Node n, CommitJson cmjs) {
         Map<String, Object> newObj = new HashMap<>();
-        newObj.put(CommitJson.PREVIOUS, n.getIndexId());
+        newObj.put(CommitJson.PREVIOUS, n.getDocId());
         newObj.put(CommitJson.TYPE, "Element");
         newObj.put(BaseJson.ID, e.getId());
         cmjs.getDeleted().add(newObj);

@@ -103,7 +103,7 @@ public class NodePostHelper extends NodeOperation {
                 service.extraProcessPostedElement(element, node, info);
             } else if (updated) {
                 Node node = info.getExistingNodeMap().get(element.getId());
-                info.getOldIndexIds().add(node.getIndexId());
+                info.getOldDocIds().add(node.getDocId());
                 processElementUpdated(element, node, info.getCommitJson());
                 info.getToSaveNodeMap().put(node.getNodeId(), node);
                 info.getUpdatedMap().put(element.getId(), element);
