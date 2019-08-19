@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.data.domains;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -10,9 +10,9 @@ import javax.persistence.Table;
 public class Metadata extends Base {
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
     private Project project;
 
+    @Column(name="\"key\"") //key is reserved word in mysql
     private String key;
     private String value;
 

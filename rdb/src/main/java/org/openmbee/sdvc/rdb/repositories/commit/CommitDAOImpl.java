@@ -90,7 +90,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             currentExtraCol++;
         }
         if (timestamp != null) {
-            query.append(" AND date_trunc('milliseconds', timestamp) <= ?");
+            query.append(" AND timestamp <= ?");
             timestampCol = currentExtraCol;
             currentExtraCol++;
         }

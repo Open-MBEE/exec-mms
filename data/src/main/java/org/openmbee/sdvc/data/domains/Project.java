@@ -42,8 +42,7 @@ public class Project extends Base {
     @JsonIgnore
     private Collection<Role> roles;
 
-    @ManyToMany
-    @JoinTable(name = "projects_metadata", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "metadata_id", referencedColumnName = "id"))
+    @OneToMany(mappedBy = "project")
     private Collection<Metadata> metadata;
 
     public Project() {

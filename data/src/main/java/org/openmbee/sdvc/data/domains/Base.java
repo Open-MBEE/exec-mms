@@ -20,7 +20,7 @@ public abstract class Base implements Serializable {
     private static final long serialVersionUID = 8389104517465359723L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //use of AUTO with mysql results in TABLE, for postgres auto is fine
     @Column(name = "id")
     Long id;
 
