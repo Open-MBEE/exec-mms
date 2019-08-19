@@ -31,7 +31,6 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     @Value("${elasticsearch.limit.term}")
     protected int termLimit;
     protected static int readTimeout = 1000000000;
-    protected final String type = "_doc";
     protected RestHighLevelClient client;
 
     @Autowired
@@ -47,7 +46,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void deleteById(String index, String docId) {
         try {
-            client.delete(new DeleteRequest(index, this.type, docId), RequestOptions.DEFAULT);
+            client.delete(new DeleteRequest(index, docId), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +56,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         try {
             BulkRequest bulkIndex = new BulkRequest();
             for (BaseJson json : jsons) {
-                bulkIndex.add(new DeleteRequest(index, this.type, json.getDocId()));
+                bulkIndex.add(new DeleteRequest(index, json.getDocId()));
             }
             client.bulk(bulkIndex, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -67,7 +66,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public boolean existsById(String index, String docId) {
         try {
-            GetRequest getRequest = new GetRequest(index, this.type, docId);
+            GetRequest getRequest = new GetRequest(index, docId);
             getRequest.fetchSourceContext(new FetchSourceContext(false));
             getRequest.storedFields("_none_");
             return client.exists(getRequest, RequestOptions.DEFAULT);
@@ -79,7 +78,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     public Optional<E> findById(String index, String docId) {
         try {
             GetResponse res = client
-                .get(new GetRequest(index, type, docId), RequestOptions.DEFAULT);
+                .get(new GetRequest(index, docId), RequestOptions.DEFAULT);
             if (res.isExists()) {
                 E ob = newInstance();
                 ob.putAll(res.getSourceAsMap());
@@ -101,7 +100,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             }
             MultiGetRequest request = new MultiGetRequest();
             for (String eid : docIds) {
-                request.add(index, this.type, eid);
+                request.add(index, eid);
             }
             MultiGetResponse response = client.mget(request, RequestOptions.DEFAULT);
 
@@ -125,7 +124,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         try {
             BulkRequest bulkIndex = new BulkRequest();
             for (BaseJson json : jsons) {
-                bulkIndex.add(new IndexRequest(index, this.type, json.getDocId()).source(json));
+                bulkIndex.add(new IndexRequest(index).id(json.getDocId()).source(json));
             }
             client.bulk(bulkIndex, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -135,7 +134,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void index(String index, BaseJson json) {
         try {
-            client.index(new IndexRequest(index, this.type, json.getDocId()).source(json),
+            client.index(new IndexRequest(index).id(json.getDocId()).source(json),
                 RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new RuntimeException(e);

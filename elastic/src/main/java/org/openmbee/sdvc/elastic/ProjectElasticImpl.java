@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -35,9 +35,9 @@ public class ProjectElasticImpl implements ProjectIndex {
         try {
             String index = projectId.toLowerCase();
             CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
-            commitIndex.mapping("_doc", getCommitMapping(), XContentType.JSON);
+            commitIndex.mapping(getCommitMapping(), XContentType.JSON);
             CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
-            nodeIndex.mapping("_doc", getNodeMapping(projectType), XContentType.JSON);
+            nodeIndex.mapping(getNodeMapping(projectType), XContentType.JSON);
             createIndex(commitIndex);
             createIndex(nodeIndex);
         } catch (IOException e) {
