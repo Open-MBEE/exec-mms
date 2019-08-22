@@ -1,5 +1,5 @@
 {
-    "_doc": {
+
         "properties": {
             "id": {
                 "type": "keyword"
@@ -34,5 +34,5 @@
                 "type": "keyword"
             }
         }
-    }
+
 }

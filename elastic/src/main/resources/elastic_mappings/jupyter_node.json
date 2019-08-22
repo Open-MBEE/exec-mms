@@ -1,5 +1,5 @@
 {
-    "_doc": {
+
         "properties": {
             "metadata": {
                 "properties":{
@@ -152,5 +152,5 @@
                 "type": "keyword"
             }
         }
-    }
+
 }
