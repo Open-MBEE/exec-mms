@@ -267,9 +267,11 @@ public class DatabaseDefinitionService {
         jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
         jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
 
-        //reset db auto increment sequence for postgresql
-        //jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
-        //jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
+        //reset db auto increment sequence for postgresql only
+        if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
+            jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
+            jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
+        }
 
         jdbcTemplate.execute("COMMIT");
     }
