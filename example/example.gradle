@@ -30,3 +30,5 @@ dependencies {
         'org.springframework.boot:spring-boot-starter-test'
     )
 }
+
+ext['elasticsearch.version'] = '7.1.1'
