@@ -6,7 +6,7 @@
                     "id":{
                         "type":"keyword"
                     },
-                    "_indexId":{
+                    "_docId":{
                         "type":"keyword"
                     },
                     "type":{
@@ -19,10 +19,10 @@
                     "id":{
                         "type":"keyword"
                     },
-                    "_indexId":{
+                    "_docId":{
                         "type":"keyword"
                     },
-                    "previousIndexId":{
+                    "previousDocId":{
                         "type":"keyword"
                     },
                     "type":{
@@ -35,7 +35,7 @@
                     "id":{
                         "type":"keyword"
                     },
-                    "previousIndexId":{
+                    "previousDocId":{
                         "type":"keyword"
                     },
                     "type":{
