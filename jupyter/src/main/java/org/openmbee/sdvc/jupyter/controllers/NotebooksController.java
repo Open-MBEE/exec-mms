@@ -25,7 +25,7 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable(required = false) String notebookId,
-        @RequestParam Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, notebookId, params);
         if (notebookId != null) {
@@ -42,7 +42,7 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
-        @RequestParam Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, req, params);
         NotebooksResponse resn = new NotebooksResponse();
@@ -56,7 +56,7 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
-        @RequestParam Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params) {
 
         return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params));
     }

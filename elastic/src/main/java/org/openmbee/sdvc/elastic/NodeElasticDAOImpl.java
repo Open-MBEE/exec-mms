@@ -73,7 +73,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
             sourceBuilder.query(query);
             searchRequest.source(sourceBuilder);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            if (searchResponse.getHits().getTotalHits() == 0) {
+            if (searchResponse.getHits().getTotalHits().value == 0) {
                 return Optional.empty();
             }
             ElementJson ob = newInstance();
@@ -104,7 +104,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         Map<String, Object> parameters = Collections.singletonMap("refId",
             ContextHolder.getContext().getBranchId());
         for (String docId : docIds) {
-            UpdateRequest request = new UpdateRequest(getIndex(), this.type, docId);
+            UpdateRequest request = new UpdateRequest(getIndex(), docId);
             Script inline = new Script(ScriptType.INLINE, "painless", script,
                 parameters);
             request.script(inline);

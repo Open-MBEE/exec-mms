@@ -1,5 +1,5 @@
 {
-    "_doc": {
+
         "dynamic_templates": [
             {
                 "id_as_keywords": {
@@ -119,5 +119,5 @@
                 "type": "keyword"
             }
         }
-    }
+
 }

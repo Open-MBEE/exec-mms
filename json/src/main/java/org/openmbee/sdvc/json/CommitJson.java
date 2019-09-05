@@ -9,7 +9,7 @@ public class CommitJson extends BaseJson<CommitJson> {
     public static final String ADDED = "added";
     public static final String DELETED = "deleted";
     public static final String UPDATED = "updated";
-    public static final String PREVIOUS = "previousIndexId";
+    public static final String PREVIOUS = "previousDocId";
     public static final String TYPE = "type";
     public static final String SOURCE = "source";
 

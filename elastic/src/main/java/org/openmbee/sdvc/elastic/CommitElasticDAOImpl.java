@@ -102,7 +102,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             searchRequest.source(sourceBuilder);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             SearchHits hits = searchResponse.getHits();
-            if (hits.getTotalHits() == 0) {
+            if (hits.getTotalHits().value == 0) {
                 return commits;
             }
             for (SearchHit hit : hits.getHits()) {
