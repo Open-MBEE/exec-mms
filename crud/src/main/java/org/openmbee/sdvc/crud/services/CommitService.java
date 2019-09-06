@@ -1,7 +1,6 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.config.Formats;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.data.domains.Branch;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CommitService {
 
-    public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private CommitDAO commitRepository;
     private CommitIndexDAO commitIndex;
     private BranchDAO branchRepository;
@@ -56,9 +56,11 @@ public class CommitService {
         }
         if (params.containsKey("maxTimestamp")) {
             try {
-                timestamp = df.parse(params.get("maxTimestamp")).toInstant();
+                timestamp = Formats.SDF.parse(params.get("maxTimestamp")).toInstant();
             } catch (ParseException e) {
                 e.printStackTrace();
+                throw new BadRequestException("maxTimestamp parse error, use " +
+                    Formats.FORMATTER.format(Instant.now()) + " as example");
             }
         }
         Optional<Branch> ref = branchRepository.findByBranchId(refId);
@@ -72,7 +74,7 @@ public class CommitService {
             List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(commit, finalTimestamp, finalLimit);
             for (Commit c : commits) {
                 CommitJson json = new CommitJson();
-                json.setCreated(c.getTimestamp().toString());
+                json.setCreated(Formats.FORMATTER.format(c.getTimestamp()));
                 json.setCreator(c.getCreator());
                 json.setId(c.getDocId());
                 json.setComment(c.getComment());

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -90,6 +91,11 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
             currentExtraCol++;
         }
         if (timestamp != null) {
+            if (timestamp.truncatedTo(ChronoUnit.MILLIS).equals(timestamp)) {
+                //if original timestamp doesn't have microseconds, add a millisecond to counter
+                //timestamp in db that has microseconds
+                timestamp = timestamp.plusMillis(1);
+            }
             query.append(" AND timestamp <= ?");
             timestampCol = currentExtraCol;
             currentExtraCol++;
@@ -102,6 +108,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         final int commitColNum = commitCol;
         final int timestampColNum = timestampCol;
         final int limitColNum = limitCol;
+        Instant finalTimestamp = timestamp;
         return getConn().query(new PreparedStatementCreator() {
             public PreparedStatement createPreparedStatement(Connection connection)
                 throws SQLException {
@@ -112,7 +119,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
                     ps.setLong(commitColNum, cid);
                 }
                 if (timestampColNum != 0) {
-                    ps.setTimestamp(timestampColNum, Timestamp.from(timestamp));
+                    ps.setTimestamp(timestampColNum, Timestamp.from(finalTimestamp));
                 }
                 if (limitColNum != 0) {
                     ps.setInt(limitColNum, limit);

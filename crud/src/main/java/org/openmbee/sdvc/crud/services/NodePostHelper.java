@@ -1,12 +1,12 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openmbee.sdvc.core.config.Formats;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.json.BaseJson;
@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NodePostHelper extends NodeOperation {
-
-    public static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public boolean isUpdated(BaseJson element, Map<String, Object> existing,
                              Map<String, Object> rejection) {
@@ -39,8 +37,8 @@ public class NodePostHelper extends NodeOperation {
         Object existingModified = existing.get(BaseJson.MODIFIED);
         if (jsonModified != null && !jsonModified.isEmpty()) {
             try {
-                Date jsonModDate = df.parse(jsonModified);
-                Date existingModDate = df.parse(existingModified.toString());
+                Date jsonModDate = Formats.SDF.parse(jsonModified);
+                Date existingModDate = Formats.SDF.parse(existingModified.toString());
                 if (jsonModDate.before(existingModDate)) {
                     rejection.put("message", "Conflict Detected");
                     rejection.put("code", 409);

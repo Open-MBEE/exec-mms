@@ -16,7 +16,6 @@ import java.util.Optional;
 @Service
 public class BranchService {
 
-    public static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private BranchDAO branchRepository;
 
     @Autowired
