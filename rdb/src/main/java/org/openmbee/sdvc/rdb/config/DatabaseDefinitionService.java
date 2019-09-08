@@ -141,11 +141,12 @@ public class DatabaseDefinitionService {
             generateProjectSchemaFromModels(project);
             created.add("Created Tables");
 
-            jdbcTemplate = new JdbcTemplate(crudDataSources.get(project.getProjectId()));
-            jdbcTemplate.execute(GET_CHILDREN);
-            jdbcTemplate.execute(GET_PARENTS);
-            jdbcTemplate.execute(GET_IMMEDIATE_PARENTS);
-            jdbcTemplate.execute(GET_DOC_GROUPS);
+            //stored procedures for postgresql for graph traversal, deprecated in favor of separate graph db
+            //jdbcTemplate = new JdbcTemplate(crudDataSources.get(project.getProjectId()));
+            //jdbcTemplate.execute(GET_CHILDREN);
+            //jdbcTemplate.execute(GET_PARENTS);
+            //jdbcTemplate.execute(GET_IMMEDIATE_PARENTS);
+            //jdbcTemplate.execute(GET_DOC_GROUPS);
 
         } catch (DataAccessException e) {
             if (e.getCause().getLocalizedMessage().toLowerCase().contains("exists")) {
@@ -265,13 +266,12 @@ public class DatabaseDefinitionService {
 
         jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
         jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
-        //copyTables(jdbcTemplate, COPY_SQL, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
-        //copyTables(jdbcTemplate, COPY_SQL, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
 
-        jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
-        jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
-        //copyTables(jdbcTemplate, COPY_IDX, targetNodeTable, parentNodeTable.toString(), new NodeRowMapper());
-        //copyTables(jdbcTemplate, COPY_IDX, targetEdgeTable, parentEdgeTable.toString(), new EdgeRowMapper());
+        //reset db auto increment sequence for postgresql only
+        if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
+            jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
+            jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
+        }
 
         jdbcTemplate.execute("COMMIT");
     }
