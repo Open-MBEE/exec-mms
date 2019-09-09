@@ -1,7 +1,0 @@
-apply plugin: 'io.spring.convention.spring-module'
-
-dependencies {
-    compile 'org.hibernate:hibernate-core:5.3.5.Final'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.6'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
-}
