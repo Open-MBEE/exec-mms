@@ -4,6 +4,12 @@ import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 
 public interface PermissionService {
 
+    void initOrgPerms(String orgId, String creator);
+
+    void initProjectPerms(String projectId, boolean inherit, String creator);
+
+    void initBranchPerms(String projectId, String branchId, boolean inherit, String creator);
+
     void updateOrgUserPerms(PermissionUpdateRequest req, String orgId);
 
     void updateOrgGroupPerms(PermissionUpdateRequest req, String orgId);
