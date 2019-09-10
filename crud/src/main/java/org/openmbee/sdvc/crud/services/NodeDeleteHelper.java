@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeService;
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.stereotype.Service;

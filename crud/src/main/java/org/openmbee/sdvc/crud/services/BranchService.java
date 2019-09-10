@@ -3,12 +3,11 @@ package org.openmbee.sdvc.crud.services;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
-import org.openmbee.sdvc.data.domains.Branch;
+import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

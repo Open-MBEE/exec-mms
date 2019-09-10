@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.core.services;
 
 import java.util.Optional;
-import org.openmbee.sdvc.data.domains.User;
+import org.openmbee.sdvc.data.domains.global.User;
 
 public interface UserService {
 

@@ -8,7 +8,7 @@ import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.core.services.NodeService;
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.cameo.CameoEdgeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;

@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.json.ElementJson;
 
 public interface NodeService {

@@ -12,7 +12,7 @@ import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.springframework.stereotype.Service;
 
 @Service

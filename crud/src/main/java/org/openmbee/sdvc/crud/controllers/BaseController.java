@@ -15,7 +15,7 @@ import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.exceptions.NotModifiedException;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
-import org.openmbee.sdvc.data.domains.Project;
+import org.openmbee.sdvc.data.domains.global.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseController {

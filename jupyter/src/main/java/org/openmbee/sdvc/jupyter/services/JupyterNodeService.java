@@ -14,7 +14,7 @@ import org.openmbee.sdvc.crud.services.NodeOperation;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.core.services.NodeService;
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.jupyter.JupyterConstants;
 import org.openmbee.sdvc.jupyter.JupyterEdgeType;
 import org.openmbee.sdvc.jupyter.JupyterNodeType;

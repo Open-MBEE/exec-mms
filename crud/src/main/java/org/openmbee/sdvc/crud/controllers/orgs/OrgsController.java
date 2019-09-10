@@ -6,7 +6,7 @@ import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
-import org.openmbee.sdvc.data.domains.Organization;
+import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.rdb.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
