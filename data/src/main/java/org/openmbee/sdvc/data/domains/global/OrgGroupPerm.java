@@ -17,8 +17,6 @@ public class OrgGroupPerm extends Base {
     @ManyToOne
     private Role role;
 
-    private boolean inherited;
-
     public Organization getOrganization() {
         return organization;
     }
@@ -41,14 +39,6 @@ public class OrgGroupPerm extends Base {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public boolean isInherited() {
-        return inherited;
-    }
-
-    public void setInherited(boolean inherited) {
-        this.inherited = inherited;
     }
 
     @Override
