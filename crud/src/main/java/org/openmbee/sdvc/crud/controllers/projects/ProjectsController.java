@@ -64,8 +64,9 @@ public class ProjectsController extends BaseController {
         } else {
             List<Project> allProjects = projectRepository.findAll();
             for (Project proj : allProjects) {
-                if ((isAnonymous(auth) && permissionService.isProjectPublic(proj.getProjectId())) ||
-                        permissionService.hasProjectPrivilege("PROJECT_READ", auth.getName(), proj.getProjectId())) {
+                if ((permissionService.isProjectPublic(proj.getProjectId())) ||
+                    (!isAnonymous(auth) &&
+                        permissionService.hasProjectPrivilege("PROJECT_READ", auth.getName(), proj.getProjectId()))) {
                     ProjectJson projectJson = new ProjectJson();
                     projectJson.merge(convertToMap(proj));
                     response.getProjects().add(projectJson);
