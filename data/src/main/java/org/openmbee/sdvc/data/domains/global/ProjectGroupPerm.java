@@ -19,6 +19,15 @@ public class ProjectGroupPerm extends Base {
 
     private boolean inherited;
 
+    public ProjectGroupPerm() {}
+
+    public ProjectGroupPerm(Project p, Group u, Role r, boolean inherited) {
+        this.project = p;
+        this.group = u;
+        this.role = r;
+        this.inherited = inherited;
+    }
+
     public Project getProject() {
         return project;
     }

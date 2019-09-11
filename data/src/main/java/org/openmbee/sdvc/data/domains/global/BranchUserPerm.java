@@ -19,6 +19,15 @@ public class BranchUserPerm extends Base {
 
     private boolean inherited;
 
+    public BranchUserPerm() {}
+
+    public BranchUserPerm(Branch b, User u, Role r, boolean inherited) {
+        this.branch = b;
+        this.user = u;
+        this.role = r;
+        this.inherited = inherited;
+    }
+
     public Branch getBranch() {
         return branch;
     }

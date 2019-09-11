@@ -17,6 +17,14 @@ public class OrgGroupPerm extends Base {
     @ManyToOne
     private Role role;
 
+    public OrgGroupPerm() {}
+
+    public OrgGroupPerm(Organization org, Group u, Role r) {
+        this.organization = org;
+        this.group = u;
+        this.role = r;
+    }
+
     public Organization getOrganization() {
         return organization;
     }

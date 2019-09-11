@@ -19,6 +19,15 @@ public class BranchGroupPerm extends Base {
 
     private boolean inherited;
 
+    public BranchGroupPerm() {}
+
+    public BranchGroupPerm(Branch b, Group u, Role r, boolean inherited) {
+        this.branch = b;
+        this.group = u;
+        this.role = r;
+        this.inherited = inherited;
+    }
+
     public Branch getBranch() {
         return branch;
     }

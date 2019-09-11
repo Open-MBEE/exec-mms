@@ -23,6 +23,14 @@ public class Branch extends Base {
     @OneToMany(mappedBy = "branch")
     private Collection<BranchUserPerm> userPerms;
 
+    public Branch() {}
+
+    public Branch(Project p, String branchId, boolean inherit) {
+        this.project = p;
+        this.branchId = branchId;
+        this.inherit = inherit;
+    }
+
     public Project getProject() {
         return project;
     }

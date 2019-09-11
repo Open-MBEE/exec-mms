@@ -19,6 +19,15 @@ public class ProjectUserPerm extends Base {
 
     private boolean inherited;
 
+    public ProjectUserPerm() {}
+
+    public ProjectUserPerm(Project p, User u, Role r, boolean inherited) {
+        this.project = p;
+        this.user = u;
+        this.role = r;
+        this.inherited = inherited;
+    }
+
     public Project getProject() {
         return project;
     }
