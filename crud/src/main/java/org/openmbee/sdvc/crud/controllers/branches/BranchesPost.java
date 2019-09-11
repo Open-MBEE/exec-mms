@@ -10,6 +10,7 @@ import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.config.Constants;
+import org.openmbee.sdvc.crud.exceptions.ForbiddenException;
 import org.openmbee.sdvc.crud.services.CommitService;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
@@ -20,6 +21,7 @@ import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,69 +52,74 @@ public class BranchesPost extends BaseController {
     @PostMapping
     @Transactional
     public ResponseEntity<? extends BaseResponse> handleRequest(
-        @PathVariable String projectId,
-        @RequestBody BranchesRequest projectsPost) {
-        if (!projectsPost.getRefs().isEmpty()) {
-            logger.info("JSON parsed properly");
-            BranchesResponse response = new BranchesResponse();
-            Instant now = Instant.now();
+            @PathVariable String projectId,
+            @RequestBody BranchesRequest projectsPost,
+            Authentication auth) {
 
-            for (RefJson branch : projectsPost.getRefs()) {
-                ContextHolder.setContext(projectId);
-                Branch b = new Branch();
-                b.setBranchId(branch.getId());
-                b.setBranchName(branch.getName());
-                b.setDescription(branch.getDescription());
-                b.setTag(branch.isTag());
-                b.setTimestamp(Instant.now());
-                logger.info("Saving branch: {}", branch.getId());
+        rejectAnonymous(auth);
+        if (!permissionService
+            .hasProjectPrivilege("PROJECT_CREATE_BRANCH", auth.getName(), projectId)) {
+            throw new ForbiddenException(new BranchesResponse().addMessage("No permission to create branches in project"));
+        }
+        if (projectsPost.getRefs().isEmpty()) {
+            throw new BadRequestException(new BranchesResponse().addMessage("Empty request"));
+        }
 
-                if (branch.getParentRefId() != null) {
-                    //Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
-                    b.setParentRefId(branch.getParentRefId());
-                } else {
-                    b.setParentRefId(Constants.MASTER_BRANCH);
-                }
+        BranchesResponse response = new BranchesResponse();
+        Instant now = Instant.now();
 
-                if (branch.getParentCommitId() != null) {
-                    Optional<Commit> parentCommit = commitRepository
-                        .findByCommitId(branch.getParentCommitId());
-                    if (parentCommit.isPresent()) {
-                        b.setParentCommit(parentCommit.get().getId());
-                    }
-                } else {
-                    Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
-                    if (ref.isPresent()) {
-                        Optional<Commit> parentCommit = commitRepository.findLatestByRef(ref.get());
-                        parentCommit.ifPresent(parent -> {
-                            b.setParentCommit(parent.getId());
-                        });
-                    }
-                }
+        for (RefJson branch : projectsPost.getRefs()) {
+            ContextHolder.setContext(projectId);
+            Branch b = new Branch();
+            b.setBranchId(branch.getId());
+            b.setBranchName(branch.getName());
+            b.setDescription(branch.getDescription());
+            b.setTag(branch.isTag());
+            b.setTimestamp(Instant.now());
+            logger.info("Saving branch: {}", branch.getId());
 
-                b.setTimestamp(now);
-
-                Branch saved = branchRepository.save(b);
-                try {
-                    ContextHolder.setContext(projectId, saved.getBranchId());
-                    if (branchesOperations.createBranch()) {
-                        branchesOperations.copyTablesFromParent(saved.getBranchId(),
-                            b.getParentRefId(), branch.getParentCommitId());
-                    }
-                    //TODO update docs with new ref
-                    response.getBranches().add(branch);
-                } catch (Exception e) {
-                    branchRepository.delete(saved);
-                    logger.error("Couldn't create branch: {}", branch.getId());
-                    logger.error(e);
-                }
-
+            if (branch.getParentRefId() != null) {
+                //Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
+                b.setParentRefId(branch.getParentRefId());
+            } else {
+                b.setParentRefId(Constants.MASTER_BRANCH);
             }
 
-            return ResponseEntity.ok(response);
+            if (branch.getParentCommitId() != null) {
+                Optional<Commit> parentCommit = commitRepository
+                    .findByCommitId(branch.getParentCommitId());
+                if (parentCommit.isPresent()) {
+                    b.setParentCommit(parentCommit.get().getId());
+                }
+            } else {
+                Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
+                if (ref.isPresent()) {
+                    Optional<Commit> parentCommit = commitRepository.findLatestByRef(ref.get());
+                    parentCommit.ifPresent(parent -> {
+                        b.setParentCommit(parent.getId());
+                    });
+                }
+            }
+
+            b.setTimestamp(now);
+
+            Branch saved = branchRepository.save(b);
+            try {
+                ContextHolder.setContext(projectId, saved.getBranchId());
+                if (branchesOperations.createBranch()) {
+                    branchesOperations.copyTablesFromParent(saved.getBranchId(),
+                        b.getParentRefId(), branch.getParentCommitId());
+                }
+                //TODO update docs with new ref
+                response.getBranches().add(branch);
+                permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
+                //TODO have initBranchPerms service create the global branch if not exist
+            } catch (Exception e) {
+                branchRepository.delete(saved);
+                logger.error("Couldn't create branch: {}", branch.getId());
+                logger.error(e);
+            }
         }
-        BranchesResponse err = new BranchesResponse();
-        err.addMessage("Bad Request");
-        throw new BadRequestException(err);
+        return ResponseEntity.ok(response);
     }
 }

@@ -1,10 +1,15 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.services.BranchService;
+import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,17 +27,32 @@ public class BranchesGet extends BaseController {
     }
 
     @GetMapping(value = {"", "/{refId}"})
-    public ResponseEntity<?> handleRequest(@PathVariable String projectId, @PathVariable(required = false) String refId) {
+    public ResponseEntity<?> handleRequest(
+        @PathVariable String projectId,
+        @PathVariable(required = false) String refId,
+        Authentication auth) {
+
         if (refId != null) {
+            if (!permissionService.isProjectPublic(projectId)) {
+                rejectAnonymous(auth);
+                checkBranchPrivilege("BRANCH_READ", "No permission to read", auth, projectId, refId);
+            }
             BranchesResponse res = branchService.getBranch(projectId, refId);
             if (res.getBranches().isEmpty()) {
-                ResponseEntity.notFound();
+               throw new NotFoundException(res.addMessage("Not found"));
             }
             return ResponseEntity.ok(res);
         } else {
             BranchesResponse res = branchService.getBranches(projectId);
-            if (res.getBranches().isEmpty()) {
-                ResponseEntity.notFound();
+            if (!permissionService.isProjectPublic(projectId)) {
+                rejectAnonymous(auth);
+                List<RefJson> filtered = new ArrayList<>();
+                for (RefJson ref: res.getBranches()) {
+                    if (permissionService.hasBranchPrivilege("BRANCH_READ", auth.getName(), projectId, ref.getId())) {
+                        filtered.add(ref);
+                    }
+                }
+                res.setBranches(filtered);
             }
             return ResponseEntity.ok(res);
         }

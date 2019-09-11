@@ -14,13 +14,13 @@ public interface NodeService {
     ElementsResponse read(String projectId, String refId, ElementsRequest req, Map<String, String> params);
 
     ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
-        Map<String, String> params);
+        Map<String, String> params, String user);
 
     void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info);
 
     void extraProcessDeletedElement(ElementJson element, Node node, NodeChangeInfo info);
 
-    ElementsResponse delete(String projectId, String refId, String id);
+    ElementsResponse delete(String projectId, String refId, String id, String user);
 
-    ElementsResponse delete(String projectId, String refId, ElementsRequest req);
+    ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user);
 }

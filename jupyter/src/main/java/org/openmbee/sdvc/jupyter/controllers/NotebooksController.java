@@ -5,6 +5,7 @@ import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -25,8 +26,13 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable(required = false) String notebookId,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
 
+        if (!permissionService.isProjectPublic(projectId)) {
+            rejectAnonymous(auth);
+            checkBranchPrivilege("BRANCH_READ", "No permission to read branch", auth, projectId, refId);
+        }
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, notebookId, params);
         if (notebookId != null) {
             this.handleSingleResponse(res);
@@ -42,8 +48,13 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
 
+        if (!permissionService.isProjectPublic(projectId)) {
+            rejectAnonymous(auth);
+            checkBranchPrivilege("BRANCH_READ", "No permission to read branch", auth, projectId, refId);
+        }
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, req, params);
         NotebooksResponse resn = new NotebooksResponse();
         resn.setNotebooks(res.getElements());
@@ -56,8 +67,11 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
 
-        return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params));
+        rejectAnonymous(auth);
+        checkBranchPrivilege("BRANCH_EDIT_CONTENT", "No permission to edit branch", auth, projectId, refId);
+        return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params, auth.getName()));
     }
 }
