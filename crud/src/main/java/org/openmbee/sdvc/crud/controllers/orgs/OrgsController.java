@@ -65,7 +65,7 @@ public class OrgsController extends BaseController {
             logger.debug("No OrgId given");
             List<Organization> allOrgs = organizationRepository.findAll();
             for (Organization org : allOrgs) {
-                if ((isAnonymous(auth) && permissionService.isOrgPublic(org.getOrganizationId())) ||
+                if (permissionService.isOrgPublic(org.getOrganizationId()) ||
                         permissionService.hasOrgPrivilege("ORG_READ", auth.getName(), org.getOrganizationId())) {
                     OrgJson orgJson = new OrgJson();
                     orgJson.merge(convertToMap(org));
