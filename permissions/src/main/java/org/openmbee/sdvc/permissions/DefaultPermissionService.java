@@ -1,8 +1,11 @@
 package org.openmbee.sdvc.permissions;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest.Permission;
 import org.openmbee.sdvc.core.services.PermissionService;
@@ -19,6 +22,7 @@ import org.openmbee.sdvc.data.domains.global.ProjectGroupPerm;
 import org.openmbee.sdvc.data.domains.global.ProjectUserPerm;
 import org.openmbee.sdvc.data.domains.global.Role;
 import org.openmbee.sdvc.data.domains.global.User;
+import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.rdb.repositories.BranchGroupPermRepository;
 import org.openmbee.sdvc.rdb.repositories.BranchRepository;
 import org.openmbee.sdvc.rdb.repositories.BranchUserPermRepository;
@@ -32,6 +36,8 @@ import org.openmbee.sdvc.rdb.repositories.ProjectUserPermRepository;
 import org.openmbee.sdvc.rdb.repositories.RoleRepository;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -118,9 +124,15 @@ public class DefaultPermissionService implements PermissionService {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
         Optional<Organization> org = orgRepo.findByOrganizationId(orgId);
-        if (!user.isPresent() || !role.isPresent() || !org.isPresent()) {
-            //throw exception
+
+        if (!user.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
+        } else if (!role.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Role not found");
+        } else if (!org.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
+
         OrgUserPerm perm = new OrgUserPerm(org.get(), user.get(), role.get());
         orgUserPermRepo.save(perm);
     }
@@ -130,9 +142,15 @@ public class DefaultPermissionService implements PermissionService {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
         Optional<Project> proj = projectRepo.findByProjectId(projectId);
-        if (!user.isPresent() || !role.isPresent() || !proj.isPresent()) {
-            //throw exception
+
+        if (!user.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
+        } else if (!role.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Role not found");
+        } else if (!proj.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
+
         ProjectUserPerm perm = new ProjectUserPerm(proj.get(), user.get(), role.get(), false);
         projectUserPermRepo.save(perm);
         proj.get().setInherit(inherit);
@@ -154,9 +172,15 @@ public class DefaultPermissionService implements PermissionService {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
         Optional<Branch> b = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
-        if (!user.isPresent() || !role.isPresent() || !b.isPresent()) {
-            //throw exception
+
+        if (!user.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
+        } else if (!role.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Role not found");
+        } else if (!b.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
         }
+
         BranchUserPerm perm = new BranchUserPerm(b.get(), user.get(), role.get(), false);
         branchUserPermRepo.save(perm);
         b.get().setInherit(inherit);
@@ -166,9 +190,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void updateOrgUserPerms(PermissionUpdateRequest req, String orgId) {
         Optional<Organization> org = orgRepo.findByOrganizationId(orgId);
+
         if (!org.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
+
         Organization o = org.get();
         switch(req.getAction()) {
             case MODIFY:
@@ -226,9 +252,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void updateOrgGroupPerms(PermissionUpdateRequest req, String orgId) {
         Optional<Organization> org = orgRepo.findByOrganizationId(orgId);
+
         if (!org.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
+
         Organization o = org.get();
         switch(req.getAction()) {
             case MODIFY:
@@ -286,9 +314,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void updateProjectUserPerms(PermissionUpdateRequest req, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
+
         if (!project.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
+
         Project proj = project.get();
         switch(req.getAction()) {
             case MODIFY:
@@ -346,9 +376,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void updateProjectGroupPerms(PermissionUpdateRequest req, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
+
         if (!project.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
+
         Project proj = project.get();
         switch(req.getAction()) {
             case MODIFY:
@@ -406,9 +438,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void updateBranchUserPerms(PermissionUpdateRequest req, String projectId, String branchId) {
         Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+
         if (!branch.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
         }
+
         Branch bran = branch.get();
         switch(req.getAction()) {
             case MODIFY:
@@ -464,9 +498,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void updateBranchGroupPerms(PermissionUpdateRequest req, String projectId, String branchId) {
         Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+
         if (!branch.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
         }
+
         Branch bran = branch.get();
         switch(req.getAction()) {
             case MODIFY:
@@ -522,9 +558,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void setProjectInherit(boolean isInherit, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
+
         if (!project.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
+
         Project proj = project.get();
         proj.setInherit(isInherit);
         projectRepo.save(proj);
@@ -533,9 +571,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void setBranchInherit(boolean isInherit, String projectId, String branchId) {
         Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+
         if (!branch.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
         }
+
         Branch bran = branch.get();
         bran.setInherit(isInherit);
         branchRepo.save(bran);
@@ -544,9 +584,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void setOrgPublic(boolean isPublic, String orgId) {
         Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
+
         if (!organization.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
+
         Organization org = organization.get();
         org.setPublic(isPublic);
         orgRepo.save(org);
@@ -555,9 +597,11 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public void setProjectPublic(boolean isPublic, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
+
         if (!project.isPresent()) {
-            //throw exception
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
+
         Project proj = project.get();
         proj.setPublic(isPublic);
         projectRepo.save(proj);
@@ -566,20 +610,24 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     public boolean hasOrgPrivilege(String privilege, String user, String orgId) {
         Set<String> privileges = new HashSet<>();
-        Optional<User> u = userRepo.findByUsername(user);
-        Optional<Organization> o = orgRepo.findByOrganizationId(orgId);
-        if (!u.isPresent() || !o.isPresent()) {
-            //throw exception
+        Optional<User> userOptional = userRepo.findByUsername(user);
+        Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
+
+        if (!userOptional.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
+        } else if (!organization.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
-        Optional<OrgUserPerm> perm = orgUserPermRepo.findByOrganizationAndUser(o.get(), u.get());
+
+        Optional<OrgUserPerm> perm = orgUserPermRepo.findByOrganizationAndUser(organization.get(), userOptional.get());
         if (perm.isPresent()) {
             for (Privilege p: perm.get().getRole().getPrivileges()) {
                 privileges.add(p.getName());
             }
         }
         //either use stored groups or get groups from sso or ldap or other means, should add a param so it can be passed in..
-        for (Group g: u.get().getGroups()) {
-            Optional<OrgGroupPerm> perm2 = orgGroupPermRepo.findByOrganizationAndGroup(o.get(), g);
+        for (Group g: userOptional.get().getGroups()) {
+            Optional<OrgGroupPerm> perm2 = orgGroupPermRepo.findByOrganizationAndGroup(organization.get(), g);
             if (perm2.isPresent()) {
                 for (Privilege p: perm2.get().getRole().getPrivileges()) {
                     privileges.add(p.getName());
@@ -591,32 +639,60 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     public boolean hasProjectPrivilege(String privilege, String user, String projectId) {
+        Optional<Project> project = projectRepo.findByProjectId(projectId);
+        Optional<User> userOption = userRepo.findByUsername(user);
+        Optional<Role> roleOption = roleRepo.findByName(privilege);
+
+        if (project.isPresent() && userOption.isPresent() && roleOption.isPresent()) {
+            List<ProjectUserPerm> exists = projectUserPermRepo.findAllByProjectAndUser(project.get(), userOption.get());
+            for (ProjectUserPerm pup : exists) {
+                if (roleOption.get().equals(pup.getRole())) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
     @Override
     public boolean hasBranchPrivilege(String privilege, String user, String projectId, String branchId) {
+        Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        Optional<User> userOption = userRepo.findByUsername(user);
+        Optional<Role> roleOption = roleRepo.findByName(privilege);
+
+        if (branch.isPresent() && userOption.isPresent() && roleOption.isPresent()) {
+            List<BranchUserPerm> exists = branchUserPermRepo.findAllByBranchAndUser(branch.get(), userOption.get());
+            for (BranchUserPerm bup : exists) {
+                if (roleOption.get().equals(bup.getRole())) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
     @Override
     public boolean isProjectInherit(String projectId) {
-        return false;
+        Optional<Project> project = projectRepo.findByProjectId(projectId);
+        return project.map(Project::isInherit).orElse(false);
     }
 
     @Override
     public boolean isBranchInherit(String projectId, String branchId) {
-        return false;
+        Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        return branch.map(Branch::isInherit).orElse(false);
     }
 
     @Override
     public boolean isOrgPublic(String orgId) {
-        return false;
+        Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
+        return organization.map(Organization::isPublic).orElse(false);
     }
 
     @Override
     public boolean isProjectPublic(String projectId) {
-        return false;
+        Optional<Project> project = projectRepo.findByProjectId(projectId);
+        return project.map(Project::isPublic).orElse(false);
     }
 
     private void recalculateInheritedPerms(Project project) {
