@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
@@ -31,7 +32,7 @@ public class NotebooksController extends BaseController {
 
         if (!permissionService.isProjectPublic(projectId)) {
             rejectAnonymous(auth);
-            checkBranchPrivilege("BRANCH_READ", "No permission to read branch", auth, projectId, refId);
+            checkBranchPrivilege(Privileges.BRANCH_READ.name(), "No permission to read branch", auth, projectId, refId);
         }
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, notebookId, params);
         if (notebookId != null) {
@@ -53,7 +54,7 @@ public class NotebooksController extends BaseController {
 
         if (!permissionService.isProjectPublic(projectId)) {
             rejectAnonymous(auth);
-            checkBranchPrivilege("BRANCH_READ", "No permission to read branch", auth, projectId, refId);
+            checkBranchPrivilege(Privileges.BRANCH_READ.name(), "No permission to read branch", auth, projectId, refId);
         }
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, req, params);
         NotebooksResponse resn = new NotebooksResponse();
@@ -71,7 +72,7 @@ public class NotebooksController extends BaseController {
         Authentication auth) {
 
         rejectAnonymous(auth);
-        checkBranchPrivilege("BRANCH_EDIT_CONTENT", "No permission to edit branch", auth, projectId, refId);
+        checkBranchPrivilege(Privileges.BRANCH_EDIT_CONTENT.name(), "No permission to edit branch", auth, projectId, refId);
         return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params, auth.getName()));
     }
 }
