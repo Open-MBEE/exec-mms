@@ -8,6 +8,10 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.objects.BaseResponse;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
+import org.openmbee.sdvc.core.services.PermissionService;
+import org.openmbee.sdvc.crud.exceptions.ForbiddenException;
+import org.openmbee.sdvc.crud.exceptions.UnauthorizedException;
 import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.crud.exceptions.DeletedException;
@@ -17,6 +21,8 @@ import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 public abstract class BaseController {
 
@@ -28,6 +34,8 @@ public abstract class BaseController {
 
     protected ProjectRepository projectRepository;
 
+    protected PermissionService permissionService;
+
     @Autowired
     public void setServiceFactory(ServiceFactory serviceFactory) {
         this.serviceFactory = serviceFactory;
@@ -36,6 +44,11 @@ public abstract class BaseController {
     @Autowired
     public void setProjectRepository(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
+    }
+
+    @Autowired
+    public void setPermissionService(PermissionService permissionService) {
+        this.permissionService = permissionService;
     }
 
     @Autowired
@@ -68,6 +81,10 @@ public abstract class BaseController {
                     throw new NotModifiedException(res);
                 case 400:
                     throw new BadRequestException(res);
+                case 401:
+                    throw new UnauthorizedException(res);
+                case 403:
+                    throw new ForbiddenException(res);
                 case 404:
                     throw new NotFoundException(res);
                 case 410:
@@ -75,6 +92,22 @@ public abstract class BaseController {
                 default:
                     break;
             }
+        }
+    }
+
+    protected void rejectAnonymous(Authentication auth) {
+        if (isAnonymous(auth)) {
+            throw new UnauthorizedException("");
+        }
+    }
+
+    protected boolean isAnonymous(Authentication auth) {
+        return (auth instanceof AnonymousAuthenticationToken);
+    }
+
+    protected void checkBranchPrivilege(String privilege, String message, Authentication auth, String projectId, String refId) {
+        if (!permissionService.hasBranchPrivilege(privilege, auth.getName(), projectId, refId)) {
+            throw new ForbiddenException(new BaseResponse().addMessage(message));
         }
     }
 }

@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.elements;
 
 import java.util.Map;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -9,6 +10,7 @@ import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,8 +30,13 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable(required = false) String elementId,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
 
+        if (!permissionService.isProjectPublic(projectId)) {
+            rejectAnonymous(auth);
+            checkBranchPrivilege(Privileges.BRANCH_READ.name(), "No permission to read branch", auth, projectId, refId);
+        }
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
         if (elementId != null) {
@@ -43,12 +50,15 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
 
+        rejectAnonymous(auth);
+        checkBranchPrivilege(Privileges.BRANCH_EDIT_CONTENT.name(), "No permission to edit branch", auth, projectId, refId);
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            response = nodeService.createOrUpdate(projectId, refId, req, params);
+            response = nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
             return ResponseEntity.ok(response);
         }
         throw new BadRequestException(response.addMessage("Empty"));
@@ -59,8 +69,13 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
 
+        if (!permissionService.isProjectPublic(projectId)) {
+            rejectAnonymous(auth);
+            checkBranchPrivilege(Privileges.BRANCH_READ.name(), "No permission to read branch", auth, projectId, refId);
+        }
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
@@ -71,13 +86,15 @@ public class ElementsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{elementId}")
-    @SuppressWarnings("unchecked")
     public ResponseEntity<? extends BaseResponse> handleDelete(
         @PathVariable String projectId,
         @PathVariable String refId,
-        @PathVariable String elementId) {
+        @PathVariable String elementId,
+        Authentication auth) {
 
-        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId);
+        rejectAnonymous(auth);
+        checkBranchPrivilege(Privileges.BRANCH_EDIT_CONTENT.name(), "No permission to edit branch", auth, projectId, refId);
+        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
         return ResponseEntity.ok(res);
     }
@@ -86,9 +103,12 @@ public class ElementsController extends BaseController {
     public ResponseEntity<? extends BaseResponse> handleBulkDelete(
         @PathVariable String projectId,
         @PathVariable String refId,
-        @RequestBody ElementsRequest req) {
+        @RequestBody ElementsRequest req,
+        Authentication auth) {
 
-        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req);
+        rejectAnonymous(auth);
+        checkBranchPrivilege(Privileges.BRANCH_EDIT_CONTENT.name(), "No permission to edit branch", auth, projectId, refId);
+        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req, auth.getName());
         return ResponseEntity.ok(res);
     }
 }
