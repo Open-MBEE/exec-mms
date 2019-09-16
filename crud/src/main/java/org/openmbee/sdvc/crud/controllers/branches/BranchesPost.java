@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Optional;
 import javax.transaction.Transactional;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.BranchesRequest;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.core.config.ContextHolder;
@@ -58,7 +59,7 @@ public class BranchesPost extends BaseController {
 
         rejectAnonymous(auth);
         if (!permissionService
-            .hasProjectPrivilege("PROJECT_CREATE_BRANCH", auth.getName(), projectId)) {
+            .hasProjectPrivilege(Privileges.PROJECT_CREATE_BRANCH.name(), auth.getName(), projectId)) {
             throw new ForbiddenException(new BranchesResponse().addMessage("No permission to create branches in project"));
         }
         if (projectsPost.getRefs().isEmpty()) {
@@ -113,7 +114,7 @@ public class BranchesPost extends BaseController {
                 //TODO update docs with new ref
                 response.getBranches().add(branch);
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
-                //TODO have initBranchPerms service create the global branch if not exist
+                //TODO have initBranchPerms create the global branch if doesn't exist
             } catch (Exception e) {
                 branchRepository.delete(saved);
                 logger.error("Couldn't create branch: {}", branch.getId());

@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.commits;
 
 import java.util.Map;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.CommitsRequest;
 import org.openmbee.sdvc.core.objects.CommitsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -80,7 +81,7 @@ public class CommitsController extends BaseController {
     private void checkPerm(Authentication auth, String projectId) {
         if (!permissionService.isProjectPublic(projectId)) {
             rejectAnonymous(auth);
-            if (!permissionService.hasProjectPrivilege("PROJECT_READ_COMMITS", auth.getName(), projectId)) {
+            if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_READ_COMMITS.name(), auth.getName(), projectId)) {
                 throw new ForbiddenException(new CommitsResponse().addMessage("No permission to read commits"));
             }
         }

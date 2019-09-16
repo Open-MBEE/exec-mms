@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.crud.exceptions.ForbiddenException;
@@ -54,7 +55,7 @@ public class ProjectsController extends BaseController {
             }
             if (!permissionService.isProjectPublic(projectId)) {
                 rejectAnonymous(auth);
-                if (!permissionService.hasProjectPrivilege("PROJECT_READ", auth.getName(), projectId)) {
+                if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_READ.name(), auth.getName(), projectId)) {
                     throw new ForbiddenException(response.addMessage("No permission for project"));
                 }
             }
@@ -66,7 +67,7 @@ public class ProjectsController extends BaseController {
             for (Project proj : allProjects) {
                 if ((permissionService.isProjectPublic(proj.getProjectId())) ||
                     (!isAnonymous(auth) &&
-                        permissionService.hasProjectPrivilege("PROJECT_READ", auth.getName(), proj.getProjectId()))) {
+                        permissionService.hasProjectPrivilege(Privileges.PROJECT_READ.name(), auth.getName(), proj.getProjectId()))) {
                     ProjectJson projectJson = new ProjectJson();
                     projectJson.merge(convertToMap(proj));
                     response.getProjects().add(projectJson);
@@ -102,7 +103,7 @@ public class ProjectsController extends BaseController {
             ProjectService ps = getProjectService(json);
             if (!ps.exists(json.getProjectId())) {
                 try {
-                    if (!permissionService.hasOrgPrivilege("ORG_CREATE_PROJECT", auth.getName(), json.getOrgId())) {
+                    if (!permissionService.hasOrgPrivilege(Privileges.ORG_CREATE_PROJECT.name(), auth.getName(), json.getOrgId())) {
                         Map<String, Object> rejection = new HashMap<>();
                         rejection.put("message", "No permission to create project under org");
                         rejection.put("code", 403);
@@ -114,13 +115,21 @@ public class ProjectsController extends BaseController {
                     permissionService.initProjectPerms(json.getProjectId(), true, auth.getName());
                 } catch (BadRequestException ex) {
                     Map<String, Object> rejection = new HashMap<>();
-                    rejection.put("message", "Org not found");
+                    rejection.put("message", "Org to put project under is not found");
                     rejection.put("code", 400);
                     rejection.put("project", json);
                     rejected.add(rejection);
                     continue;
                 }
             } else {
+                if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_EDIT.name(), auth.getName(), json.getProjectId())) {
+                    Map<String, Object> rejection = new HashMap<>();
+                    rejection.put("message", "No permission to change project");
+                    rejection.put("code", 403);
+                    rejection.put("project", json);
+                    rejected.add(rejection);
+                    continue;
+                }
                 //TODO need to check delete perm on proj and create perm in new org if moving org, and reset project perms if org changed
                 response.getProjects().add(ps.update(json));
             }
@@ -137,7 +146,7 @@ public class ProjectsController extends BaseController {
         Authentication auth) {
 
         rejectAnonymous(auth);
-        if (!permissionService.hasProjectPrivilege("PROJECT_DELETE", auth.getName(), projectId)) {
+        if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_DELETE.name(), auth.getName(), projectId)) {
             throw new ForbiddenException(new ProjectsResponse().addMessage("No permission to delete project."));
         }
         return ResponseEntity.ok(new ProjectsResponse()); //TODO

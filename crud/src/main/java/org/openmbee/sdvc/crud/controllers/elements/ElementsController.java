@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.elements;
 
 import java.util.Map;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -34,7 +35,7 @@ public class ElementsController extends BaseController {
 
         if (!permissionService.isProjectPublic(projectId)) {
             rejectAnonymous(auth);
-            checkBranchPrivilege("BRANCH_READ", "No permission to read branch", auth, projectId, refId);
+            checkBranchPrivilege(Privileges.BRANCH_READ.name(), "No permission to read branch", auth, projectId, refId);
         }
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
@@ -53,7 +54,7 @@ public class ElementsController extends BaseController {
         Authentication auth) {
 
         rejectAnonymous(auth);
-        checkBranchPrivilege("BRANCH_EDIT_CONTENT", "No permission to edit branch", auth, projectId, refId);
+        checkBranchPrivilege(Privileges.BRANCH_EDIT_CONTENT.name(), "No permission to edit branch", auth, projectId, refId);
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
@@ -73,7 +74,7 @@ public class ElementsController extends BaseController {
 
         if (!permissionService.isProjectPublic(projectId)) {
             rejectAnonymous(auth);
-            checkBranchPrivilege("BRANCH_READ", "No permission to read branch", auth, projectId, refId);
+            checkBranchPrivilege(Privileges.BRANCH_READ.name(), "No permission to read branch", auth, projectId, refId);
         }
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
@@ -92,7 +93,7 @@ public class ElementsController extends BaseController {
         Authentication auth) {
 
         rejectAnonymous(auth);
-        checkBranchPrivilege("BRANCH_EDIT_CONTENT", "No permission to edit branch", auth, projectId, refId);
+        checkBranchPrivilege(Privileges.BRANCH_EDIT_CONTENT.name(), "No permission to edit branch", auth, projectId, refId);
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
         return ResponseEntity.ok(res);
@@ -106,7 +107,7 @@ public class ElementsController extends BaseController {
         Authentication auth) {
 
         rejectAnonymous(auth);
-        checkBranchPrivilege("BRANCH_EDIT_CONTENT", "No permission to edit branch", auth, projectId, refId);
+        checkBranchPrivilege(Privileges.BRANCH_EDIT_CONTENT.name(), "No permission to edit branch", auth, projectId, refId);
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req, auth.getName());
         return ResponseEntity.ok(res);
     }

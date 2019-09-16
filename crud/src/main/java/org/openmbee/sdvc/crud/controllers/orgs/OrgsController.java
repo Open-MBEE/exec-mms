@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
 import org.openmbee.sdvc.crud.exceptions.ForbiddenException;
@@ -20,6 +21,7 @@ import org.openmbee.sdvc.json.OrgJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,7 +56,7 @@ public class OrgsController extends BaseController {
             }
             if (!permissionService.isOrgPublic(orgId)) {
                 rejectAnonymous(auth);
-                if (!permissionService.hasOrgPrivilege("ORG_READ", auth.getName(), orgId)) {
+                if (!permissionService.hasOrgPrivilege(Privileges.ORG_READ.name(), auth.getName(), orgId)) {
                     throw new ForbiddenException(response.addMessage("No permission for org"));
                 }
             }
@@ -67,7 +69,7 @@ public class OrgsController extends BaseController {
             for (Organization org : allOrgs) {
                 if (permissionService.isOrgPublic(org.getOrganizationId()) ||
                     (!isAnonymous(auth) &&
-                        permissionService.hasOrgPrivilege("ORG_READ", auth.getName(), org.getOrganizationId()))) {
+                        permissionService.hasOrgPrivilege(Privileges.ORG_READ.name(), auth.getName(), org.getOrganizationId()))) {
                     OrgJson orgJson = new OrgJson();
                     orgJson.merge(convertToMap(org));
                     response.getOrgs().add(orgJson);
@@ -105,7 +107,7 @@ public class OrgsController extends BaseController {
                 .orElse(new Organization());
             boolean newOrg = true;
             if (o.getId() != null) {
-                if (!permissionService.hasOrgPrivilege("ORG_EDIT", auth.getName(), o.getOrganizationId())) {
+                if (!permissionService.hasOrgPrivilege(Privileges.ORG_EDIT.name(), auth.getName(), o.getOrganizationId())) {
                     Map<String, Object> rejection = new HashMap<>();
                     rejection.put("message", "No permission to update org");
                     rejection.put("code", 403);
@@ -129,5 +131,23 @@ public class OrgsController extends BaseController {
             handleSingleResponse(response);
         }
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(value = "/{orgId}")
+    public ResponseEntity<? extends BaseResponse> handleDelete(
+        @PathVariable String orgId,
+        Authentication auth) {
+
+        rejectAnonymous(auth);
+        OrganizationsResponse response = new OrganizationsResponse();
+        Optional<Organization> orgOption = organizationRepository.findByOrganizationId(orgId);
+        if (!orgOption.isPresent()) {
+            throw new NotFoundException(response.addMessage("Organization not found."));
+        }
+        if (!permissionService.hasOrgPrivilege(Privileges.ORG_DELETE.name(), auth.getName(), orgId)) {
+            throw new ForbiddenException(response.addMessage("No permission to delete org."));
+        }
+
+        return ResponseEntity.ok(new OrganizationsResponse()); //TODO
     }
 }

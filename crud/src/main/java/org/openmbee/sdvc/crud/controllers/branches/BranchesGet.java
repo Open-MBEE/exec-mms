@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
@@ -35,7 +36,7 @@ public class BranchesGet extends BaseController {
         if (refId != null) {
             if (!permissionService.isProjectPublic(projectId)) {
                 rejectAnonymous(auth);
-                checkBranchPrivilege("BRANCH_READ", "No permission to read", auth, projectId, refId);
+                checkBranchPrivilege(Privileges.BRANCH_READ.name(), "No permission to read", auth, projectId, refId);
             }
             BranchesResponse res = branchService.getBranch(projectId, refId);
             if (res.getBranches().isEmpty()) {
@@ -48,7 +49,7 @@ public class BranchesGet extends BaseController {
                 rejectAnonymous(auth);
                 List<RefJson> filtered = new ArrayList<>();
                 for (RefJson ref: res.getBranches()) {
-                    if (permissionService.hasBranchPrivilege("BRANCH_READ", auth.getName(), projectId, ref.getId())) {
+                    if (permissionService.hasBranchPrivilege(Privileges.BRANCH_READ.name(), auth.getName(), projectId, ref.getId())) {
                         filtered.add(ref);
                     }
                 }
