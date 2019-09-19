@@ -2,6 +2,7 @@ package org.openmbee.sdvc.rdb.repositories;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.openmbee.sdvc.data.domains.global.Branch;
 import org.openmbee.sdvc.data.domains.global.BranchUserPerm;
 import org.openmbee.sdvc.data.domains.global.User;
@@ -19,7 +20,11 @@ public interface BranchUserPermRepository extends JpaRepository<BranchUserPerm, 
 
     List<BranchUserPerm> findAllByBranchAndUser_Username(Branch b, String u);
 
-    Optional<BranchUserPerm> findByBranchAndUserAndInherited(Branch b, User u, boolean inherited);
+    List<BranchUserPerm> findByBranchAndUserAndInherited(Branch b, User u, boolean inherited);
+
+    Optional<BranchUserPerm> findByBranchAndUserAndInheritedIsFalse(Branch b, User u);
 
     Optional<BranchUserPerm> findByBranchAndUser_UsernameAndInherited(Branch b, String u, boolean inherited);
+
+    Optional<BranchUserPerm> findByBranch_BranchIdAndUser_UsernameAndInheritedIsFalse(String b, String u);
 }

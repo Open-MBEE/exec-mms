@@ -2,6 +2,8 @@ package org.openmbee.sdvc.rdb.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.data.domains.global.ProjectGroupPerm;
@@ -20,17 +22,23 @@ public interface ProjectGroupPermRepository extends JpaRepository<ProjectGroupPe
 
     List<ProjectGroupPerm> findAllByProject_ProjectIdAndInherited(String projectId, boolean inherited);
 
-    List<ProjectGroupPerm> findAllByProjectAndGroup(Project proj, Group group);
+    Optional<ProjectGroupPerm> findByProjectAndGroup(Project proj, Group group);
+
+    Set<ProjectGroupPerm> findAllByProjectAndGroup(Project proj, Set<Group> group);
 
     Optional<ProjectGroupPerm> findByProjectAndGroupAndInherited(Project proj, Group group, boolean inherited);
 
     List<ProjectGroupPerm> findAllByProjectAndGroup_Name(Project proj, String group);
 
-    Optional<ProjectGroupPerm> findByProjectAndGroup_NameAndInherited(Project proj, String group, boolean inherited);
+    Optional<ProjectGroupPerm> findByProjectAndGroup_NameAndInheritedIsFalse(Project proj, String group);
+
+    List<ProjectGroupPerm> findByProjectAndGroup_NameAndInherited(Project proj, String group, boolean inherited);
 
     List<ProjectGroupPerm> findAllByProject_ProjectIdAndGroup_Name(String projectId, String group);
 
-    Optional<ProjectGroupPerm> findByProject_ProjectIdAndGroup_NameAndInherited(String projectId, String group, boolean inherited);
+    Optional<ProjectGroupPerm> findByProject_ProjectIdAndGroup_NameAndInheritedIsFalse(String projectId, String group);
+
+    List<ProjectGroupPerm> findByProject_ProjectIdAndGroup_NameAndInherited(String projectId, String group, boolean inherited);
 
     List<ProjectGroupPerm> findAllByProjectAndRole(Project proj, Role r);
 

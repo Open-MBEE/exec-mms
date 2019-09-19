@@ -2,6 +2,7 @@ package org.openmbee.sdvc.rdb.repositories;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.data.domains.global.ProjectUserPerm;
 import org.openmbee.sdvc.data.domains.global.Role;
@@ -26,11 +27,15 @@ public interface ProjectUserPermRepository extends JpaRepository<ProjectUserPerm
 
     List<ProjectUserPerm> findAllByProjectAndUser_Username(Project proj, String User);
 
-    Optional<ProjectUserPerm> findByProjectAndUser_UsernameAndInherited(Project proj, String User, boolean inherited);
+    Optional<ProjectUserPerm> findByProjectAndUser_UsernameAndInheritedIsFalse(Project proj, String User);
+
+    List<ProjectUserPerm> findByProjectAndUser_UsernameAndInherited(Project proj, String User, boolean inherited);
 
     List<ProjectUserPerm> findAllByProject_ProjectIdAndUser_Username(String projectId, String User);
 
-    Optional<ProjectUserPerm> findByProject_ProjectIdAndUser_UsernameAndInherited(String projectId, String User, boolean inherited);
+    Optional<ProjectUserPerm> findByProject_ProjectIdAndUser_UsernameAndInheritedIsFalse(String projectId, String User);
+
+    List<ProjectUserPerm> findByProject_ProjectIdAndUser_UsernameAndInherited(String projectId, String User, boolean inherited);
 
     List<ProjectUserPerm> findAllByProjectAndRole(Project proj, Role r);
 

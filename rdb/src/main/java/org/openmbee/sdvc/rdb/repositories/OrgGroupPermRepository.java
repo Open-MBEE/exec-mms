@@ -2,6 +2,8 @@ package org.openmbee.sdvc.rdb.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.data.domains.global.OrgGroupPerm;
 import org.openmbee.sdvc.data.domains.global.Organization;
@@ -17,6 +19,8 @@ public interface OrgGroupPermRepository extends JpaRepository<OrgGroupPerm, Long
     List<OrgGroupPerm> findAllByOrganization_OrganizationId(String orgId);
 
     Optional<OrgGroupPerm> findByOrganizationAndGroup(Organization b, Group group);
+
+    Set<OrgGroupPerm> findAllByOrganizationAndGroup(Organization b, Set<Group> group);
 
     Optional<OrgGroupPerm> findByOrganizationAndGroup_Name(Organization b, String group);
 
