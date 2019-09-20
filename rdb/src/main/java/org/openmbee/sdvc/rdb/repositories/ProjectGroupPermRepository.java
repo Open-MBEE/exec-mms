@@ -24,7 +24,7 @@ public interface ProjectGroupPermRepository extends JpaRepository<ProjectGroupPe
 
     Optional<ProjectGroupPerm> findByProjectAndGroup(Project proj, Group group);
 
-    Set<ProjectGroupPerm> findAllByProjectAndGroup(Project proj, Set<Group> group);
+    Set<ProjectGroupPerm> findAllByProjectAndGroupIn(Project proj, Set<Group> group);
 
     Optional<ProjectGroupPerm> findByProjectAndGroupAndInherited(Project proj, Group group, boolean inherited);
 

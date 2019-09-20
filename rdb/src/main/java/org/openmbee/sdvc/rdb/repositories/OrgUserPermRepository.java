@@ -2,6 +2,8 @@ package org.openmbee.sdvc.rdb.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.openmbee.sdvc.data.domains.global.OrgUserPerm;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Role;
@@ -18,9 +20,7 @@ public interface OrgUserPermRepository extends JpaRepository<OrgUserPerm, Long> 
 
     Optional<OrgUserPerm> findByOrganizationAndUser(Organization b, User u);
 
-    Optional<OrgUserPerm> findAllByOrganizationAndUser_Username(Organization b, String u);
-
-    Optional<OrgUserPerm> findAllByOrganization_OrganizationIdAndUser_Username(String orgId, String u);
+    Set<OrgUserPerm> findAllByOrganizationAndUser_Username(Organization b, String u);
 
     List<OrgUserPerm> findAllByOrganizationAndRole(Organization org, Role r);
 

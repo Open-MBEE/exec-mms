@@ -20,7 +20,7 @@ public interface OrgGroupPermRepository extends JpaRepository<OrgGroupPerm, Long
 
     Optional<OrgGroupPerm> findByOrganizationAndGroup(Organization b, Group group);
 
-    Set<OrgGroupPerm> findAllByOrganizationAndGroup(Organization b, Set<Group> group);
+    Set<OrgGroupPerm> findAllByOrganizationAndGroupIn(Organization b, Set<Group> group);
 
     Optional<OrgGroupPerm> findByOrganizationAndGroup_Name(Organization b, String group);
 

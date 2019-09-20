@@ -591,22 +591,32 @@ public class DefaultPermissionService implements PermissionService {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
         }
 
-        Optional<OrgUserPerm> orgUserPerm = orgUserPermRepo.findAllByOrganization_OrganizationIdAndUser_Username(orgId, user);
-        if (!orgUserPerm.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization or Role not found");
+        Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
+        if (!organization.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
 
-        Set<Privilege> privileges = orgUserPerm.get().getRole().getPrivileges();
+        Set<OrgUserPerm> orgUserPerm = orgUserPermRepo.findAllByOrganizationAndUser_Username(organization.get(), user);
+        Set<Privilege> privileges = new HashSet<>();
+        Set<Group> groups = new HashSet<>();
+        orgUserPerm.forEach(oup -> {
+            privileges.addAll(oup.getRole().getPrivileges());
+            groups.addAll(oup.getUser().getGroups());
+        });
+
         if (privileges.contains(priv.get())) {
             return true;
         }
 
-        Optional<OrgUserPerm> orgGroupPerm = orgUserPermRepo.findAllByOrganization_OrganizationIdAndUser_Username(orgId, user);
-        if (!orgGroupPerm.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization or Group not found");
+        Set<OrgGroupPerm> orgGroupPerm = orgGroupPermRepo.findAllByOrganizationAndGroupIn(organization.get(), groups);
+        if (orgGroupPerm.isEmpty()) {
+            return false;
         }
 
-        privileges.addAll(orgGroupPerm.get().getRole().getPrivileges());
+        orgGroupPerm.forEach(ogp -> {
+            privileges.addAll(ogp.getRole().getPrivileges());
+        });
+
         return privileges.contains(priv.get());
     }
 
@@ -617,24 +627,31 @@ public class DefaultPermissionService implements PermissionService {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
         }
 
-        Optional<ProjectUserPerm> projectUserPerm = projectUserPermRepo.findByProject_ProjectIdAndUser_UsernameAndInheritedIsFalse(projectId, user);
-        if (!projectUserPerm.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization or Role not found");
+        Optional<Project> project = projectRepo.findByProjectId(projectId);
+        if (!project.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
 
-        Set<Privilege> privileges = projectUserPerm.get().getRole().getPrivileges();
+        Set<ProjectUserPerm> projectUserPerm = projectUserPermRepo.findAllByProjectAndUser_Username(project.get(), user);
+        Set<Privilege> privileges = new HashSet<>();
+        Set<Group> groups = new HashSet<>();
+        projectUserPerm.forEach(pup -> {
+            privileges.addAll(pup.getRole().getPrivileges());
+            groups.addAll(pup.getUser().getGroups());
+        });
+
         if (privileges.contains(priv.get())) {
             return true;
         }
 
-        Set<ProjectGroupPerm> projectGroupPerm = projectGroupPermRepo.findAllByProjectAndGroup(projectUserPerm.get().getProject(), new HashSet<>(projectUserPerm.get().getUser().getGroups()));
+        Set<ProjectGroupPerm> projectGroupPerm = projectGroupPermRepo.findAllByProjectAndGroupIn(project.get(), groups);
         if (projectGroupPerm.isEmpty()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization or Group not found");
+            return false;
         }
 
-        for (ProjectGroupPerm groupPerm : projectGroupPerm) {
-            privileges.addAll(groupPerm.getRole().getPrivileges());
-        }
+        projectGroupPerm.forEach(pgp -> {
+            privileges.addAll(pgp.getRole().getPrivileges());
+        });
 
         return privileges.contains(priv.get());
     }
@@ -643,27 +660,34 @@ public class DefaultPermissionService implements PermissionService {
     public boolean hasBranchPrivilege(String privilege, String user, String projectId, String branchId) {
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
-            throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
+            throw new PermissionException(HttpStatus.NOT_FOUND, "No such privilege");
         }
 
-        Optional<BranchUserPerm> branchUserPerm = branchUserPermRepo.findByBranch_BranchIdAndUser_UsernameAndInheritedIsFalse(branchId, user);
-        if (!branchUserPerm.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization or Role not found");
+        Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        if (!branch.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
         }
 
-        Set<Privilege> privileges = branchUserPerm.get().getRole().getPrivileges();
+        Set<BranchUserPerm> branchUserPerm = branchUserPermRepo.findAllByBranchAndUser_Username(branch.get(), user);
+        Set<Privilege> privileges = new HashSet<>();
+        Set<Group> groups = new HashSet<>();
+        branchUserPerm.forEach(bup -> {
+            privileges.addAll(bup.getRole().getPrivileges());
+            groups.addAll(bup.getUser().getGroups());
+        });
+
         if (privileges.contains(priv.get())) {
             return true;
         }
 
-        Set<BranchGroupPerm> branchGroupPerm = branchGroupPermRepo.findAllByBranchAndGroup(branchUserPerm.get().getBranch(), new HashSet<>(branchUserPerm.get().getUser().getGroups()));
+        Set<BranchGroupPerm> branchGroupPerm = branchGroupPermRepo.findAllByBranchAndGroupIn(branch.get(), groups);
         if (branchGroupPerm.isEmpty()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization or Group not found");
+            return false;
         }
 
-        for (BranchGroupPerm groupPerm : branchGroupPerm) {
-            privileges.addAll(groupPerm.getRole().getPrivileges());
-        }
+        branchGroupPerm.forEach(bgp -> {
+            privileges.addAll(bgp.getRole().getPrivileges());
+        });
 
         return privileges.contains(priv.get());
     }
