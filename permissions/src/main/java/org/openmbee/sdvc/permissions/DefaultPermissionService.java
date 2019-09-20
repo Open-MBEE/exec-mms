@@ -144,17 +144,10 @@ public class DefaultPermissionService implements PermissionService {
         ProjectUserPerm perm = new ProjectUserPerm(proj.get(), user.get(), role.get(), false);
         projectUserPermRepo.save(perm);
         proj.get().setInherit(inherit);
-        //auto create global master branch if not already there
-        Optional<Branch> master = branchRepo.findByProject_ProjectIdAndBranchId(projectId, "master");
-        Branch m;
-        if (!master.isPresent()) {
-            m = new Branch(proj.get(), "master", true);
-            branchRepo.save(m);
-        } else {
-            m = master.get();
-        }
-        branchUserPermRepo.save(new BranchUserPerm(m, user.get(), role.get(), false));
+        projectRepo.save(proj.get());
+
         recalculateInheritedPerms(proj.get());
+        initBranchPerms(projectId, "master", true, creator);
     }
 
     @Override
@@ -162,19 +155,22 @@ public class DefaultPermissionService implements PermissionService {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
         Optional<Branch> b = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        Optional<Project> p = projectRepo.findByProjectId(projectId);
 
         if (!user.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
         } else if (!role.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Role not found");
-        } else if (!b.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
+        } else if (!p.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
+        Branch branch = b.orElse(new Branch(p.get(), branchId, inherit));
+        branch.setInherit(inherit);
+        branchRepo.save(branch);
 
-        BranchUserPerm perm = new BranchUserPerm(b.get(), user.get(), role.get(), false);
+        BranchUserPerm perm = new BranchUserPerm(branch, user.get(), role.get(), false);
         branchUserPermRepo.save(perm);
-        b.get().setInherit(inherit);
-        recalculateInheritedPerms(b.get());
+        recalculateInheritedPerms(branch);
     }
 
     @Override
@@ -471,7 +467,6 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
         }
-        recalculateInheritedPerms(bran);
     }
 
     @Override
@@ -529,7 +524,6 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
         }
-        recalculateInheritedPerms(branch);
     }
 
     @Override
@@ -543,6 +537,7 @@ public class DefaultPermissionService implements PermissionService {
         Project proj = project.get();
         proj.setInherit(isInherit);
         projectRepo.save(proj);
+        recalculateInheritedPerms(proj);
     }
 
     @Override
@@ -556,6 +551,7 @@ public class DefaultPermissionService implements PermissionService {
         Branch bran = branch.get();
         bran.setInherit(isInherit);
         branchRepo.save(bran);
+        recalculateInheritedPerms(bran);
     }
 
     @Override
