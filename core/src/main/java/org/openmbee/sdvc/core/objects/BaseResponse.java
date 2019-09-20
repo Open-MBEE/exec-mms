@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.config.Constants;
 
-public abstract class BaseResponse<T> extends HashMap<String, Object> {
+public class BaseResponse<T> extends HashMap<String, Object> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 

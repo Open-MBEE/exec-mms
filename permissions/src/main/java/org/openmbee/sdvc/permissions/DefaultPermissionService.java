@@ -1,11 +1,9 @@
 package org.openmbee.sdvc.permissions;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest.Permission;
 import org.openmbee.sdvc.core.services.PermissionService;
@@ -23,21 +21,9 @@ import org.openmbee.sdvc.data.domains.global.ProjectUserPerm;
 import org.openmbee.sdvc.data.domains.global.Role;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
-import org.openmbee.sdvc.rdb.repositories.BranchGroupPermRepository;
-import org.openmbee.sdvc.rdb.repositories.BranchRepository;
-import org.openmbee.sdvc.rdb.repositories.BranchUserPermRepository;
-import org.openmbee.sdvc.rdb.repositories.GroupRepository;
-import org.openmbee.sdvc.rdb.repositories.OrgGroupPermRepository;
-import org.openmbee.sdvc.rdb.repositories.OrgUserPermRepository;
-import org.openmbee.sdvc.rdb.repositories.OrganizationRepository;
-import org.openmbee.sdvc.rdb.repositories.ProjectGroupPermRepository;
-import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
-import org.openmbee.sdvc.rdb.repositories.ProjectUserPermRepository;
-import org.openmbee.sdvc.rdb.repositories.RoleRepository;
-import org.openmbee.sdvc.rdb.repositories.UserRepository;
+import org.openmbee.sdvc.rdb.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -55,6 +41,7 @@ public class DefaultPermissionService implements PermissionService {
     private UserRepository userRepo;
     private GroupRepository groupRepo;
     private RoleRepository roleRepo;
+    private PrivilegeRepository privRepo;
 
     @Autowired
     public void setBranchRepo(BranchRepository branchRepo) {
@@ -117,7 +104,10 @@ public class DefaultPermissionService implements PermissionService {
         this.roleRepo = roleRepo;
     }
 
-
+    @Autowired
+    public void setPrivRepo(PrivilegeRepository privRepo) {
+        this.privRepo = privRepo;
+    }
 
     @Override
     public void initOrgPerms(String orgId, String creator) {
@@ -154,17 +144,10 @@ public class DefaultPermissionService implements PermissionService {
         ProjectUserPerm perm = new ProjectUserPerm(proj.get(), user.get(), role.get(), false);
         projectUserPermRepo.save(perm);
         proj.get().setInherit(inherit);
-        //auto create global master branch if not already there
-        Optional<Branch> master = branchRepo.findByProject_ProjectIdAndBranchId(projectId, "master");
-        Branch m;
-        if (!master.isPresent()) {
-            m = new Branch(proj.get(), "master", true);
-            branchRepo.save(m);
-        } else {
-            m = master.get();
-        }
-        branchUserPermRepo.save(new BranchUserPerm(m, user.get(), role.get(), false));
+        projectRepo.save(proj.get());
+
         recalculateInheritedPerms(proj.get());
+        initBranchPerms(projectId, "master", true, creator);
     }
 
     @Override
@@ -172,19 +155,22 @@ public class DefaultPermissionService implements PermissionService {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
         Optional<Branch> b = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        Optional<Project> p = projectRepo.findByProjectId(projectId);
 
         if (!user.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
         } else if (!role.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Role not found");
-        } else if (!b.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
+        } else if (!p.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
+        Branch branch = b.orElse(new Branch(p.get(), branchId, inherit));
+        branch.setInherit(inherit);
+        branchRepo.save(branch);
 
-        BranchUserPerm perm = new BranchUserPerm(b.get(), user.get(), role.get(), false);
+        BranchUserPerm perm = new BranchUserPerm(branch, user.get(), role.get(), false);
         branchUserPermRepo.save(perm);
-        b.get().setInherit(inherit);
-        recalculateInheritedPerms(b.get());
+        recalculateInheritedPerms(branch);
     }
 
     @Override
@@ -232,15 +218,12 @@ public class DefaultPermissionService implements PermissionService {
             case REMOVE:
                 for (Permission p: req.getPermissions()) {
                     Optional<User> user = userRepo.findByUsername(p.getName());
-                    //Optional<Role> role = roleRepo.findByName(p.getRole()); //role is irrelevant here?
                     if (!user.isPresent()) {
                         //throw exception or skip
                         continue;
                     }
                     Optional<OrgUserPerm> perm = orgUserPermRepo.findByOrganizationAndUser(o, user.get());
-                    if (perm.isPresent()) {
-                        orgUserPermRepo.delete(perm.get());
-                    }
+                    perm.ifPresent(orgUserPerm -> orgUserPermRepo.delete(orgUserPerm));
                 }
                 break;
         }
@@ -300,9 +283,7 @@ public class DefaultPermissionService implements PermissionService {
                         continue;
                     }
                     Optional<OrgGroupPerm> perm = orgGroupPermRepo.findByOrganizationAndGroup(o, group.get());
-                    if (perm.isPresent()) {
-                        orgGroupPermRepo.delete(perm.get());
-                    }
+                    perm.ifPresent(orgGroupPerm -> orgGroupPermRepo.delete(orgGroupPerm));
                 }
                 break;
         }
@@ -362,9 +343,7 @@ public class DefaultPermissionService implements PermissionService {
                         continue;
                     }
                     Optional<ProjectUserPerm> perm = projectUserPermRepo.findByProjectAndUserAndInherited(proj, user.get(), false);
-                    if (perm.isPresent()) {
-                        projectUserPermRepo.delete(perm.get());
-                    }
+                    perm.ifPresent(projectUserPerm -> projectUserPermRepo.delete(projectUserPerm));
                 }
                 break;
         }
@@ -424,9 +403,7 @@ public class DefaultPermissionService implements PermissionService {
                         continue;
                     }
                     Optional<ProjectGroupPerm> perm = projectGroupPermRepo.findByProjectAndGroupAndInherited(proj, group.get(), false);
-                    if (perm.isPresent()) {
-                        projectGroupPermRepo.delete(perm.get());
-                    }
+                    perm.ifPresent(projectGroupPerm -> projectGroupPermRepo.delete(projectGroupPerm));
                 }
                 break;
         }
@@ -453,7 +430,7 @@ public class DefaultPermissionService implements PermissionService {
                         //throw exception or skip
                         continue;
                     }
-                    Optional<BranchUserPerm> exist = branchUserPermRepo.findByBranchAndUserAndInherited(bran, user.get(), false);
+                    Optional<BranchUserPerm> exist = branchUserPermRepo.findByBranchAndUserAndInheritedIsFalse(bran, user.get());
                     if (exist.isPresent()) {
                         BranchUserPerm e = exist.get();
                         if (!role.get().equals(e.getRole())) {
@@ -485,25 +462,22 @@ public class DefaultPermissionService implements PermissionService {
                         //throw exception or skip
                         continue;
                     }
-                    Optional<BranchUserPerm> perm = branchUserPermRepo.findByBranchAndUserAndInherited(bran, user.get(), false);
-                    if (perm.isPresent()) {
-                        branchUserPermRepo.delete(perm.get());
-                    }
+                    Optional<BranchUserPerm> perm = branchUserPermRepo.findByBranchAndUserAndInheritedIsFalse(bran, user.get());
+                    perm.ifPresent(branchUserPerm -> branchUserPermRepo.delete(branchUserPerm));
                 }
                 break;
         }
-        recalculateInheritedPerms(bran);
     }
 
     @Override
     public void updateBranchGroupPerms(PermissionUpdateRequest req, String projectId, String branchId) {
-        Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        Optional<Branch> branchOptional = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
 
-        if (!branch.isPresent()) {
+        if (!branchOptional.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
         }
 
-        Branch bran = branch.get();
+        Branch branch = branchOptional.get();
         switch(req.getAction()) {
             case MODIFY:
                 for (Permission p: req.getPermissions()) {
@@ -513,7 +487,7 @@ public class DefaultPermissionService implements PermissionService {
                         //throw exception or skip
                         continue;
                     }
-                    Optional<BranchGroupPerm> exist = branchGroupPermRepo.findByBranchAndGroupAndInherited(bran, group.get(), false);
+                    Optional<BranchGroupPerm> exist = branchGroupPermRepo.findByBranchAndGroupAndInheritedIsFalse(branch, group.get());
                     if (exist.isPresent()) {
                         BranchGroupPerm e = exist.get();
                         if (!role.get().equals(e.getRole())) {
@@ -521,12 +495,12 @@ public class DefaultPermissionService implements PermissionService {
                             branchGroupPermRepo.save(e);
                         }
                     } else {
-                        branchGroupPermRepo.save(new BranchGroupPerm(bran, group.get(), role.get(), false));
+                        branchGroupPermRepo.save(new BranchGroupPerm(branch, group.get(), role.get(), false));
                     }
                 }
                 break;
             case REPLACE:
-                branchGroupPermRepo.deleteAll(branchGroupPermRepo.findAllByBranchAndInherited(bran, false));
+                branchGroupPermRepo.deleteAll(branchGroupPermRepo.findAllByBranchAndInherited(branch, false));
                 for (Permission p: req.getPermissions()) {
                     Optional<Group> group = groupRepo.findByName(p.getName());
                     Optional<Role> role = roleRepo.findByName(p.getRole());
@@ -534,7 +508,7 @@ public class DefaultPermissionService implements PermissionService {
                         //throw exception or skip
                         continue;
                     }
-                    branchGroupPermRepo.save(new BranchGroupPerm(bran, group.get(), role.get(), false));
+                    branchGroupPermRepo.save(new BranchGroupPerm(branch, group.get(), role.get(), false));
                 }
                 break;
             case REMOVE:
@@ -545,14 +519,11 @@ public class DefaultPermissionService implements PermissionService {
                         //throw exception or skip
                         continue;
                     }
-                    Optional<BranchGroupPerm> perm = branchGroupPermRepo.findByBranchAndGroupAndInherited(bran, group.get(), false);
-                    if (perm.isPresent()) {
-                        branchGroupPermRepo.delete(perm.get());
-                    }
+                    Optional<BranchGroupPerm> perm = branchGroupPermRepo.findByBranchAndGroupAndInheritedIsFalse(branch, group.get());
+                    perm.ifPresent(branchGroupPerm -> branchGroupPermRepo.delete(branchGroupPerm));
                 }
                 break;
         }
-        recalculateInheritedPerms(bran);
     }
 
     @Override
@@ -566,6 +537,7 @@ public class DefaultPermissionService implements PermissionService {
         Project proj = project.get();
         proj.setInherit(isInherit);
         projectRepo.save(proj);
+        recalculateInheritedPerms(proj);
     }
 
     @Override
@@ -579,6 +551,7 @@ public class DefaultPermissionService implements PermissionService {
         Branch bran = branch.get();
         bran.setInherit(isInherit);
         branchRepo.save(bran);
+        recalculateInheritedPerms(bran);
     }
 
     @Override
@@ -609,66 +582,110 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     public boolean hasOrgPrivilege(String privilege, String user, String orgId) {
-        Set<String> privileges = new HashSet<>();
-        Optional<User> userOptional = userRepo.findByUsername(user);
-        Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
+        Optional<Privilege> priv = privRepo.findByName(privilege);
+        if (!priv.isPresent()) {
+            throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
+        }
 
-        if (!userOptional.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
-        } else if (!organization.isPresent()) {
+        Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
+        if (!organization.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
 
-        Optional<OrgUserPerm> perm = orgUserPermRepo.findByOrganizationAndUser(organization.get(), userOptional.get());
-        if (perm.isPresent()) {
-            for (Privilege p: perm.get().getRole().getPrivileges()) {
-                privileges.add(p.getName());
-            }
+        Set<OrgUserPerm> orgUserPerm = orgUserPermRepo.findAllByOrganizationAndUser_Username(organization.get(), user);
+        Set<Privilege> privileges = new HashSet<>();
+        Set<Group> groups = new HashSet<>();
+        orgUserPerm.forEach(oup -> {
+            privileges.addAll(oup.getRole().getPrivileges());
+            groups.addAll(oup.getUser().getGroups());
+        });
+
+        if (privileges.contains(priv.get())) {
+            return true;
         }
-        //either use stored groups or get groups from sso or ldap or other means, should add a param so it can be passed in..
-        for (Group g: userOptional.get().getGroups()) {
-            Optional<OrgGroupPerm> perm2 = orgGroupPermRepo.findByOrganizationAndGroup(organization.get(), g);
-            if (perm2.isPresent()) {
-                for (Privilege p: perm2.get().getRole().getPrivileges()) {
-                    privileges.add(p.getName());
-                }
-            }
+
+        Set<OrgGroupPerm> orgGroupPerm = orgGroupPermRepo.findAllByOrganizationAndGroupIn(organization.get(), groups);
+        if (orgGroupPerm.isEmpty()) {
+            return false;
         }
-        return privileges.contains(privilege);
+
+        orgGroupPerm.forEach(ogp -> {
+            privileges.addAll(ogp.getRole().getPrivileges());
+        });
+
+        return privileges.contains(priv.get());
     }
 
     @Override
     public boolean hasProjectPrivilege(String privilege, String user, String projectId) {
-        Optional<Project> project = projectRepo.findByProjectId(projectId);
-        Optional<User> userOption = userRepo.findByUsername(user);
-        Optional<Role> roleOption = roleRepo.findByName(privilege);
-
-        if (project.isPresent() && userOption.isPresent() && roleOption.isPresent()) {
-            List<ProjectUserPerm> exists = projectUserPermRepo.findAllByProjectAndUser(project.get(), userOption.get());
-            for (ProjectUserPerm pup : exists) {
-                if (roleOption.get().equals(pup.getRole())) {
-                    return true;
-                }
-            }
+        Optional<Privilege> priv = privRepo.findByName(privilege);
+        if (!priv.isPresent()) {
+            throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
         }
-        return false;
+
+        Optional<Project> project = projectRepo.findByProjectId(projectId);
+        if (!project.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
+        }
+
+        Set<ProjectUserPerm> projectUserPerm = projectUserPermRepo.findAllByProjectAndUser_Username(project.get(), user);
+        Set<Privilege> privileges = new HashSet<>();
+        Set<Group> groups = new HashSet<>();
+        projectUserPerm.forEach(pup -> {
+            privileges.addAll(pup.getRole().getPrivileges());
+            groups.addAll(pup.getUser().getGroups());
+        });
+
+        if (privileges.contains(priv.get())) {
+            return true;
+        }
+
+        Set<ProjectGroupPerm> projectGroupPerm = projectGroupPermRepo.findAllByProjectAndGroupIn(project.get(), groups);
+        if (projectGroupPerm.isEmpty()) {
+            return false;
+        }
+
+        projectGroupPerm.forEach(pgp -> {
+            privileges.addAll(pgp.getRole().getPrivileges());
+        });
+
+        return privileges.contains(priv.get());
     }
 
     @Override
     public boolean hasBranchPrivilege(String privilege, String user, String projectId, String branchId) {
-        Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
-        Optional<User> userOption = userRepo.findByUsername(user);
-        Optional<Role> roleOption = roleRepo.findByName(privilege);
-
-        if (branch.isPresent() && userOption.isPresent() && roleOption.isPresent()) {
-            List<BranchUserPerm> exists = branchUserPermRepo.findAllByBranchAndUser(branch.get(), userOption.get());
-            for (BranchUserPerm bup : exists) {
-                if (roleOption.get().equals(bup.getRole())) {
-                    return true;
-                }
-            }
+        Optional<Privilege> priv = privRepo.findByName(privilege);
+        if (!priv.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "No such privilege");
         }
-        return false;
+
+        Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        if (!branch.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
+        }
+
+        Set<BranchUserPerm> branchUserPerm = branchUserPermRepo.findAllByBranchAndUser_Username(branch.get(), user);
+        Set<Privilege> privileges = new HashSet<>();
+        Set<Group> groups = new HashSet<>();
+        branchUserPerm.forEach(bup -> {
+            privileges.addAll(bup.getRole().getPrivileges());
+            groups.addAll(bup.getUser().getGroups());
+        });
+
+        if (privileges.contains(priv.get())) {
+            return true;
+        }
+
+        Set<BranchGroupPerm> branchGroupPerm = branchGroupPermRepo.findAllByBranchAndGroupIn(branch.get(), groups);
+        if (branchGroupPerm.isEmpty()) {
+            return false;
+        }
+
+        branchGroupPerm.forEach(bgp -> {
+            privileges.addAll(bgp.getRole().getPrivileges());
+        });
+
+        return privileges.contains(priv.get());
     }
 
     @Override
