@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.permissions;
 
 import javax.transaction.Transactional;
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.services.PermissionService;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,19 +132,18 @@ public class PermissionsController {
         return res;
     }
 
-    //TODO, switch to enums when merged
     private void checkUpdatePerm(Authentication auth, String orgId, String projectId, String refId) {
         if (auth instanceof AnonymousAuthenticationToken) {
             throw new PermissionException(HttpStatus.UNAUTHORIZED, "");
         }
-        if (orgId != null && permissionService.hasOrgPrivilege("ORG_UPDATE_PERMISSIONS", auth.getName(), orgId)) {
+        if (orgId != null && permissionService.hasOrgPrivilege(Privileges.ORG_UPDATE_PERMISSIONS.name(), auth.getName(), orgId)) {
             return;
         }
         if (projectId != null) {
-            if (refId != null && permissionService.hasBranchPrivilege("BRANCH_UPDATE_PERMISSIONS", auth.getName(), projectId, refId)) {
+            if (refId != null && permissionService.hasBranchPrivilege(Privileges.BRANCH_UPDATE_PERMISSIONS.name(), auth.getName(), projectId, refId)) {
                     return;
             }
-            if (permissionService.hasProjectPrivilege("PROJECT_UPDATE_PERMISSIONS", auth.getName(), projectId)) {
+            if (permissionService.hasProjectPrivilege(Privileges.PROJECT_UPDATE_PERMISSIONS.name(), auth.getName(), projectId)) {
                 return;
             }
         }
@@ -151,17 +151,17 @@ public class PermissionsController {
     }
 
     private void checkReadPerm(Authentication auth, String orgId, String projectId, String refId) {
-        if (orgId != null && (permissionService.isOrgPublic(orgId) || permissionService.hasOrgPrivilege("ORG_READ_PERMISSIONS", auth.getName(), orgId))) {
+        if (orgId != null && (permissionService.isOrgPublic(orgId) || permissionService.hasOrgPrivilege(Privileges.ORG_READ_PERMISSIONS.name(), auth.getName(), orgId))) {
             return;
         }
         if (projectId != null) {
             if (permissionService.isProjectPublic(projectId)) {
                 return;
             }
-            if (refId != null && permissionService.hasBranchPrivilege("BRANCH_READ_PERMISSIONS", auth.getName(), projectId, refId)) {
+            if (refId != null && permissionService.hasBranchPrivilege(Privileges.BRANCH_READ_PERMISSIONS.name(), auth.getName(), projectId, refId)) {
                 return;
             }
-            if (permissionService.hasProjectPrivilege("PROJECT_READ_PERMISSIONS", auth.getName(), projectId)) {
+            if (permissionService.hasProjectPrivilege(Privileges.PROJECT_READ_PERMISSIONS.name(), auth.getName(), projectId)) {
                 return;
             }
         }
