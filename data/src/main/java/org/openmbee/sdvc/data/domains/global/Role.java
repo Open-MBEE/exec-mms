@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import java.util.Collection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 @Table(name = "roles")
 public class Role extends Base {
 
+    @Column(unique = true)
     private String name;
 
     @OneToMany(mappedBy = "role")

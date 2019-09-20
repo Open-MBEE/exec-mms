@@ -1,11 +1,17 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "project_user_perms")
+@Table(name = "project_user_perms",
+    indexes = {
+        @Index(columnList = "project_id"),
+        @Index(columnList = "project_id,user_id"),
+        @Index(columnList = "project_id,inherited")
+    })
 public class ProjectUserPerm extends Base {
 
     @ManyToOne

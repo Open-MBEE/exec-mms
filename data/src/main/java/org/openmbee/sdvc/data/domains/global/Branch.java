@@ -5,9 +5,13 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "branches")
+@Table(name = "branches",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"branchid","project_id"})
+    })
 public class Branch extends Base {
 
     @ManyToOne

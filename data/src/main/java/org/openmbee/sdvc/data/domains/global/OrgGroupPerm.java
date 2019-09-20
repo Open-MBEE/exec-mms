@@ -1,11 +1,16 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "org_group_perms")
+@Table(name = "org_group_perms",
+    indexes = {
+        @Index(columnList = "organization_id"),
+        @Index(columnList = "organization_id,group_id")
+    })
 public class OrgGroupPerm extends Base {
 
     @ManyToOne

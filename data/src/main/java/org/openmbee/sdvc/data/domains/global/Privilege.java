@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import java.util.Collection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 @Table(name = "privileges")
 public class Privilege extends Base {
 
+    @Column(unique = true)
     private String name;
 
     @ManyToMany(mappedBy = "privileges")
