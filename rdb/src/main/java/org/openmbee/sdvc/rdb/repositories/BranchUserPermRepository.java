@@ -1,7 +1,8 @@
 package org.openmbee.sdvc.rdb.repositories;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.openmbee.sdvc.data.domains.global.Branch;
 import org.openmbee.sdvc.data.domains.global.BranchUserPerm;
 import org.openmbee.sdvc.data.domains.global.User;
@@ -11,15 +12,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BranchUserPermRepository extends JpaRepository<BranchUserPerm, Long> {
 
-    List<BranchUserPerm> findAllByBranch(Branch b);
+    Set<BranchUserPerm> findAllByBranch(Branch b);
 
-    List<BranchUserPerm> findAllByBranchAndInherited(Branch b, boolean inherited);
+    Set<BranchUserPerm> findAllByBranchAndInherited(Branch b, boolean inherited);
 
-    List<BranchUserPerm> findAllByBranchAndUser(Branch b, User u);
+    Set<BranchUserPerm> findAllByBranchAndUser(Branch b, User u);
 
-    List<BranchUserPerm> findAllByBranchAndUser_Username(Branch b, String u);
+    Set<BranchUserPerm> findAllByBranchAndUser_Username(Branch b, String u);
 
-    Optional<BranchUserPerm> findByBranchAndUserAndInherited(Branch b, User u, boolean inherited);
+    Set<BranchUserPerm> findAllByBranch_BranchIdAndUser_Username(String b, String u);
+
+    Set<BranchUserPerm> findByBranchAndUserAndInherited(Branch b, User u, boolean inherited);
+
+    Optional<BranchUserPerm> findByBranchAndUserAndInheritedIsFalse(Branch b, User u);
 
     Optional<BranchUserPerm> findByBranchAndUser_UsernameAndInherited(Branch b, String u, boolean inherited);
 }
