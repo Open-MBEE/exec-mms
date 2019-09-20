@@ -22,7 +22,7 @@ public interface ProjectGroupPermRepository extends JpaRepository<ProjectGroupPe
 
     List<ProjectGroupPerm> findAllByProject_ProjectIdAndInherited(String projectId, boolean inherited);
 
-    Optional<ProjectGroupPerm> findByProjectAndGroup(Project proj, Group group);
+    Set<ProjectGroupPerm> findAllByProjectAndGroup(Project proj, Group group);
 
     Set<ProjectGroupPerm> findAllByProjectAndGroupIn(Project proj, Set<Group> group);
 

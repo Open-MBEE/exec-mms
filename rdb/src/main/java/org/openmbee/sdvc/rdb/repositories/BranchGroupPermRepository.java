@@ -17,7 +17,7 @@ public interface BranchGroupPermRepository extends JpaRepository<BranchGroupPerm
 
     List<BranchGroupPerm> findAllByBranchAndInherited(Branch b, boolean inherited);
 
-    Optional<BranchGroupPerm> findByBranchAndGroup(Branch b, Group g);
+    Set<BranchGroupPerm> findAllByBranchAndGroup(Branch b, Group g);
 
     Set<BranchGroupPerm> findAllByBranchAndGroupIn(Branch b, Set<Group> g);
 

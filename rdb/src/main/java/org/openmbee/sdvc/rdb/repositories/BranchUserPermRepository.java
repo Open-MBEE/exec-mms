@@ -27,6 +27,4 @@ public interface BranchUserPermRepository extends JpaRepository<BranchUserPerm, 
     Optional<BranchUserPerm> findByBranchAndUserAndInheritedIsFalse(Branch b, User u);
 
     Optional<BranchUserPerm> findByBranchAndUser_UsernameAndInherited(Branch b, String u, boolean inherited);
-
-    Optional<BranchUserPerm> findByBranch_BranchIdAndUser_UsernameAndInheritedIsFalse(String b, String u);
 }
