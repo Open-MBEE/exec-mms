@@ -26,7 +26,7 @@ spring.datasource.username=mmsuser
 spring.datasource.password=test1234
 spring.datasource.driver-class-name=org.postgresql.Driver
 #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-
+spring.datasource.initialization-mode=always
 
 # The SQL dialect makes Hibernate generate better SQL for the chosen database
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL94Dialect
