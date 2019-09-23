@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.core.services;
 
+import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 
 public interface PermissionService {
@@ -43,4 +44,16 @@ public interface PermissionService {
     boolean isOrgPublic(String orgId);
 
     boolean isProjectPublic(String projectId);
+
+    PermissionResponse getOrgGroupRoles(String orgId);
+
+    PermissionResponse getOrgUserRoles(String orgId);
+
+    PermissionResponse getProjectGroupRoles(String projectId);
+
+    PermissionResponse getProjectUserRoles(String projectId);
+
+    PermissionResponse getBranchGroupRoles(String projectId, String branchId);
+
+    PermissionResponse getBranchUserRoles(String projectId, String branchId);
 }

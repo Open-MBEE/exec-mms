@@ -6,7 +6,7 @@ public class PermissionResponse {
 
     private List<Permission> permissions;
 
-    public class Permission {
+    public static class Permission {
         private String name;
 
         private String role;

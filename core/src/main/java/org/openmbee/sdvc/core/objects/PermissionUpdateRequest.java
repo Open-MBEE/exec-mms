@@ -6,7 +6,7 @@ public class PermissionUpdateRequest {
 
     public enum Action {MODIFY, REPLACE, REMOVE;}
 
-    public class Permission {
+    public static class Permission {
         private String name;
 
         private String role;
