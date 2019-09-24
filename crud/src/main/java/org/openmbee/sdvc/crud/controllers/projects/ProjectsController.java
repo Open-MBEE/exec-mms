@@ -141,6 +141,7 @@ public class ProjectsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{projectId}")
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handleDelete(
         @PathVariable String projectId,
         Authentication auth) {

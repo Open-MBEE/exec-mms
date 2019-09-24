@@ -20,7 +20,7 @@ INSERT INTO privileges (id, modified, created, name) VALUES
   (19, NOW(), NOW(), 'BRANCH_READ_PERMISSIONS');
 
 INSERT INTO roles (id, modified, created, name) VALUES
-  (0, NOW(), NOW(), 'admin');
+  (0, NOW(), NOW(), 'ADMIN');
 
 INSERT INTO roles_privileges (role_id, privilege_id) VALUES
   (0, 1),

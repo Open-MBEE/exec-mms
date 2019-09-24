@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -28,6 +29,7 @@ public class BranchesGet extends BaseController {
     }
 
     @GetMapping(value = {"", "/{refId}"})
+    @Transactional
     public ResponseEntity<?> handleRequest(
         @PathVariable String projectId,
         @PathVariable(required = false) String refId,

@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.elements;
 
 import java.util.Map;
 
+import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ElementsController extends BaseController {
 
     @GetMapping(value = {"", "/{elementId}"})
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -46,6 +48,7 @@ public class ElementsController extends BaseController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handlePost(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -65,6 +68,7 @@ public class ElementsController extends BaseController {
     }
 
     @PutMapping
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handlePut(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -86,6 +90,7 @@ public class ElementsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{elementId}")
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handleDelete(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -100,6 +105,7 @@ public class ElementsController extends BaseController {
     }
 
     @DeleteMapping
+    @Transactional
     public ResponseEntity<? extends BaseResponse> handleBulkDelete(
         @PathVariable String projectId,
         @PathVariable String refId,

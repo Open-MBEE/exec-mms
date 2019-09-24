@@ -831,6 +831,9 @@ public class DefaultPermissionService implements PermissionService {
                 projectGroupPermRepo.save(new ProjectGroupPerm(project, p.getGroup(), p.getRole(), true));
             }
         }
+        if (project.getBranches() == null) { //TODO this shouldn't be returning null..
+            return;
+        }
         for (Branch b: project.getBranches()) {
             recalculateInheritedPerms(b);
         }
