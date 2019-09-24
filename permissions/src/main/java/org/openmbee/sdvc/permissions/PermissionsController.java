@@ -90,6 +90,7 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")
+    @Transactional
     public PermissionsResponse getOrgPermissions(
         @PathVariable String orgId,
         Authentication auth) {
@@ -103,6 +104,7 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/permissions")
+    @Transactional
     public PermissionsResponse getProjectPermissions(
         @PathVariable String projectId,
         Authentication auth) {
@@ -117,6 +119,7 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
+    @Transactional
     public PermissionsResponse getBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId,

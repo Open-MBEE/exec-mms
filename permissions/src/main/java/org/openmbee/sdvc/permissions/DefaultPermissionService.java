@@ -717,99 +717,94 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     public PermissionResponse getOrgGroupRoles(String orgId) {
-        PermissionResponse res = new PermissionResponse();
-        List<PermissionResponse.Permission> perms = new ArrayList<>();
-        res.setPermissions(perms);
+        PermissionResponse res = initResponse();
         for (OrgGroupPerm perm: orgGroupPermRepo.findAllByOrganization_OrganizationId(orgId)) {
-            PermissionResponse.Permission p = new PermissionResponse.Permission();
-            p.setInherited(false);
-            p.setName(perm.getGroup().getName());
-            p.setRole(perm.getRole().getName());
-            perms.add(p);
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getGroup().getName(),
+                perm.getRole().getName(),
+                false
+            ));
         }
         return res;
     }
 
     @Override
     public PermissionResponse getOrgUserRoles(String orgId) {
-        PermissionResponse res = new PermissionResponse();
-        List<PermissionResponse.Permission> perms = new ArrayList<>();
-        res.setPermissions(perms);
+        PermissionResponse res = initResponse();
         for (OrgUserPerm perm: orgUserPermRepo.findAllByOrganization_OrganizationId(orgId)) {
-            PermissionResponse.Permission p = new PermissionResponse.Permission();
-            p.setInherited(false);
-            p.setName(perm.getUser().getUsername());
-            p.setRole(perm.getRole().getName());
-            perms.add(p);
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getUser().getUsername(),
+                perm.getRole().getName(),
+                false
+            ));
         }
         return res;
     }
 
     @Override
     public PermissionResponse getProjectGroupRoles(String projectId) {
-        PermissionResponse res = new PermissionResponse();
-        List<PermissionResponse.Permission> perms = new ArrayList<>();
-        res.setPermissions(perms);
+        PermissionResponse res = initResponse();
         for (ProjectGroupPerm perm: projectGroupPermRepo.findAllByProject_ProjectId(projectId)) {
-            PermissionResponse.Permission p = new PermissionResponse.Permission();
-            p.setInherited(perm.isInherited());
-            p.setName(perm.getGroup().getName());
-            p.setRole(perm.getRole().getName());
-            perms.add(p);
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getGroup().getName(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
         }
         return res;
     }
 
     @Override
     public PermissionResponse getProjectUserRoles(String projectId) {
-        PermissionResponse res = new PermissionResponse();
-        List<PermissionResponse.Permission> perms = new ArrayList<>();
-        res.setPermissions(perms);
+        PermissionResponse res = initResponse();
         for (ProjectUserPerm perm: projectUserPermRepo.findAllByProject_ProjectId(projectId)) {
-            PermissionResponse.Permission p = new PermissionResponse.Permission();
-            p.setInherited(perm.isInherited());
-            p.setName(perm.getUser().getUsername());
-            p.setRole(perm.getRole().getName());
-            perms.add(p);
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getUser().getUsername(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
         }
         return res;
     }
 
     @Override
     public PermissionResponse getBranchGroupRoles(String projectId, String branchId) {
-        PermissionResponse res = new PermissionResponse();
-        List<PermissionResponse.Permission> perms = new ArrayList<>();
-        res.setPermissions(perms);
+        PermissionResponse res = initResponse();
         Optional<Branch> b = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
         if (!b.isPresent()) {
             return res;
         }
         for (BranchGroupPerm perm: branchGroupPermRepo.findAllByBranch(b.get())) {
-            PermissionResponse.Permission p = new PermissionResponse.Permission();
-            p.setInherited(perm.isInherited());
-            p.setName(perm.getGroup().getName());
-            p.setRole(perm.getRole().getName());
-            perms.add(p);
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getGroup().getName(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
         }
         return res;
     }
 
     @Override
     public PermissionResponse getBranchUserRoles(String projectId, String branchId) {
-        PermissionResponse res = new PermissionResponse();
-        List<PermissionResponse.Permission> perms = new ArrayList<>();
-        res.setPermissions(perms);
+        PermissionResponse res = initResponse();
         Optional<Branch> b = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
         if (!b.isPresent()) {
             return res;
         }
         for (BranchUserPerm perm: branchUserPermRepo.findAllByBranch(b.get())) {
-            PermissionResponse.Permission p = new PermissionResponse.Permission();
-            p.setInherited(perm.isInherited());
-            p.setName(perm.getUser().getUsername());
-            p.setRole(perm.getRole().getName());
-            perms.add(p);
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getUser().getUsername(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
         }
+        return res;
+    }
+
+    private PermissionResponse initResponse() {
+        PermissionResponse res = new PermissionResponse();
+        List<PermissionResponse.Permission> perms = new ArrayList<>();
+        res.setPermissions(perms);
         return res;
     }
 

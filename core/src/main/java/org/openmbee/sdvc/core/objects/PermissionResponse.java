@@ -13,6 +13,13 @@ public class PermissionResponse {
 
         private boolean inherited;
 
+        public Permission() {}
+        public Permission(String name, String role, boolean inherited) {
+            this.name = name;
+            this.role = role;
+            this.inherited = inherited;
+        }
+
         public String getName() {
             return name;
         }
