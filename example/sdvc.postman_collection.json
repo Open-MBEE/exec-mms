@@ -2751,6 +2751,132 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "remove reader perms on branch writer as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\": {\n    \t\"action\": \"REMOVE\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove reader perms on project aa as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\": {\n    \t\"action\": \"REMOVE\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"READER\"\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on branch writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"branch has 4 perms\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.users.permissions.length).to.eql(4);",
+									"    pm.expect(jsonData.public).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"permissions"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "test permission handling",
