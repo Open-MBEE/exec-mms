@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
-import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
@@ -24,7 +23,6 @@ public class NotebooksController extends BaseController {
     }
 
     @GetMapping(value = {"", "/{notebookId}"})
-    @Transactional
     public ResponseEntity<?> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -47,7 +45,6 @@ public class NotebooksController extends BaseController {
     }
 
     @PutMapping
-    @Transactional
     public ResponseEntity<?> handlePut(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -67,7 +64,6 @@ public class NotebooksController extends BaseController {
     }
 
     @PostMapping
-    @Transactional
     public ResponseEntity<?> handlePost(
         @PathVariable String projectId,
         @PathVariable String refId,

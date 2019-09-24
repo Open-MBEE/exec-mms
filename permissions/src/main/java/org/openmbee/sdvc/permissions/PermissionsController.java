@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.permissions;
 
-import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.services.PermissionService;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
@@ -26,7 +25,6 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/orgs/{orgId}/permissions")
-    @Transactional
     public ResponseEntity<?> updateOrgPermissions(
         @PathVariable String orgId,
         @RequestBody PermissionsRequest req,
@@ -46,7 +44,6 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/projects/{projectId}/permissions")
-    @Transactional
     public ResponseEntity<?> updateProjectPermissions(
         @PathVariable String projectId,
         @RequestBody PermissionsRequest req,
@@ -69,7 +66,6 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
-    @Transactional
     public ResponseEntity<?> updateBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -90,7 +86,6 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")
-    @Transactional
     public PermissionsResponse getOrgPermissions(
         @PathVariable String orgId,
         Authentication auth) {
@@ -104,7 +99,6 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/permissions")
-    @Transactional
     public PermissionsResponse getProjectPermissions(
         @PathVariable String projectId,
         Authentication auth) {
@@ -119,7 +113,6 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
-    @Transactional
     public PermissionsResponse getBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId,

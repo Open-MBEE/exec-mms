@@ -134,7 +134,6 @@ public class OrgsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{orgId}")
-    @Transactional
     public ResponseEntity<? extends BaseResponse> handleDelete(
         @PathVariable String orgId,
         Authentication auth) {

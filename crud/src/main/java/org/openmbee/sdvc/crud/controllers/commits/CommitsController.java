@@ -2,7 +2,6 @@ package org.openmbee.sdvc.crud.controllers.commits;
 
 import java.util.Map;
 
-import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.CommitsRequest;
 import org.openmbee.sdvc.core.objects.CommitsResponse;
@@ -33,7 +32,6 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/commits")
-    @Transactional
     public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -46,7 +44,6 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/commits/{commitId}")
-    @Transactional
     public ResponseEntity<? extends BaseResponse> handleCommitGet(
         @PathVariable String projectId,
         @PathVariable String commitId,
@@ -58,7 +55,6 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/elements/{elementId}/commits")
-    @Transactional
     public ResponseEntity<? extends BaseResponse> handleElementCommitsGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -72,7 +68,6 @@ public class CommitsController extends BaseController {
     }
 
     @PutMapping(value = "/commits")
-    @Transactional
     public ResponseEntity<? extends BaseResponse> handleBulkGet(
         @PathVariable String projectId,
         @RequestBody CommitsRequest req,
