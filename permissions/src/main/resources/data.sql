@@ -20,7 +20,9 @@ INSERT INTO privileges (id, modified, created, name) VALUES
   (19, NOW(), NOW(), 'BRANCH_READ_PERMISSIONS');
 
 INSERT INTO roles (id, modified, created, name) VALUES
-  (0, NOW(), NOW(), 'ADMIN');
+  (0, NOW(), NOW(), 'ADMIN'),
+  (1, NOW(), NOW(), 'READER'),
+  (2, NOW(), NOW(), 'WRITER');
 
 INSERT INTO roles_privileges (role_id, privilege_id) VALUES
   (0, 1),
@@ -41,4 +43,24 @@ INSERT INTO roles_privileges (role_id, privilege_id) VALUES
   (0, 16),
   (0, 17),
   (0, 18),
-  (0, 19);
+  (0, 19),
+  (2, 1),
+  (2, 2),
+  (2, 4),
+  (2, 5),
+  (2, 7),
+  (2, 8),
+  (2, 9),
+  (2, 10),
+  (2, 13),
+  (2, 14),
+  (2, 15),
+  (2, 16),
+  (2, 19),
+  (1, 1),
+  (1, 4),
+  (1, 7),
+  (1, 9),
+  (1, 13),
+  (1, 15),
+  (1, 19);
