@@ -23,7 +23,7 @@ public class PermissionsController {
 
     @PostMapping(value = "/orgs/{orgId}/permissions")
     @Transactional
-    @PreAuthorize("hasOrgPrivilege(#orgId, 'ORG_UPDATE_PERMISSIONS', false)")
+    @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateOrgPermissions(
         @PathVariable String orgId,
         @RequestBody PermissionsRequest req) {
@@ -42,7 +42,7 @@ public class PermissionsController {
 
     @PostMapping(value = "/projects/{projectId}/permissions")
     @Transactional
-    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_UPDATE_PERMISSIONS', false)")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateProjectPermissions(
         @PathVariable String projectId,
         @RequestBody PermissionsRequest req) {
@@ -64,7 +64,7 @@ public class PermissionsController {
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
     @Transactional
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_UPDATE_PERMISSIONS', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -83,7 +83,7 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")
-    @PreAuthorize("hasOrgPrivilege(#orgId, 'ORG_READ_PERMISSIONS', true)")
+    @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_READ_PERMISSIONS', true)")
     public PermissionsResponse getOrgPermissions(
         @PathVariable String orgId) {
 
@@ -95,7 +95,7 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/permissions")
-    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_READ_PERMISSIONS', true)")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_PERMISSIONS', true)")
     public PermissionsResponse getProjectPermissions(
         @PathVariable String projectId) {
 
@@ -108,7 +108,7 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_READ_PERMISSIONS', true)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ_PERMISSIONS', true)")
     public PermissionsResponse getBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId) {

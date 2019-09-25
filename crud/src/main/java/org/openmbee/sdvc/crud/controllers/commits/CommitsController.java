@@ -30,7 +30,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/commits")
-    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_READ_COMMITS', true)")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -41,7 +41,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/commits/{commitId}")
-    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_READ_COMMITS', true)")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleCommitGet(
         @PathVariable String projectId,
         @PathVariable String commitId) {
@@ -51,7 +51,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/elements/{elementId}/commits")
-    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_READ_COMMITS', true)")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleElementCommitsGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -63,7 +63,7 @@ public class CommitsController extends BaseController {
     }
 
     @PutMapping(value = "/commits")
-    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_READ_COMMITS', true)")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleBulkGet(
         @PathVariable String projectId,
         @RequestBody CommitsRequest req) {

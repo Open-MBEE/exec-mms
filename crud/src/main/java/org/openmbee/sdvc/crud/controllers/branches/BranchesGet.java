@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
-import org.openmbee.sdvc.core.security.CustomMSERoot;
+import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.crud.services.BranchService;
@@ -30,7 +30,7 @@ public class BranchesGet extends BaseController {
     }
 
     @GetMapping(value = {"", "/{refId}"})
-    @PreAuthorize("#refId == null || hasBranchPrivilege(#projectId, #refId, 'BRANCH_READ', true)")
+    @PreAuthorize("#refId == null || @mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ResponseEntity<?> handleRequest(
         @PathVariable String projectId,
         @PathVariable(required = false) String refId,
@@ -49,7 +49,7 @@ public class BranchesGet extends BaseController {
                 List<RefJson> filtered = new ArrayList<>();
                 for (RefJson ref: res.getBranches()) {
                     if (permissionService.hasBranchPrivilege(Privileges.BRANCH_READ.name(), auth.getName(),
-                            CustomMSERoot.getGroups(auth), projectId, ref.getId())) {
+                            MethodSecurityService.getGroups(auth), projectId, ref.getId())) {
                         filtered.add(ref);
                     }
                 }

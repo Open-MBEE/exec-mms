@@ -53,7 +53,7 @@ public class BranchesPost extends BaseController {
 
     @PostMapping
     @Transactional
-    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_CREATE_BRANCH', false)")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_BRANCH', false)")
     public ResponseEntity<? extends BaseResponse> handleRequest(
             @PathVariable String projectId,
             @RequestBody BranchesRequest projectsPost,

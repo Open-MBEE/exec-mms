@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ElementsController extends BaseController {
 
     @GetMapping(value = {"", "/{elementId}"})
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_READ', true)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -42,7 +42,7 @@ public class ElementsController extends BaseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ResponseEntity<? extends BaseResponse> handlePost(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -60,7 +60,7 @@ public class ElementsController extends BaseController {
     }
 
     @PutMapping
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_READ', true)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ResponseEntity<? extends BaseResponse> handlePut(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -77,7 +77,7 @@ public class ElementsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{elementId}")
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ResponseEntity<? extends BaseResponse> handleDelete(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -90,7 +90,7 @@ public class ElementsController extends BaseController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_DELETE', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_DELETE', false)")
     public ResponseEntity<? extends BaseResponse> handleBulkDelete(
         @PathVariable String projectId,
         @PathVariable String refId,

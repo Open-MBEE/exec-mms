@@ -23,7 +23,7 @@ public class NotebooksController extends BaseController {
     }
 
     @GetMapping(value = {"", "/{notebookId}"})
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_READ', true)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ResponseEntity<?> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -41,7 +41,7 @@ public class NotebooksController extends BaseController {
     }
 
     @PutMapping
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_READ', true)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ResponseEntity<?> handlePut(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -56,7 +56,7 @@ public class NotebooksController extends BaseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ResponseEntity<?> handlePost(
         @PathVariable String projectId,
         @PathVariable String refId,

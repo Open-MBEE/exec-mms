@@ -10,7 +10,7 @@ import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
-import org.openmbee.sdvc.core.security.CustomMSERoot;
+import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.rdb.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -43,7 +43,7 @@ public class OrgsController extends BaseController {
 
     @GetMapping(value = {"", "/{orgId}"})
     @Transactional
-    @PreAuthorize("#orgId == null || hasOrgPrivilege(#orgId, 'ORG_READ', true)")
+    @PreAuthorize("#orgId == null || @mss.hasOrgPrivilege(authentication, #orgId, 'ORG_READ', true)")
     public ResponseEntity<?> handleGet(
         @PathVariable(required = false) String orgId,
         Authentication auth) {
@@ -66,7 +66,7 @@ public class OrgsController extends BaseController {
                 if (permissionService.isOrgPublic(org.getOrganizationId()) ||
                     (!isAnonymous(auth) &&
                         permissionService.hasOrgPrivilege(Privileges.ORG_READ.name(), auth.getName(),
-                            CustomMSERoot.getGroups(auth), org.getOrganizationId()))) {
+                            MethodSecurityService.getGroups(auth), org.getOrganizationId()))) {
                     OrgJson orgJson = new OrgJson();
                     orgJson.merge(convertToMap(org));
                     response.getOrgs().add(orgJson);
@@ -105,7 +105,7 @@ public class OrgsController extends BaseController {
             boolean newOrg = true;
             if (o.getId() != null) {
                 if (!permissionService.hasOrgPrivilege(Privileges.ORG_EDIT.name(), auth.getName(),
-                        CustomMSERoot.getGroups(auth), o.getOrganizationId())) {
+                        MethodSecurityService.getGroups(auth), o.getOrganizationId())) {
                     Map<String, Object> rejection = new HashMap<>();
                     rejection.put("message", "No permission to update org");
                     rejection.put("code", 403);
@@ -132,7 +132,7 @@ public class OrgsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{orgId}")
-    @PreAuthorize("hasOrgPrivilege(#orgId, 'ORG_DELETE', false)")
+    @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_DELETE', false)")
     public ResponseEntity<? extends BaseResponse> handleDelete(
         @PathVariable String orgId) {
 
