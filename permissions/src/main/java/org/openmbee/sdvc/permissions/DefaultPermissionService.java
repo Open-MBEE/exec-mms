@@ -599,7 +599,7 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public boolean hasOrgPrivilege(String privilege, String user, String orgId) {
+    public boolean hasOrgPrivilege(String privilege, String user, Set<String> groups, String orgId) {
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
@@ -612,17 +612,15 @@ public class DefaultPermissionService implements PermissionService {
 
         Set<OrgUserPerm> orgUserPerm = orgUserPermRepo.findAllByOrganizationAndUser_Username(organization.get(), user);
         Set<Privilege> privileges = new HashSet<>();
-        Set<Group> groups = new HashSet<>();
         orgUserPerm.forEach(oup -> {
             privileges.addAll(oup.getRole().getPrivileges());
-            groups.addAll(oup.getUser().getGroups());
         });
 
         if (privileges.contains(priv.get())) {
             return true;
         }
 
-        Set<OrgGroupPerm> orgGroupPerm = orgGroupPermRepo.findAllByOrganizationAndGroupIn(organization.get(), groups);
+        Set<OrgGroupPerm> orgGroupPerm = orgGroupPermRepo.findAllByOrganizationAndGroup_NameIn(organization.get(), groups);
         if (orgGroupPerm.isEmpty()) {
             return false;
         }
@@ -636,7 +634,7 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public boolean hasProjectPrivilege(String privilege, String user, String projectId) {
+    public boolean hasProjectPrivilege(String privilege, String user, Set<String> groups, String projectId) {
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
@@ -649,17 +647,15 @@ public class DefaultPermissionService implements PermissionService {
 
         Set<ProjectUserPerm> projectUserPerm = projectUserPermRepo.findAllByProjectAndUser_Username(project.get(), user);
         Set<Privilege> privileges = new HashSet<>();
-        Set<Group> groups = new HashSet<>();
         projectUserPerm.forEach(pup -> {
             privileges.addAll(pup.getRole().getPrivileges());
-            groups.addAll(pup.getUser().getGroups());
         });
 
         if (privileges.contains(priv.get())) {
             return true;
         }
 
-        Set<ProjectGroupPerm> projectGroupPerm = projectGroupPermRepo.findAllByProjectAndGroupIn(project.get(), groups);
+        Set<ProjectGroupPerm> projectGroupPerm = projectGroupPermRepo.findAllByProjectAndGroup_NameIn(project.get(), groups);
         if (projectGroupPerm.isEmpty()) {
             return false;
         }
@@ -673,7 +669,7 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public boolean hasBranchPrivilege(String privilege, String user, String projectId, String branchId) {
+    public boolean hasBranchPrivilege(String privilege, String user, Set<String> groups, String projectId, String branchId) {
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "No such privilege");
@@ -686,17 +682,15 @@ public class DefaultPermissionService implements PermissionService {
 
         Set<BranchUserPerm> branchUserPerm = branchUserPermRepo.findAllByBranchAndUser_Username(branch.get(), user);
         Set<Privilege> privileges = new HashSet<>();
-        Set<Group> groups = new HashSet<>();
         branchUserPerm.forEach(bup -> {
             privileges.addAll(bup.getRole().getPrivileges());
-            groups.addAll(bup.getUser().getGroups());
         });
 
         if (privileges.contains(priv.get())) {
             return true;
         }
 
-        Set<BranchGroupPerm> branchGroupPerm = branchGroupPermRepo.findAllByBranchAndGroupIn(branch.get(), groups);
+        Set<BranchGroupPerm> branchGroupPerm = branchGroupPermRepo.findAllByBranchAndGroup_NameIn(branch.get(), groups);
         if (branchGroupPerm.isEmpty()) {
             return false;
         }

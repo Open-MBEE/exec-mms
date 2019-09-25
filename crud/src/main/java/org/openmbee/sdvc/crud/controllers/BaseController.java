@@ -107,10 +107,4 @@ public abstract class BaseController {
         // https://github.com/spring-projects/spring-security/issues/3338
         return (auth == null || auth instanceof AnonymousAuthenticationToken);
     }
-
-    protected void checkBranchPrivilege(String privilege, String message, Authentication auth, String projectId, String refId) {
-        if (!permissionService.hasBranchPrivilege(privilege, auth.getName(), projectId, refId)) {
-            throw new ForbiddenException(new BaseResponse().addMessage(message));
-        }
-    }
 }

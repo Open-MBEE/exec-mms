@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
+import org.openmbee.sdvc.core.security.CustomMSERoot;
 import org.openmbee.sdvc.crud.exceptions.ForbiddenException;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
@@ -21,6 +22,7 @@ import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects")
+@Transactional
 public class ProjectsController extends BaseController {
 
     ProjectRepository projectRepository;
@@ -42,7 +45,7 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping(value = {"", "/{projectId}"})
-    @Transactional
+    @PreAuthorize("#projectId == null || hasProjectPrivilege(#projectId, 'PROJECT_READ', true)")
     public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable(required = false) String projectId,
         Authentication auth) {
@@ -53,12 +56,6 @@ public class ProjectsController extends BaseController {
             if (!projectOption.isPresent()) {
                 throw new NotFoundException(response.addMessage("Project not found"));
             }
-            if (!permissionService.isProjectPublic(projectId)) {
-                rejectAnonymous(auth);
-                if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_READ.name(), auth.getName(), projectId)) {
-                    throw new ForbiddenException(response.addMessage("No permission for project"));
-                }
-            }
             ProjectJson projectJson = new ProjectJson();
             projectJson.merge(convertToMap(projectOption.get()));
             response.getProjects().add(projectJson);
@@ -67,7 +64,8 @@ public class ProjectsController extends BaseController {
             for (Project proj : allProjects) {
                 if ((permissionService.isProjectPublic(proj.getProjectId())) ||
                     (!isAnonymous(auth) &&
-                        permissionService.hasProjectPrivilege(Privileges.PROJECT_READ.name(), auth.getName(), proj.getProjectId()))) {
+                        permissionService.hasProjectPrivilege(Privileges.PROJECT_READ.name(), auth.getName(),
+                            CustomMSERoot.getGroups(auth), proj.getProjectId()))) {
                     ProjectJson projectJson = new ProjectJson();
                     projectJson.merge(convertToMap(proj));
                     response.getProjects().add(projectJson);
@@ -78,12 +76,11 @@ public class ProjectsController extends BaseController {
     }
 
     @PostMapping
-    @Transactional
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody ProjectsRequest projectsPost,
         Authentication auth) {
 
-        rejectAnonymous(auth);
         if (projectsPost.getProjects().isEmpty()) {
             throw new BadRequestException(new ProjectsResponse().addMessage("No projects provided"));
         }
@@ -103,7 +100,8 @@ public class ProjectsController extends BaseController {
             ProjectService ps = getProjectService(json);
             if (!ps.exists(json.getProjectId())) {
                 try {
-                    if (!permissionService.hasOrgPrivilege(Privileges.ORG_CREATE_PROJECT.name(), auth.getName(), json.getOrgId())) {
+                    if (!permissionService.hasOrgPrivilege(Privileges.ORG_CREATE_PROJECT.name(), auth.getName(),
+                            CustomMSERoot.getGroups(auth), json.getOrgId())) {
                         Map<String, Object> rejection = new HashMap<>();
                         rejection.put("message", "No permission to create project under org");
                         rejection.put("code", 403);
@@ -122,7 +120,8 @@ public class ProjectsController extends BaseController {
                     continue;
                 }
             } else {
-                if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_EDIT.name(), auth.getName(), json.getProjectId())) {
+                if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_EDIT.name(), auth.getName(),
+                        CustomMSERoot.getGroups(auth), json.getProjectId())) {
                     Map<String, Object> rejection = new HashMap<>();
                     rejection.put("message", "No permission to change project");
                     rejection.put("code", 403);
@@ -141,14 +140,10 @@ public class ProjectsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{projectId}")
+    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_DELETE', false)")
     public ResponseEntity<? extends BaseResponse> handleDelete(
-        @PathVariable String projectId,
-        Authentication auth) {
+        @PathVariable String projectId) {
 
-        rejectAnonymous(auth);
-        if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_DELETE.name(), auth.getName(), projectId)) {
-            throw new ForbiddenException(new ProjectsResponse().addMessage("No permission to delete project."));
-        }
         return ResponseEntity.ok(new ProjectsResponse()); //TODO
     }
 

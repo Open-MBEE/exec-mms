@@ -1,14 +1,10 @@
 package org.openmbee.sdvc.permissions;
 
 import javax.transaction.Transactional;
-import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.services.PermissionService;
-import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Transactional
 public class PermissionsController {
 
     PermissionService permissionService;
@@ -26,13 +23,11 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/orgs/{orgId}/permissions")
-    @Transactional
+    @PreAuthorize("hasOrgPrivilege(#orgId, 'ORG_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateOrgPermissions(
         @PathVariable String orgId,
-        @RequestBody PermissionsRequest req,
-        Authentication auth) {
+        @RequestBody PermissionsRequest req) {
 
-        checkUpdatePerm(auth, orgId, null, null);
         if (req.getGroups() != null) {
             permissionService.updateOrgGroupPerms(req.getGroups(), orgId);
         }
@@ -46,13 +41,11 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/projects/{projectId}/permissions")
-    @Transactional
+    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateProjectPermissions(
         @PathVariable String projectId,
-        @RequestBody PermissionsRequest req,
-        Authentication auth) {
+        @RequestBody PermissionsRequest req) {
 
-        checkUpdatePerm(auth, null, projectId, null);
         if (req.getGroups() != null) {
             permissionService.updateProjectGroupPerms(req.getGroups(), projectId);
         }
@@ -69,14 +62,12 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
-    @Transactional
+    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId,
-        @RequestBody PermissionsRequest req,
-        Authentication auth) {
+        @RequestBody PermissionsRequest req) {
 
-        checkUpdatePerm(auth, null, projectId, refId);
         if (req.getGroups() != null) {
             permissionService.updateBranchGroupPerms(req.getGroups(), projectId, refId);
         }
@@ -90,11 +81,10 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")
+    @PreAuthorize("hasOrgPrivilege(#orgId, 'ORG_READ_PERMISSIONS', true)")
     public PermissionsResponse getOrgPermissions(
-        @PathVariable String orgId,
-        Authentication auth) {
+        @PathVariable String orgId) {
 
-        checkReadPerm(auth, orgId, null, null);
         PermissionsResponse res = new PermissionsResponse();
         res.setGroups(permissionService.getOrgGroupRoles(orgId));
         res.setUsers(permissionService.getOrgUserRoles(orgId));
@@ -103,11 +93,10 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/permissions")
+    @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_READ_PERMISSIONS', true)")
     public PermissionsResponse getProjectPermissions(
-        @PathVariable String projectId,
-        Authentication auth) {
+        @PathVariable String projectId) {
 
-        checkReadPerm(auth, null, projectId, null);
         PermissionsResponse res = new PermissionsResponse();
         res.setGroups(permissionService.getProjectGroupRoles(projectId));
         res.setUsers(permissionService.getProjectUserRoles(projectId));
@@ -117,53 +106,16 @@ public class PermissionsController {
     }
 
     @GetMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
+    @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_READ_PERMISSIONS', true)")
     public PermissionsResponse getBranchPermissions(
         @PathVariable String projectId,
-        @PathVariable String refId,
-        Authentication auth) {
+        @PathVariable String refId) {
 
-        checkReadPerm(auth, null, projectId, refId);
         PermissionsResponse res = new PermissionsResponse();
         res.setGroups(permissionService.getBranchGroupRoles(projectId, refId));
         res.setUsers(permissionService.getBranchUserRoles(projectId, refId));
         res.setPublic(permissionService.isProjectPublic(projectId));
         res.setInherit(permissionService.isBranchInherit(projectId, refId));
         return res;
-    }
-
-    private void checkUpdatePerm(Authentication auth, String orgId, String projectId, String refId) {
-        if (auth instanceof AnonymousAuthenticationToken) {
-            throw new PermissionException(HttpStatus.UNAUTHORIZED, "");
-        }
-        if (orgId != null && permissionService.hasOrgPrivilege(Privileges.ORG_UPDATE_PERMISSIONS.name(), auth.getName(), orgId)) {
-            return;
-        }
-        if (projectId != null) {
-            if (refId != null && permissionService.hasBranchPrivilege(Privileges.BRANCH_UPDATE_PERMISSIONS.name(), auth.getName(), projectId, refId)) {
-                    return;
-            }
-            if (permissionService.hasProjectPrivilege(Privileges.PROJECT_UPDATE_PERMISSIONS.name(), auth.getName(), projectId)) {
-                return;
-            }
-        }
-        throw new PermissionException(HttpStatus.FORBIDDEN, "");
-    }
-
-    private void checkReadPerm(Authentication auth, String orgId, String projectId, String refId) {
-        if (orgId != null && (permissionService.isOrgPublic(orgId) || permissionService.hasOrgPrivilege(Privileges.ORG_READ_PERMISSIONS.name(), auth.getName(), orgId))) {
-            return;
-        }
-        if (projectId != null) {
-            if (permissionService.isProjectPublic(projectId)) {
-                return;
-            }
-            if (refId != null && permissionService.hasBranchPrivilege(Privileges.BRANCH_READ_PERMISSIONS.name(), auth.getName(), projectId, refId)) {
-                return;
-            }
-            if (permissionService.hasProjectPrivilege(Privileges.PROJECT_READ_PERMISSIONS.name(), auth.getName(), projectId)) {
-                return;
-            }
-        }
-        throw new PermissionException(HttpStatus.FORBIDDEN, "");
     }
 }
