@@ -45,11 +45,9 @@ public class BranchesGet extends BaseController {
         } else {
             BranchesResponse res = branchService.getBranches(projectId);
             if (!permissionService.isProjectPublic(projectId)) {
-                rejectAnonymous(auth);
                 List<RefJson> filtered = new ArrayList<>();
                 for (RefJson ref: res.getBranches()) {
-                    if (permissionService.hasBranchPrivilege(Privileges.BRANCH_READ.name(), auth.getName(),
-                            MethodSecurityService.getGroups(auth), projectId, ref.getId())) {
+                    if (mss.hasBranchPrivilege(auth, projectId, ref.getId(), Privileges.BRANCH_READ.name(), false)) {
                         filtered.add(ref);
                     }
                 }

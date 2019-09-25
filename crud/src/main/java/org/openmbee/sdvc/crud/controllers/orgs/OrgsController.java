@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
-import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.rdb.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -63,10 +62,7 @@ public class OrgsController extends BaseController {
             logger.debug("No OrgId given");
             List<Organization> allOrgs = organizationRepository.findAll();
             for (Organization org : allOrgs) {
-                if (permissionService.isOrgPublic(org.getOrganizationId()) ||
-                    (!isAnonymous(auth) &&
-                        permissionService.hasOrgPrivilege(Privileges.ORG_READ.name(), auth.getName(),
-                            MethodSecurityService.getGroups(auth), org.getOrganizationId()))) {
+                if (mss.hasOrgPrivilege(auth, org.getOrganizationId(), Privileges.ORG_READ.name(), true)) {
                     OrgJson orgJson = new OrgJson();
                     orgJson.merge(convertToMap(org));
                     response.getOrgs().add(orgJson);
@@ -104,8 +100,7 @@ public class OrgsController extends BaseController {
                 .orElse(new Organization());
             boolean newOrg = true;
             if (o.getId() != null) {
-                if (!permissionService.hasOrgPrivilege(Privileges.ORG_EDIT.name(), auth.getName(),
-                        MethodSecurityService.getGroups(auth), o.getOrganizationId())) {
+                if (!mss.hasOrgPrivilege(auth, o.getOrganizationId(), Privileges.ORG_EDIT.name(), false)) {
                     Map<String, Object> rejection = new HashMap<>();
                     rejection.put("message", "No permission to update org");
                     rejection.put("code", 403);

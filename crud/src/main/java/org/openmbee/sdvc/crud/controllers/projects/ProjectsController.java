@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
-import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -60,10 +59,7 @@ public class ProjectsController extends BaseController {
         } else {
             List<Project> allProjects = projectRepository.findAll();
             for (Project proj : allProjects) {
-                if ((permissionService.isProjectPublic(proj.getProjectId())) ||
-                    (!isAnonymous(auth) &&
-                        permissionService.hasProjectPrivilege(Privileges.PROJECT_READ.name(), auth.getName(),
-                            MethodSecurityService.getGroups(auth), proj.getProjectId()))) {
+                if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
                     ProjectJson projectJson = new ProjectJson();
                     projectJson.merge(convertToMap(proj));
                     response.getProjects().add(projectJson);
@@ -99,8 +95,7 @@ public class ProjectsController extends BaseController {
             ProjectService ps = getProjectService(json);
             if (!ps.exists(json.getProjectId())) {
                 try {
-                    if (!permissionService.hasOrgPrivilege(Privileges.ORG_CREATE_PROJECT.name(), auth.getName(),
-                            MethodSecurityService.getGroups(auth), json.getOrgId())) {
+                    if (!mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
                         Map<String, Object> rejection = new HashMap<>();
                         rejection.put("message", "No permission to create project under org");
                         rejection.put("code", 403);
@@ -119,8 +114,7 @@ public class ProjectsController extends BaseController {
                     continue;
                 }
             } else {
-                if (!permissionService.hasProjectPrivilege(Privileges.PROJECT_EDIT.name(), auth.getName(),
-                        MethodSecurityService.getGroups(auth), json.getProjectId())) {
+                if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_EDIT.name(), false)) {
                     Map<String, Object> rejection = new HashMap<>();
                     rejection.put("message", "No permission to change project");
                     rejection.put("code", 403);
