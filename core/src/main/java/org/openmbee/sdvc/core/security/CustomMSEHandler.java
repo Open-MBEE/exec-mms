@@ -24,7 +24,7 @@ public class CustomMSEHandler extends DefaultMethodSecurityExpressionHandler {
     protected MethodSecurityExpressionOperations createSecurityExpressionRoot(
         Authentication authentication, MethodInvocation invocation) {
         CustomMSERoot root =
-            new CustomMSERoot(authentication, permissionService);
+            new CustomMSERoot(authentication, permissionService.getObject());
         root.setPermissionEvaluator(getPermissionEvaluator());
         root.setTrustResolver(this.trustResolver);
         root.setRoleHierarchy(getRoleHierarchy());

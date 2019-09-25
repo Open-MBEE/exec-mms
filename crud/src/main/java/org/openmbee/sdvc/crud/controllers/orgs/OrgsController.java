@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.transaction.Transactional;
 
+import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/orgs")
-@Transactional
 public class OrgsController extends BaseController {
 
     OrganizationRepository organizationRepository;
@@ -77,6 +76,7 @@ public class OrgsController extends BaseController {
     }
 
     @PostMapping
+    @Transactional
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody OrganizationsRequest orgPost,

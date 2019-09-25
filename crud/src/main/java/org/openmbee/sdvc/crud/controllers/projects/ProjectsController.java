@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects")
-@Transactional
 public class ProjectsController extends BaseController {
 
     ProjectRepository projectRepository;
@@ -76,6 +75,7 @@ public class ProjectsController extends BaseController {
     }
 
     @PostMapping
+    @Transactional
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<? extends BaseResponse> handlePost(
         @RequestBody ProjectsRequest projectsPost,

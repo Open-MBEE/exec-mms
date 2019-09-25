@@ -2,7 +2,6 @@ package org.openmbee.sdvc.crud.controllers.commits;
 
 import java.util.Map;
 
-import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.objects.CommitsRequest;
 import org.openmbee.sdvc.core.objects.CommitsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}")
-@Transactional
 public class CommitsController extends BaseController {
 
     private CommitService commitService;

@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
-import javax.transaction.Transactional;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
@@ -14,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}/notebooks")
-@Transactional
 public class NotebooksController extends BaseController {
 
     private JupyterNodeService nodeService;

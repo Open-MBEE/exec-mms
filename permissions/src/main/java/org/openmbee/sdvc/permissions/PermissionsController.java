@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Transactional
 public class PermissionsController {
 
     PermissionService permissionService;
@@ -23,6 +22,7 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/orgs/{orgId}/permissions")
+    @Transactional
     @PreAuthorize("hasOrgPrivilege(#orgId, 'ORG_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateOrgPermissions(
         @PathVariable String orgId,
@@ -41,6 +41,7 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/projects/{projectId}/permissions")
+    @Transactional
     @PreAuthorize("hasProjectPrivilege(#projectId, 'PROJECT_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateProjectPermissions(
         @PathVariable String projectId,
@@ -62,6 +63,7 @@ public class PermissionsController {
     }
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
+    @Transactional
     @PreAuthorize("hasBranchPrivilege(#projectId, #refId, 'BRANCH_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateBranchPermissions(
         @PathVariable String projectId,

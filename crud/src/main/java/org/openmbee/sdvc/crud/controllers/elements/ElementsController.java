@@ -2,7 +2,6 @@ package org.openmbee.sdvc.crud.controllers.elements;
 
 import java.util.Map;
 
-import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
-@Transactional
 public class ElementsController extends BaseController {
 
     @GetMapping(value = {"", "/{elementId}"})

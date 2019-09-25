@@ -17,10 +17,9 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     private Object target;
     private Set<String> groups;
 
-    public ObjectFactory<PermissionService> permissionService;
+    private PermissionService permissionService;
 
-    public CustomMSERoot(
-        Authentication authentication, ObjectFactory<PermissionService> permissionService) {
+    public CustomMSERoot(Authentication authentication, PermissionService permissionService) {
         super(authentication);
         this.permissionService = permissionService;
         groups = getGroups(authentication);
@@ -58,7 +57,6 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     }
 
     public boolean hasOrgPrivilege(String orgId, String privilege, boolean allowAnonIfPublic) {
-        PermissionService permissionService = this.permissionService.getObject();
         if (allowAnonIfPublic && permissionService.isOrgPublic(orgId)) {
             return true;
         }
@@ -72,8 +70,6 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     }
 
     public boolean hasProjectPrivilege(String projectId, String privilege, boolean allowAnonIfPublic) {
-        PermissionService permissionService = this.permissionService.getObject();
-
         if (allowAnonIfPublic && permissionService.isProjectPublic(projectId)) {
             return true;
         }
@@ -87,8 +83,6 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     }
 
     public boolean hasBranchPrivilege(String projectId, String branchId, String privilege, boolean allowAnonIfPublic) {
-        PermissionService permissionService = this.permissionService.getObject();
-
         if (allowAnonIfPublic && permissionService.isProjectPublic(projectId)) {
             return true;
         }
