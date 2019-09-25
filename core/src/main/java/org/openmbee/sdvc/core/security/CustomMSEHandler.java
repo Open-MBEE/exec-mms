@@ -11,8 +11,6 @@ import org.springframework.security.core.Authentication;
 
 public class CustomMSEHandler extends DefaultMethodSecurityExpressionHandler {
 
-    private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
-
     private ObjectFactory<PermissionService> permissionService;
 
     public CustomMSEHandler(ObjectFactory<PermissionService> permissionService) {
@@ -25,9 +23,11 @@ public class CustomMSEHandler extends DefaultMethodSecurityExpressionHandler {
         Authentication authentication, MethodInvocation invocation) {
         CustomMSERoot root =
             new CustomMSERoot(authentication, permissionService.getObject());
+        root.setThis(invocation.getThis());
         root.setPermissionEvaluator(getPermissionEvaluator());
-        root.setTrustResolver(this.trustResolver);
+        root.setTrustResolver(getTrustResolver());
         root.setRoleHierarchy(getRoleHierarchy());
+        root.setDefaultRolePrefix(getDefaultRolePrefix());
         return root;
     }
 }

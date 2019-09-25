@@ -19,11 +19,11 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //Collection<Role> roles = null;//user.getRoles();
-        //Collection<Privilege> privileges = new ArrayList<>();
+        Collection<Role> roles = null;//user.getRoles();
+        Collection<Privilege> privileges = new ArrayList<>();
         Collection<GrantedAuthority> authorities = new ArrayList<>();
 
-        /*if (roles != null) {
+        if (roles != null) {
             for (Role role : roles) {
                 privileges.addAll(role.getPrivileges());
             }
@@ -31,7 +31,7 @@ public class UserDetailsImpl implements UserDetails {
 
         for (Privilege privilege : privileges) {
             authorities.add(new SimpleGrantedAuthority(privilege.getName()));
-        }*/
+        }
 
         return authorities;
     }

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.transaction.Transactional;
+
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
@@ -42,6 +42,7 @@ public class OrgsController extends BaseController {
     }
 
     @GetMapping(value = {"", "/{orgId}"})
+    @Transactional
     @PreAuthorize("#orgId == null || hasOrgPrivilege(#orgId, 'ORG_READ', true)")
     public ResponseEntity<?> handleGet(
         @PathVariable(required = false) String orgId,
