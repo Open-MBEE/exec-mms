@@ -90,7 +90,7 @@ public class ElementsController extends BaseController {
     }
 
     @DeleteMapping
-    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_DELETE', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ResponseEntity<? extends BaseResponse> handleBulkDelete(
         @PathVariable String projectId,
         @PathVariable String refId,
