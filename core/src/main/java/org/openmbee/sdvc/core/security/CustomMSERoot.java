@@ -3,6 +3,7 @@ package org.openmbee.sdvc.core.security;
 import java.util.HashSet;
 import java.util.Set;
 import org.openmbee.sdvc.core.services.PermissionService;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -16,10 +17,10 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     private Object target;
     private Set<String> groups;
 
-    public PermissionService permissionService;
+    public ObjectFactory<PermissionService> permissionService;
 
     public CustomMSERoot(
-        Authentication authentication, PermissionService permissionService) {
+        Authentication authentication, ObjectFactory<PermissionService> permissionService) {
         super(authentication);
         this.permissionService = permissionService;
         groups = getGroups(authentication);
@@ -57,6 +58,7 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     }
 
     public boolean hasOrgPrivilege(String orgId, String privilege, boolean allowAnonIfPublic) {
+        PermissionService permissionService = this.permissionService.getObject();
         if (allowAnonIfPublic && permissionService.isOrgPublic(orgId)) {
             return true;
         }
@@ -70,6 +72,8 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     }
 
     public boolean hasProjectPrivilege(String projectId, String privilege, boolean allowAnonIfPublic) {
+        PermissionService permissionService = this.permissionService.getObject();
+
         if (allowAnonIfPublic && permissionService.isProjectPublic(projectId)) {
             return true;
         }
@@ -83,6 +87,8 @@ public class CustomMSERoot extends SecurityExpressionRoot implements
     }
 
     public boolean hasBranchPrivilege(String projectId, String branchId, String privilege, boolean allowAnonIfPublic) {
+        PermissionService permissionService = this.permissionService.getObject();
+
         if (allowAnonIfPublic && permissionService.isProjectPublic(projectId)) {
             return true;
         }

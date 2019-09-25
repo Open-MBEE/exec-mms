@@ -2,6 +2,7 @@ package org.openmbee.sdvc.core.security;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.openmbee.sdvc.core.services.PermissionService;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -12,9 +13,9 @@ public class CustomMSEHandler extends DefaultMethodSecurityExpressionHandler {
 
     private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
-    private PermissionService permissionService;
+    private ObjectFactory<PermissionService> permissionService;
 
-    public CustomMSEHandler(PermissionService permissionService) {
+    public CustomMSEHandler(ObjectFactory<PermissionService> permissionService) {
         super();
         this.permissionService = permissionService;
     }
