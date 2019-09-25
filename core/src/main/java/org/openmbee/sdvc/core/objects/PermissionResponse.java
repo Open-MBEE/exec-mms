@@ -6,12 +6,19 @@ public class PermissionResponse {
 
     private List<Permission> permissions;
 
-    public class Permission {
+    public static class Permission {
         private String name;
 
         private String role;
 
         private boolean inherited;
+
+        public Permission() {}
+        public Permission(String name, String role, boolean inherited) {
+            this.name = name;
+            this.role = role;
+            this.inherited = inherited;
+        }
 
         public String getName() {
             return name;

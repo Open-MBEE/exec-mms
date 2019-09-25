@@ -96,9 +96,8 @@ public class PermissionsController {
 
         checkReadPerm(auth, orgId, null, null);
         PermissionsResponse res = new PermissionsResponse();
-        //TODO add interface and implement
-        //res.setGroups(permissionService.getOrgGroupRoles(orgId));
-        //res.setUsers(permissionService.getOrgUserRoles(orgId));
+        res.setGroups(permissionService.getOrgGroupRoles(orgId));
+        res.setUsers(permissionService.getOrgUserRoles(orgId));
         res.setPublic(permissionService.isOrgPublic(orgId));
         return res;
     }
@@ -110,8 +109,8 @@ public class PermissionsController {
 
         checkReadPerm(auth, null, projectId, null);
         PermissionsResponse res = new PermissionsResponse();
-        //res.setGroups(permissionService.getProjectGroupRoles(projectId));
-        //res.setUsers(permissionService.getProjectUserRoles(projectId));
+        res.setGroups(permissionService.getProjectGroupRoles(projectId));
+        res.setUsers(permissionService.getProjectUserRoles(projectId));
         res.setPublic(permissionService.isProjectPublic(projectId));
         res.setInherit(permissionService.isProjectInherit(projectId));
         return res;
@@ -125,8 +124,8 @@ public class PermissionsController {
 
         checkReadPerm(auth, null, projectId, refId);
         PermissionsResponse res = new PermissionsResponse();
-        //res.setGroups(permissionService.getBranchGroupRoles(projectId, refId));
-        //res.setUsers(permissionService.getBranchUserRoles(projectId, refId));
+        res.setGroups(permissionService.getBranchGroupRoles(projectId, refId));
+        res.setUsers(permissionService.getBranchUserRoles(projectId, refId));
         res.setPublic(permissionService.isProjectPublic(projectId));
         res.setInherit(permissionService.isBranchInherit(projectId, refId));
         return res;

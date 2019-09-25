@@ -68,10 +68,12 @@ public abstract class SecurityConfig extends WebSecurityConfigurerAdapter implem
             .authenticationEntryPoint(new JwtAuthenticationEntryPoint()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
-            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .antMatchers(HttpMethod.POST, "/authentication/**")
-            .permitAll().antMatchers("/orgs/**", "/projects/**", "**/elements/**").permitAll()
-            .antMatchers(AUTH_WHITELIST).permitAll().anyRequest().authenticated();
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.POST,"/authentication/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/**").permitAll()
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationTokenFilter(),
             UsernamePasswordAuthenticationFilter.class);

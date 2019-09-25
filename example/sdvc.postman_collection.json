@@ -6,1411 +6,2918 @@
 	},
 	"item": [
 		{
-			"name": "add org a",
-			"event": [
+			"name": "crud",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
-						"exec": [
-							"pm.test(\"response has org a\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.orgs[0].id).to.eql('a');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"a\",\n\t\t\t\"name\": \"a\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/orgs",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"orgs"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "add project aa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
-						"exec": [
-							"pm.test(\"response has project aa\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "add elements to aa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
-						"exec": [
-							"pm.test(\"response has elements\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(3);",
-							"});",
-							"",
-							"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update x",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
-						"exec": [
-							"pm.test(\"response has elements\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(1);",
-							"});",
-							"",
-							"pm.environment.set(\"commitId2\", pm.response.json().elements[0]._commitId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated1\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update x and y",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "1a4df438-4092-43c5-b3cf-ce0647140aa8",
-						"exec": [
-							"pm.test(\"response has elements\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(2);",
-							"});",
-							"",
-							"pm.environment.set(\"commitId3\", pm.response.json().elements[0]._commitId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated2\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\",\n\t\t\t\"name\": \"updated2\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update z",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c9c64c9a-2f97-41aa-9b61-8dfa7df1cee6",
-						"exec": [
-							"pm.test(\"response has elements\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(1);",
-							"});",
-							"",
-							"pm.environment.set(\"commitId4\", pm.response.json().elements[0]._commitId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated3\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check ref commit history",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "08c416fb-fd43-44be-85e9-4ab831b31800",
-						"exec": [
-							"pm.test(\"response has 4 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(4);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId4\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId2\"))",
-							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check x commit history",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "e06d4d29-5e1a-4dd9-89b4-9dd91e289c5c",
-						"exec": [
-							"pm.test(\"response has 3 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(3);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId2\"))",
-							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements/x/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements",
-						"x",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check y commit history",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "8f686089-594f-4343-ad14-290b61243afc",
-						"exec": [
-							"pm.test(\"response has 2 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(2);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements/y/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements",
-						"y",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check z commit history",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c062a254-95ba-4c37-884a-c4adf8b7c46b",
-						"exec": [
-							"pm.test(\"response has 2 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(2);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId4\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements/z/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements",
-						"z",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check first commit",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "7923d947-3a8f-40c0-8d6b-4d6e69ae7f50",
-						"exec": [
-							"pm.test(\"first commit has 3 added\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].added.length).to.eql(3);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/commits/{{commitId1}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"commits",
-						"{{commitId1}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get elements at second update",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
-						"exec": [
-							"pm.test(\"elements have expected names\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    for (var e in jsonData.elements) {",
-							"        var el = jsonData.elements[e];",
-							"        if (el.id == 'x') {",
-							"            pm.expect(el.name == 'updated2');",
-							"        }",
-							"        if (el.id == 'y') {",
-							"            pm.expect(el.name == 'updated2');",
-							"        }",
-							"        if (el.id == 'z') {",
-							"            pm.expect(el.name == 'z');",
-							"        }",
-							"    }",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements?commitId={{commitId3}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					],
-					"query": [
+					"name": "login using admin",
+					"event": [
 						{
-							"key": "commitId",
-							"value": "{{commitId3}}"
+							"listen": "test",
+							"script": {
+								"id": "217210a9-1489-4057-b89f-bc0b44111569",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    ",
+									"});",
+									"",
+									"pm.test(\"response has token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "create branch a",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
-						"exec": [
-							"pm.test(\"branch created\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.refs[0].id).to.eql('refa');",
-							"});"
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"refa\",\n\t\t\t\"name\": \"refa\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/authentication",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"authentication"
+							]
+						}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check inRefIds",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update x and y on refa",
-			"event": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "6ca83fd4-0bcb-481d-a1d7-4feab4d6ae3d",
-						"exec": [
-							"pm.test(\"response has elements\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(2);",
-							"});",
-							"",
-							"pm.environment.set(\"commitXYRef\", pm.response.json().elements[0]._commitId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated4\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\",\n\t\t\t\"name\": \"updated4\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update z on refa and add element q",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "608a9690-7b33-4dda-aa87-9199c02b5a31",
-						"exec": [
-							"pm.test(\"response has elements\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(2);",
-							"});",
-							"",
-							"pm.environment.set(\"commitZQRef\", pm.response.json().elements[0]._commitId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated5\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"q\",\n\t\t\t\"name\": \"q\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update z on master and add element p",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c004393d-091c-4cd4-bc63-b32ccb3838e9",
-						"exec": [
-							"pm.test(\"response has elements\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(2);",
-							"});",
-							"",
-							"pm.environment.set(\"commitZP\", pm.response.json().elements[0]._commitId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated6\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"p\",\n\t\t\t\"name\": \"p\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check master commit history",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "bf3f6bfe-c4c4-48a5-89e8-9839be53ba2b",
-						"exec": [
-							"pm.test(\"response has 5 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(5);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZP\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId4\"))",
-							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId2\"))",
-							"    pm.expect(jsonData.commits[4].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check refa commit history",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "9042a69c-9d45-4878-8dd9-6a7993bb2058",
-						"exec": [
-							"pm.test(\"response has 6 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(6);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZQRef\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitXYRef\"))",
-							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId4\"))",
-							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[4].id).to.eql(pm.environment.get(\"commitId2\"))",
-							"    pm.expect(jsonData.commits[5].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check x commit history on refa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "af87dbd2-808e-44b7-801b-75d04c79e791",
-						"exec": [
-							"pm.test(\"response has 3 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(4);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitXYRef\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId2\"))",
-							"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements/x/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements",
-						"x",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check y commit history on refa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "92012bbb-f303-48bc-8e6a-e7dd3073c999",
-						"exec": [
-							"pm.test(\"response has 3 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(3);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitXYRef\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements/y/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements",
-						"y",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "check z commit history on refa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "294bbde7-b077-44d0-af00-f11588bfec2c",
-						"exec": [
-							"pm.test(\"response has 3 commits\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits.length).to.eql(3);",
-							"});",
-							"",
-							"pm.test(\"commit history is right\", function() {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZQRef\"))",
-							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId4\"))",
-							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
-							"})",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements/z/commits",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements",
-						"z",
-						"commits"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get latest elements at refa",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get latest elements at master",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get mix of elements at master with missing",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/master/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"master",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get mix of elements at refa with commit",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}, {\n\t\t\t\"id\": \"p\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements?commitId={{commitXYRef}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements"
-					],
-					"query": [
+					"name": "add org a",
+					"event": [
 						{
-							"key": "commitId",
-							"value": "{{commitXYRef}}"
+							"listen": "test",
+							"script": {
+								"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+								"exec": [
+									"pm.test(\"response has org a\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.orgs[0].id).to.eql('a');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "delete x on refa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "4b2d1932-f6fc-44d3-a6b4-95ff3e70e133",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"a\",\n\t\t\t\"name\": \"a\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/orgs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get orgs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+								"exec": [
+									"pm.test(\"response has org a\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.orgs[0].id).to.eql('a');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/orgs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add project aa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has project aa\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add project bb jupyter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has project bb\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('bb');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"bb\", \n\t\t\t\"name\": \"bb\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"jupyter\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get projects",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has 2 projects\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects.length).to.eql(2);",
+									"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
+									"    pm.expect(jsonData.projects[0].projectType).to.eql('cameo');",
+									"    pm.expect(jsonData.projects[1].id).to.eql('bb');",
+									"    pm.expect(jsonData.projects[1].projectType).to.eql('jupyter');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add elements to aa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(3);",
+									"});",
+									"",
+									"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add notebook to bb",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has notebook\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.notebooks.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"notebooks\": [\n\t\t{\n \"cells\": [\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"<!--BOOK_INFORMATION-->\\n\",\n    \"<img align=\\\"left\\\" style=\\\"padding-right:10px;\\\" src=\\\"figures/PDSH-cover-small.png\\\">\\n\",\n    \"\\n\",\n    \"*This notebook contains an excerpt from the [Python Data Science Handbook](http://shop.oreilly.com/product/0636920034919.do) by Jake VanderPlas; the content is available [on GitHub](https://github.com/jakevdp/PythonDataScienceHandbook).*\\n\",\n    \"\\n\",\n    \"*The text is released under the [CC-BY-NC-ND license](https://creativecommons.org/licenses/by-nc-nd/3.0/us/legalcode), and code is released under the [MIT license](https://opensource.org/licenses/MIT). If you find this content useful, please consider supporting the work by [buying the book](http://shop.oreilly.com/product/0636920034919.do)!*\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"<!--NAVIGATION-->\\n\",\n    \"< [Understanding Data Types in Python](02.01-Understanding-Data-Types.ipynb) | [Contents](Index.ipynb) | [Computation on NumPy Arrays: Universal Functions](02.03-Computation-on-arrays-ufuncs.ipynb) >\\n\",\n    \"\\n\",\n    \"<a href=\\\"https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/02.02-The-Basics-Of-NumPy-Arrays.ipynb\\\"><img align=\\\"left\\\" src=\\\"https://colab.research.google.com/assets/colab-badge.svg\\\" alt=\\\"Open in Colab\\\" title=\\\"Open and Execute in Google Colaboratory\\\"></a>\\n\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"# The Basics of NumPy Arrays\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Data manipulation in Python is nearly synonymous with NumPy array manipulation: even newer tools like Pandas ([Chapter 3](03.00-Introduction-to-Pandas.ipynb)) are built around the NumPy array.\\n\",\n    \"This section will present several examples of using NumPy array manipulation to access data and subarrays, and to split, reshape, and join the arrays.\\n\",\n    \"While the types of operations shown here may seem a bit dry and pedantic, they comprise the building blocks of many other examples used throughout the book.\\n\",\n    \"Get to know them well!\\n\",\n    \"\\n\",\n    \"We'll cover a few categories of basic array manipulations here:\\n\",\n    \"\\n\",\n    \"- *Attributes of arrays*: Determining the size, shape, memory consumption, and data types of arrays\\n\",\n    \"- *Indexing of arrays*: Getting and setting the value of individual array elements\\n\",\n    \"- *Slicing of arrays*: Getting and setting smaller subarrays within a larger array\\n\",\n    \"- *Reshaping of arrays*: Changing the shape of a given array\\n\",\n    \"- *Joining and splitting of arrays*: Combining multiple arrays into one, and splitting one array into many\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## NumPy Array Attributes\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"First let's discuss some useful array attributes.\\n\",\n    \"We'll start by defining three random arrays, a one-dimensional, two-dimensional, and three-dimensional array.\\n\",\n    \"We'll use NumPy's random number generator, which we will *seed* with a set value in order to ensure that the same random arrays are generated each time this code is run:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 1,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [],\n   \"source\": [\n    \"import numpy as np\\n\",\n    \"np.random.seed(0)  # seed for reproducibility\\n\",\n    \"\\n\",\n    \"x1 = np.random.randint(10, size=6)  # One-dimensional array\\n\",\n    \"x2 = np.random.randint(10, size=(3, 4))  # Two-dimensional array\\n\",\n    \"x3 = np.random.randint(10, size=(3, 4, 5))  # Three-dimensional array\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Each array has attributes ``ndim`` (the number of dimensions), ``shape`` (the size of each dimension), and ``size`` (the total size of the array):\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 2,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"x3 ndim:  3\\n\",\n      \"x3 shape: (3, 4, 5)\\n\",\n      \"x3 size:  60\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(\\\"x3 ndim: \\\", x3.ndim)\\n\",\n    \"print(\\\"x3 shape:\\\", x3.shape)\\n\",\n    \"print(\\\"x3 size: \\\", x3.size)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Another useful attribute is the ``dtype``, the data type of the array (which we discussed previously in [Understanding Data Types in Python](02.01-Understanding-Data-Types.ipynb)):\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 3,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"dtype: int64\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(\\\"dtype:\\\", x3.dtype)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Other attributes include ``itemsize``, which lists the size (in bytes) of each array element, and ``nbytes``, which lists the total size (in bytes) of the array:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 4,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"itemsize: 8 bytes\\n\",\n      \"nbytes: 480 bytes\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(\\\"itemsize:\\\", x3.itemsize, \\\"bytes\\\")\\n\",\n    \"print(\\\"nbytes:\\\", x3.nbytes, \\\"bytes\\\")\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"In general, we expect that ``nbytes`` is equal to ``itemsize`` times ``size``.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Array Indexing: Accessing Single Elements\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"If you are familiar with Python's standard list indexing, indexing in NumPy will feel quite familiar.\\n\",\n    \"In a one-dimensional array, the $i^{th}$ value (counting from zero) can be accessed by specifying the desired index in square brackets, just as with Python lists:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 5,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([5, 0, 3, 3, 7, 9])\"\n      ]\n     },\n     \"execution_count\": 5,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 6,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"5\"\n      ]\n     },\n     \"execution_count\": 6,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[0]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 7,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"7\"\n      ]\n     },\n     \"execution_count\": 7,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[4]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"To index from the end of the array, you can use negative indices:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 8,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"9\"\n      ]\n     },\n     \"execution_count\": 8,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[-1]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 9,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"7\"\n      ]\n     },\n     \"execution_count\": 9,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[-2]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"In a multi-dimensional array, items can be accessed using a comma-separated tuple of indices:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 10,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[3, 5, 2, 4],\\n\",\n       \"       [7, 6, 8, 8],\\n\",\n       \"       [1, 6, 7, 7]])\"\n      ]\n     },\n     \"execution_count\": 10,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 11,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"3\"\n      ]\n     },\n     \"execution_count\": 11,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[0, 0]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 12,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"1\"\n      ]\n     },\n     \"execution_count\": 12,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[2, 0]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 13,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"7\"\n      ]\n     },\n     \"execution_count\": 13,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[2, -1]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Values can also be modified using any of the above index notation:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 14,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  5,  2,  4],\\n\",\n       \"       [ 7,  6,  8,  8],\\n\",\n       \"       [ 1,  6,  7,  7]])\"\n      ]\n     },\n     \"execution_count\": 14,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[0, 0] = 12\\n\",\n    \"x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Keep in mind that, unlike Python lists, NumPy arrays have a fixed type.\\n\",\n    \"This means, for example, that if you attempt to insert a floating-point value to an integer array, the value will be silently truncated. Don't be caught unaware by this behavior!\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 15,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([3, 0, 3, 3, 7, 9])\"\n      ]\n     },\n     \"execution_count\": 15,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[0] = 3.14159  # this will be truncated!\\n\",\n    \"x1\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Array Slicing: Accessing Subarrays\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Just as we can use square brackets to access individual array elements, we can also use them to access subarrays with the *slice* notation, marked by the colon (``:``) character.\\n\",\n    \"The NumPy slicing syntax follows that of the standard Python list; to access a slice of an array ``x``, use this:\\n\",\n    \"``` python\\n\",\n    \"x[start:stop:step]\\n\",\n    \"```\\n\",\n    \"If any of these are unspecified, they default to the values ``start=0``, ``stop=``*``size of dimension``*, ``step=1``.\\n\",\n    \"We'll take a look at accessing sub-arrays in one dimension and in multiple dimensions.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### One-dimensional subarrays\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 16,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])\"\n      ]\n     },\n     \"execution_count\": 16,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.arange(10)\\n\",\n    \"x\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 17,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([0, 1, 2, 3, 4])\"\n      ]\n     },\n     \"execution_count\": 17,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[:5]  # first five elements\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 18,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([5, 6, 7, 8, 9])\"\n      ]\n     },\n     \"execution_count\": 18,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[5:]  # elements after index 5\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 19,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([4, 5, 6])\"\n      ]\n     },\n     \"execution_count\": 19,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[4:7]  # middle sub-array\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 20,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([0, 2, 4, 6, 8])\"\n      ]\n     },\n     \"execution_count\": 20,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[::2]  # every other element\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 21,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([1, 3, 5, 7, 9])\"\n      ]\n     },\n     \"execution_count\": 21,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[1::2]  # every other element, starting at index 1\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"A potentially confusing case is when the ``step`` value is negative.\\n\",\n    \"In this case, the defaults for ``start`` and ``stop`` are swapped.\\n\",\n    \"This becomes a convenient way to reverse an array:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 22,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])\"\n      ]\n     },\n     \"execution_count\": 22,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[::-1]  # all elements, reversed\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 23,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([5, 3, 1])\"\n      ]\n     },\n     \"execution_count\": 23,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[5::-2]  # reversed every other from index 5\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Multi-dimensional subarrays\\n\",\n    \"\\n\",\n    \"Multi-dimensional slices work in the same way, with multiple slices separated by commas.\\n\",\n    \"For example:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 24,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  5,  2,  4],\\n\",\n       \"       [ 7,  6,  8,  8],\\n\",\n       \"       [ 1,  6,  7,  7]])\"\n      ]\n     },\n     \"execution_count\": 24,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 25,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  5,  2],\\n\",\n       \"       [ 7,  6,  8]])\"\n      ]\n     },\n     \"execution_count\": 25,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[:2, :3]  # two rows, three columns\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 26,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  2],\\n\",\n       \"       [ 7,  8],\\n\",\n       \"       [ 1,  7]])\"\n      ]\n     },\n     \"execution_count\": 26,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[:3, ::2]  # all rows, every other column\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Finally, subarray dimensions can even be reversed together:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 27,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[ 7,  7,  6,  1],\\n\",\n       \"       [ 8,  8,  6,  7],\\n\",\n       \"       [ 4,  2,  5, 12]])\"\n      ]\n     },\n     \"execution_count\": 27,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[::-1, ::-1]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"#### Accessing array rows and columns\\n\",\n    \"\\n\",\n    \"One commonly needed routine is accessing of single rows or columns of an array.\\n\",\n    \"This can be done by combining indexing and slicing, using an empty slice marked by a single colon (``:``):\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 28,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[12  7  1]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2[:, 0])  # first column of x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 29,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[12  5  2  4]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2[0, :])  # first row of x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"In the case of row access, the empty slice can be omitted for a more compact syntax:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 30,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[12  5  2  4]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2[0])  # equivalent to x2[0, :]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Subarrays as no-copy views\\n\",\n    \"\\n\",\n    \"One important–and extremely useful–thing to know about array slices is that they return *views* rather than *copies* of the array data.\\n\",\n    \"This is one area in which NumPy array slicing differs from Python list slicing: in lists, slices will be copies.\\n\",\n    \"Consider our two-dimensional array from before:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 31,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[12  5  2  4]\\n\",\n      \" [ 7  6  8  8]\\n\",\n      \" [ 1  6  7  7]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Let's extract a $2 \\\\times 2$ subarray from this:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 32,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[12  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub = x2[:2, :2]\\n\",\n    \"print(x2_sub)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Now if we modify this subarray, we'll see that the original array is changed! Observe:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 33,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub[0, 0] = 99\\n\",\n    \"print(x2_sub)\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 34,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5  2  4]\\n\",\n      \" [ 7  6  8  8]\\n\",\n      \" [ 1  6  7  7]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"This default behavior is actually quite useful: it means that when we work with large datasets, we can access and process pieces of these datasets without the need to copy the underlying data buffer.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Creating copies of arrays\\n\",\n    \"\\n\",\n    \"Despite the nice features of array views, it is sometimes useful to instead explicitly copy the data within an array or a subarray. This can be most easily done with the ``copy()`` method:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 35,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub_copy = x2[:2, :2].copy()\\n\",\n    \"print(x2_sub_copy)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"If we now modify this subarray, the original array is not touched:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 36,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[42  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub_copy[0, 0] = 42\\n\",\n    \"print(x2_sub_copy)\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 37,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5  2  4]\\n\",\n      \" [ 7  6  8  8]\\n\",\n      \" [ 1  6  7  7]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Reshaping of Arrays\\n\",\n    \"\\n\",\n    \"Another useful type of operation is reshaping of arrays.\\n\",\n    \"The most flexible way of doing this is with the ``reshape`` method.\\n\",\n    \"For example, if you want to put the numbers 1 through 9 in a $3 \\\\times 3$ grid, you can do the following:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 38,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[1 2 3]\\n\",\n      \" [4 5 6]\\n\",\n      \" [7 8 9]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"grid = np.arange(1, 10).reshape((3, 3))\\n\",\n    \"print(grid)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Note that for this to work, the size of the initial array must match the size of the reshaped array. \\n\",\n    \"Where possible, the ``reshape`` method will use a no-copy view of the initial array, but with non-contiguous memory buffers this is not always the case.\\n\",\n    \"\\n\",\n    \"Another common reshaping pattern is the conversion of a one-dimensional array into a two-dimensional row or column matrix.\\n\",\n    \"This can be done with the ``reshape`` method, or more easily done by making use of the ``newaxis`` keyword within a slice operation:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 39,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3]])\"\n      ]\n     },\n     \"execution_count\": 39,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.array([1, 2, 3])\\n\",\n    \"\\n\",\n    \"# row vector via reshape\\n\",\n    \"x.reshape((1, 3))\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 40,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3]])\"\n      ]\n     },\n     \"execution_count\": 40,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# row vector via newaxis\\n\",\n    \"x[np.newaxis, :]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 41,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1],\\n\",\n       \"       [2],\\n\",\n       \"       [3]])\"\n      ]\n     },\n     \"execution_count\": 41,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# column vector via reshape\\n\",\n    \"x.reshape((3, 1))\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 42,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1],\\n\",\n       \"       [2],\\n\",\n       \"       [3]])\"\n      ]\n     },\n     \"execution_count\": 42,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# column vector via newaxis\\n\",\n    \"x[:, np.newaxis]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"We will see this type of transformation often throughout the remainder of the book.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Array Concatenation and Splitting\\n\",\n    \"\\n\",\n    \"All of the preceding routines worked on single arrays. It's also possible to combine multiple arrays into one, and to conversely split a single array into multiple arrays. We'll take a look at those operations here.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Concatenation of arrays\\n\",\n    \"\\n\",\n    \"Concatenation, or joining of two arrays in NumPy, is primarily accomplished using the routines ``np.concatenate``, ``np.vstack``, and ``np.hstack``.\\n\",\n    \"``np.concatenate`` takes a tuple or list of arrays as its first argument, as we can see here:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 43,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([1, 2, 3, 3, 2, 1])\"\n      ]\n     },\n     \"execution_count\": 43,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.array([1, 2, 3])\\n\",\n    \"y = np.array([3, 2, 1])\\n\",\n    \"np.concatenate([x, y])\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"You can also concatenate more than two arrays at once:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 44,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[ 1  2  3  3  2  1 99 99 99]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"z = [99, 99, 99]\\n\",\n    \"print(np.concatenate([x, y, z]))\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"It can also be used for two-dimensional arrays:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 45,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [],\n   \"source\": [\n    \"grid = np.array([[1, 2, 3],\\n\",\n    \"                 [4, 5, 6]])\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 46,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3],\\n\",\n       \"       [4, 5, 6],\\n\",\n       \"       [1, 2, 3],\\n\",\n       \"       [4, 5, 6]])\"\n      ]\n     },\n     \"execution_count\": 46,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# concatenate along the first axis\\n\",\n    \"np.concatenate([grid, grid])\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 47,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3, 1, 2, 3],\\n\",\n       \"       [4, 5, 6, 4, 5, 6]])\"\n      ]\n     },\n     \"execution_count\": 47,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# concatenate along the second axis (zero-indexed)\\n\",\n    \"np.concatenate([grid, grid], axis=1)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"For working with arrays of mixed dimensions, it can be clearer to use the ``np.vstack`` (vertical stack) and ``np.hstack`` (horizontal stack) functions:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 48,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3],\\n\",\n       \"       [9, 8, 7],\\n\",\n       \"       [6, 5, 4]])\"\n      ]\n     },\n     \"execution_count\": 48,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.array([1, 2, 3])\\n\",\n    \"grid = np.array([[9, 8, 7],\\n\",\n    \"                 [6, 5, 4]])\\n\",\n    \"\\n\",\n    \"# vertically stack the arrays\\n\",\n    \"np.vstack([x, grid])\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 49,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[ 9,  8,  7, 99],\\n\",\n       \"       [ 6,  5,  4, 99]])\"\n      ]\n     },\n     \"execution_count\": 49,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# horizontally stack the arrays\\n\",\n    \"y = np.array([[99],\\n\",\n    \"              [99]])\\n\",\n    \"np.hstack([grid, y])\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Similary, ``np.dstack`` will stack arrays along the third axis.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Splitting of arrays\\n\",\n    \"\\n\",\n    \"The opposite of concatenation is splitting, which is implemented by the functions ``np.split``, ``np.hsplit``, and ``np.vsplit``.  For each of these, we can pass a list of indices giving the split points:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 50,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[1 2 3] [99 99] [3 2 1]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x = [1, 2, 3, 99, 99, 3, 2, 1]\\n\",\n    \"x1, x2, x3 = np.split(x, [3, 5])\\n\",\n    \"print(x1, x2, x3)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Notice that *N* split-points, leads to *N + 1* subarrays.\\n\",\n    \"The related functions ``np.hsplit`` and ``np.vsplit`` are similar:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 51,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[ 0,  1,  2,  3],\\n\",\n       \"       [ 4,  5,  6,  7],\\n\",\n       \"       [ 8,  9, 10, 11],\\n\",\n       \"       [12, 13, 14, 15]])\"\n      ]\n     },\n     \"execution_count\": 51,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"grid = np.arange(16).reshape((4, 4))\\n\",\n    \"grid\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 52,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[0 1 2 3]\\n\",\n      \" [4 5 6 7]]\\n\",\n      \"[[ 8  9 10 11]\\n\",\n      \" [12 13 14 15]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"upper, lower = np.vsplit(grid, [2])\\n\",\n    \"print(upper)\\n\",\n    \"print(lower)\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 53,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[ 0  1]\\n\",\n      \" [ 4  5]\\n\",\n      \" [ 8  9]\\n\",\n      \" [12 13]]\\n\",\n      \"[[ 2  3]\\n\",\n      \" [ 6  7]\\n\",\n      \" [10 11]\\n\",\n      \" [14 15]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"left, right = np.hsplit(grid, [2])\\n\",\n    \"print(left)\\n\",\n    \"print(right)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Similarly, ``np.dsplit`` will split arrays along the third axis.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"<!--NAVIGATION-->\\n\",\n    \"< [Understanding Data Types in Python](02.01-Understanding-Data-Types.ipynb) | [Contents](Index.ipynb) | [Computation on NumPy Arrays: Universal Functions](02.03-Computation-on-arrays-ufuncs.ipynb) >\\n\",\n    \"\\n\",\n    \"<a href=\\\"https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/02.02-The-Basics-Of-NumPy-Arrays.ipynb\\\"><img align=\\\"left\\\" src=\\\"https://colab.research.google.com/assets/colab-badge.svg\\\" alt=\\\"Open in Colab\\\" title=\\\"Open and Execute in Google Colaboratory\\\"></a>\\n\"\n   ]\n  }\n ],\n \"metadata\": {\n  \"anaconda-cloud\": {},\n  \"kernelspec\": {\n   \"display_name\": \"Python 3\",\n   \"language\": \"python\",\n   \"name\": \"python3\"\n  },\n  \"language_info\": {\n   \"codemirror_mode\": {\n    \"name\": \"ipython\",\n    \"version\": 3\n   },\n   \"file_extension\": \".py\",\n   \"mimetype\": \"text/x-python\",\n   \"name\": \"python\",\n   \"nbconvert_exporter\": \"python\",\n   \"pygments_lexer\": \"ipython3\",\n   \"version\": \"3.5.1\"\n  }\n },\n \"nbformat\": 4,\n \"nbformat_minor\": 0\n}\n\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/bb/refs/master/notebooks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"bb",
+								"refs",
+								"master",
+								"notebooks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get notebooks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has notebooks\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.notebooks.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/bb/refs/master/notebooks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"bb",
+								"refs",
+								"master",
+								"notebooks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update x",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									"",
+									"pm.environment.set(\"commitId2\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated1\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update x and y",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1a4df438-4092-43c5-b3cf-ce0647140aa8",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(2);",
+									"});",
+									"",
+									"pm.environment.set(\"commitId3\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated2\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\",\n\t\t\t\"name\": \"updated2\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update z",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c9c64c9a-2f97-41aa-9b61-8dfa7df1cee6",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									"",
+									"pm.environment.set(\"commitId4\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated3\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check ref commit history",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08c416fb-fd43-44be-85e9-4ab831b31800",
+								"exec": [
+									"pm.test(\"response has 4 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(4);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId4\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
+									"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId2\"))",
+									"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check x commit history",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e06d4d29-5e1a-4dd9-89b4-9dd91e289c5c",
+								"exec": [
+									"pm.test(\"response has 3 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(3);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId2\"))",
+									"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements/x/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements",
+								"x",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check y commit history",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f686089-594f-4343-ad14-290b61243afc",
+								"exec": [
+									"pm.test(\"response has 2 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(2);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements/y/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements",
+								"y",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check z commit history",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c062a254-95ba-4c37-884a-c4adf8b7c46b",
+								"exec": [
+									"pm.test(\"response has 2 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(2);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId4\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements/z/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements",
+								"z",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check first commit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7923d947-3a8f-40c0-8d6b-4d6e69ae7f50",
+								"exec": [
+									"pm.test(\"first commit has 3 added\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].added.length).to.eql(3);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/commits/{{commitId1}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"commits",
+								"{{commitId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get elements at second update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"elements have expected names\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    for (var e in jsonData.elements) {",
+									"        var el = jsonData.elements[e];",
+									"        if (el.id == 'x') {",
+									"            pm.expect(el.name == 'updated2');",
+									"        }",
+									"        if (el.id == 'y') {",
+									"            pm.expect(el.name == 'updated2');",
+									"        }",
+									"        if (el.id == 'z') {",
+									"            pm.expect(el.name == 'z');",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements?commitId={{commitId3}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							],
+							"query": [
+								{
+									"key": "commitId",
+									"value": "{{commitId3}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create branch a",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"branch created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.refs[0].id).to.eql('refa');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"refa\",\n\t\t\t\"name\": \"refa\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check inRefIds",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update x and y on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6ca83fd4-0bcb-481d-a1d7-4feab4d6ae3d",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(2);",
+									"});",
+									"",
+									"pm.environment.set(\"commitXYRef\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated4\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\",\n\t\t\t\"name\": \"updated4\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update z on refa and add element q",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "608a9690-7b33-4dda-aa87-9199c02b5a31",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(2);",
+									"});",
+									"",
+									"pm.environment.set(\"commitZQRef\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated5\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"q\",\n\t\t\t\"name\": \"q\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update z on master and add element p",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c004393d-091c-4cd4-bc63-b32ccb3838e9",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(2);",
+									"});",
+									"",
+									"pm.environment.set(\"commitZP\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"updated6\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"p\",\n\t\t\t\"name\": \"p\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check master commit history",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf3f6bfe-c4c4-48a5-89e8-9839be53ba2b",
+								"exec": [
+									"pm.test(\"response has 5 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(5);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZP\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId4\"))",
+									"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId3\"))",
+									"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId2\"))",
+									"    pm.expect(jsonData.commits[4].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check refa commit history",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9042a69c-9d45-4878-8dd9-6a7993bb2058",
+								"exec": [
+									"pm.test(\"response has 6 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(6);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZQRef\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitXYRef\"))",
+									"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId4\"))",
+									"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId3\"))",
+									"    pm.expect(jsonData.commits[4].id).to.eql(pm.environment.get(\"commitId2\"))",
+									"    pm.expect(jsonData.commits[5].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check x commit history on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "af87dbd2-808e-44b7-801b-75d04c79e791",
+								"exec": [
+									"pm.test(\"response has 3 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(4);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitXYRef\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
+									"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId2\"))",
+									"    pm.expect(jsonData.commits[3].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements/x/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements",
+								"x",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check y commit history on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "92012bbb-f303-48bc-8e6a-e7dd3073c999",
+								"exec": [
+									"pm.test(\"response has 3 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(3);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitXYRef\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId3\"))",
+									"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements/y/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements",
+								"y",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check z commit history on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "294bbde7-b077-44d0-af00-f11588bfec2c",
+								"exec": [
+									"pm.test(\"response has 3 commits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits.length).to.eql(3);",
+									"});",
+									"",
+									"pm.test(\"commit history is right\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitZQRef\"))",
+									"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId4\"))",
+									"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements/z/commits",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements",
+								"z",
+								"commits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get latest elements at refa",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get latest elements at master",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get mix of elements at master with missing",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get mix of elements at refa with commit",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t},{\n\t\t\t\"id\": \"q\"\n\t\t}, {\n\t\t\t\"id\": \"p\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements?commitId={{commitXYRef}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements"
+							],
+							"query": [
+								{
+									"key": "commitId",
+									"value": "{{commitXYRef}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete x on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4b2d1932-f6fc-44d3-a6b4-95ff3e70e133",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements/x",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements",
+								"x"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get x on refa deleted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b98c448a-1fae-42b9-951d-dc51fddf0647",
+								"exec": [
+									"pm.test(\"Status code is 410\", function () {",
+									"    pm.response.to.have.status(410);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements/x",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements",
+								"x"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resurrect x on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "853ac58c-b184-47cd-929a-83fecb433a9a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response has element\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated4\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get resurrected x on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "853ac58c-b184-47cd-929a-83fecb433a9a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response has element\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements/x",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements",
+								"x"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add ownerId for cameo element on refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4e1dd6d-61b6-4f4a-affe-943e3f7a1c9c",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated7\",\n\t\t\t\"ownerId\": \"z\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements",
-						"x"
-					]
-				}
-			},
-			"response": []
+			"description": "test crud of org, project, branch, elements, check commits",
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "get x on refa deleted",
-			"event": [
+			"name": "permissions",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "b98c448a-1fae-42b9-951d-dc51fddf0647",
-						"exec": [
-							"pm.test(\"Status code is 410\", function () {",
-							"    pm.response.to.have.status(410);",
-							"});"
+					"name": "check perms on branch master on aa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"admin as 3 permissions - 2 inherited and 1 not\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+									"    pm.expect(jsonData.public).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check anonymous is rejected for project aa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1b237e80-4487-4562-ba7b-274f0ef94a21",
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create reader user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"reader\",\n\t\"password\": \"reader\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/user",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create writer user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"writer\",\n\t\"password\": \"writer\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/user",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add reader to project aa with READER role and writer to aa with WRITER role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "38bab316-eff8-43a8-91fc-b2dc283b306e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"READER\"\n            },\n            {\n                \"name\": \"writer\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on branch master on aa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"branch should have 4 inherited perms and 1 non inherited\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+									"    pm.expect(jsonData.public).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on branch refa on aa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"branch has 5 perms\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+									"    pm.expect(jsonData.public).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "set branch refa to not inherit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "032dc39f-2291-4a2b-9adb-78928a617403",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"inherit\": false\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on branch refa on aa again",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"branch has 3 perms\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(false);",
+									"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+									"    pm.expect(jsonData.public).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login as reader",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f99a1f7c-6557-418a-8c0d-61a81be9f1aa",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"response has token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"    pm.environment.set(\"readerToken\", jsonData.token);",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"reader\",\n\t\"password\": \"reader\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/authentication",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"authentication"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "can read elements from project aa branch master as reader",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+								"exec": [
+									"pm.test(\"response has 4 elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{readerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cannot post elements to aa as reader",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{readerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"readerElement\",\n\t\t\t\"name\": \"not good\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cannot read branch refa as reader since not inherit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{readerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/refa/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"refa",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get projects list as reader",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"can only see project aa\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects.length).to.eql(1);",
+									"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{readerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login as writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f99a1f7c-6557-418a-8c0d-61a81be9f1aa",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"response has token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"    pm.environment.set(\"writerToken\", jsonData.token);",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"writer\",\n\t\"password\": \"writer\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/authentication",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"authentication"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "can read elements from project aa branch master as writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+								"exec": [
+									"pm.test(\"response has 4 elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{writerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update x on branch master as writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									"",
+									"pm.environment.set(\"commitWriter\", pm.response.json().elements[0]._commitId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{writerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updatedByWriter\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create branch on project aa as writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
+								"exec": [
+									"pm.test(\"branch created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.refs[0].id).to.eql('writer');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{writerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"name\": \"writer\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on branch writer as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"branch has 5 perms\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+									"    pm.expect(jsonData.public).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "give reader write access on writer branch as writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{writerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "can post elements to writer branch as reader",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+								"exec": [
+									"",
+									"pm.test(\"element created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements[0].id).to.eql('readerElement');",
+									"});   ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{readerToken}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "Authorization",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"readerElement\",\n\t\t\t\"name\": \"reader\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "make project aa public as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "032dc39f-2291-4a2b-9adb-78928a617403",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"isPublic\": true\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get project aa element without auth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "76ef9638-6735-4659-906a-ffb4f18d4080",
+								"exec": [
+									"pm.test(\"got 4 elements from project aa as anon\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove reader perms on branch writer as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\": {\n    \t\"action\": \"REMOVE\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove reader perms on project aa as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"users\": {\n    \t\"action\": \"REMOVE\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"READER\"\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on branch writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"branch has 4 perms\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.users.permissions.length).to.eql(4);",
+									"    pm.expect(jsonData.public).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"permissions"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements",
-						"x"
-					]
-				}
+			"description": "test permission handling",
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{token}}",
+				"type": "string"
 			},
-			"response": []
+			{
+				"key": "key",
+				"value": "Authorization",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "a38d93e6-1de5-4875-8f80-a5a6cec3dcd4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		},
 		{
-			"name": "resurrect x on refa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "853ac58c-b184-47cd-929a-83fecb433a9a",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response has element\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(1);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated4\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get resurrected x on refa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "853ac58c-b184-47cd-929a-83fecb433a9a",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"response has element\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(1);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements",
-						"x"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "add ownerId for cameo element on refa",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "c4e1dd6d-61b6-4f4a-affe-943e3f7a1c9c",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated7\",\n\t\t\t\"ownerId\": \"z\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects/aa/refs/refa/elements",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects",
-						"aa",
-						"refs",
-						"refa",
-						"elements"
-					]
-				}
-			},
-			"response": []
+			"listen": "test",
+			"script": {
+				"id": "0866a69c-ea90-48f6-bedf-269b559b40d8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

@@ -102,7 +102,10 @@ public abstract class BaseController {
     }
 
     protected boolean isAnonymous(Authentication auth) {
-        return (auth instanceof AnonymousAuthenticationToken);
+        //auth injected into controller would be null if anonymous,
+        // but would be anon token if gotten from security context
+        // https://github.com/spring-projects/spring-security/issues/3338
+        return (auth == null || auth instanceof AnonymousAuthenticationToken);
     }
 
     protected void checkBranchPrivilege(String privilege, String message, Authentication auth, String projectId, String refId) {

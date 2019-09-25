@@ -1,9 +1,13 @@
 package org.openmbee.sdvc.permissions;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest.Permission;
 import org.openmbee.sdvc.core.services.PermissionService;
@@ -110,6 +114,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void initOrgPerms(String orgId, String creator) {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
@@ -128,6 +133,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void initProjectPerms(String projectId, boolean inherit, String creator) {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
@@ -151,6 +157,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void initBranchPerms(String projectId, String branchId, boolean inherit, String creator) {
         Optional<User> user = userRepo.findByUsername(creator);
         Optional<Role> role = roleRepo.findByName("ADMIN");
@@ -174,6 +181,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void updateOrgUserPerms(PermissionUpdateRequest req, String orgId) {
         Optional<Organization> org = orgRepo.findByOrganizationId(orgId);
 
@@ -233,6 +241,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void updateOrgGroupPerms(PermissionUpdateRequest req, String orgId) {
         Optional<Organization> org = orgRepo.findByOrganizationId(orgId);
 
@@ -293,6 +302,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void updateProjectUserPerms(PermissionUpdateRequest req, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
 
@@ -353,6 +363,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void updateProjectGroupPerms(PermissionUpdateRequest req, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
 
@@ -413,6 +424,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void updateBranchUserPerms(PermissionUpdateRequest req, String projectId, String branchId) {
         Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
 
@@ -470,6 +482,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void updateBranchGroupPerms(PermissionUpdateRequest req, String projectId, String branchId) {
         Optional<Branch> branchOptional = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
 
@@ -527,6 +540,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void setProjectInherit(boolean isInherit, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
 
@@ -541,6 +555,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void setBranchInherit(boolean isInherit, String projectId, String branchId) {
         Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
 
@@ -555,6 +570,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void setOrgPublic(boolean isPublic, String orgId) {
         Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
 
@@ -568,6 +584,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public void setProjectPublic(boolean isPublic, String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
 
@@ -581,6 +598,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public boolean hasOrgPrivilege(String privilege, String user, String orgId) {
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
@@ -617,6 +635,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public boolean hasProjectPrivilege(String privilege, String user, String projectId) {
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
@@ -653,6 +672,7 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public boolean hasBranchPrivilege(String privilege, String user, String projectId, String branchId) {
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
@@ -689,27 +709,130 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
+    @Transactional
     public boolean isProjectInherit(String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
         return project.map(Project::isInherit).orElse(false);
     }
 
     @Override
+    @Transactional
     public boolean isBranchInherit(String projectId, String branchId) {
         Optional<Branch> branch = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
         return branch.map(Branch::isInherit).orElse(false);
     }
 
     @Override
+    @Transactional
     public boolean isOrgPublic(String orgId) {
         Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
         return organization.map(Organization::isPublic).orElse(false);
     }
 
     @Override
+    @Transactional
     public boolean isProjectPublic(String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
         return project.map(Project::isPublic).orElse(false);
+    }
+
+    @Override
+    @Transactional
+    public PermissionResponse getOrgGroupRoles(String orgId) {
+        PermissionResponse res = initResponse();
+        for (OrgGroupPerm perm: orgGroupPermRepo.findAllByOrganization_OrganizationId(orgId)) {
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getGroup().getName(),
+                perm.getRole().getName(),
+                false
+            ));
+        }
+        return res;
+    }
+
+    @Override
+    @Transactional
+    public PermissionResponse getOrgUserRoles(String orgId) {
+        PermissionResponse res = initResponse();
+        for (OrgUserPerm perm: orgUserPermRepo.findAllByOrganization_OrganizationId(orgId)) {
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getUser().getUsername(),
+                perm.getRole().getName(),
+                false
+            ));
+        }
+        return res;
+    }
+
+    @Override
+    @Transactional
+    public PermissionResponse getProjectGroupRoles(String projectId) {
+        PermissionResponse res = initResponse();
+        for (ProjectGroupPerm perm: projectGroupPermRepo.findAllByProject_ProjectId(projectId)) {
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getGroup().getName(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
+        }
+        return res;
+    }
+
+    @Override
+    @Transactional
+    public PermissionResponse getProjectUserRoles(String projectId) {
+        PermissionResponse res = initResponse();
+        for (ProjectUserPerm perm: projectUserPermRepo.findAllByProject_ProjectId(projectId)) {
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getUser().getUsername(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
+        }
+        return res;
+    }
+
+    @Override
+    @Transactional
+    public PermissionResponse getBranchGroupRoles(String projectId, String branchId) {
+        PermissionResponse res = initResponse();
+        Optional<Branch> b = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        if (!b.isPresent()) {
+            return res;
+        }
+        for (BranchGroupPerm perm: branchGroupPermRepo.findAllByBranch(b.get())) {
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getGroup().getName(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
+        }
+        return res;
+    }
+
+    @Override
+    @Transactional
+    public PermissionResponse getBranchUserRoles(String projectId, String branchId) {
+        PermissionResponse res = initResponse();
+        Optional<Branch> b = branchRepo.findByProject_ProjectIdAndBranchId(projectId, branchId);
+        if (!b.isPresent()) {
+            return res;
+        }
+        for (BranchUserPerm perm: branchUserPermRepo.findAllByBranch(b.get())) {
+            res.getPermissions().add(new PermissionResponse.Permission(
+                perm.getUser().getUsername(),
+                perm.getRole().getName(),
+                perm.isInherited()
+            ));
+        }
+        return res;
+    }
+
+    private PermissionResponse initResponse() {
+        PermissionResponse res = new PermissionResponse();
+        List<PermissionResponse.Permission> perms = new ArrayList<>();
+        res.setPermissions(perms);
+        return res;
     }
 
     private void recalculateInheritedPerms(Project project) {
@@ -729,6 +852,9 @@ public class DefaultPermissionService implements PermissionService {
             for (OrgGroupPerm p: orgGroupPermRepo.findAllByOrganizationAndRole_Name(project.getOrganization(), "ADMIN")) {
                 projectGroupPermRepo.save(new ProjectGroupPerm(project, p.getGroup(), p.getRole(), true));
             }
+        }
+        if (project.getBranches() == null) { //TODO this shouldn't be returning null..
+            return;
         }
         for (Branch b: project.getBranches()) {
             recalculateInheritedPerms(b);
