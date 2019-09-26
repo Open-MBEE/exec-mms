@@ -7,6 +7,7 @@ import java.util.Set;
 import org.openmbee.sdvc.data.domains.global.Branch;
 import org.openmbee.sdvc.data.domains.global.BranchGroupPerm;
 import org.openmbee.sdvc.data.domains.global.Group;
+import org.openmbee.sdvc.data.domains.global.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,16 +18,12 @@ public interface BranchGroupPermRepository extends JpaRepository<BranchGroupPerm
 
     List<BranchGroupPerm> findAllByBranchAndInherited(Branch b, boolean inherited);
 
-    Set<BranchGroupPerm> findAllByBranchAndGroup(Branch b, Group g);
-
-    Set<BranchGroupPerm> findAllByBranchAndGroup_NameIn(Branch b, Set<String> g);
-
-    List<BranchGroupPerm> findAllByBranchAndGroup_Name(Branch b, String name);
-
-    List<BranchGroupPerm> findByBranchAndGroupAndInherited(Branch b, Group g, boolean inherited);
-
     Optional<BranchGroupPerm> findByBranchAndGroupAndInheritedIsFalse(Branch b, Group g);
 
-    Optional<BranchGroupPerm> findByBranchAndGroup_NameAndInherited(Branch b, String g, boolean inherited);
+    boolean existsByBranchAndGroup_NameInAndRoleIn(Branch b, Set<String> groups, Set<Role> roles);
+
+    void deleteByBranchAndGroup_NameInAndInheritedIsFalse(Branch b, Set<String> groups);
+
+    void deleteByBranchAndInherited(Branch b, boolean inherited);
 
 }

@@ -27,6 +27,7 @@ import org.openmbee.sdvc.data.domains.global.User;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.rdb.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -212,7 +213,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                orgUserPermRepo.deleteAll(orgUserPermRepo.findAllByOrganization(o));
+                orgUserPermRepo.deleteByOrganization(o);
                 for (Permission p: req.getPermissions()) {
                     Optional<User> user = userRepo.findByUsername(p.getName());
                     Optional<Role> role = roleRepo.findByName(p.getRole());
@@ -224,15 +225,9 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REMOVE:
-                for (Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    if (!user.isPresent()) {
-                        //throw exception or skip
-                        continue;
-                    }
-                    Optional<OrgUserPerm> perm = orgUserPermRepo.findByOrganizationAndUser(o, user.get());
-                    perm.ifPresent(orgUserPerm -> orgUserPermRepo.delete(orgUserPerm));
-                }
+                Set<String> users = new HashSet<>();
+                req.getPermissions().forEach(p -> users.add(p.getName()));
+                orgUserPermRepo.deleteByOrganizationAndUser_UsernameIn(o, users);
                 break;
         }
         for (Project proj: o.getProjects()) {
@@ -253,47 +248,36 @@ public class DefaultPermissionService implements PermissionService {
         switch(req.getAction()) {
             case MODIFY:
                 for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
-                    if (!group.isPresent() || !role.isPresent()) {
-                        //throw exception or skip
+                    Pair<Group, Role> pair = getGroupAndRole(p);
+                    if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    Optional<OrgGroupPerm> exist = orgGroupPermRepo.findByOrganizationAndGroup(o, group.get());
+                    Optional<OrgGroupPerm> exist = orgGroupPermRepo.findByOrganizationAndGroup(o, pair.getFirst());
                     if (exist.isPresent()) {
                         OrgGroupPerm e = exist.get();
-                        if (!role.get().equals(e.getRole())) {
-                            e.setRole(role.get());
+                        if (!pair.getSecond().equals(e.getRole())) {
+                            e.setRole(pair.getSecond());
                             orgGroupPermRepo.save(e);
                         }
                     } else {
-                        orgGroupPermRepo.save(new OrgGroupPerm(o, group.get(), role.get()));
+                        orgGroupPermRepo.save(new OrgGroupPerm(o, pair.getFirst(), pair.getSecond()));
                     }
                 }
                 break;
             case REPLACE:
-                orgGroupPermRepo.deleteAll(orgGroupPermRepo.findAllByOrganization(o));
+                orgGroupPermRepo.deleteByOrganization(o);
                 for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
-                    if (!group.isPresent() || !role.isPresent()) {
-                        //throw exception or skip
+                    Pair<Group, Role> pair = getGroupAndRole(p);
+                    if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    orgGroupPermRepo.save(new OrgGroupPerm(o, group.get(), role.get()));
+                    orgGroupPermRepo.save(new OrgGroupPerm(o, pair.getFirst(), pair.getSecond()));
                 }
                 break;
             case REMOVE:
-                for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    //Optional<Role> role = roleRepo.findByName(p.getRole()); //role is irrelevant here?
-                    if (!group.isPresent()) {
-                        //throw exception or skip
-                        continue;
-                    }
-                    Optional<OrgGroupPerm> perm = orgGroupPermRepo.findByOrganizationAndGroup(o, group.get());
-                    perm.ifPresent(orgGroupPerm -> orgGroupPermRepo.delete(orgGroupPerm));
-                }
+                Set<String> groups = new HashSet<>();
+                req.getPermissions().forEach(p -> groups.add(p.getName()));
+                orgGroupPermRepo.deleteByOrganizationAndGroup_NameIn(o, groups);
                 break;
         }
         for (Project proj: o.getProjects()) {
@@ -320,7 +304,7 @@ public class DefaultPermissionService implements PermissionService {
                         //throw exception or skip
                         continue;
                     }
-                    Optional<ProjectUserPerm> exist = projectUserPermRepo.findByProjectAndUserAndInherited(proj, user.get(), false);
+                    Optional<ProjectUserPerm> exist = projectUserPermRepo.findByProjectAndUserAndInheritedIsFalse(proj, user.get());
                     if (exist.isPresent()) {
                         ProjectUserPerm e = exist.get();
                         if (!role.get().equals(e.getRole())) {
@@ -333,7 +317,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                projectUserPermRepo.deleteAll(projectUserPermRepo.findAllByProjectAndInherited(proj, false));
+                projectUserPermRepo.deleteByProjectAndInherited(proj, false);
                 for (Permission p: req.getPermissions()) {
                     Optional<User> user = userRepo.findByUsername(p.getName());
                     Optional<Role> role = roleRepo.findByName(p.getRole());
@@ -345,16 +329,9 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REMOVE:
-                for (Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    //Optional<Role> role = roleRepo.findByName(p.getRole()); //role is irrelevant here?
-                    if (!user.isPresent()) {
-                        //throw exception or skip
-                        continue;
-                    }
-                    Optional<ProjectUserPerm> perm = projectUserPermRepo.findByProjectAndUserAndInherited(proj, user.get(), false);
-                    perm.ifPresent(projectUserPerm -> projectUserPermRepo.delete(projectUserPerm));
-                }
+                Set<String> users = new HashSet<>();
+                req.getPermissions().forEach(p -> users.add(p.getName()));
+                projectUserPermRepo.deleteByProjectAndUser_UsernameInAndInheritedIsFalse(proj, users);
                 break;
         }
         for (Branch b: proj.getBranches()) {
@@ -375,47 +352,36 @@ public class DefaultPermissionService implements PermissionService {
         switch(req.getAction()) {
             case MODIFY:
                 for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
-                    if (!group.isPresent() || !role.isPresent()) {
-                        //throw exception or skip
+                    Pair<Group, Role> pair = getGroupAndRole(p);
+                    if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    Optional<ProjectGroupPerm> exist = projectGroupPermRepo.findByProjectAndGroupAndInherited(proj, group.get(), false);
+                    Optional<ProjectGroupPerm> exist = projectGroupPermRepo.findByProjectAndGroupAndInheritedIsFalse(proj, pair.getFirst());
                     if (exist.isPresent()) {
                         ProjectGroupPerm e = exist.get();
-                        if (!role.get().equals(e.getRole())) {
-                            e.setRole(role.get());
+                        if (!pair.getSecond().equals(e.getRole())) {
+                            e.setRole(pair.getSecond());
                             projectGroupPermRepo.save(e);
                         }
                     } else {
-                        projectGroupPermRepo.save(new ProjectGroupPerm(proj, group.get(), role.get(), false));
+                        projectGroupPermRepo.save(new ProjectGroupPerm(proj, pair.getFirst(), pair.getSecond(), false));
                     }
                 }
                 break;
             case REPLACE:
-                projectGroupPermRepo.deleteAll(projectGroupPermRepo.findAllByProjectAndInherited(proj, false));
+                projectGroupPermRepo.deleteByProjectAndInherited(proj, false);
                 for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
-                    if (!group.isPresent() || !role.isPresent()) {
-                        //throw exception or skip
+                    Pair<Group, Role> pair = getGroupAndRole(p);
+                    if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    projectGroupPermRepo.save(new ProjectGroupPerm(proj, group.get(), role.get(), false));
+                    projectGroupPermRepo.save(new ProjectGroupPerm(proj, pair.getFirst(), pair.getSecond(), false));
                 }
                 break;
             case REMOVE:
-                for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    //Optional<Role> role = roleRepo.findByName(p.getRole()); //role is irrelevant here?
-                    if (!group.isPresent()) {
-                        //throw exception or skip
-                        continue;
-                    }
-                    Optional<ProjectGroupPerm> perm = projectGroupPermRepo.findByProjectAndGroupAndInherited(proj, group.get(), false);
-                    perm.ifPresent(projectGroupPerm -> projectGroupPermRepo.delete(projectGroupPerm));
-                }
+                Set<String> groups = new HashSet<>();
+                req.getPermissions().forEach(p -> groups.add(p.getName()));
+                projectGroupPermRepo.deleteByProjectAndGroup_NameInAndInheritedIsFalse(proj, groups);
                 break;
         }
         for (Branch b: proj.getBranches()) {
@@ -455,7 +421,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                branchUserPermRepo.deleteAll(branchUserPermRepo.findAllByBranchAndInherited(bran, false));
+                branchUserPermRepo.deleteByBranchAndInherited(bran, false);
                 for (Permission p: req.getPermissions()) {
                     Optional<User> user = userRepo.findByUsername(p.getName());
                     Optional<Role> role = roleRepo.findByName(p.getRole());
@@ -467,16 +433,9 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REMOVE:
-                for (Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    //Optional<Role> role = roleRepo.findByName(p.getRole()); //role is irrelevant here?
-                    if (!user.isPresent()) {
-                        //throw exception or skip
-                        continue;
-                    }
-                    Optional<BranchUserPerm> perm = branchUserPermRepo.findByBranchAndUserAndInheritedIsFalse(bran, user.get());
-                    perm.ifPresent(branchUserPerm -> branchUserPermRepo.delete(branchUserPerm));
-                }
+                Set<String> users = new HashSet<>();
+                req.getPermissions().forEach(p -> users.add(p.getName()));
+                branchUserPermRepo.deleteByBranchAndUser_UsernameInAndInheritedIsFalse(bran, users);
                 break;
         }
     }
@@ -494,47 +453,36 @@ public class DefaultPermissionService implements PermissionService {
         switch(req.getAction()) {
             case MODIFY:
                 for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
-                    if (!group.isPresent() || !role.isPresent()) {
-                        //throw exception or skip
+                    Pair<Group, Role> pair = getGroupAndRole(p);
+                    if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    Optional<BranchGroupPerm> exist = branchGroupPermRepo.findByBranchAndGroupAndInheritedIsFalse(branch, group.get());
+                    Optional<BranchGroupPerm> exist = branchGroupPermRepo.findByBranchAndGroupAndInheritedIsFalse(branch, pair.getFirst());
                     if (exist.isPresent()) {
                         BranchGroupPerm e = exist.get();
-                        if (!role.get().equals(e.getRole())) {
-                            e.setRole(role.get());
+                        if (!pair.getSecond().equals(e.getRole())) {
+                            e.setRole(pair.getSecond());
                             branchGroupPermRepo.save(e);
                         }
                     } else {
-                        branchGroupPermRepo.save(new BranchGroupPerm(branch, group.get(), role.get(), false));
+                        branchGroupPermRepo.save(new BranchGroupPerm(branch, pair.getFirst(), pair.getSecond(), false));
                     }
                 }
                 break;
             case REPLACE:
-                branchGroupPermRepo.deleteAll(branchGroupPermRepo.findAllByBranchAndInherited(branch, false));
+                branchGroupPermRepo.deleteByBranchAndInherited(branch, false);
                 for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
-                    if (!group.isPresent() || !role.isPresent()) {
-                        //throw exception or skip
+                    Pair<Group, Role> pair = getGroupAndRole(p);
+                    if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    branchGroupPermRepo.save(new BranchGroupPerm(branch, group.get(), role.get(), false));
+                    branchGroupPermRepo.save(new BranchGroupPerm(branch, pair.getFirst(), pair.getSecond(), false));
                 }
                 break;
             case REMOVE:
-                for (Permission p: req.getPermissions()) {
-                    Optional<Group> group = groupRepo.findByName(p.getName());
-                    //Optional<Role> role = roleRepo.findByName(p.getRole()); //role is irrelevant here?
-                    if (!group.isPresent()) {
-                        //throw exception or skip
-                        continue;
-                    }
-                    Optional<BranchGroupPerm> perm = branchGroupPermRepo.findByBranchAndGroupAndInheritedIsFalse(branch, group.get());
-                    perm.ifPresent(branchGroupPerm -> branchGroupPermRepo.delete(branchGroupPerm));
-                }
+                Set<String> groups = new HashSet<>();
+                req.getPermissions().forEach(p -> groups.add(p.getName()));
+                branchGroupPermRepo.deleteByBranchAndGroup_NameInAndInheritedIsFalse(branch, groups);
                 break;
         }
     }
@@ -549,9 +497,11 @@ public class DefaultPermissionService implements PermissionService {
         }
 
         Project proj = project.get();
-        proj.setInherit(isInherit);
-        projectRepo.save(proj);
-        recalculateInheritedPerms(proj);
+        if (proj.isInherit() != isInherit) {
+            proj.setInherit(isInherit);
+            projectRepo.save(proj);
+            recalculateInheritedPerms(proj);
+        }
     }
 
     @Override
@@ -564,9 +514,11 @@ public class DefaultPermissionService implements PermissionService {
         }
 
         Branch bran = branch.get();
-        bran.setInherit(isInherit);
-        branchRepo.save(bran);
-        recalculateInheritedPerms(bran);
+        if (bran.isInherit() != isInherit) {
+            bran.setInherit(isInherit);
+            branchRepo.save(bran);
+            recalculateInheritedPerms(bran);
+        }
     }
 
     @Override
@@ -609,27 +561,14 @@ public class DefaultPermissionService implements PermissionService {
         if (!organization.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
         }
-
-        Set<OrgUserPerm> orgUserPerm = orgUserPermRepo.findAllByOrganizationAndUser_Username(organization.get(), user);
-        Set<Privilege> privileges = new HashSet<>();
-        orgUserPerm.forEach(oup -> {
-            privileges.addAll(oup.getRole().getPrivileges());
-        });
-
-        if (privileges.contains(priv.get())) {
+        Set<Role> roles = priv.get().getRoles();
+        if (orgUserPermRepo.existsByOrganizationAndUser_UsernameAndRoleIn(organization.get(), user, roles)) {
             return true;
         }
-
-        Set<OrgGroupPerm> orgGroupPerm = orgGroupPermRepo.findAllByOrganizationAndGroup_NameIn(organization.get(), groups);
-        if (orgGroupPerm.isEmpty()) {
-            return false;
+        if (!groups.isEmpty() && orgGroupPermRepo.existsByOrganizationAndGroup_NameInAndRoleIn(organization.get(), groups, roles)) {
+            return true;
         }
-
-        orgGroupPerm.forEach(ogp -> {
-            privileges.addAll(ogp.getRole().getPrivileges());
-        });
-
-        return privileges.contains(priv.get());
+        return false;
     }
 
     @Override
@@ -639,32 +578,19 @@ public class DefaultPermissionService implements PermissionService {
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
         }
-
         Optional<Project> project = projectRepo.findByProjectId(projectId);
         if (!project.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
         }
-
-        Set<ProjectUserPerm> projectUserPerm = projectUserPermRepo.findAllByProjectAndUser_Username(project.get(), user);
-        Set<Privilege> privileges = new HashSet<>();
-        projectUserPerm.forEach(pup -> {
-            privileges.addAll(pup.getRole().getPrivileges());
-        });
-
-        if (privileges.contains(priv.get())) {
+        Set<Role> roles = priv.get().getRoles();
+        if (projectUserPermRepo.existsByProjectAndUser_UsernameAndRoleIn(project.get(), user, roles)) {
             return true;
         }
 
-        Set<ProjectGroupPerm> projectGroupPerm = projectGroupPermRepo.findAllByProjectAndGroup_NameIn(project.get(), groups);
-        if (projectGroupPerm.isEmpty()) {
-            return false;
+        if (!groups.isEmpty() && projectGroupPermRepo.existsByProjectAndGroup_NameInAndRoleIn(project.get(), groups, roles)) {
+            return true;
         }
-
-        projectGroupPerm.forEach(pgp -> {
-            privileges.addAll(pgp.getRole().getPrivileges());
-        });
-
-        return privileges.contains(priv.get());
+        return false;
     }
 
     @Override
@@ -679,27 +605,14 @@ public class DefaultPermissionService implements PermissionService {
         if (!branch.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
         }
-
-        Set<BranchUserPerm> branchUserPerm = branchUserPermRepo.findAllByBranchAndUser_Username(branch.get(), user);
-        Set<Privilege> privileges = new HashSet<>();
-        branchUserPerm.forEach(bup -> {
-            privileges.addAll(bup.getRole().getPrivileges());
-        });
-
-        if (privileges.contains(priv.get())) {
+        Set<Role> roles = priv.get().getRoles();
+        if (branchUserPermRepo.existsByBranchAndUser_UsernameAndRoleIn(branch.get(), user, roles)) {
             return true;
         }
-
-        Set<BranchGroupPerm> branchGroupPerm = branchGroupPermRepo.findAllByBranchAndGroup_NameIn(branch.get(), groups);
-        if (branchGroupPerm.isEmpty()) {
-            return false;
+        if (!groups.isEmpty() && branchGroupPermRepo.existsByBranchAndGroup_NameInAndRoleIn(branch.get(), groups, roles)) {
+            return true;
         }
-
-        branchGroupPerm.forEach(bgp -> {
-            privileges.addAll(bgp.getRole().getPrivileges());
-        });
-
-        return privileges.contains(priv.get());
+        return false;
     }
 
     @Override
@@ -820,6 +733,19 @@ public class DefaultPermissionService implements PermissionService {
             ));
         }
         return res;
+    }
+
+    private Pair<Group, Role> getGroupAndRole(Permission p) {
+        Optional<Group> group = groupRepo.findByName(p.getName());
+        Optional<Role> role = roleRepo.findByName(p.getRole());
+        if (!role.isPresent()) {
+            return Pair.of(group.orElse(null), null);
+        }
+        if (!group.isPresent()) {
+            group = Optional.of(new Group(p.getName()));
+            groupRepo.save(group.get());
+        }
+        return Pair.of(group.get(), role.get());
     }
 
     private PermissionResponse initResponse() {
