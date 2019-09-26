@@ -20,33 +20,11 @@ public interface ProjectUserPermRepository extends JpaRepository<ProjectUserPerm
 
     List<ProjectUserPerm> findAllByProject_ProjectId(String projectId);
 
-    List<ProjectUserPerm> findAllByProject_ProjectIdAndInherited(String projectId, boolean inherited);
-
-    Set<ProjectUserPerm> findAllByProjectAndUser(Project proj, User user);
-
-    Optional<ProjectUserPerm> findByProjectAndUserAndInherited(Project proj, User user, boolean inherited);
-
-    Set<ProjectUserPerm> findAllByProjectAndUser_Username(Project proj, String User);
-
-    Optional<ProjectUserPerm> findByProjectAndUser_UsernameAndInheritedIsFalse(Project proj, String User);
-
-    List<ProjectUserPerm> findByProjectAndUser_UsernameAndInherited(Project proj, String User, boolean inherited);
-
-    Set<ProjectUserPerm> findAllByProject_ProjectIdAndUser_Username(String projectId, String User);
-
-    Optional<ProjectUserPerm> findByProject_ProjectIdAndUser_UsernameAndInheritedIsFalse(String projectId, String User);
-
-    List<ProjectUserPerm> findByProject_ProjectIdAndUser_UsernameAndInherited(String projectId, String User, boolean inherited);
-
-    List<ProjectUserPerm> findAllByProjectAndRole(Project proj, Role r);
-
-    List<ProjectUserPerm> findAllByProjectAndRoleAndInherited(Project proj, Role r, boolean inherited);
+    Optional<ProjectUserPerm> findByProjectAndUserAndInheritedIsFalse(Project proj, User user);
 
     List<ProjectUserPerm> findAllByProjectAndRole_Name(Project proj, String r);
 
-    List<ProjectUserPerm> findAllByProjectAndRole_NameAndInherited(Project proj, String r, boolean inherited);
+    boolean existsByProjectAndUser_UsernameAndRoleIn(Project proj, String user, Set<Role> roles);
 
-    List<ProjectUserPerm> findAllByProject_ProjectIdAndRole_Name(String projectId, String role);
-
-    List<ProjectUserPerm> findAllByProject_ProjectIdAndRole_NameAndInherited(String projectId, String role, boolean inherited);
+    void deleteByProjectAndUser_UsernameInAndInheritedIsFalse(Project proj, Set<String> users);
 }

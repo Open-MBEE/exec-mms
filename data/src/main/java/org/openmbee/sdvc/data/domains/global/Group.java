@@ -10,11 +10,17 @@ import javax.persistence.Table;
 @Table(name = "groups")
 public class Group extends Base {
 
+
     @Column(unique = true)
     private String name;
 
     @ManyToMany(mappedBy = "groups")
     private Collection<User> users;
+
+    public Group() {}
+    public Group(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return name;

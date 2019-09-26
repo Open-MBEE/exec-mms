@@ -20,36 +20,12 @@ public interface ProjectGroupPermRepository extends JpaRepository<ProjectGroupPe
 
     List<ProjectGroupPerm> findAllByProject_ProjectId(String projectId);
 
-    List<ProjectGroupPerm> findAllByProject_ProjectIdAndInherited(String projectId, boolean inherited);
-
-    Set<ProjectGroupPerm> findAllByProjectAndGroup(Project proj, Group group);
-
-    Set<ProjectGroupPerm> findAllByProjectAndGroup_NameIn(Project proj, Set<String> group);
-
-    Optional<ProjectGroupPerm> findByProjectAndGroupAndInherited(Project proj, Group group, boolean inherited);
-
-    List<ProjectGroupPerm> findAllByProjectAndGroup_Name(Project proj, String group);
-
-    Optional<ProjectGroupPerm> findByProjectAndGroup_NameAndInheritedIsFalse(Project proj, String group);
-
-    List<ProjectGroupPerm> findByProjectAndGroup_NameAndInherited(Project proj, String group, boolean inherited);
-
-    List<ProjectGroupPerm> findAllByProject_ProjectIdAndGroup_Name(String projectId, String group);
-
-    Optional<ProjectGroupPerm> findByProject_ProjectIdAndGroup_NameAndInheritedIsFalse(String projectId, String group);
-
-    List<ProjectGroupPerm> findByProject_ProjectIdAndGroup_NameAndInherited(String projectId, String group, boolean inherited);
-
-    List<ProjectGroupPerm> findAllByProjectAndRole(Project proj, Role r);
-
-    List<ProjectGroupPerm> findAllByProjectAndRoleAndInherited(Project proj, Role r, boolean inherited);
+    Optional<ProjectGroupPerm> findByProjectAndGroupAndInheritedIsFalse(Project proj, Group group);
 
     List<ProjectGroupPerm> findAllByProjectAndRole_Name(Project proj, String r);
 
-    List<ProjectGroupPerm> findAllByProjectAndRole_NameAndInherited(Project proj, String r, boolean inherited);
+    boolean existsByProjectAndGroup_NameInAndRoleIn(Project proj, Set<String> groups, Set<Role> roles);
 
-    List<ProjectGroupPerm> findAllByProject_ProjectIdAndRole_Name(String projectId, String role);
-
-    List<ProjectGroupPerm> findAllByProject_ProjectIdAndRole_NameAndInherited(String projectId, String role, boolean inherited);
+    void deleteByProjectAndGroup_NameInAndInheritedIsFalse(Project proj, Set<String> groups);
 
 }
