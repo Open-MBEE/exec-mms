@@ -3,7 +3,6 @@ package org.openmbee.sdvc.ldap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
@@ -23,10 +22,12 @@ import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.filter.AndFilter;
+import org.springframework.ldap.filter.EqualsFilter;
+import org.springframework.ldap.filter.OrFilter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
@@ -140,10 +141,15 @@ class LdapSecurityConfig extends SecurityConfig {
                     userRepository.save(newUser);
                 }
                 List<Group> groups = groupRepository.findAll();
-                List<String> groupNames = groups.stream().map(group -> "(" + groupRoleAttribute + "=" + group.getName() + ")").collect(Collectors.toList());
+
+                OrFilter orFilter = new OrFilter();
+                groups.forEach(group -> orFilter.or(new EqualsFilter(groupRoleAttribute, group.getName())));
+                AndFilter andFilter = new AndFilter();
                 String userDn = userData.getDn().toString() + "," + providerBase;
-                String groupFilter = "(&(uniqueMember=" + userDn + ")(|" + String.join("", groupNames) + "))";
-                List<GrantedAuthority> gas = ldapTemplate.search("", groupFilter, SearchControls.SUBTREE_SCOPE, GROUP_ATTRIBUTE, mapper);
+                andFilter.and(new EqualsFilter("uniqueMember", userDn));
+                andFilter.and(orFilter);
+
+                List<GrantedAuthority> gas = ldapTemplate.search("", andFilter.encode(), SearchControls.SUBTREE_SCOPE, GROUP_ATTRIBUTE, mapper);
                 return gas;
             }
         }
