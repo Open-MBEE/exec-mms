@@ -22,6 +22,7 @@ import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,16 +53,12 @@ public class BranchesPost extends BaseController {
 
     @PostMapping
     @Transactional
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_BRANCH', false)")
     public ResponseEntity<? extends BaseResponse> handleRequest(
             @PathVariable String projectId,
             @RequestBody BranchesRequest projectsPost,
             Authentication auth) {
 
-        rejectAnonymous(auth);
-        if (!permissionService
-            .hasProjectPrivilege(Privileges.PROJECT_CREATE_BRANCH.name(), auth.getName(), projectId)) {
-            throw new ForbiddenException(new BranchesResponse().addMessage("No permission to create branches in project"));
-        }
         if (projectsPost.getRefs().isEmpty()) {
             throw new BadRequestException(new BranchesResponse().addMessage("Empty request"));
         }
@@ -114,7 +111,6 @@ public class BranchesPost extends BaseController {
                 //TODO update docs with new ref
                 response.getBranches().add(branch);
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
-                //TODO have initBranchPerms create the global branch if doesn't exist
             } catch (Exception e) {
                 branchRepository.delete(saved);
                 logger.error("Couldn't create branch: {}", branch.getId());

@@ -19,7 +19,7 @@ public interface BranchGroupPermRepository extends JpaRepository<BranchGroupPerm
 
     Set<BranchGroupPerm> findAllByBranchAndGroup(Branch b, Group g);
 
-    Set<BranchGroupPerm> findAllByBranchAndGroupIn(Branch b, Set<Group> g);
+    Set<BranchGroupPerm> findAllByBranchAndGroup_NameIn(Branch b, Set<String> g);
 
     List<BranchGroupPerm> findAllByBranchAndGroup_Name(Branch b, String name);
 

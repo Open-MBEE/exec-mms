@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.core.services;
 
+import java.util.Set;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 
@@ -31,11 +32,11 @@ public interface PermissionService {
 
     void setProjectPublic(boolean isPublic, String projectId);
 
-    boolean hasOrgPrivilege(String privilege, String user, String orgId);
+    boolean hasOrgPrivilege(String privilege, String user, Set<String> groups, String orgId);
 
-    boolean hasProjectPrivilege(String privilege, String user, String projectId);
+    boolean hasProjectPrivilege(String privilege, String user, Set<String> groups, String projectId);
 
-    boolean hasBranchPrivilege(String privilege, String user, String projectId, String branchId);
+    boolean hasBranchPrivilege(String privilege, String user, Set<String> groups, String projectId, String branchId);
 
     boolean isProjectInherit(String projectId);
 

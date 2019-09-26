@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
+import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.core.services.PermissionService;
 import org.openmbee.sdvc.crud.exceptions.ForbiddenException;
 import org.openmbee.sdvc.crud.exceptions.UnauthorizedException;
@@ -36,6 +37,8 @@ public abstract class BaseController {
 
     protected PermissionService permissionService;
 
+    protected MethodSecurityService mss;
+
     @Autowired
     public void setServiceFactory(ServiceFactory serviceFactory) {
         this.serviceFactory = serviceFactory;
@@ -49,6 +52,11 @@ public abstract class BaseController {
     @Autowired
     public void setPermissionService(PermissionService permissionService) {
         this.permissionService = permissionService;
+    }
+
+    @Autowired
+    public void setMss(MethodSecurityService mss) {
+        this.mss = mss;
     }
 
     @Autowired
@@ -92,25 +100,6 @@ public abstract class BaseController {
                 default:
                     break;
             }
-        }
-    }
-
-    protected void rejectAnonymous(Authentication auth) {
-        if (isAnonymous(auth)) {
-            throw new UnauthorizedException("");
-        }
-    }
-
-    protected boolean isAnonymous(Authentication auth) {
-        //auth injected into controller would be null if anonymous,
-        // but would be anon token if gotten from security context
-        // https://github.com/spring-projects/spring-security/issues/3338
-        return (auth == null || auth instanceof AnonymousAuthenticationToken);
-    }
-
-    protected void checkBranchPrivilege(String privilege, String message, Authentication auth, String projectId, String refId) {
-        if (!permissionService.hasBranchPrivilege(privilege, auth.getName(), projectId, refId)) {
-            throw new ForbiddenException(new BaseResponse().addMessage(message));
         }
     }
 }
