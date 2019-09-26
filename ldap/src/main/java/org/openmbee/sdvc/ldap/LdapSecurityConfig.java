@@ -1,14 +1,17 @@
 package org.openmbee.sdvc.ldap;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchControls;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.config.SecurityConfig;
+import org.openmbee.sdvc.data.domains.global.Group;
+import org.openmbee.sdvc.rdb.repositories.GroupRepository;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
@@ -23,6 +27,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
@@ -68,9 +73,16 @@ class LdapSecurityConfig extends SecurityConfig {
 
     private UserRepository userRepository;
 
+    private GroupRepository groupRepository;
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setGroupRepository(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
     }
 
     @Autowired
@@ -80,8 +92,12 @@ class LdapSecurityConfig extends SecurityConfig {
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
             We need to delegate the creation of the contextSource out of the builder-configuration.
         */
-        auth.ldapAuthentication().userDnPatterns(userDnPattern).groupSearchBase(groupSearchBase)
-            .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
+        auth.ldapAuthentication()
+            .userDnPatterns(userDnPattern)
+            .groupSearchBase(groupSearchBase)
+            .groupRoleAttribute(groupRoleAttribute)
+            .groupSearchFilter(groupSearchFilter)
+            .rolePrefix("")
             .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator())
             .contextSource(contextSource());
     }
@@ -95,17 +111,26 @@ class LdapSecurityConfig extends SecurityConfig {
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
-            private final String[] GROUP_ATTRIBUTE = {"cn", "uniqueMember"};
+            private final String[] GROUP_ATTRIBUTE = {groupRoleAttribute};
             SpringSecurityLdapTemplate ldapTemplate;
 
             private CustomLdapAuthoritiesPopulator(ContextSource contextSource) {
                 ldapTemplate = new SpringSecurityLdapTemplate(contextSource);
             }
 
+            private CustomAttributeMapper mapper = new CustomAttributeMapper();
+            class CustomAttributeMapper implements AttributesMapper<GrantedAuthority> {
+                @Override
+                public GrantedAuthority mapFromAttributes(Attributes attributes) throws NamingException {
+                    return new SimpleGrantedAuthority(attributes.get(groupRoleAttribute).get().toString());
+                }
+            }
+
             @Override
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData,
                 String username) {
+                //this only gets groups that's relevant in the db, otherwise can just use the ldap config to find all groups
                 Optional<User> user = userRepository.findByUsername(username);
                 if (!user.isPresent()) {
                     User newUser = new User();
@@ -114,19 +139,12 @@ class LdapSecurityConfig extends SecurityConfig {
                     newUser.setEnabled(true);
                     userRepository.save(newUser);
                 }
-
-                String[] groupDns = new String[]{groupSearchBase};
-
-                String roles = Stream.of(groupDns).map(groupDn -> {
-                    LdapName groupLdapName = (LdapName) ldapTemplate
-                        .retrieveEntry(groupDn, GROUP_ATTRIBUTE).getDn();
-                    // split DN in its different components et get only the last one (cn=my_group)
-                    // getValue() allows to only get get the value of the pair (cn=>my_group)
-                    return groupLdapName.getRdns().stream().map(Rdn::getValue).reduce((a, b) -> b)
-                        .orElse(null);
-                }).map(x -> (String) x).collect(Collectors.joining(","));
-
-                return AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
+                List<Group> groups = groupRepository.findAll();
+                List<String> groupNames = groups.stream().map(group -> "(" + groupRoleAttribute + "=" + group.getName() + ")").collect(Collectors.toList());
+                String userDn = userData.getDn().toString() + "," + providerBase;
+                String groupFilter = "(&(uniqueMember=" + userDn + ")(|" + String.join("", groupNames) + "))";
+                List<GrantedAuthority> gas = ldapTemplate.search("", groupFilter, SearchControls.SUBTREE_SCOPE, GROUP_ATTRIBUTE, mapper);
+                return gas;
             }
         }
 
