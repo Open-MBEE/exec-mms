@@ -24,4 +24,6 @@ public interface BranchGroupPermRepository extends JpaRepository<BranchGroupPerm
 
     void deleteByBranchAndGroup_NameInAndInheritedIsFalse(Branch b, Set<String> groups);
 
+    void deleteByBranchAndInherited(Branch b, boolean inherited);
+
 }

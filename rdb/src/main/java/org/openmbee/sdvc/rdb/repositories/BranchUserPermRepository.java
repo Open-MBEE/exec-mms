@@ -22,4 +22,6 @@ public interface BranchUserPermRepository extends JpaRepository<BranchUserPerm, 
     boolean existsByBranchAndUser_UsernameAndRoleIn(Branch b, String user, Set<Role> roles);
 
     void deleteByBranchAndUser_UsernameInAndInheritedIsFalse(Branch b, Set<String> users);
+
+    void deleteByBranchAndInherited(Branch b, boolean inherited);
 }

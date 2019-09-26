@@ -26,4 +26,6 @@ public interface OrgGroupPermRepository extends JpaRepository<OrgGroupPerm, Long
 
     void deleteByOrganizationAndGroup_NameIn(Organization org, Set<String> groups);
 
+    void deleteByOrganization(Organization org);
+
 }
