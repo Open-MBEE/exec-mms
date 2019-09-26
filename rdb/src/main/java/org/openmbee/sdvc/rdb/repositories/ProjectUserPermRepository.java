@@ -27,4 +27,6 @@ public interface ProjectUserPermRepository extends JpaRepository<ProjectUserPerm
     boolean existsByProjectAndUser_UsernameAndRoleIn(Project proj, String user, Set<Role> roles);
 
     void deleteByProjectAndUser_UsernameInAndInheritedIsFalse(Project proj, Set<String> users);
+
+    void deleteByProjectAndInherited(Project proj, boolean inherited);
 }

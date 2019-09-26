@@ -213,7 +213,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                orgUserPermRepo.deleteAll(orgUserPermRepo.findAllByOrganization(o));
+                orgUserPermRepo.deleteByOrganization(o);
                 for (Permission p: req.getPermissions()) {
                     Optional<User> user = userRepo.findByUsername(p.getName());
                     Optional<Role> role = roleRepo.findByName(p.getRole());
@@ -265,7 +265,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                orgGroupPermRepo.deleteAll(orgGroupPermRepo.findAllByOrganization(o));
+                orgGroupPermRepo.deleteByOrganization(o);
                 for (Permission p: req.getPermissions()) {
                     Pair<Group, Role> pair = getGroupAndRole(p);
                     if (pair.getFirst() == null || pair.getSecond() == null) {
@@ -317,7 +317,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                projectUserPermRepo.deleteAll(projectUserPermRepo.findAllByProjectAndInherited(proj, false));
+                projectUserPermRepo.deleteByProjectAndInherited(proj, false);
                 for (Permission p: req.getPermissions()) {
                     Optional<User> user = userRepo.findByUsername(p.getName());
                     Optional<Role> role = roleRepo.findByName(p.getRole());
@@ -369,7 +369,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                projectGroupPermRepo.deleteAll(projectGroupPermRepo.findAllByProjectAndInherited(proj, false));
+                projectGroupPermRepo.deleteByProjectAndInherited(proj, false);
                 for (Permission p: req.getPermissions()) {
                     Pair<Group, Role> pair = getGroupAndRole(p);
                     if (pair.getFirst() == null || pair.getSecond() == null) {
@@ -421,7 +421,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                branchUserPermRepo.deleteAll(branchUserPermRepo.findAllByBranchAndInherited(bran, false));
+                branchUserPermRepo.deleteByBranchAndInherited(bran, false);
                 for (Permission p: req.getPermissions()) {
                     Optional<User> user = userRepo.findByUsername(p.getName());
                     Optional<Role> role = roleRepo.findByName(p.getRole());
@@ -470,7 +470,7 @@ public class DefaultPermissionService implements PermissionService {
                 }
                 break;
             case REPLACE:
-                branchGroupPermRepo.deleteAll(branchGroupPermRepo.findAllByBranchAndInherited(branch, false));
+                branchGroupPermRepo.deleteByBranchAndInherited(branch, false);
                 for (Permission p: req.getPermissions()) {
                     Pair<Group, Role> pair = getGroupAndRole(p);
                     if (pair.getFirst() == null || pair.getSecond() == null) {
@@ -497,9 +497,11 @@ public class DefaultPermissionService implements PermissionService {
         }
 
         Project proj = project.get();
-        proj.setInherit(isInherit);
-        projectRepo.save(proj);
-        recalculateInheritedPerms(proj);
+        if (proj.isInherit() != isInherit) {
+            proj.setInherit(isInherit);
+            projectRepo.save(proj);
+            recalculateInheritedPerms(proj);
+        }
     }
 
     @Override
@@ -512,9 +514,11 @@ public class DefaultPermissionService implements PermissionService {
         }
 
         Branch bran = branch.get();
-        bran.setInherit(isInherit);
-        branchRepo.save(bran);
-        recalculateInheritedPerms(bran);
+        if (bran.isInherit() != isInherit) {
+            bran.setInherit(isInherit);
+            branchRepo.save(bran);
+            recalculateInheritedPerms(bran);
+        }
     }
 
     @Override
@@ -561,7 +565,7 @@ public class DefaultPermissionService implements PermissionService {
         if (orgUserPermRepo.existsByOrganizationAndUser_UsernameAndRoleIn(organization.get(), user, roles)) {
             return true;
         }
-        if (orgGroupPermRepo.existsByOrganizationAndGroup_NameInAndRoleIn(organization.get(), groups, roles)) {
+        if (!groups.isEmpty() && orgGroupPermRepo.existsByOrganizationAndGroup_NameInAndRoleIn(organization.get(), groups, roles)) {
             return true;
         }
         return false;
@@ -583,7 +587,7 @@ public class DefaultPermissionService implements PermissionService {
             return true;
         }
 
-        if (projectGroupPermRepo.existsByProjectAndGroup_NameInAndRoleIn(project.get(), groups, roles)) {
+        if (!groups.isEmpty() && projectGroupPermRepo.existsByProjectAndGroup_NameInAndRoleIn(project.get(), groups, roles)) {
             return true;
         }
         return false;
@@ -605,7 +609,7 @@ public class DefaultPermissionService implements PermissionService {
         if (branchUserPermRepo.existsByBranchAndUser_UsernameAndRoleIn(branch.get(), user, roles)) {
             return true;
         }
-        if (branchGroupPermRepo.existsByBranchAndGroup_NameInAndRoleIn(branch.get(), groups, roles)) {
+        if (!groups.isEmpty() && branchGroupPermRepo.existsByBranchAndGroup_NameInAndRoleIn(branch.get(), groups, roles)) {
             return true;
         }
         return false;

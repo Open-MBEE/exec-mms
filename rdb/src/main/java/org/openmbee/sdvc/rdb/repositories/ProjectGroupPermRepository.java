@@ -28,4 +28,6 @@ public interface ProjectGroupPermRepository extends JpaRepository<ProjectGroupPe
 
     void deleteByProjectAndGroup_NameInAndInheritedIsFalse(Project proj, Set<String> groups);
 
+    void deleteByProjectAndInherited(Project proj, boolean inherited);
+
 }

@@ -26,4 +26,5 @@ public interface OrgUserPermRepository extends JpaRepository<OrgUserPerm, Long> 
 
     void deleteByOrganizationAndUser_UsernameIn(Organization org, Set<String> users);
 
+    void deleteByOrganization(Organization org);
 }
