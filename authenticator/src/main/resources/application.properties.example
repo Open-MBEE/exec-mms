@@ -3,4 +3,3 @@ sdvc.admin.password=
 
 jwt.secret=abc123
 jwt.expiration=86400
-jwt.header=Authorization
