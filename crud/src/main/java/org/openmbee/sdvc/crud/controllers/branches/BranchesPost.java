@@ -1,13 +1,16 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.BranchesRequest;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.services.NodeIndexDAO;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.config.Constants;
@@ -16,10 +19,12 @@ import org.openmbee.sdvc.crud.services.CommitService;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
 import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.openmbee.sdvc.json.RefJson;
+import org.openmbee.sdvc.rdb.repositories.node.NodeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,13 +47,19 @@ public class BranchesPost extends BaseController {
 
     private CommitService commitService;
 
+    private NodeDAO nodeRepository;
+
+    private NodeIndexDAO nodeIndex;
+
     @Autowired
     public BranchesPost(BranchDAO branchRepository, DatabaseDefinitionService branchesOperations,
-        CommitDAO commitRepository, CommitService commitService) {
+        CommitDAO commitRepository, CommitService commitService, NodeDAO nodeRepository, NodeIndexDAO nodeIndex) {
         this.branchRepository = branchRepository;
         this.branchesOperations = branchesOperations;
         this.commitRepository = commitRepository;
         this.commitService = commitService;
+        this.nodeRepository = nodeRepository;
+        this.nodeIndex = nodeIndex;
     }
 
     @PostMapping
@@ -108,9 +119,14 @@ public class BranchesPost extends BaseController {
                     branchesOperations.copyTablesFromParent(saved.getBranchId(),
                         b.getParentRefId(), branch.getParentCommitId());
                 }
-                //TODO update docs with new ref
                 response.getBranches().add(branch);
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
+                ContextHolder.setContext(projectId, saved.getBranchId());
+                Set<String> docIds = new HashSet<>();
+                for (Node n: nodeRepository.findAllByDeleted(false)) {
+                    docIds.add(n.getDocId());
+                }
+                nodeIndex.addToRef(docIds);
             } catch (Exception e) {
                 branchRepository.delete(saved);
                 logger.error("Couldn't create branch: {}", branch.getId());

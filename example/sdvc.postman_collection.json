@@ -901,11 +901,28 @@
 				},
 				{
 					"name": "check inRefIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "30e3d0dd-f29f-4885-a9b3-3f1c423bfc20",
+								"exec": [
+									"pm.test(\"elements in new ref have right _inRefIds\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    jsonData.elements.forEach(function(e) {",
+									"        pm.expect(e._inRefIds).to.include('refa');",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/projects/aa/refs/master/elements",
+							"raw": "{{host}}/projects/aa/refs/refa/elements",
 							"host": [
 								"{{host}}"
 							],
@@ -913,7 +930,7 @@
 								"projects",
 								"aa",
 								"refs",
-								"master",
+								"refa",
 								"elements"
 							]
 						}
