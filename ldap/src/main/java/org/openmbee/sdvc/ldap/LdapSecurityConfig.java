@@ -8,7 +8,7 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.authenticator.config.SecurityConfig;
+import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource("classpath:application.properties")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
-class LdapSecurityConfig extends SecurityConfig {
+public abstract class LdapSecurityConfig extends AuthSecurityConfig {
 
-    private static Logger logger = LogManager.getLogger(SecurityConfig.class);
+    private static Logger logger = LogManager.getLogger(AuthSecurityConfig.class);
 
     @Value("${ldap.provider.url}")
     private String providerUrl;

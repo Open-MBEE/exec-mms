@@ -22,7 +22,7 @@ public class Branch {
     private String branchName;
 
     private String parentRefId;
-    private Long parentCommit;
+    private Long parentCommit = 0L;
 
     private Instant timestamp;
 

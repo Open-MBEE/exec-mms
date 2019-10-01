@@ -1,16 +1,5 @@
 package org.openmbee.sdvc.authenticator.config;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpHeaders.ORIGIN;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.OPTIONS;
-import static org.springframework.http.HttpMethod.PATCH;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationEntryPoint;
@@ -33,28 +22,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration
 @PropertySource("classpath:application.properties")
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
-public abstract class SecurityConfig extends WebSecurityConfigurerAdapter implements
-    WebMvcConfigurer {
+public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
-    private static final String[] AUTH_WHITELIST = {
-        // -- swagger ui
-        "/swagger-resources/**", "/swagger-ui.html", "/v2/api-docs/**", "/webjars/**"};
-    private static Logger logger = LogManager.getLogger(SecurityConfig.class);
+    private static Logger logger = LogManager.getLogger(AuthSecurityConfig.class);
     @Autowired
     public UserDetailsServiceImpl userDetailsService;
     @Value("${sdvc.admin.username}")
@@ -64,34 +43,21 @@ public abstract class SecurityConfig extends WebSecurityConfigurerAdapter implem
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().exceptionHandling()
+        http.exceptionHandling()
             .authenticationEntryPoint(new JwtAuthenticationEntryPoint()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers(HttpMethod.POST,"/authentication/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/**").permitAll()
-                .antMatchers(HttpMethod.PUT, "/**").permitAll()
-                .antMatchers(AUTH_WHITELIST).permitAll()
-                .anyRequest().authenticated();
+            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .antMatchers(HttpMethod.POST,"/authentication/**").permitAll()
+            .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationTokenFilter(),
             UsernamePasswordAuthenticationFilter.class);
-        http.headers().cacheControl();
-
-        http.addFilterAfter(corsFilter(), ExceptionTranslationFilter.class);
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public RequestMappingHandlerMapping useTrailingSlash() {
-        RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
-        requestMappingHandlerMapping.setUseTrailingSlashMatch(true);
-        return requestMappingHandlerMapping;
     }
 
     @Bean
@@ -105,38 +71,6 @@ public abstract class SecurityConfig extends WebSecurityConfigurerAdapter implem
         JwtAuthenticationTokenFilter authenticationTokenFilter = new JwtAuthenticationTokenFilter();
         authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
         return authenticationTokenFilter;
-    }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE");
-    }
-
-    private CorsFilter corsFilter() {
-        /*
-         CORS requests are managed only if headers Origin and Access-Control-Request-Method are available on OPTIONS requests
-         (this filter is simply ignored in other cases).
-         This filter can be used as a replacement for the @Cors annotation.
-        */
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader(ORIGIN);
-        config.addAllowedHeader(CONTENT_TYPE);
-        config.addAllowedHeader(ACCEPT);
-        config.addAllowedHeader(AUTHORIZATION);
-        config.addAllowedMethod(GET);
-        config.addAllowedMethod(PUT);
-        config.addAllowedMethod(POST);
-        config.addAllowedMethod(OPTIONS);
-        config.addAllowedMethod(DELETE);
-        config.addAllowedMethod(PATCH);
-        config.setMaxAge(3600L);
-
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
     }
 
     @Autowired

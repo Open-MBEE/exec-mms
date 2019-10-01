@@ -106,7 +106,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
             for (MultiGetItemResponse res : response.getResponses()) {
                 GetResponse item = res.getResponse();
-                if (item.isExists()) {
+                if (item != null && item.isExists()) {
                     E ob = newInstance();
                     ob.putAll(item.getSourceAsMap());
                     listOfResponses.add(ob);
