@@ -2106,16 +2106,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{readerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2156,16 +2151,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{readerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2216,16 +2206,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{readerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2271,16 +2256,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{readerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2372,16 +2352,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{writerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2425,16 +2400,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{writerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2486,16 +2456,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{writerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2582,16 +2547,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{writerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2645,16 +2605,11 @@
 					],
 					"request": {
 						"auth": {
-							"type": "apikey",
-							"apikey": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "value",
+									"key": "token",
 									"value": "{{readerToken}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
 									"type": "string"
 								}
 							]
@@ -2901,16 +2856,11 @@
 		}
 	],
 	"auth": {
-		"type": "apikey",
-		"apikey": [
+		"type": "bearer",
+		"bearer": [
 			{
-				"key": "value",
+				"key": "token",
 				"value": "{{token}}",
-				"type": "string"
-			},
-			{
-				"key": "key",
-				"value": "Authorization",
 				"type": "string"
 			}
 		]
@@ -2936,5 +2886,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
