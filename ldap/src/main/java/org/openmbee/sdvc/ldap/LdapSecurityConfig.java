@@ -1,14 +1,11 @@
 package org.openmbee.sdvc.ldap;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
+import org.openmbee.sdvc.data.domains.global.Group;
+import org.openmbee.sdvc.rdb.repositories.GroupRepository;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +16,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.filter.*;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -67,10 +65,16 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
     private String groupSearchFilter;
 
     private UserRepository userRepository;
+    private GroupRepository groupRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setGroupRepository(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
     }
 
     @Autowired
@@ -95,7 +99,7 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
-            private final String[] GROUP_ATTRIBUTE = {"cn", "uniqueMember"};
+            private final String[] GROUP_ATTRIBUTE = {groupRoleAttribute};
             SpringSecurityLdapTemplate ldapTemplate;
 
             private CustomLdapAuthoritiesPopulator(ContextSource contextSource) {
@@ -104,8 +108,7 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
 
             @Override
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
-                DirContextOperations userData,
-                String username) {
+                DirContextOperations userData, String username) {
                 Optional<User> user = userRepository.findByUsername(username);
                 if (!user.isPresent()) {
                     User newUser = new User();
@@ -115,18 +118,23 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
                     userRepository.save(newUser);
                 }
 
-                String[] groupDns = new String[]{groupSearchBase};
+                String userDn = "uid=" + username + "," + providerBase;
 
-                String roles = Stream.of(groupDns).map(groupDn -> {
-                    LdapName groupLdapName = (LdapName) ldapTemplate
-                        .retrieveEntry(groupDn, GROUP_ATTRIBUTE).getDn();
-                    // split DN in its different components et get only the last one (cn=my_group)
-                    // getValue() allows to only get get the value of the pair (cn=>my_group)
-                    return groupLdapName.getRdns().stream().map(Rdn::getValue).reduce((a, b) -> b)
-                        .orElse(null);
-                }).map(x -> (String) x).collect(Collectors.joining(","));
+                List<Group> definedGroups = groupRepository.findAll();
+                OrFilter orFilter = new OrFilter();
 
-                return AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
+                for (int i = 0; i < definedGroups.size(); i++) {
+                    orFilter.or(new EqualsFilter("cn", definedGroups.get(i).getName()));
+                }
+
+                AndFilter andFilter = new AndFilter();
+                HardcodedFilter groupsFilter = new HardcodedFilter(groupSearchFilter.replace("{0}", userDn));
+                andFilter.and(groupsFilter);
+                andFilter.and(orFilter);
+
+                Set<String> memberGroups = ldapTemplate.searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""}, groupRoleAttribute);
+
+                return AuthorityUtils.commaSeparatedStringToAuthorityList(String.join(",", memberGroups));
             }
         }
 
