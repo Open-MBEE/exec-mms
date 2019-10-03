@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
@@ -21,10 +22,14 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
 
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -109,16 +114,20 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
             @Override
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
-                Optional<User> user = userRepository.findByUsername(username);
-                if (!user.isPresent()) {
+                Optional<User> userOptional = userRepository.findByUsername(username);
+                if (!userOptional.isPresent()) {
                     User newUser = new User();
                     newUser.setEmail(userData.getStringAttribute(userAttributesEmail));
                     newUser.setUsername(userData.getStringAttribute(userAttributesUsername));
                     newUser.setEnabled(true);
                     userRepository.save(newUser);
+
+                    userOptional = Optional.of(newUser);
                 }
 
-                String userDn = "uid=" + username + "," + providerBase;
+                User user = userOptional.get();
+
+                String userDn = "uid=" + user.getUsername() + "," + providerBase;
 
                 List<Group> definedGroups = groupRepository.findAll();
                 OrFilter orFilter = new OrFilter();
@@ -134,7 +143,8 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
 
                 Set<String> memberGroups = ldapTemplate.searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""}, groupRoleAttribute);
 
-                return AuthorityUtils.commaSeparatedStringToAuthorityList(String.join(",", memberGroups));
+                
+                return AuthorityUtils.createAuthorityList(memberGroups.toArray(new String[0]));
             }
         }
 
