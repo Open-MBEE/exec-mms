@@ -22,7 +22,6 @@ public class JwtTokenGenerator implements Serializable {
     private static final String CLAIM_KEY_USERID = "id";
     private static final String CLAIM_KEY_CREATED = "created";
     private static final String CLAIM_KEY_ENABLED = "enabled";
-    private static final String CLAIM_KEY_AUTHORITIES = "authorities";
     static Logger logger = LogManager.getLogger(JwtTokenGenerator.class);
     @Value("${jwt.secret}")
     private String secret;
@@ -100,7 +99,6 @@ public class JwtTokenGenerator implements Serializable {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_USERID, userDetails.getUser().getId());
-        claims.put(CLAIM_KEY_AUTHORITIES, userDetails.getAuthorities());
         claims.put(CLAIM_KEY_ENABLED, userDetails.isEnabled());
         claims.put(CLAIM_KEY_CREATED, new Date());
         return generateToken(claims);
