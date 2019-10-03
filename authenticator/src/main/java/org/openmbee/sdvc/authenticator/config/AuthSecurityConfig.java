@@ -49,7 +49,7 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
             .authorizeRequests()
             .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .antMatchers(HttpMethod.POST,"/authentication/**").permitAll()
-            .anyRequest().authenticated();
+            .anyRequest().authenticated().and().httpBasic();
 
         http.addFilterBefore(jwtAuthenticationTokenFilter(),
             UsernamePasswordAuthenticationFilter.class);
