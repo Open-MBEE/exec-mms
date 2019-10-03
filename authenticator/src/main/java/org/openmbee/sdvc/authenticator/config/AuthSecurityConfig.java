@@ -45,11 +45,7 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
     protected void configure(HttpSecurity http) throws Exception {
         http.exceptionHandling()
             .authenticationEntryPoint(new JwtAuthenticationEntryPoint()).and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-            .authorizeRequests()
-            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .antMatchers(HttpMethod.POST,"/authentication/**").permitAll()
-            .anyRequest().authenticated().and().httpBasic();
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(jwtAuthenticationTokenFilter(),
             UsernamePasswordAuthenticationFilter.class);
