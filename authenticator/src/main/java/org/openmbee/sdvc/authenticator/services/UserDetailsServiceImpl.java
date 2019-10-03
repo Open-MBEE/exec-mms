@@ -5,9 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
+import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
-import org.openmbee.sdvc.data.domains.global.Privilege;
-import org.openmbee.sdvc.data.domains.global.Role;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,21 +44,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new UserDetailsImpl(user.get());
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(
-        Collection<Role> roles) {
-
-        return getGrantedAuthorities(getPrivileges(roles));
+    private Collection<? extends GrantedAuthority> getAuthorities(Collection<Group> groups) {
+        return getGrantedAuthorities(getPrivileges(groups));
     }
 
-    private List<String> getPrivileges(Collection<Role> roles) {
-
+    private List<String> getPrivileges(Collection<Group> groups) {
         List<String> privileges = new ArrayList<>();
-        List<Privilege> collection = new ArrayList<>();
-        for (Role role : roles) {
-            collection.addAll(role.getPrivileges());
-        }
-        for (Privilege item : collection) {
-            privileges.add(item.getName());
+        for (Group group : groups) {
+            privileges.add(group.getName());
         }
         return privileges;
     }

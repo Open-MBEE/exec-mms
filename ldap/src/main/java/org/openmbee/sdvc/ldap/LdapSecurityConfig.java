@@ -90,7 +90,7 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
             We need to delegate the creation of the contextSource out of the builder-configuration.
         */
         auth.ldapAuthentication().userDnPatterns(userDnPattern).groupSearchBase(groupSearchBase)
-            .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
+            .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter).rolePrefix("")
             .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator())
             .contextSource(contextSource());
     }
@@ -104,7 +104,6 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
-            private final String[] GROUP_ATTRIBUTE = {groupRoleAttribute};
             SpringSecurityLdapTemplate ldapTemplate;
 
             private CustomLdapAuthoritiesPopulator(ContextSource contextSource) {
@@ -143,6 +142,13 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
 
                 Set<String> memberGroups = ldapTemplate.searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""}, groupRoleAttribute);
 
+                Set<Group> addGroups = new HashSet<>();
+                for (String memberGroup : memberGroups) {
+                    Optional<Group> group = groupRepository.findByName(memberGroup);
+                    group.ifPresent(addGroups::add);
+                }
+                user.setGroups(addGroups);
+                userRepository.save(user);
                 
                 return AuthorityUtils.createAuthorityList(memberGroups.toArray(new String[0]));
             }
