@@ -3,13 +3,8 @@ package org.openmbee.sdvc.data.domains.global;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -37,7 +32,7 @@ public class User extends Base {
     @OneToMany(mappedBy = "user")
     private Collection<BranchUserPerm> branchPerms;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
     private Collection<Group> groups;
 

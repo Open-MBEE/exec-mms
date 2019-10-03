@@ -2849,6 +2849,258 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "give ldap group to org a with writer role as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "032dc39f-2291-4a2b-9adb-78928a617403",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"groups\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"{{ldapGroup}}\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/orgs/a/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs",
+								"a",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login as ldap user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f99a1f7c-6557-418a-8c0d-61a81be9f1aa",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"response has token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"    pm.environment.set(\"ldapToken\", jsonData.token);",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"{{ldapUser}}\",\n\t\"password\": \"{{ldapPass}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/authentication",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"authentication"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "can post elements to writer branch as ldap user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+								"exec": [
+									"",
+									"pm.test(\"element created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements[0].id).to.eql('ldapUserElement');",
+									"});   ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ldapToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"ldapUserElement\",\n\t\t\t\"name\": \"ldapUserUpdated\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs/writer/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs",
+								"writer",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on project aa as ldap user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"project has 1 group perm\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.groups.permissions.length).to.eql(1);",
+									"    pm.expect(jsonData.public).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ldapToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/aa/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check perms on project bb as ldap user using basic auth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"project has 1 group perm\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.inherit).to.eql(true);",
+									"    pm.expect(jsonData.groups.permissions.length).to.eql(1);",
+									"    pm.expect(jsonData.public).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{ldapPass}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{ldapUser}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/bb/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"bb",
+								"permissions"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "test permission handling",

@@ -64,3 +64,6 @@ INSERT INTO roles_privileges (role_id, privilege_id) VALUES
   (1, 13),
   (1, 15),
   (1, 19);
+
+INSERT INTO groups (id, created, modified, name) VALUES
+  (0, NOW(), NOW(), 'everyone');

@@ -38,10 +38,10 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
             String authToken = httpRequest.getHeader(AUTHORIZATION).substring(BEARER.length());
 
             if (!authToken.isEmpty()) {
-                String email = jwtTokenGenerator.getUsernameFromToken(authToken);
+                String username = jwtTokenGenerator.getUsernameFromToken(authToken);
 
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetailsImpl userDetails = this.userDetailsService.loadUserByUsername(email);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetailsImpl userDetails = this.userDetailsService.loadUserByUsername(username);
                     if (jwtTokenGenerator.validateToken(authToken, userDetails)) {
                         UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(userDetails, null,

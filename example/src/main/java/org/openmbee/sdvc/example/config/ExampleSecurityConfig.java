@@ -38,12 +38,8 @@ public class ExampleSecurityConfig extends LdapSecurityConfig {
         super.configure(http);
         http.csrf().disable()
             .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/**").permitAll()
-                .antMatchers(HttpMethod.PUT, "/**").permitAll()
-                .antMatchers(AUTH_WHITELIST).permitAll()
-                .anyRequest().authenticated();
-
+            .anyRequest().permitAll().and()
+            .httpBasic();
         http.headers().cacheControl();
 
         http.addFilterAfter(corsFilter(), ExceptionTranslationFilter.class);
