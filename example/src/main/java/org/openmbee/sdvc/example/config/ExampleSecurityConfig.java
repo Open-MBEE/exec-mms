@@ -27,21 +27,13 @@ import static org.springframework.http.HttpMethod.*;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
 public class ExampleSecurityConfig extends LdapSecurityConfig {
-
-    private static final String[] AUTH_WHITELIST = {
-        // -- swagger ui
-        "/swagger-resources/**", "/swagger-ui.html", "/v2/api-docs/**", "/webjars/**"};
     private static Logger logger = LogManager.getLogger(ExampleSecurityConfig.class);
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.csrf().disable()
-            .authorizeRequests()
-            .anyRequest().permitAll().and()
-            .httpBasic();
+        http.csrf().disable().authorizeRequests().anyRequest().permitAll().and().httpBasic();
         http.headers().cacheControl();
-
         http.addFilterAfter(corsFilter(), ExceptionTranslationFilter.class);
     }
 

@@ -47,8 +47,7 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
             .authenticationEntryPoint(new JwtAuthenticationEntryPoint()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.addFilterBefore(jwtAuthenticationTokenFilter(),
-            UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
@@ -64,9 +63,7 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
 
     @Bean
     public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() throws Exception {
-        JwtAuthenticationTokenFilter authenticationTokenFilter = new JwtAuthenticationTokenFilter();
-        authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
-        return authenticationTokenFilter;
+        return new JwtAuthenticationTokenFilter();
     }
 
     @Autowired
