@@ -26,7 +26,6 @@ import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-
 @Configuration
 @PropertySource("classpath:application.properties")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
