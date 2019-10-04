@@ -18,6 +18,8 @@ public class Branch {
     Long id;
 
     private String description;
+
+    @Column(unique = true)
     private String branchId;
     private String branchName;
 

@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
+import org.openmbee.sdvc.crud.exceptions.DeletedException;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -56,6 +58,9 @@ public class ProjectsController extends BaseController {
             ProjectJson projectJson = new ProjectJson();
             projectJson.merge(convertToMap(projectOption.get()));
             response.getProjects().add(projectJson);
+            if (projectOption.get().isDeleted()) {
+                throw new DeletedException(response);
+            }
         } else {
             List<Project> allProjects = projectRepository.findAll();
             for (Project proj : allProjects) {
@@ -133,11 +138,30 @@ public class ProjectsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{projectId}")
+    @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_DELETE', false)")
     public ResponseEntity<? extends BaseResponse> handleDelete(
-        @PathVariable String projectId) {
+        @PathVariable String projectId,
+        @RequestParam(required = false, defaultValue = "false") boolean hard) {
 
-        return ResponseEntity.ok(new ProjectsResponse()); //TODO
+        ProjectsResponse response = new ProjectsResponse();
+        Optional<Project> projectOption = projectRepository.findByProjectId(projectId);
+        if (!projectOption.isPresent()) {
+            throw new NotFoundException(response.addMessage("Project not found"));
+        }
+        Project project = projectOption.get();
+        project.setDeleted(true);
+        ProjectJson projectJson = new ProjectJson();
+        projectJson.merge(convertToMap(project));
+        List<ProjectJson> res = new ArrayList<>();
+        res.add(projectJson);
+        if (hard) {
+            projectRepository.delete(project);
+            //TODO delete DB
+        } else {
+            projectRepository.save(project);
+        }
+        return ResponseEntity.ok(response.setProjects(res));
     }
 
     private ProjectService getProjectService(ProjectJson json) {

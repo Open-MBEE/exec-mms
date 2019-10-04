@@ -15,55 +15,32 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
-/*
-    private CommitDAO commitRepository;
 
-    @Autowired
-    public void setCommitRepository(CommitDAO commitRepository) {
-        this.commitRepository = commitRepository;
-    }
-*/
+    private final String INSERT_SQL = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String UPDATE_SQL = "UPDATE branches SET description = ?, branchId = ?, branchName = ?, parentRefId = ?, parentCommit = ?, timestamp = ?, tag = ?, deleted = ? WHERE id = ?";
     public Branch save(Branch branch) {
-        String sql = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-/*
-        if (branch.getParentRefId() != null && branch.getParentRef() == null) {
-            Branch parentRef = findByBranchId(branch.getParentRefId());
-            branch.setParentRef(parentRef);
-        } else if (branch.getParentRef() == null) {
-            Branch masterRef = findByBranchId("master");
-            branch.setParentRef(masterRef);
-        }
 
-        if (branch.getParentCommitId() != null && branch.getParentCommit() == null) {
-            Commit parentCommit = commitRepository.findByCommitId(branch.getParentCommitId());
-            branch.setParentCommit(parentCommit);
-        } else if (branch.getParentCommit() == null) {
-            Commit latest = commitRepository.findLatest();
-            branch.setParentCommit(latest);
-        }
-*/
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+        if (branch.getId() == null) {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        getConn().update(new PreparedStatementCreator() {
-            public PreparedStatement createPreparedStatement(Connection connection)
-                throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-                ps.setString(1, branch.getDescription());
-                ps.setString(2, branch.getBranchId());
-                ps.setString(3, branch.getBranchName());
-                ps.setString(4, branch.getParentRefId());
-                ps.setLong(5, branch.getParentCommit());
-                ps.setTimestamp(6, Timestamp.from(branch.getTimestamp()));
-                ps.setBoolean(7, branch.isTag());
-                ps.setBoolean(8, branch.isDeleted());
-                return ps;
-            }
-        }, keyHolder);
+            getConn().update(new PreparedStatementCreator() {
+                public PreparedStatement createPreparedStatement(Connection connection)
+                    throws SQLException {
+                    PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[]{"id"});
+                    return prepareStatement(ps, branch);
+                }
+            }, keyHolder);
 
-        if (keyHolder.getKeyList().isEmpty()) {
-            return null;
+            branch.setId(keyHolder.getKey().longValue());
+        } else {
+            getConn().update(new PreparedStatementCreator() {
+                public PreparedStatement createPreparedStatement(Connection connection)
+                    throws SQLException {
+                    PreparedStatement ps = connection.prepareStatement(UPDATE_SQL);
+                    return prepareStatement(ps, branch);
+                }
+            });
         }
-        branch.setId(keyHolder.getKey().longValue());
         return branch;
     }
 
@@ -93,5 +70,20 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         String sql = "UPDATE branches SET deleted = true WHERE branchId = ?";
 
         getConn().update(sql, branch.getBranchId());
+    }
+
+    private PreparedStatement prepareStatement(PreparedStatement ps, Branch branch) throws SQLException {
+        ps.setString(1, branch.getDescription());
+        ps.setString(2, branch.getBranchId());
+        ps.setString(3, branch.getBranchName());
+        ps.setString(4, branch.getParentRefId());
+        ps.setLong(5, branch.getParentCommit());
+        ps.setTimestamp(6, Timestamp.from(branch.getTimestamp()));
+        ps.setBoolean(7, branch.isTag());
+        ps.setBoolean(8, branch.isDeleted());
+        if (branch.getId() != null) {
+            ps.setLong(9, branch.getId());
+        }
+        return ps;
     }
 }

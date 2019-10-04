@@ -10,6 +10,9 @@ import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.core.services.BranchService;
 import org.openmbee.sdvc.core.services.NodeIndexDAO;
+import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.crud.exceptions.DeletedException;
+import org.openmbee.sdvc.crud.exceptions.NotFoundException;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
@@ -88,11 +91,16 @@ public class DefaultBranchService implements BranchService {
         ContextHolder.setContext(projectId);
         BranchesResponse branchesResponse = new BranchesResponse();
         Optional<Branch> branches = this.branchRepository.findByBranchId(id);
+        if (!branches.isPresent()) {
+            throw new NotFoundException(branchesResponse);
+        }
+        Branch b = branches.get();
         List<RefJson> refs = new ArrayList<>();
-        branches.ifPresent(branch -> {
-            refs.add(convertToJson(branch));
-        });
+        refs.add(convertToJson(b));
         branchesResponse.setBranches(refs);
+        if (b.isDeleted()) {
+            throw new DeletedException(branchesResponse);
+        }
         return branchesResponse;
     }
 
@@ -154,6 +162,25 @@ public class DefaultBranchService implements BranchService {
         return branch;
     }
 
+    public BranchesResponse deleteBranch(String projectId, String id) {
+        ContextHolder.setContext(projectId);
+        BranchesResponse branchesResponse = new BranchesResponse();
+        if ("master".equals(id)) {
+            throw new BadRequestException(branchesResponse.addMessage("Cannot delete master"));
+        }
+        Optional<Branch> branch = this.branchRepository.findByBranchId(id);
+        if (!branch.isPresent()) {
+            throw new NotFoundException(branchesResponse);
+        }
+        Branch b = branch.get();
+        b.setDeleted(true);
+        branchRepository.save(b);
+        List<RefJson> refs = new ArrayList<>();
+        refs.add(convertToJson(b));
+        branchesResponse.setBranches(refs);
+        return branchesResponse;
+    }
+
     private RefJson convertToJson(Branch branch) {
         RefJson refJson = new RefJson();
         if (branch != null) {
@@ -163,7 +190,8 @@ public class DefaultBranchService implements BranchService {
             }
             refJson.setId(branch.getBranchId());
             refJson.setName(branch.getBranchName());
-            refJson.setType(branch.isTag() ? "tag" : "branch");
+            refJson.setType(branch.isTag() ? "Tag" : "Branch");
+            refJson.setDeleted(branch.isDeleted());
         }
         return refJson;
     }

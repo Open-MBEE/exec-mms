@@ -127,6 +127,7 @@ public class OrgsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{orgId}")
+    @Transactional
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_DELETE', false)")
     public ResponseEntity<? extends BaseResponse> handleDelete(
         @PathVariable String orgId) {
@@ -136,7 +137,11 @@ public class OrgsController extends BaseController {
         if (!orgOption.isPresent()) {
             throw new NotFoundException(response.addMessage("Organization not found."));
         }
-
-        return ResponseEntity.ok(new OrganizationsResponse()); //TODO
+        Organization org = orgOption.get();
+        if (!org.getProjects().isEmpty()) {
+            throw new BadRequestException(response.addMessage("Organization is not empty"));
+        }
+        organizationRepository.delete(org);
+        return ResponseEntity.ok(response);
     }
 }
