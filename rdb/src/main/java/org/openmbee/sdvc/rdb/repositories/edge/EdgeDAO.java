@@ -3,7 +3,7 @@ package org.openmbee.sdvc.rdb.repositories.edge;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.openmbee.sdvc.data.domains.Edge;
+import org.openmbee.sdvc.data.domains.scoped.Edge;
 
 public interface EdgeDAO {
 

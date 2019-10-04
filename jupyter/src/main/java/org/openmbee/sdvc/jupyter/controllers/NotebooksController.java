@@ -5,6 +5,8 @@ import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -21,6 +23,7 @@ public class NotebooksController extends BaseController {
     }
 
     @GetMapping(value = {"", "/{notebookId}"})
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ResponseEntity<?> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -38,6 +41,7 @@ public class NotebooksController extends BaseController {
     }
 
     @PutMapping
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ResponseEntity<?> handlePut(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -52,12 +56,14 @@ public class NotebooksController extends BaseController {
     }
 
     @PostMapping
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ResponseEntity<?> handlePost(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
 
-        return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params));
+        return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params, auth.getName()));
     }
 }

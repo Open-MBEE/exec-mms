@@ -2,9 +2,9 @@ package org.openmbee.sdvc.authenticator.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.openmbee.sdvc.data.domains.Privilege;
-import org.openmbee.sdvc.data.domains.Role;
-import org.openmbee.sdvc.data.domains.User;
+
+import org.openmbee.sdvc.data.domains.global.Group;
+import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,18 +19,13 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<Role> roles = user.getRoles();
-        Collection<Privilege> privileges = new ArrayList<>();
+        Collection<Group> groups = user.getGroups();
         Collection<GrantedAuthority> authorities = new ArrayList<>();
 
-        if (roles != null) {
-            for (Role role : roles) {
-                privileges.addAll(role.getPrivileges());
+        if (groups != null) {
+            for (Group group : groups) {
+                authorities.add(new SimpleGrantedAuthority(group.getName()));
             }
-        }
-
-        for (Privilege privilege : privileges) {
-            authorities.add(new SimpleGrantedAuthority(privilege.getName()));
         }
 
         return authorities;

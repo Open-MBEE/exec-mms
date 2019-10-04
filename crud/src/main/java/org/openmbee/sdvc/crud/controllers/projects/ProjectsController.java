@@ -1,12 +1,16 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 
+import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
-import org.openmbee.sdvc.data.domains.Project;
+import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
@@ -16,6 +20,8 @@ import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,28 +42,28 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping(value = {"", "/{projectId}"})
-    @Transactional
+    @PreAuthorize("#projectId == null || @mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public ResponseEntity<? extends BaseResponse> handleGet(
-        @PathVariable(required = false) String projectId) {
-        ProjectsResponse response = new ProjectsResponse();
+        @PathVariable(required = false) String projectId,
+        Authentication auth) {
 
+        ProjectsResponse response = new ProjectsResponse();
         if (projectId != null) {
-            logger.debug("ProjectId given: ", projectId);
             Optional<Project> projectOption = projectRepository.findByProjectId(projectId);
             if (!projectOption.isPresent()) {
-                response.addMessage("Project not found");
-                throw new NotFoundException(response);
+                throw new NotFoundException(response.addMessage("Project not found"));
             }
             ProjectJson projectJson = new ProjectJson();
             projectJson.merge(convertToMap(projectOption.get()));
             response.getProjects().add(projectJson);
         } else {
-            logger.debug("No ProjectId given");
-            List<Project> allOrgs = projectRepository.findAll();
-            for (Project org : allOrgs) {
-                ProjectJson projectJson = new ProjectJson();
-                projectJson.merge(convertToMap(org));
-                response.getProjects().add(projectJson);
+            List<Project> allProjects = projectRepository.findAll();
+            for (Project proj : allProjects) {
+                if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
+                    ProjectJson projectJson = new ProjectJson();
+                    projectJson.merge(convertToMap(proj));
+                    response.getProjects().add(projectJson);
+                }
             }
         }
         return ResponseEntity.ok(response);
@@ -65,31 +71,72 @@ public class ProjectsController extends BaseController {
 
     @PostMapping
     @Transactional
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<? extends BaseResponse> handlePost(
-        @RequestBody ProjectsRequest projectsPost) {
+        @RequestBody ProjectsRequest projectsPost,
+        Authentication auth) {
 
         if (projectsPost.getProjects().isEmpty()) {
-            throw new BadRequestException(new ProjectsResponse().addMessage("No projects"));
+            throw new BadRequestException(new ProjectsResponse().addMessage("No projects provided"));
         }
 
         ProjectsResponse response = new ProjectsResponse();
+        List<Map> rejected = new ArrayList<>();
+        response.setRejected(rejected);
         for (ProjectJson json: projectsPost.getProjects()) {
             if (json.getProjectId().isEmpty()) {
-                response.addMessage("Project ID is missing");
+                Map<String, Object> rejection = new HashMap<>();
+                rejection.put("message", "Project id missing");
+                rejection.put("code", 400);
+                rejection.put("project", json);
+                rejected.add(rejection);
                 continue;
             }
             ProjectService ps = getProjectService(json);
             if (!ps.exists(json.getProjectId())) {
-                response.getProjects().add(ps.create(json));
+                try {
+                    if (!mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
+                        Map<String, Object> rejection = new HashMap<>();
+                        rejection.put("message", "No permission to create project under org");
+                        rejection.put("code", 403);
+                        rejection.put("project", json);
+                        rejected.add(rejection);
+                        continue;
+                    }
+                    response.getProjects().add(ps.create(json));
+                    permissionService.initProjectPerms(json.getProjectId(), true, auth.getName());
+                } catch (BadRequestException ex) {
+                    Map<String, Object> rejection = new HashMap<>();
+                    rejection.put("message", "Org to put project under is not found");
+                    rejection.put("code", 400);
+                    rejection.put("project", json);
+                    rejected.add(rejection);
+                    continue;
+                }
             } else {
+                if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_EDIT.name(), false)) {
+                    Map<String, Object> rejection = new HashMap<>();
+                    rejection.put("message", "No permission to change project");
+                    rejection.put("code", 403);
+                    rejection.put("project", json);
+                    rejected.add(rejection);
+                    continue;
+                }
+                //TODO need to check delete perm on proj and create perm in new org if moving org, and reset project perms if org changed
                 response.getProjects().add(ps.update(json));
             }
+        }
+        if (projectsPost.getProjects().size() == 1) {
+            handleSingleResponse(response);
         }
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping(value = "/{projectId}")
-    public ResponseEntity<? extends BaseResponse> handleDelete(@PathVariable String projectId) {
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_DELETE', false)")
+    public ResponseEntity<? extends BaseResponse> handleDelete(
+        @PathVariable String projectId) {
+
         return ResponseEntity.ok(new ProjectsResponse()); //TODO
     }
 

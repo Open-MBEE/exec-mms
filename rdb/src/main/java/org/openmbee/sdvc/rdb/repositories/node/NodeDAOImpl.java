@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.rdb.repositories.BaseDAOImpl;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;

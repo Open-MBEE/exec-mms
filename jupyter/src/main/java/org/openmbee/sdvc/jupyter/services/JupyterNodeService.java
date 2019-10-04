@@ -14,7 +14,7 @@ import org.openmbee.sdvc.crud.services.NodeOperation;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.core.services.NodeService;
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.jupyter.JupyterConstants;
 import org.openmbee.sdvc.jupyter.JupyterEdgeType;
 import org.openmbee.sdvc.jupyter.JupyterNodeType;
@@ -98,7 +98,7 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
     }
 
     public NotebooksResponse createOrUpdateNotebooks(String projectId, String refId, NotebooksRequest req,
-            Map<String, String> params) {
+            Map<String, String> params, String user) {
         List<ElementJson> postReqs = new ArrayList<>();
         List<ElementJson> resReqs = new ArrayList<>();
         for (ElementJson notebook: req.getNotebooks()) {
@@ -123,7 +123,7 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
         }
         ElementsRequest postReq = new ElementsRequest();
         postReq.setElements(postReqs);
-        this.createOrUpdate(projectId, refId, postReq, params);
+        this.createOrUpdate(projectId, refId, postReq, params, user);
 
         ElementsRequest resReq = new ElementsRequest();
         resReq.setElements(resReqs);

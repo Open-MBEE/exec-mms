@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
-import org.openmbee.sdvc.data.domains.Branch;
-import org.openmbee.sdvc.data.domains.Commit;
+import org.openmbee.sdvc.data.domains.scoped.Branch;
+import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.rdb.repositories.BaseDAOImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.PreparedStatementCreator;

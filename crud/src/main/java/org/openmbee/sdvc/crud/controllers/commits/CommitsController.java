@@ -9,6 +9,7 @@ import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.crud.services.CommitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,6 +30,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/commits")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -39,6 +41,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/commits/{commitId}")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleCommitGet(
         @PathVariable String projectId,
         @PathVariable String commitId) {
@@ -48,6 +51,7 @@ public class CommitsController extends BaseController {
     }
 
     @GetMapping(value = "/refs/{refId}/elements/{elementId}/commits")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleElementCommitsGet(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -59,6 +63,7 @@ public class CommitsController extends BaseController {
     }
 
     @PutMapping(value = "/commits")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public ResponseEntity<? extends BaseResponse> handleBulkGet(
         @PathVariable String projectId,
         @RequestBody CommitsRequest req) {

@@ -15,10 +15,10 @@ import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
-import org.openmbee.sdvc.data.domains.Commit;
-import org.openmbee.sdvc.data.domains.CommitType;
-import org.openmbee.sdvc.data.domains.Edge;
-import org.openmbee.sdvc.data.domains.Node;
+import org.openmbee.sdvc.data.domains.scoped.Commit;
+import org.openmbee.sdvc.data.domains.scoped.CommitType;
+import org.openmbee.sdvc.data.domains.scoped.Edge;
+import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
 import org.openmbee.sdvc.core.services.CommitIndexDAO;
 import org.openmbee.sdvc.rdb.repositories.edge.EdgeDAO;
@@ -130,14 +130,14 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
-        Map<String, String> params) {
+        Map<String, String> params, String user) {
 
         ContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
 
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,
-                createCommit("admin", refId, projectId, req), this);
+                createCommit(user, refId, projectId, req), this);
 
         commitChanges(info);
 
@@ -198,9 +198,9 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse delete(String projectId, String refId, String id) {
+    public ElementsResponse delete(String projectId, String refId, String id, String user) {
         ElementsRequest req = buildRequest(id);
-        return delete(projectId, refId, req);
+        return delete(projectId, refId, req, user);
     }
 
     protected ElementsRequest buildRequest(String id) {
@@ -214,11 +214,11 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse delete(String projectId, String refId, ElementsRequest req) {
+    public ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user) {
         ContextHolder.setContext(projectId, refId);
 
         NodeChangeInfo info = nodeDeleteHelper
-            .processDeleteJson(req.getElements(), createCommit("admin", refId, projectId, req),
+            .processDeleteJson(req.getElements(), createCommit(user, refId, projectId, req),
                 this);
         ElementsResponse response = new ElementsResponse();
 
