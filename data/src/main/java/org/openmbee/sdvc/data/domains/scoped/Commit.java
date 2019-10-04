@@ -22,6 +22,7 @@ public class Commit implements Serializable {
 
     private Instant timestamp;
 
+    @Column(unique = true)
     private String docId;
     private String branchId;
     private String creator;

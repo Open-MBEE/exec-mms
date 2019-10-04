@@ -10,4 +10,6 @@ public interface BranchService {
     BranchesResponse getBranch(String projectId, String id);
 
     RefJson createBranch(String projectId, RefJson branch);
+
+    BranchesResponse deleteBranch(String projectId, String id);
 }

@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.data.domains.global;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
@@ -23,15 +24,19 @@ public class User extends Base {
 
     private boolean enabled;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Collection<ProjectUserPerm> projectPerms;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Collection<OrgUserPerm> orgPerms;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Collection<BranchUserPerm> branchPerms;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
     private Collection<Group> groups;

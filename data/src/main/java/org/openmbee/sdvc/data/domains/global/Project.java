@@ -1,8 +1,10 @@
 package org.openmbee.sdvc.data.domains.global;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -29,21 +31,27 @@ public class Project extends Base {
     @JsonManagedReference
     private Organization organization;
 
-    @OneToMany(mappedBy = "project")
+    @JsonIgnore
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<Branch> branches;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<Metadata> metadata;
 
-    @OneToMany(mappedBy = "project")
+    @JsonIgnore
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<ProjectGroupPerm> groupPerms;
 
-    @OneToMany(mappedBy = "project")
+    @JsonIgnore
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<ProjectUserPerm> userPerms;
 
+    @JsonProperty("public")
     private boolean isPublic;
 
     private boolean inherit;
+
+    private boolean deleted;
 
     public Project() {
     }
@@ -143,6 +151,14 @@ public class Project extends Base {
 
     public void setPublic(boolean aPublic) {
         isPublic = aPublic;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @Override

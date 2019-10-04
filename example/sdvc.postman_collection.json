@@ -1668,6 +1668,486 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "add org b",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+								"exec": [
+									"pm.test(\"response has org a\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.orgs[0].id).to.eql('b');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"b\",\n\t\t\t\"name\": \"b\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/orgs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add project cc under org b",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has project cc\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('cc');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cc\", \n\t\t\t\"name\": \"cc\",\n\t\t\t\"orgId\": \"b\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create branch del under cc",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"branch created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.refs[0].id).to.eql('del');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"del\",\n\t\t\t\"name\": \"del\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc/refs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc",
+								"refs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete branch del",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"branch deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.refs[0].id).to.eql('del');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc/refs/del",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc",
+								"refs",
+								"del"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get deleted branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"  ",
+									"pm.test(\"Status code is 410\", function () {",
+									"    pm.response.to.have.status(410);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc/refs/del",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc",
+								"refs",
+								"del"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete branch master",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc/refs/master",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc",
+								"refs",
+								"master"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete project cc",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"project soft deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('cc');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get project cc",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"Status code is 410\", function () {",
+									"    pm.response.to.have.status(410);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete org b",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"Status code is 400, org not empty\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/orgs/b",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs",
+								"b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "hard delete project cc",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"project hard deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('cc');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc?hard=true",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc"
+							],
+							"query": [
+								{
+									"key": "hard",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete empty org b",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/orgs/b",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs",
+								"b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get org b",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/orgs/b",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs",
+								"b"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "test crud of org, project, branch, elements, check commits",
@@ -2669,7 +3149,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"isPublic\": true\n}"
+							"raw": "{\n\t\"public\": true\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects/aa/permissions",

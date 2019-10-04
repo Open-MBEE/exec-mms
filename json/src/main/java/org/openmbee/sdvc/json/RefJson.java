@@ -7,6 +7,7 @@ public class RefJson extends BaseJson<RefJson> {
     public static final String STATUS = "status";
     public static final String TYPE = "type";
     public static final String DESCRIPTION = "description";
+    public static final String DELETED = "deleted";
 
     public String getParentRefId() {
         return (String) this.get(PARENT_REF_ID);
@@ -50,6 +51,15 @@ public class RefJson extends BaseJson<RefJson> {
 
     public String getDescription() {
         return (String) this.getOrDefault(DESCRIPTION, "");
+    }
+
+    public RefJson setDeleted(boolean deleted) {
+        this.put(DELETED, deleted);
+        return this;
+    }
+
+    public boolean isDeleted() {
+        return (Boolean) this.getOrDefault(DELETED, false);
     }
 
 }

@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import java.util.Collection;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -21,10 +22,10 @@ public class Branch extends Base {
 
     private boolean inherit;
 
-    @OneToMany(mappedBy = "branch")
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<BranchGroupPerm> groupPerms;
 
-    @OneToMany(mappedBy = "branch")
+    @OneToMany(mappedBy = "branch", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<BranchUserPerm> userPerms;
 
     public Branch() {}

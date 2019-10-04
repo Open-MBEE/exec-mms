@@ -1,8 +1,10 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -23,12 +25,15 @@ public class Organization extends Base {
     @JsonBackReference
     private Collection<Project> projects;
 
-    @OneToMany(mappedBy = "organization")
+    @JsonIgnore
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<OrgGroupPerm> groupPerms;
 
-    @OneToMany(mappedBy = "organization")
+    @JsonIgnore
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<OrgUserPerm> userPerms;
 
+    @JsonProperty("public")
     private boolean isPublic;
 
     public Organization() {

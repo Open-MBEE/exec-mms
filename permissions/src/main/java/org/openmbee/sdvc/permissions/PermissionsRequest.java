@@ -37,7 +37,7 @@ public class PermissionsRequest {
         return isPublic;
     }
 
-    public void setIsPublic(Boolean isPublic) {
+    public void setPublic(Boolean isPublic) {
         this.isPublic = isPublic;
     }
 

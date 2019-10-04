@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,11 +43,7 @@ public class BranchesController extends BaseController {
         Authentication auth) {
 
         if (refId != null) {
-            BranchesResponse res = branchService.getBranch(projectId, refId);
-            if (res.getBranches().isEmpty()) {
-               throw new NotFoundException(res.addMessage("Not found"));
-            }
-            return ResponseEntity.ok(res);
+            return ResponseEntity.ok(branchService.getBranch(projectId, refId));
         } else {
             BranchesResponse res = branchService.getBranches(projectId);
             if (!permissionService.isProjectPublic(projectId)) {
@@ -82,5 +79,15 @@ public class BranchesController extends BaseController {
             }
         }
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{refId}")
+    @Transactional
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_DELETE', false)")
+    public ResponseEntity<? extends BaseResponse> deleteBranch(
+        @PathVariable String projectId,
+        @PathVariable String refId) {
+
+        return ResponseEntity.ok(branchService.deleteBranch(projectId, refId));
     }
 }
