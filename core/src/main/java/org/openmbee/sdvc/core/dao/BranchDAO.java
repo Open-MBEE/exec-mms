@@ -6,11 +6,11 @@ import org.openmbee.sdvc.data.domains.scoped.Branch;
 
 public interface BranchDAO {
 
-    public Branch save(Branch branch);
+    Branch save(Branch branch);
 
-    public Optional<Branch> findByBranchId(String sysmlid);
+    Optional<Branch> findByBranchId(String sysmlid);
 
-    public List<Branch> findAll();
+    List<Branch> findAll();
 
-    public void delete(Branch branch);
+    void delete(Branch branch);
 }

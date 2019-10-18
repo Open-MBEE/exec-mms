@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

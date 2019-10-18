@@ -9,17 +9,17 @@ import org.openmbee.sdvc.data.domains.scoped.Commit;
 
 public interface CommitDAO {
 
-    public Commit save(Commit commit);
+    Commit save(Commit commit);
 
-    public Optional<Commit> findById(long id);
+    Optional<Commit> findById(long id);
 
-    public Optional<Commit> findByCommitId(String commitId);
+    Optional<Commit> findByCommitId(String commitId);
 
-    public List<Commit> findAll();
+    List<Commit> findAll();
 
-    public Optional<Commit> findLatestByRef(Branch ref);
+    Optional<Commit> findLatestByRef(Branch ref);
 
-    public Optional<Commit> findByRefAndTimestamp(Branch ref, Instant timestamp);
+    Optional<Commit> findByRefAndTimestamp(Branch ref, Instant timestamp);
 
-    public List<Commit> findByRefAndTimestampAndLimit(Branch ref, Instant timestamp, int limit);
+    List<Commit> findByRefAndTimestampAndLimit(Branch ref, Instant timestamp, int limit);
 }

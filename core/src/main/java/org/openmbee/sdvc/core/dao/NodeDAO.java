@@ -8,23 +8,23 @@ import org.openmbee.sdvc.data.domains.scoped.Node;
 
 public interface NodeDAO extends BaseDAO {
 
-    public Node save(Node node);
+    Node save(Node node);
 
-    public List<Node> saveAll(List<Node> nodes);
+    List<Node> saveAll(List<Node> nodes);
 
-    public List<Node> insertAll(List<Node> nodes);
+    List<Node> insertAll(List<Node> nodes);
 
-    public List<Node> updateAll(List<Node> nodes);
+    List<Node> updateAll(List<Node> nodes);
 
-    public void deleteAll(List<Node> nodes);
+    void deleteAll(List<Node> nodes);
 
-    public Optional<Node> findByNodeId(String nodeId);
+    Optional<Node> findByNodeId(String nodeId);
 
-    public List<Node> findAllByNodeIds(Collection<String> ids);
+    List<Node> findAllByNodeIds(Collection<String> ids);
 
-    public List<Node> findAll();
+    List<Node> findAll();
 
-    public List<Node> findAllByDeleted(boolean deleted);
+    List<Node> findAllByDeleted(boolean deleted);
 
-    public List<Node> findAllByDeletedAndNodeType(boolean deleted, int nodeType);
+    List<Node> findAllByDeletedAndNodeType(boolean deleted, int nodeType);
 }
