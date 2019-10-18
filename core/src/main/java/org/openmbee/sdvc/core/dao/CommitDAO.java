@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.rdb.repositories.commit;
+package org.openmbee.sdvc.core.dao;
 
 import java.time.Instant;
 import java.util.List;

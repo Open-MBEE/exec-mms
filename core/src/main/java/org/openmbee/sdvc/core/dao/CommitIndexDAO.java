@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.services;
+package org.openmbee.sdvc.core.dao;
 
 import java.io.IOException;
 import java.util.Collection;

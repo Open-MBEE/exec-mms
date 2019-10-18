@@ -8,15 +8,15 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.config.Privileges;
+import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
-import org.openmbee.sdvc.crud.exceptions.DeletedException;
+import org.openmbee.sdvc.core.exceptions.DeletedException;
 import org.openmbee.sdvc.data.domains.global.Project;
-import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects")
 public class ProjectsController extends BaseController {
 
-    ProjectRepository projectRepository;
+    ProjectDAO projectRepository;
 
     @Autowired
-    public ProjectsController(ProjectRepository projectRepository) {
+    public ProjectsController(ProjectDAO projectRepository) {
         this.projectRepository = projectRepository;
     }
 
@@ -157,7 +157,6 @@ public class ProjectsController extends BaseController {
         res.add(projectJson);
         if (hard) {
             projectRepository.delete(project);
-            //TODO delete DB
         } else {
             projectRepository.save(project);
         }

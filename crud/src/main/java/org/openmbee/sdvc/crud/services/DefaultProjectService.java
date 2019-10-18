@@ -1,20 +1,18 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.sql.SQLException;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.dao.OrgDAO;
+import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.services.ProjectService;
-import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Project;
-import org.openmbee.sdvc.rdb.repositories.OrganizationRepository;
-import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.core.services.ProjectIndex;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.dao.ProjectIndex;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
-import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,24 +20,18 @@ import org.springframework.stereotype.Service;
 public class DefaultProjectService implements ProjectService {
 
     protected final Logger logger = LogManager.getLogger(getClass());
-    protected ProjectRepository projectRepository;
-    protected OrganizationRepository orgRepository;
-    protected DatabaseDefinitionService projectOperations;
+    protected ProjectDAO projectRepository;
+    protected OrgDAO orgRepository;
     protected ProjectIndex projectIndex;
 
     @Autowired
-    public void setProjectRepository(ProjectRepository projectRepository) {
+    public void setProjectRepository(ProjectDAO projectRepository) {
         this.projectRepository = projectRepository;
     }
 
     @Autowired
-    public void setOrganizationRepository(OrganizationRepository orgRepository) {
+    public void setOrganizationRepository(OrgDAO orgRepository) {
         this.orgRepository = orgRepository;
-    }
-
-    @Autowired
-    public void setDatabaseDefinitionService(DatabaseDefinitionService projectOperations) {
-        this.projectOperations = projectOperations;
     }
 
     @Autowired
@@ -62,19 +54,12 @@ public class DefaultProjectService implements ProjectService {
         proj.setProjectName(project.getName());
         proj.setOrganization(org.get());
         proj.setProjectType(project.getProjectType());
-        Project saved = projectRepository.save(proj);
-
         try {
-            if (projectOperations.createProjectDatabase(proj)) {
-                projectIndex.create(proj.getProjectId(), project.getProjectType());
-                return project;
-            }
-        } catch (SQLException sqlException) {
-            // Database already exists
+            projectRepository.save(proj);
+            projectIndex.create(proj.getProjectId(), project.getProjectType());
             return project;
         } catch (Exception e) {
-            projectRepository.delete(saved);
-            logger.error("Couldn't create database: {}", project.getProjectId());
+            logger.error("Couldn't create project: {}", project.getProjectId());
             logger.error(e);
         }
         throw new InternalErrorException("Could not create project");

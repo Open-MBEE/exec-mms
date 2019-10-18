@@ -1,16 +1,18 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
+import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.objects.BranchesRequest;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.core.services.BranchService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -71,12 +73,23 @@ public class BranchesController extends BaseController {
             throw new BadRequestException(new BranchesResponse().addMessage("Empty request"));
         }
         BranchesResponse response = new BranchesResponse();
+        List<Map> rejected = new ArrayList<>();
+        response.setRejected(rejected);
         for (RefJson branch : projectsPost.getRefs()) {
-            RefJson res = branchService.createBranch(projectId, branch);
-            if (res != null) {
+            try {
+                RefJson res = branchService.createBranch(projectId, branch);
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
                 response.getBranches().add(res);
+            } catch (SdvcException e) {
+                Map<String, Object> rejection = new HashMap<>();
+                rejection.put("message", e.getMessageObject());
+                rejection.put("code", e.getCode().value());
+                rejection.put("ref", branch);
+                rejected.add(rejection);
             }
+        }
+        if (projectsPost.getRefs().size() == 1) {
+            handleSingleResponse(response);
         }
         return ResponseEntity.ok(response);
     }

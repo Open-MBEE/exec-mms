@@ -11,16 +11,16 @@ import java.util.Set;
 
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Formats;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
-import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.core.objects.CommitsRequest;
 import org.openmbee.sdvc.core.objects.CommitsResponse;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
-import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.core.services.CommitIndexDAO;
+import org.openmbee.sdvc.core.dao.CommitDAO;
+import org.openmbee.sdvc.core.dao.CommitIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,8 +70,8 @@ public class CommitService {
         int finalLimit = limit;
         Instant finalTimestamp = timestamp;
 
-        ref.ifPresentOrElse(commit -> {
-            List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(commit, finalTimestamp, finalLimit);
+        ref.ifPresentOrElse(branch -> {
+            List<Commit> commits = commitRepository.findByRefAndTimestampAndLimit(branch, finalTimestamp, finalLimit);
             for (Commit c : commits) {
                 CommitJson json = new CommitJson();
                 json.setCreated(Formats.FORMATTER.format(c.getTimestamp()));

@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.openmbee.sdvc.core.dao.NodeDAO;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.rdb.repositories.BaseDAOImpl;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -53,7 +55,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return node;
     }
 
-    public List<Node> saveAll(List<Node> nodes) throws SQLException {
+    public List<Node> saveAll(List<Node> nodes) {
         List<Node> newNodes = new ArrayList<>();
         List<Node> updateNodes = new ArrayList<>();
 
@@ -75,24 +77,28 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         return nodes;
     }
 
-    public List<Node> insertAll(List<Node> nodes) throws SQLException {
-        //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
-        Connection rawConn = getConn().getDataSource().getConnection();
-        PreparedStatement ps = rawConn
-            .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
-        for (Node n : nodes) {
-            prepareStatement(ps, n);
-            ps.addBatch();
-        }
-        ps.executeBatch();
-        ResultSet rs = ps.getGeneratedKeys();
-        int i = 0;
-        while (rs.next()) {
-            nodes.get(i).setId(rs.getLong(1));
-            i++;
-        }
+    public List<Node> insertAll(List<Node> nodes) {
+        try {
+            //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
+            Connection rawConn = getConn().getDataSource().getConnection();
+            PreparedStatement ps = rawConn
+                .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
+            for (Node n : nodes) {
+                prepareStatement(ps, n);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            ResultSet rs = ps.getGeneratedKeys();
+            int i = 0;
+            while (rs.next()) {
+                nodes.get(i).setId(rs.getLong(1));
+                i++;
+            }
 
-        return nodes;
+            return nodes;
+        } catch (SQLException ex) {
+            throw new InternalErrorException(ex);
+        }
     }
 
     public List<Node> updateAll(List<Node> nodes) {

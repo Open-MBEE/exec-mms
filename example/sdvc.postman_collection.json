@@ -856,16 +856,18 @@
 					"response": []
 				},
 				{
-					"name": "create branch a",
+					"name": "create branch refa",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
 								"exec": [
-									"pm.test(\"branch created\", function () {",
+									"pm.test(\"branch created with right parentRef and commit id\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.refs[0].id).to.eql('refa');",
+									"    pm.expect(jsonData.refs[0].parentRefId).to.eql('master');",
+									"    pm.expect(jsonData.refs[0].parentCommitId).to.eql(pm.environment.get(\"commitId4\"))",
 									"});"
 								],
 								"type": "text/javascript"
@@ -877,8 +879,8 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
+								"type": "text",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1317,6 +1319,21 @@
 				},
 				{
 					"name": "get latest elements at refa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c3250286-d7ce-424c-8ffe-a1601d65a296",
+								"exec": [
+									"pm.test(\"has 4 results\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -1348,6 +1365,21 @@
 				},
 				{
 					"name": "get latest elements at master",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "262962ce-3848-4189-b81e-0df185b8d1a3",
+								"exec": [
+									"pm.test(\"has 4 results\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -1382,6 +1414,22 @@
 				},
 				{
 					"name": "get mix of elements at master with missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ee0359d3-0bff-42e0-94d2-23564a8b8761",
+								"exec": [
+									"pm.test(\"has 3 results and 1 rejected\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(3);",
+									"    pm.expect(jsonData.rejected.length).to.eql(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -1413,6 +1461,22 @@
 				},
 				{
 					"name": "get mix of elements at refa with commit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ef5db2b-ba24-44d0-b8f1-9934fc1d028e",
+								"exec": [
+									"pm.test(\"has 3 results and 2 rejected\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(3);",
+									"    pm.expect(jsonData.rejected.length).to.eql(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -1748,6 +1812,95 @@
 							],
 							"path": [
 								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create branch del under cc with no commit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 400, cannot make branch in empty project\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"del\",\n\t\t\t\"name\": \"del\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc/refs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc",
+								"refs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "make a commit on project cc",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"random\", \n\t\t\t\"name\": \"random\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cc/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cc",
+								"refs",
+								"master",
+								"elements"
 							]
 						}
 					},

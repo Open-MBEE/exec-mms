@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.core.dao.BranchDAO;
+import org.openmbee.sdvc.core.dao.CommitDAO;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.rdb.repositories.BaseDAOImpl;

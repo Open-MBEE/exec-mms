@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.rdb.repositories;
+package org.openmbee.sdvc.core.dao;
 
 import org.springframework.transaction.PlatformTransactionManager;
 

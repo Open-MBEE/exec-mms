@@ -24,7 +24,7 @@ public class Branch {
     private String branchName;
 
     private String parentRefId;
-    private Long parentCommit = 0L;
+    private Long parentCommit;
 
     private Instant timestamp;
 

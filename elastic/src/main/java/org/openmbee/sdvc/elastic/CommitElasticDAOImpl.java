@@ -17,7 +17,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.openmbee.sdvc.core.services.CommitIndexDAO;
+import org.openmbee.sdvc.core.dao.CommitIndexDAO;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.springframework.stereotype.Component;
