@@ -6,8 +6,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
+import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
 import org.openmbee.sdvc.rdb.repositories.BaseDAOImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -16,11 +20,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
 
+    private DatabaseDefinitionService branchesOperations;
+
+    @Autowired
+    public void setBranchesOperations(DatabaseDefinitionService branchesOperations) {
+        this.branchesOperations = branchesOperations;
+    }
+
     private final String INSERT_SQL = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     private final String UPDATE_SQL = "UPDATE branches SET description = ?, branchId = ?, branchName = ?, parentRefId = ?, parentCommit = ?, timestamp = ?, tag = ?, deleted = ? WHERE id = ?";
+
     public Branch save(Branch branch) {
 
         if (branch.getId() == null) {
+            ContextHolder.setContext(ContextHolder.getContext().getProjectId(), branch.getBranchId());
+            branchesOperations.createBranch();
+            branchesOperations.copyTablesFromParent(branch.getBranchId(), branch.getParentRefId(), null);
+            //TODO it only supports branch from latest here
+
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             getConn().update(new PreparedStatementCreator() {

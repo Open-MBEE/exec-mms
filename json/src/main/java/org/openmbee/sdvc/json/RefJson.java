@@ -22,7 +22,7 @@ public class RefJson extends BaseJson<RefJson> {
         return (String) this.get(PARENT_COMMIT_ID);
     }
 
-    public RefJson setParentCommitId(int parentCommitId) {
+    public RefJson setParentCommitId(String parentCommitId) {
         this.put(PARENT_COMMIT_ID, parentCommitId);
         return this;
     }

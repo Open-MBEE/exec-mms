@@ -8,14 +8,14 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.config.Privileges;
+import org.openmbee.sdvc.core.dao.OrgDAO;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
 import org.openmbee.sdvc.data.domains.global.Organization;
-import org.openmbee.sdvc.rdb.repositories.OrganizationRepository;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.json.OrgJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/orgs")
 public class OrgsController extends BaseController {
 
-    OrganizationRepository organizationRepository;
+    OrgDAO organizationRepository;
 
     @Autowired
-    public OrgsController(OrganizationRepository organizationRepository) {
+    public OrgsController(OrgDAO organizationRepository) {
         this.organizationRepository = organizationRepository;
     }
 

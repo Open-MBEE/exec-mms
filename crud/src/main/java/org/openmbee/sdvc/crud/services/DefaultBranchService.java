@@ -7,20 +7,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.core.services.BranchService;
-import org.openmbee.sdvc.core.services.NodeIndexDAO;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.DeletedException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.dao.NodeIndexDAO;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.DeletedException;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;
-import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
-import org.openmbee.sdvc.rdb.repositories.branch.BranchDAO;
+import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.RefJson;
-import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.rdb.repositories.node.NodeDAO;
+import org.openmbee.sdvc.core.dao.CommitDAO;
+import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +34,6 @@ public class DefaultBranchService implements BranchService {
 
     private BranchDAO branchRepository;
 
-    private DatabaseDefinitionService branchesOperations;
-
     private CommitDAO commitRepository;
 
     private CommitService commitService;
@@ -47,12 +45,6 @@ public class DefaultBranchService implements BranchService {
     @Autowired
     public void setBranchRepository(BranchDAO branchRepository) {
         this.branchRepository = branchRepository;
-    }
-
-    @Autowired
-    public void setBranchesOperations(
-        DatabaseDefinitionService branchesOperations) {
-        this.branchesOperations = branchesOperations;
     }
 
     @Autowired
@@ -105,6 +97,7 @@ public class DefaultBranchService implements BranchService {
     }
 
     public RefJson createBranch(String projectId, RefJson branch) {
+        //TODO sanitize or reject branch id
         Instant now = Instant.now();
         ContextHolder.setContext(projectId);
         Branch b = new Branch();
@@ -116,7 +109,6 @@ public class DefaultBranchService implements BranchService {
         logger.info("Saving branch: {}", branch.getId());
 
         if (branch.getParentRefId() != null) {
-            //Branch parentRef = branchRepository.findByBranchId(branch.getParentRefId());
             b.setParentRefId(branch.getParentRefId());
         } else {
             b.setParentRefId(Constants.MASTER_BRANCH);
@@ -128,7 +120,8 @@ public class DefaultBranchService implements BranchService {
             if (parentCommit.isPresent()) {
                 b.setParentCommit(parentCommit.get().getId());
             }
-        } else {
+        }
+        if (b.getParentCommit() == null){
             Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
             if (ref.isPresent()) {
                 Optional<Commit> parentCommit = commitRepository.findLatestByRef(ref.get());
@@ -137,29 +130,24 @@ public class DefaultBranchService implements BranchService {
                 });
             }
         }
+        if (b.getParentCommit() == null) {
+            throw new BadRequestException("Parent branch or commit cannot be determined");
+            //creating more branches are not allowed until there's at least 1 commit, same as git
+        }
 
         b.setTimestamp(now);
-
-        Branch saved = branchRepository.save(b);
         try {
-            ContextHolder.setContext(projectId, saved.getBranchId());
-            if (branchesOperations.createBranch()) {
-                branchesOperations.copyTablesFromParent(saved.getBranchId(),
-                    b.getParentRefId(), branch.getParentCommitId());
-            }
-            ContextHolder.setContext(projectId, saved.getBranchId());
+            branchRepository.save(b);
             Set<String> docIds = new HashSet<>();
             for (Node n: nodeRepository.findAllByDeleted(false)) {
                 docIds.add(n.getDocId());
             }
             nodeIndex.addToRef(docIds);
+            return convertToJson(b);
         } catch (Exception e) {
-            logger.error("Couldn't create branch: {}", branch.getId());
-            logger.error(e);
-            branchRepository.delete(saved);
-            return null;
+            logger.error("Couldn't create branch: {}", branch.getId(), e);
+            throw new InternalErrorException(e);
         }
-        return branch;
     }
 
     public BranchesResponse deleteBranch(String projectId, String id) {
@@ -186,7 +174,10 @@ public class DefaultBranchService implements BranchService {
         if (branch != null) {
             refJson.setParentRefId(branch.getParentRefId());
             if (branch.getParentCommit() != null) {
-                refJson.setParentCommitId(branch.getParentCommit().intValue());
+                Optional<Commit> c = commitRepository.findById(branch.getParentCommit());
+                if (c.isPresent()) {
+                    refJson.setParentCommitId(c.get().getDocId());
+                }
             }
             refJson.setId(branch.getBranchId());
             refJson.setName(branch.getBranchName());

@@ -21,8 +21,6 @@ import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
-import org.openmbee.sdvc.data.domains.scoped.Edge;
-import org.openmbee.sdvc.data.domains.scoped.EdgeType;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.data.domains.scoped.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +28,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -61,6 +57,7 @@ public class DatabaseDefinitionService {
 
     public boolean createProjectDatabase(Project project) throws SQLException {
         ContextHolder.setContext(null);
+        //TODO sanitize projectId? or reject if not valid id
         String queryString = String.format("CREATE DATABASE _%s", project.getProjectId());
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
             crudDataSources.get(ContextHolder.getContext().getKey()));
@@ -84,15 +81,14 @@ public class DatabaseDefinitionService {
         return !created.isEmpty();
     }
 
-    public boolean createBranch() {
-        logger.error(
+    public void createBranch() {
+        logger.info(
             "Current Context is: {} on ref {}", ContextHolder.getContext().getProjectId(),
             ContextHolder.getContext().getBranchId());
         generateBranchSchemaFromModels();
-        return true;
     }
 
-    public void generateProjectSchemaFromModels(Project project) {
+    public void generateProjectSchemaFromModels(Project project) throws SQLException {
 
         String connectionString = project.getConnectionString();
         if (connectionString == null || connectionString.equals("")) {
@@ -119,8 +115,6 @@ public class DatabaseDefinitionService {
 
         metadata.addAnnotatedClass(Branch.class);
         metadata.addAnnotatedClass(Commit.class);
-        metadata.addAnnotatedClass(Edge.class);
-        metadata.addAnnotatedClass(EdgeType.class);
         metadata.addAnnotatedClass(Node.class);
         metadata.addAnnotatedClass(NodeType.class);
 
@@ -145,8 +139,6 @@ public class DatabaseDefinitionService {
             try (PreparedStatement ps = conn.prepareStatement(INITIAL_REF)) {
                 ps.execute();
             }
-        } catch (SQLException e) {
-
         }
     }
 
@@ -157,7 +149,6 @@ public class DatabaseDefinitionService {
                 .build()
         );
 
-        metadata.addAnnotatedClass(Edge.class);
         metadata.addAnnotatedClass(Node.class);
 
         new SchemaExport()
@@ -174,13 +165,10 @@ public class DatabaseDefinitionService {
         }
 
         final String targetNodeTable = String.format("nodes%s", target);
-        final String targetEdgeTable = String.format("edges%s", target);
         StringBuilder parentNodeTable = new StringBuilder("nodes");
-        StringBuilder parentEdgeTable = new StringBuilder("edges");
 
         if (parent != null && !parent.equalsIgnoreCase("master")) {
             parentNodeTable.append(String.format("%s", parent));
-            parentEdgeTable.append(String.format("%s", parent));
         }
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
@@ -189,12 +177,10 @@ public class DatabaseDefinitionService {
         jdbcTemplate.execute("BEGIN");
 
         jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
-        jdbcTemplate.execute(String.format(COPY_SQL, targetEdgeTable, parentEdgeTable));
 
         //reset db auto increment sequence for postgresql only
         if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
             jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
-            jdbcTemplate.execute(String.format(COPY_IDX, targetEdgeTable, parentEdgeTable));
         }
 
         jdbcTemplate.execute("COMMIT");
@@ -222,15 +208,5 @@ public class DatabaseDefinitionService {
             "org.openmbee.sdvc.rdb.config.SuffixedPhysicalNamingStrategy");
 
         return properties;
-    }
-
-    private void copyTables(JdbcTemplate jdbcTemplate, String sql, String target, String parent, RowMapper<?> rowMapper) {
-        jdbcTemplate.query(sql, new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                ps.setString(1, target);
-                ps.setString(2, parent);
-            }
-        }, rowMapper);
     }
 }

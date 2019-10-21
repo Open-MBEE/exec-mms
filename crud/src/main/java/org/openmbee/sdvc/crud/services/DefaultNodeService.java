@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,16 +13,14 @@ import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
-import org.openmbee.sdvc.crud.exceptions.InternalErrorException;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.CommitType;
-import org.openmbee.sdvc.data.domains.scoped.Edge;
 import org.openmbee.sdvc.data.domains.scoped.Node;
-import org.openmbee.sdvc.rdb.repositories.commit.CommitDAO;
-import org.openmbee.sdvc.core.services.CommitIndexDAO;
-import org.openmbee.sdvc.rdb.repositories.edge.EdgeDAO;
-import org.openmbee.sdvc.rdb.repositories.node.NodeDAO;
-import org.openmbee.sdvc.core.services.NodeIndexDAO;
+import org.openmbee.sdvc.core.dao.CommitDAO;
+import org.openmbee.sdvc.core.dao.CommitIndexDAO;
+import org.openmbee.sdvc.core.dao.NodeDAO;
+import org.openmbee.sdvc.core.dao.NodeIndexDAO;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +41,6 @@ public class DefaultNodeService implements NodeService {
     protected NodeIndexDAO nodeIndex;
     //to save to this use base json classes
     protected CommitIndexDAO commitIndex;
-    protected EdgeDAO edgeRepository;
     protected NodeGetHelper nodeGetHelper;
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
@@ -68,11 +64,6 @@ public class DefaultNodeService implements NodeService {
     @Autowired
     public void setCommitIndex(CommitIndexDAO commitIndex) {
         this.commitIndex = commitIndex;
-    }
-
-    @Autowired
-    public void setEdgeRepository(EdgeDAO edgeRepository) {
-        this.edgeRepository = edgeRepository;
     }
 
     @Autowired
@@ -157,18 +148,16 @@ public class DefaultNodeService implements NodeService {
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
         Instant now = info.getNow();
-        List<Edge> edges = null;
         if (!nodes.isEmpty()) {
             try {
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
                 if (json != null && !json.isEmpty()) {
-                    //edges needed nodes to save first in order to get id
-                    edges = nodePostHelper.getEdgesToSave(info);
                     this.nodeIndex.indexAll(json.values());
-                    this.edgeRepository.saveAll(edges);
                 }
+                //TODO reevaluate transaction handling to include commit data
+                //transactional vs the right transaction manager?
                 this.nodeRepository.getTransactionManager().commit(status);
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 logger.error("commitChanges error: ", e);
                 this.nodeRepository.getTransactionManager().rollback(status);
                 throw new InternalErrorException("Error committing transaction");

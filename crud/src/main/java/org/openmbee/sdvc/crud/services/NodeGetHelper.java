@@ -5,7 +5,7 @@ import java.util.*;
 
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.config.ContextHolder;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;

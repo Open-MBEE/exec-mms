@@ -6,7 +6,7 @@ import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.BaseResponse;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -7,23 +7,20 @@ import java.util.Map;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.objects.BaseResponse;
-import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.core.services.PermissionService;
-import org.openmbee.sdvc.crud.exceptions.ForbiddenException;
-import org.openmbee.sdvc.crud.exceptions.UnauthorizedException;
-import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
-import org.openmbee.sdvc.crud.exceptions.BadRequestException;
-import org.openmbee.sdvc.crud.exceptions.DeletedException;
-import org.openmbee.sdvc.crud.exceptions.NotFoundException;
-import org.openmbee.sdvc.crud.exceptions.NotModifiedException;
+import org.openmbee.sdvc.core.exceptions.ForbiddenException;
+import org.openmbee.sdvc.core.exceptions.UnauthorizedException;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.DeletedException;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.exceptions.NotModifiedException;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 
 public abstract class BaseController {
 
@@ -33,7 +30,7 @@ public abstract class BaseController {
 
     protected ServiceFactory serviceFactory;
 
-    protected ProjectRepository projectRepository;
+    protected ProjectDAO projectRepository;
 
     protected PermissionService permissionService;
 
@@ -45,7 +42,7 @@ public abstract class BaseController {
     }
 
     @Autowired
-    public void setProjectRepository(ProjectRepository projectRepository) {
+    public void setProjectRepository(ProjectDAO projectRepository) {
         this.projectRepository = projectRepository;
     }
 
