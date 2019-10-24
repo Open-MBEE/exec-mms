@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.config.EventPublisher;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
@@ -44,6 +45,7 @@ public class DefaultNodeService implements NodeService {
     protected NodeGetHelper nodeGetHelper;
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
+    protected EventPublisher eventPublisher;
 
 
     @Autowired
@@ -81,9 +83,16 @@ public class DefaultNodeService implements NodeService {
         this.nodeGetHelper = nodeGetHelper;
     }
 
+    @Autowired
+    public void setEventPublisher(EventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
     @Override
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
+
+        this.eventPublisher.publishEvent("This is a test!!!!!!!!!!");
 
         if (id != null) {
             logger.debug("ElementId given: ", id);
