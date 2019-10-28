@@ -2,15 +2,23 @@ package org.openmbee.sdvc.core.objects;
 
 import org.springframework.context.ApplicationEvent;
 
-public class BaseEvent extends ApplicationEvent {
-    private String message;
+import java.util.Map;
 
-    public BaseEvent(Object source, String message) {
+public class BaseEvent extends ApplicationEvent {
+    private Object payload;
+    private String event;
+
+    public BaseEvent(Object source, String event, Object payload) {
         super(source);
-        this.message = message;
+        this.event = event;
+        this.payload = payload;
     }
 
-    public String getMessage() {
-        return message;
+    public Object getPayload() {
+        return payload;
+    }
+
+    public String getEvent() {
+        return event;
     }
 }

@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.core.config.EventPublisher;
+import org.openmbee.sdvc.crud.components.EventPublisher;
+import org.openmbee.sdvc.core.objects.BaseEvent;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
@@ -45,8 +47,8 @@ public class DefaultNodeService implements NodeService {
     protected NodeGetHelper nodeGetHelper;
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
-    protected EventPublisher eventPublisher;
 
+    protected Optional<EventPublisher> eventPublisher;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -84,7 +86,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
-    public void setEventPublisher(EventPublisher eventPublisher) {
+    public void setEventPublisher(Optional<EventPublisher> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -92,10 +94,13 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        this.eventPublisher.publishEvent("This is a test!!!!!!!!!!");
+        BaseEvent event = new BaseEvent(this, "READ", params);
+        eventPublisher.ifPresent(ep -> {
+            ep.publish(event);
+        });
 
         if (id != null) {
-            logger.debug("ElementId given: ", id);
+            logger.debug("ElementId given: {}", id);
 
             ElementsRequest req = buildRequest(id);
             return read(projectId, refId, req, params);

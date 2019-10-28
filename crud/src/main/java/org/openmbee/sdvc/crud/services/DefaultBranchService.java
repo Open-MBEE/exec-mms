@@ -117,9 +117,9 @@ public class DefaultBranchService implements BranchService {
         if (branch.getParentCommitId() != null) {
             Optional<Commit> parentCommit = commitRepository
                 .findByCommitId(branch.getParentCommitId());
-            if (parentCommit.isPresent()) {
-                b.setParentCommit(parentCommit.get().getId());
-            }
+            parentCommit.ifPresent(parent -> {
+                b.setParentCommit(parent.getId());
+            });
         }
         if (b.getParentCommit() == null){
             Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
@@ -175,9 +175,9 @@ public class DefaultBranchService implements BranchService {
             refJson.setParentRefId(branch.getParentRefId());
             if (branch.getParentCommit() != null) {
                 Optional<Commit> c = commitRepository.findById(branch.getParentCommit());
-                if (c.isPresent()) {
-                    refJson.setParentCommitId(c.get().getDocId());
-                }
+                c.ifPresent(parent -> {
+                    refJson.setParentCommitId(parent.getDocId());
+                });
             }
             refJson.setId(branch.getBranchId());
             refJson.setName(branch.getBranchName());
