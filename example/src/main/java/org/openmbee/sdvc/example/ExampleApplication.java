@@ -1,6 +1,10 @@
 package org.openmbee.sdvc.example;
 
 import java.util.Arrays;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.update.UpdateFactory;
+import org.apache.jena.update.UpdateRequest;
 import org.eclipse.rdf4j.query.parser.ParsedQuery;
 import org.eclipse.rdf4j.query.parser.ParsedUpdate;
 import org.eclipse.rdf4j.query.parser.QueryParser;
@@ -122,6 +126,9 @@ public class ExampleApplication {
         ParsedQuery parsed = parser.parseQuery(query, "http://mms.openmbee.org");
         ParsedUpdate parsedU = parser.parseUpdate(updateWithUsing, "http://mms.openmbee.org");
 
+
+        Query q = QueryFactory.create(query);//can get at graph by going to queryPattern, ElementNamedGraph, node URI
+        UpdateRequest u = UpdateFactory.create(updateCopy); //jena is easier to get at named graphs defined with GRAPH, handles default, all, supports visitors
         String a = "a";
     }
 

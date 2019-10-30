@@ -27,7 +27,8 @@ dependencies {
         //'mysql:mysql-connector-java:8.0.17',
         'io.springfox:springfox-swagger2:2.9.2',
         'io.springfox:springfox-swagger-ui:2.9.2',
-        'org.eclipse.rdf4j:rdf4j-queryparser-sparql:3.0.2'
+        'org.eclipse.rdf4j:rdf4j-queryparser-sparql:3.0.2',
+        "org.apache.jena:jena-arq:3.13.1"
     )
     testCompile(
         'org.springframework.boot:spring-boot-starter-test'
