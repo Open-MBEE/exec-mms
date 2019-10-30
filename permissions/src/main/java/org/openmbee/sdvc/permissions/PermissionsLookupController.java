@@ -32,6 +32,7 @@ public class PermissionsLookupController {
         List<Map> rejected = new ArrayList<>();
         res.setLookups(lookups);
         res.setRejected(rejected);
+        res.setAllPassed(true);
         for (PermissionLookup lookup: req.getLookups()) {
             try {
                 boolean result;
@@ -52,12 +53,16 @@ public class PermissionsLookupController {
                 }
                 lookup.setHasPrivilege(result);
                 lookups.add(lookup);
+                if (!result) {
+                    res.setAllPassed(false);
+                }
             } catch (PermissionException e) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("code", e.getCode().value());
                 map.put("message", e.getMessage());
                 map.put("lookup", lookup);
                 rejected.add(map);
+                res.setAllPassed(false);
             }
         }
         return res;

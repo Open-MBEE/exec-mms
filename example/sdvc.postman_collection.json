@@ -3747,6 +3747,7 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
 									"    pm.expect(jsonData.lookups[1].hasPrivilege).to.eql(false);",
+									"    pm.expect(jsonData.allPassed).to.eql(false);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3806,6 +3807,7 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
 									"    pm.expect(jsonData.lookups[1].hasPrivilege).to.eql(false);",
+									"    pm.expect(jsonData.allPassed).to.eql(false);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3858,6 +3860,7 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
 									"    pm.expect(jsonData.rejected.length).to.eql(1);",
+									"    pm.expect(jsonData.allPassed).to.eql(false);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3887,6 +3890,66 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\t\"lookups\": [\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_READ\",\n\t\t\t\"allowAnonIfPublic\": true\n\t\t},\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"aaa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_EDIT_CONTENT\",\n\t\t\t\"allowAnonIfPublic\": false\n\t\t}\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/permissions",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permission lookup as writer all pass",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+								"exec": [
+									"pm.test(\"all true\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
+									"    pm.expect(jsonData.lookups[1].hasPrivilege).to.eql(true);",
+									"    pm.expect(jsonData.allPassed).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{writerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"lookups\": [\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_READ\",\n\t\t\t\"allowAnonIfPublic\": true\n\t\t},\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_EDIT_CONTENT\",\n\t\t\t\"allowAnonIfPublic\": false\n\t\t}\n\t]\n}",
 							"options": {
 								"raw": {
 									"language": "json"

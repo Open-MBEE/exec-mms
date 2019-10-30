@@ -9,6 +9,16 @@ public class PermissionLookupResponse {
 
     private List<Map> rejected;
 
+    private boolean allPassed;
+
+    public boolean isAllPassed() {
+        return allPassed;
+    }
+
+    public void setAllPassed(boolean allPassed) {
+        this.allPassed = allPassed;
+    }
+
     public List<PermissionLookup> getLookups() {
         return lookups;
     }
