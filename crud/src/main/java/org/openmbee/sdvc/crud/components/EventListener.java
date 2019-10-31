@@ -6,7 +6,6 @@ import org.openmbee.sdvc.core.dao.EventDAO;
 import org.openmbee.sdvc.core.objects.BaseEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.data.repository.core.support.EventPublishingRepositoryProxyPostProcessor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ public class EventListener implements ApplicationListener<BaseEvent> {
     private EventDAO eventRepository;
 
     @Autowired
-    public void setBranchRepository(EventDAO eventRepository) {
+    public void setEventRepository(EventDAO eventRepository) {
         this.eventRepository = eventRepository;
     }
 

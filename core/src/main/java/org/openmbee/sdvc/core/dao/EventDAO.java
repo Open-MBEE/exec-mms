@@ -1,19 +1,20 @@
 package org.openmbee.sdvc.core.dao;
 
 import org.openmbee.sdvc.core.objects.BaseEvent;
+import org.openmbee.sdvc.data.domains.global.Event;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface EventDAO {
 
-    BaseEvent save(BaseEvent event);
+    Event save(Event event);
 
-    Optional<BaseEvent> findByBranchId(String eventid);
+    Optional<Event> findByBranchId(String eventid);
 
-    List<BaseEvent> findAll();
+    List<Event> findAll();
 
-    List<BaseEvent> findAllByProject_ProjectId(String projectId);
+    List<Event> findAllByProject_ProjectId(String projectId);
 
-    void delete(BaseEvent event);
+    void delete(Event event);
 }
