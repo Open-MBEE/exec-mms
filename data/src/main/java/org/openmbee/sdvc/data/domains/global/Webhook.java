@@ -10,16 +10,16 @@ import javax.persistence.UniqueConstraint;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"uri","project_id"})
     })
-public class Event extends Base {
+public class Webhook extends Base {
 
     @ManyToOne
     private Project project;
 
     private String uri;
 
-    public Event() {}
+    public Webhook() {}
 
-    public Event(Project p, String uri) {
+    public Webhook(Project p, String uri) {
         this.project = p;
         this.uri = uri;
     }
@@ -49,7 +49,7 @@ public class Event extends Base {
             return false;
         }
 
-        Event node = (Event) o;
+        Webhook node = (Webhook) o;
 
         return id.equals(node.id);
     }

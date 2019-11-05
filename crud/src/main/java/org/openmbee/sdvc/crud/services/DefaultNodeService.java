@@ -1,15 +1,12 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.crud.components.EventPublisher;
-import org.openmbee.sdvc.core.objects.BaseEvent;
+import org.openmbee.sdvc.webhooks.components.EventPublisher;
+import org.openmbee.sdvc.core.objects.EventResponse;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
@@ -94,7 +91,7 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        BaseEvent event = new BaseEvent(this, "READ", params);
+        EventResponse event = EventResponse.create(projectId, refId, "READ", params);
         eventPublisher.ifPresent(ep -> {
             ep.publish(event);
         });

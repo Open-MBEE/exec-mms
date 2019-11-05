@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.core.services;
 
-import org.openmbee.sdvc.core.objects.BaseEvent;
+import org.openmbee.sdvc.core.objects.EventObject;
 
 public interface EventService {
-    boolean publish(BaseEvent event);
+    boolean publish(EventObject event);
 }

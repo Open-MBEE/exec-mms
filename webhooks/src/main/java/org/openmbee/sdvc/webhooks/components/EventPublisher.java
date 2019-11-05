@@ -1,6 +1,6 @@
-package org.openmbee.sdvc.crud.components;
+package org.openmbee.sdvc.webhooks.components;
 
-import org.openmbee.sdvc.core.objects.BaseEvent;
+import org.openmbee.sdvc.core.objects.EventObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ public class EventPublisher {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    public void publish(final BaseEvent event) {
+    public void publish(final EventObject event) {
         applicationEventPublisher.publishEvent(event);
     }
 

@@ -3,8 +3,8 @@
         {"key": "host", "value": "http://localhost:8080"},
         {"key": "adminUsername", "value": "admin"},
         {"key": "adminPassword", "value": "admin"},
-        {"key": "ldapGroup", "value": "ldapGroup"},
-        {"key": "ldapUser", "value": "ldapUser"},
-        {"key": "ldapPass", "value": "ldapPass"}
+        {"key": "ldapGroup", "value": "cae.sswe.team"},
+        {"key": "ldapUser", "value": "han"},
+        {"key": "ldapPass", "value": "Asdlkj$$$$"}
     ]
 }

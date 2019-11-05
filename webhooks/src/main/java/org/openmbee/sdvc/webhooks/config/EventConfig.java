@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.config;
+package org.openmbee.sdvc.webhooks.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
