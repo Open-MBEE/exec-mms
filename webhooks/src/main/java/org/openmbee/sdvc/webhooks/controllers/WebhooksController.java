@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@RestController
+@RequestMapping("/webhooks")
 public class WebhooksController {
 
     private WebhookDAO webhookRepository;
@@ -113,7 +115,7 @@ public class WebhooksController {
 
             if (!webhookExists(json)) {
                 try {
-                    if (!mss.hasOrgPrivilege(auth, json.getProjectId(), Privileges.PROJECT_CREATE_WEBHOOKS.name(), false)) {
+                    if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_CREATE_WEBHOOKS.name(), false)) {
                         Map<String, Object> rejection = new HashMap<>();
                         rejection.put("message", "No permission to create project under org");
                         rejection.put("code", 403);
@@ -127,6 +129,7 @@ public class WebhooksController {
                         Webhook newWebhook = new Webhook();
                         newWebhook.setProject(proj);
                         newWebhook.setUri(json.getUri());
+                        webhookRepository.save(newWebhook);
                         response.getWebhooks().add(json);
                     }, () -> {
                         Map<String, Object> rejection = new HashMap<>();
@@ -196,7 +199,7 @@ public class WebhooksController {
     private boolean webhookExists(WebhookJson json) {
         List<Webhook> projectWebhooks = webhookRepository.findAllByProject_ProjectId(json.getProjectId());
         for (Webhook webhook : projectWebhooks) {
-            if (webhook.getUri().equalsIgnoreCase(json.getUri())) {
+            if (webhook.getUri() != null && webhook.getUri().equalsIgnoreCase(json.getUri())) {
                 return true;
             }
         }

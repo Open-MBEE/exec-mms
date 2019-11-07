@@ -50,6 +50,9 @@ public class EventListener implements ApplicationListener<EventObject> {
                 // Do nothing; Nowhere to post;
                 logger.error("Error in web hook: ", se);
                 return;
+            } catch (Exception e) {
+                logger.error("Some error happened", e);
+                return;
             }
             logger.info("Sent event to " + webhook.getUri() + " with payload: " + eventObject.getPayload());
         }
