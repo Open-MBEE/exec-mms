@@ -9,8 +9,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class WebhookEventService implements EventService {
 
-    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     public boolean publish(EventObject event) {
         applicationEventPublisher.publishEvent(event);

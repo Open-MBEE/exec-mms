@@ -5,8 +5,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.webhooks.components.EventPublisher;
-import org.openmbee.sdvc.core.objects.EventResponse;
+import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
@@ -23,6 +22,7 @@ import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
+import org.openmbee.sdvc.webhooks.components.EventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
@@ -91,7 +91,7 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        EventResponse event = EventResponse.create(projectId, refId, "READ", params);
+        EventObject event = EventObject.create(projectId, refId, "READ", params);
         eventPublisher.ifPresent(ep -> {
             ep.publish(event);
         });

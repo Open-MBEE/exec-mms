@@ -2,4 +2,5 @@ apply plugin: 'io.spring.convention.spring-module'
 
 dependencies {
     compile project(':core')
+    compile project(':webhooks')
 }
