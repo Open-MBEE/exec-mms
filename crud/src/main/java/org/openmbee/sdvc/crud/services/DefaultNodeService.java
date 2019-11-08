@@ -1,15 +1,11 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.crud.components.EventPublisher;
-import org.openmbee.sdvc.core.objects.BaseEvent;
+import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
@@ -26,6 +22,7 @@ import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
+import org.openmbee.sdvc.webhooks.components.EventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
@@ -94,7 +91,7 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        BaseEvent event = new BaseEvent(this, "READ", params);
+        EventObject event = EventObject.create(projectId, refId, "READ", params);
         eventPublisher.ifPresent(ep -> {
             ep.publish(event);
         });
