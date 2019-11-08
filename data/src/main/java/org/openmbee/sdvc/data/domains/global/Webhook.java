@@ -6,7 +6,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "events",
+@Table(name = "webhooks",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"uri","project_id"})
     })
