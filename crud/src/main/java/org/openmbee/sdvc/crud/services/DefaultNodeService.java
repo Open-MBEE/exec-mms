@@ -91,11 +91,6 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        EventObject event = EventObject.create(projectId, refId, "READ", params);
-        eventPublisher.ifPresent(ep -> {
-            ep.publish(event);
-        });
-
         if (id != null) {
             logger.debug("ElementId given: {}", id);
 
