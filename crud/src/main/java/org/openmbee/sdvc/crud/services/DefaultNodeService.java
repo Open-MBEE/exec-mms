@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.components.EventPublisher;
 import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
@@ -22,7 +23,6 @@ import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
-import org.openmbee.sdvc.webhooks.components.EventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;

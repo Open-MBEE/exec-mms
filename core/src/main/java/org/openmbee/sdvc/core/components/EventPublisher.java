@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.webhooks.components;
+package org.openmbee.sdvc.core.components;
 
 import org.openmbee.sdvc.core.objects.EventObject;
 import org.springframework.beans.factory.annotation.Autowired;

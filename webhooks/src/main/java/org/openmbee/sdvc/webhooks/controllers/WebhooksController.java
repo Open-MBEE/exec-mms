@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/webhooks")
+@RequestMapping("/project")
 public class WebhooksController {
 
     private WebhookDAO webhookRepository;
@@ -65,36 +65,34 @@ public class WebhooksController {
         this.om = om;
     }
 
-    @GetMapping(value = {"", "/{projectId}"})
+    @GetMapping(value = {"", "/{projectId}/webhooks"})
     @PreAuthorize("#projectId == null || @mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public ResponseEntity<? extends BaseResponse> handleGet(@PathVariable(required = false) String projectId, Authentication auth) {
 
         WebhookResponse response = new WebhookResponse();
+        List<Webhook> webhooks = new ArrayList<>();
+
         if (projectId != null) {
-            List<Webhook> webhooks = webhookRepository.findAllByProject_ProjectId(projectId);
-            if (webhooks.isEmpty()) {
-                throw new NotFoundException(response.addMessage("No webhooks not found"));
-            }
-            WebhookJson webhookJson = new WebhookJson();
-            for (Webhook webhook : webhooks) {
-                webhookJson.merge(convertToMap(webhook));
-            }
-            response.getWebhooks().add(webhookJson);
+            webhooks = webhookRepository.findAllByProject_ProjectId(projectId);
         } else {
-            List<Webhook> allWebhooks = webhookRepository.findAll();
-            for (Webhook webhook : allWebhooks) {
-                WebhookJson webhookJson = new WebhookJson();
-                webhookJson.merge(convertToMap(webhook));
-                response.getWebhooks().add(webhookJson);
-            }
+            webhooks = webhookRepository.findAll();
+        }
+
+        if (webhooks.isEmpty()) {
+            throw new NotFoundException(response.addMessage("No web hooks found"));
+        }
+        for (Webhook webhook : webhooks) {
+            WebhookJson webhookJson = new WebhookJson();
+            webhookJson.merge(convertToMap(webhook));
+            response.getWebhooks().add(webhookJson);
         }
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @PostMapping(value = {"", "/{projectId}/webhooks"})
     @Transactional
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<? extends BaseResponse> handlePost( @RequestBody WebhookRequest webhooksPost, Authentication auth) {
+    public ResponseEntity<? extends BaseResponse> handlePost( @PathVariable String projectId, @RequestBody WebhookRequest webhooksPost, Authentication auth) {
 
         if (webhooksPost.getWebhooks().isEmpty()) {
             throw new BadRequestException(new WebhookResponse().addMessage("No projects provided"));
@@ -104,7 +102,7 @@ public class WebhooksController {
         List<Map> rejected = new ArrayList<>();
         response.setRejected(rejected);
         for (WebhookJson json: webhooksPost.getWebhooks()) {
-            if (json.getProjectId().isEmpty()) {
+            if (projectId.isEmpty()) {
                 Map<String, Object> rejection = new HashMap<>();
                 rejection.put("message", "Project id missing");
                 rejection.put("code", 400);
@@ -113,9 +111,9 @@ public class WebhooksController {
                 continue;
             }
 
-            if (!webhookExists(json)) {
+            if (!webhookExists(json, projectId)) {
                 try {
-                    if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_CREATE_WEBHOOKS.name(), false)) {
+                    if (!mss.hasProjectPrivilege(auth, projectId, Privileges.PROJECT_CREATE_WEBHOOKS.name(), false)) {
                         Map<String, Object> rejection = new HashMap<>();
                         rejection.put("message", "No permission to create project under org");
                         rejection.put("code", 403);
@@ -124,7 +122,7 @@ public class WebhooksController {
                         continue;
                     }
 
-                    Optional<Project> project = projectRepository.findByProjectId(json.getProjectId());
+                    Optional<Project> project = projectRepository.findByProjectId(projectId);
                     project.ifPresentOrElse(proj -> {
                         Webhook newWebhook = new Webhook();
                         newWebhook.setProject(proj);
@@ -159,33 +157,27 @@ public class WebhooksController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping
+    @DeleteMapping(value = {"", "/{projectId}/webhooks"})
     @Transactional
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<? extends BaseResponse> handleDelete(
-        @RequestBody WebhookRequest webhookRequest,
-        @RequestParam(required = false, defaultValue = "false") boolean hard) {
+    public ResponseEntity<? extends BaseResponse> handleDelete( @PathVariable String projectId, @RequestBody WebhookRequest webhookRequest) {
 
         // TODO: Determine which webhook to delete somehow. Maybe require webhook id.
 
-        Set<String> projects = new HashSet<>();
         Set<String> uris = new HashSet<>();
         for (WebhookJson webhookJson : webhookRequest.getWebhooks()) {
-            projects.add(webhookJson.getProjectId());
             uris.add(webhookJson.getUri());
         }
 
         WebhookResponse response = new WebhookResponse();
-        for (String projectId : projects) {
-            List<Webhook> webhooks = webhookRepository.findAllByProject_ProjectId(projectId);
-            if (webhooks.isEmpty()) {
-                throw new NotFoundException(response.addMessage("No webhooks found for project"));
-            }
-            for (Webhook webhook : webhooks) {
-                if (uris.contains(webhook.getUri())) {
-                    webhookRepository.delete(webhook);
-                    response.addMessage(String.format("Webhook for project %s to %s deleted", webhook.getProject().getProjectId(), webhook.getUri()));
-                }
+        List<Webhook> webhooks = webhookRepository.findAllByProject_ProjectId(projectId);
+        if (webhooks.isEmpty()) {
+            throw new NotFoundException(response.addMessage("No webhooks found for project"));
+        }
+        for (Webhook webhook : webhooks) {
+            if (uris.contains(webhook.getUri())) {
+                webhookRepository.delete(webhook);
+                response.addMessage(String.format("Webhook for project %s to %s deleted", projectId, webhook.getUri()));
             }
         }
 
@@ -196,8 +188,8 @@ public class WebhooksController {
         return om.convertValue(obj, new TypeReference<Map<String, Object>>() {});
     }
 
-    private boolean webhookExists(WebhookJson json) {
-        List<Webhook> projectWebhooks = webhookRepository.findAllByProject_ProjectId(json.getProjectId());
+    private boolean webhookExists(WebhookJson json, String projectId) {
+        List<Webhook> projectWebhooks = webhookRepository.findAllByProject_ProjectId(projectId);
         for (Webhook webhook : projectWebhooks) {
             if (webhook.getUri() != null && webhook.getUri().equalsIgnoreCase(json.getUri())) {
                 return true;
