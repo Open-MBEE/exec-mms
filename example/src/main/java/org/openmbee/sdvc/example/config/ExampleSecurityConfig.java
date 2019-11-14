@@ -6,7 +6,7 @@ import org.openmbee.sdvc.ldap.LdapSecurityConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,6 +26,7 @@ import static org.springframework.http.HttpMethod.*;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
+@EnableAsync
 public class ExampleSecurityConfig extends LdapSecurityConfig {
     private static Logger logger = LogManager.getLogger(ExampleSecurityConfig.class);
 

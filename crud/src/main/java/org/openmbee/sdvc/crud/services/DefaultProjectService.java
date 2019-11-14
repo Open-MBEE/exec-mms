@@ -5,6 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.dao.OrgDAO;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
+import org.openmbee.sdvc.core.objects.EventObject;
+import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.global.Organization;
@@ -23,6 +25,7 @@ public class DefaultProjectService implements ProjectService {
     protected ProjectDAO projectRepository;
     protected OrgDAO orgRepository;
     protected ProjectIndex projectIndex;
+    protected Optional<EventService> eventPublisher;
 
     @Autowired
     public void setProjectRepository(ProjectDAO projectRepository) {
@@ -37,6 +40,11 @@ public class DefaultProjectService implements ProjectService {
     @Autowired
     public void setProjectIndex(ProjectIndex projectIndex) {
         this.projectIndex = projectIndex;
+    }
+
+    @Autowired
+    public void setEventPublisher(Optional<EventService> eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     public ProjectJson create(ProjectJson project) {
@@ -57,6 +65,8 @@ public class DefaultProjectService implements ProjectService {
         try {
             projectRepository.save(proj);
             projectIndex.create(proj.getProjectId(), project.getProjectType());
+            eventPublisher.ifPresent((pub) -> pub.publish(
+                EventObject.create(project.getId(), "master", "project_created", project)));
             return project;
         } catch (Exception e) {
             logger.error("Couldn't create project: {}", project.getProjectId());

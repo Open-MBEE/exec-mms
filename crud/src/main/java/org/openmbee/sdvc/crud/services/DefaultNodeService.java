@@ -1,12 +1,12 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.objects.EventObject;
+import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
@@ -45,6 +45,7 @@ public class DefaultNodeService implements NodeService {
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
 
+    protected Optional<EventService> eventPublisher;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -81,12 +82,17 @@ public class DefaultNodeService implements NodeService {
         this.nodeGetHelper = nodeGetHelper;
     }
 
+    @Autowired
+    public void setEventPublisher(Optional<EventService> eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
     @Override
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
         if (id != null) {
-            logger.debug("ElementId given: ", id);
+            logger.debug("ElementId given: {}", id);
 
             ElementsRequest req = buildRequest(id);
             return read(projectId, refId, req, params);
@@ -175,6 +181,9 @@ public class DefaultNodeService implements NodeService {
 
             this.commitIndex.index(cmjs);
             this.commitRepository.save(commit);
+
+            eventPublisher.ifPresent((pub) -> pub.publish(
+                EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));
         }
     }
 

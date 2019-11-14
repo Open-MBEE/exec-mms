@@ -9,11 +9,13 @@ import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
+import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.BranchService;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.DeletedException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.core.dao.BranchDAO;
@@ -42,6 +44,8 @@ public class DefaultBranchService implements BranchService {
 
     private NodeIndexDAO nodeIndex;
 
+    protected Optional<EventService> eventPublisher;
+
     @Autowired
     public void setBranchRepository(BranchDAO branchRepository) {
         this.branchRepository = branchRepository;
@@ -65,6 +69,11 @@ public class DefaultBranchService implements BranchService {
     @Autowired
     public void setNodeIndex(NodeIndexDAO nodeIndex) {
         this.nodeIndex = nodeIndex;
+    }
+
+    @Autowired
+    public void setEventPublisher(Optional<EventService> eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     public BranchesResponse getBranches(String projectId) {
@@ -117,9 +126,9 @@ public class DefaultBranchService implements BranchService {
         if (branch.getParentCommitId() != null) {
             Optional<Commit> parentCommit = commitRepository
                 .findByCommitId(branch.getParentCommitId());
-            if (parentCommit.isPresent()) {
-                b.setParentCommit(parentCommit.get().getId());
-            }
+            parentCommit.ifPresent(parent -> {
+                b.setParentCommit(parent.getId());
+            });
         }
         if (b.getParentCommit() == null){
             Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
@@ -143,7 +152,11 @@ public class DefaultBranchService implements BranchService {
                 docIds.add(n.getDocId());
             }
             nodeIndex.addToRef(docIds);
-            return convertToJson(b);
+            RefJson res = convertToJson(b);
+            res.setProjectId(projectId);
+            eventPublisher.ifPresent((pub) -> pub.publish(
+                EventObject.create(projectId, res.getId(), "branch_created", res)));
+            return res;
         } catch (Exception e) {
             logger.error("Couldn't create branch: {}", branch.getId(), e);
             throw new InternalErrorException(e);
@@ -175,9 +188,9 @@ public class DefaultBranchService implements BranchService {
             refJson.setParentRefId(branch.getParentRefId());
             if (branch.getParentCommit() != null) {
                 Optional<Commit> c = commitRepository.findById(branch.getParentCommit());
-                if (c.isPresent()) {
-                    refJson.setParentCommitId(c.get().getDocId());
-                }
+                c.ifPresent(parent -> {
+                    refJson.setParentCommitId(parent.getDocId());
+                });
             }
             refJson.setId(branch.getBranchId());
             refJson.setName(branch.getBranchName());
