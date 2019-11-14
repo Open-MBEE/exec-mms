@@ -4,14 +4,14 @@ import org.openmbee.sdvc.json.BaseJson;
 
 public class WebhookJson extends BaseJson<WebhookJson> {
 
-    public static final String URI = "uri";
+    public static final String URL = "url";
 
-    public String getUri() {
-        return (String) this.get(URI);
+    public String getUrl() {
+        return (String) this.get(URL);
     }
 
-    public WebhookJson setUri(String uri) {
-        this.put(URI, uri);
+    public WebhookJson setUrl(String url) {
+        this.put(URL, url);
         return this;
     }
 }

@@ -15,7 +15,7 @@ public interface WebhookDAO {
 
     List<Webhook> findAllByProject_ProjectId(String projectId);
 
-    Optional<Webhook> findByProject_ProjectIdAndUri(String projectId, String uri);
+    Optional<Webhook> findByProject_ProjectIdAndUrl(String projectId, String url);
 
     void delete(Webhook webhook);
 }

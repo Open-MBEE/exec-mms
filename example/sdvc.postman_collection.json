@@ -2301,6 +2301,197 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "create webhook on project aa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"webhook created with returned id\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.webhooks[0]).to.have.property('id');",
+									"});",
+									"    ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"webhooks\": [\n\t\t{\"url\": \"https://random.org\"}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/webhooks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"webhooks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get webhooks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"project aa has one webhook\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.webhooks[0]).to.have.property('id');",
+									"    pm.expect(jsonData.webhooks.length).to.eql(1);",
+									"});",
+									"    ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/webhooks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"webhooks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete webhook",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"    ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"webhooks\": [\n\t\t{\"url\": \"https://random.org\"}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/webhooks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"webhooks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get webhooks again",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"project aa has no webhooks\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.webhooks.length).to.eql(0);",
+									"});",
+									"    ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/webhooks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"webhooks"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"description": "test crud of org, project, branch, elements, check commits",

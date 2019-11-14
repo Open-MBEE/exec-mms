@@ -12,8 +12,6 @@ public interface WebhookRepository extends JpaRepository<Webhook, Long> {
 
     List<Webhook> findAllByProject_ProjectId(String projectId);
 
-    Optional<Webhook> findById(Long id);
-
-    Optional<Webhook> findByProject_ProjectIdAndUri(String projectId, String uri);
+    Optional<Webhook> findByProject_ProjectIdAndUrl(String projectId, String url);
 
 }

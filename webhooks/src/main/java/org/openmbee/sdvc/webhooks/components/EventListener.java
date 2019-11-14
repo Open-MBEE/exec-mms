@@ -39,19 +39,15 @@ public class EventListener implements ApplicationListener<EventObject> {
         List<Webhook> webhooks = eventRepository.findAllByProject_ProjectId(eventObject.getProjectId());
 
         for (Webhook webhook : webhooks) {
-            sendWebhook(webhook, eventObject.getPayload());
+            sendWebhook(webhook.getUrl(), eventObject.getSource());
         }
 
-        allEvents.ifPresent(event -> {
-            Webhook defaultWebhook = new Webhook();
-            defaultWebhook.setUri(event);
-            sendWebhook(defaultWebhook, eventObject.getPayload());
-        });
+        allEvents.ifPresent(event -> sendWebhook(event, eventObject.getSource()));
     }
 
-    private void sendWebhook(Webhook webhook, Object payload) {
+    private void sendWebhook(String webhook, Object payload) {
         try {
-            URI uri = new URI(webhook.getUri());
+            URI uri = new URI(webhook);
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
@@ -60,7 +56,7 @@ public class EventListener implements ApplicationListener<EventObject> {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> result = restTemplate.postForEntity(uri, request, String.class);
             if (result.getStatusCodeValue() == 200) {
-                logger.info("Sent event to " + webhook.getUri() + " with payload: " + payload);
+                logger.info("Sent event to " + webhook + " with payload: " + payload);
             }
         } catch (URISyntaxException se) {
             // Do nothing; Nowhere to post;
@@ -70,6 +66,6 @@ public class EventListener implements ApplicationListener<EventObject> {
             logger.error("Some error happened", e);
             return;
         }
-        logger.info("Sent event to " + webhook.getUri() + " with payload: " + payload);
+        logger.info("Sent event to " + webhook + " with payload: " + payload);
     }
 }

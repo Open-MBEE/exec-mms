@@ -33,8 +33,8 @@ public class WebhookDAOImpl implements WebhookDAO {
     }
 
     @Override
-    public Optional<Webhook> findByProject_ProjectIdAndUri(String id, String uri) {
-        return webhookRepository.findByProject_ProjectIdAndUri(id, uri);
+    public Optional<Webhook> findByProject_ProjectIdAndUrl(String id, String url) {
+        return webhookRepository.findByProject_ProjectIdAndUrl(id, url);
     }
 
     @Override

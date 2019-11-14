@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
@@ -180,6 +181,9 @@ public class DefaultNodeService implements NodeService {
 
             this.commitIndex.index(cmjs);
             this.commitRepository.save(commit);
+
+            eventPublisher.ifPresent((pub) -> pub.publish(
+                EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));
         }
     }
 
