@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class WebhookDAOImpl implements WebhookDAO {
@@ -32,7 +33,17 @@ public class WebhookDAOImpl implements WebhookDAO {
     }
 
     @Override
+    public Optional<Webhook> findByProject_ProjectIdAndUri(String id, String uri) {
+        return webhookRepository.findByProject_ProjectIdAndUri(id, uri);
+    }
+
+    @Override
     public List<Webhook> findAll() {
         return webhookRepository.findAll();
+    }
+
+    @Override
+    public Optional<Webhook> findById(Long id) {
+        return webhookRepository.findById(id);
     }
 }

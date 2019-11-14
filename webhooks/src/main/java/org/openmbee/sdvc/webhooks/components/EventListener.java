@@ -6,6 +6,7 @@ import org.openmbee.sdvc.core.dao.WebhookDAO;
 import org.openmbee.sdvc.data.domains.global.Webhook;
 import org.openmbee.sdvc.core.objects.EventObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,11 +17,15 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class EventListener implements ApplicationListener<EventObject> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
+
+    @Value("${webhook.default.all:#{null}}")
+    private Optional<String> allEvents;
 
     private WebhookDAO eventRepository;
 
@@ -31,30 +36,40 @@ public class EventListener implements ApplicationListener<EventObject> {
 
     @Override
     public void onApplicationEvent(EventObject eventObject) {
-        RestTemplate restTemplate = new RestTemplate();
         List<Webhook> webhooks = eventRepository.findAllByProject_ProjectId(eventObject.getProjectId());
 
         for (Webhook webhook : webhooks) {
-            try {
-                URI uri = new URI(webhook.getUri());
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.set("Content-Type", "application/json");
-                HttpEntity<Object> request = new HttpEntity<>(eventObject.getPayload(), headers);
-
-                ResponseEntity<String> result = restTemplate.postForEntity(uri, request, String.class);
-                if (result.getStatusCodeValue() == 200) {
-                    logger.info("Sent event to " + webhook.getUri() + " with payload: " + eventObject.getPayload());
-                }
-            } catch (URISyntaxException se) {
-                // Do nothing; Nowhere to post;
-                logger.error("Error in web hook: ", se);
-                return;
-            } catch (Exception e) {
-                logger.error("Some error happened", e);
-                return;
-            }
-            logger.info("Sent event to " + webhook.getUri() + " with payload: " + eventObject.getPayload());
+            sendWebhook(webhook, eventObject.getPayload());
         }
+
+        allEvents.ifPresent(event -> {
+            Webhook defaultWebhook = new Webhook();
+            defaultWebhook.setUri(event);
+            sendWebhook(defaultWebhook, eventObject.getPayload());
+        });
+    }
+
+    private void sendWebhook(Webhook webhook, Object payload) {
+        try {
+            URI uri = new URI(webhook.getUri());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            HttpEntity<Object> request = new HttpEntity<>(payload, headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> result = restTemplate.postForEntity(uri, request, String.class);
+            if (result.getStatusCodeValue() == 200) {
+                logger.info("Sent event to " + webhook.getUri() + " with payload: " + payload);
+            }
+        } catch (URISyntaxException se) {
+            // Do nothing; Nowhere to post;
+            logger.error("Error in web hook: ", se);
+            return;
+        } catch (Exception e) {
+            logger.error("Some error happened", e);
+            return;
+        }
+        logger.info("Sent event to " + webhook.getUri() + " with payload: " + payload);
     }
 }
