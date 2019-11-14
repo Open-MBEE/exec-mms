@@ -5,8 +5,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.core.components.EventPublisher;
-import org.openmbee.sdvc.core.objects.EventObject;
+import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.services.NodeService;
@@ -45,7 +44,7 @@ public class DefaultNodeService implements NodeService {
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
 
-    protected Optional<EventPublisher> eventPublisher;
+    protected Optional<EventService> eventPublisher;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -83,7 +82,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
-    public void setEventPublisher(Optional<EventPublisher> eventPublisher) {
+    public void setEventPublisher(Optional<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
