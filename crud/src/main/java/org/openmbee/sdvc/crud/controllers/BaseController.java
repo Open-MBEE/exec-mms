@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.objects.BaseResponse;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.core.services.PermissionService;
 import org.openmbee.sdvc.core.exceptions.ForbiddenException;
@@ -79,8 +80,8 @@ public abstract class BaseController {
 
     protected void handleSingleResponse(BaseResponse res) {
         if (res.getRejected() != null && !res.getRejected().isEmpty()) {
-            List<Map> rejected = res.getRejected();
-            Integer code = (Integer) rejected.get(0).get("code");
+            List<Rejection> rejected = res.getRejected();
+            int code = rejected.get(0).getCode();
             switch(code) {
                 case 304:
                     throw new NotModifiedException(res);

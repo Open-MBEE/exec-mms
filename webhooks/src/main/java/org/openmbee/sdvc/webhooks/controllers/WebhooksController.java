@@ -45,7 +45,7 @@ public class WebhooksController {
 
     @GetMapping
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
-    public ResponseEntity<? extends BaseResponse> handleGet(@PathVariable String projectId) {
+    public WebhookResponse getAllWebhooks(@PathVariable String projectId) {
 
         WebhookResponse response = new WebhookResponse();
         List<Webhook> webhooks = webhookRepository.findAllByProject_ProjectId(projectId);
@@ -56,21 +56,19 @@ public class WebhooksController {
             webhookJson.setId(webhook.getId().toString());
             response.getWebhooks().add(webhookJson);
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     @PostMapping
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_WEBHOOKS', false)")
-    public ResponseEntity<? extends BaseResponse> handlePost(@PathVariable String projectId, @RequestBody WebhookRequest webhooksPost) {
+    public WebhookResponse createOrUpdateWebhooks(@PathVariable String projectId, @RequestBody WebhookRequest webhooksPost) {
 
         if (webhooksPost.getWebhooks().isEmpty()) {
             throw new BadRequestException(new WebhookResponse().addMessage("No web hooks provided"));
         }
 
         WebhookResponse response = new WebhookResponse();
-        List<Map> rejected = new ArrayList<>();
-        response.setRejected(rejected);
         Optional<Project> project = projectRepository.findByProjectId(projectId);
 
         for (WebhookJson json: webhooksPost.getWebhooks()) {
@@ -91,13 +89,13 @@ public class WebhooksController {
                 response.getWebhooks().add(json);
             }
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     @DeleteMapping
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_WEBHOOKS', false)")
-    public ResponseEntity<? extends BaseResponse> handleDelete(@PathVariable String projectId, @RequestBody WebhookRequest webhookRequest) {
+    public WebhookResponse deleteWebhooks(@PathVariable String projectId, @RequestBody WebhookRequest webhookRequest) {
 
         // TODO: Determine which webhook to delete somehow. Maybe require webhook id.
 
@@ -117,7 +115,7 @@ public class WebhooksController {
                 response.addMessage(String.format("Web hook for project %s to %s deleted", projectId, webhook.getUrl()));
             }
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     public Map<String, Object> convertToMap(Object obj) {

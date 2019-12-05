@@ -22,27 +22,39 @@ public class NotebooksController extends BaseController {
         this.nodeService = nodeService;
     }
 
-    @GetMapping(value = {"", "/{notebookId}"})
+    @GetMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ResponseEntity<?> handleGet(
+    public NotebooksResponse getAllNotebooks(
         @PathVariable String projectId,
         @PathVariable String refId,
-        @PathVariable(required = false) String notebookId,
         @RequestParam(required = false) Map<String, String> params) {
 
-        ElementsResponse res = nodeService.readNotebooks(projectId, refId, notebookId, params);
-        if (notebookId != null) {
-            this.handleSingleResponse(res);
-        }
+        ElementsResponse res = nodeService.readNotebooks(projectId, refId, "", params);
         NotebooksResponse resn = new NotebooksResponse();
         resn.setNotebooks(res.getElements());
         resn.setRejected(res.getRejected());
-        return ResponseEntity.ok(resn);
+        return resn;
+    }
+
+    @GetMapping(value = "/{notebookId}")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
+    public NotebooksResponse getNotebook(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @PathVariable String notebookId,
+        @RequestParam(required = false) Map<String, String> params) {
+
+        ElementsResponse res = nodeService.readNotebooks(projectId, refId, notebookId, params);
+        this.handleSingleResponse(res);
+        NotebooksResponse resn = new NotebooksResponse();
+        resn.setNotebooks(res.getElements());
+        resn.setRejected(res.getRejected());
+        return resn;
     }
 
     @PutMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ResponseEntity<?> handlePut(
+    public NotebooksResponse bulkGetNotebooks(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
@@ -52,18 +64,18 @@ public class NotebooksController extends BaseController {
         NotebooksResponse resn = new NotebooksResponse();
         resn.setNotebooks(res.getElements());
         resn.setRejected(res.getRejected());
-        return ResponseEntity.ok(resn);
+        return resn;
     }
 
     @PostMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
-    public ResponseEntity<?> handlePost(
+    public NotebooksResponse createOrUpdateNotebooks(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
         @RequestParam(required = false) Map<String, String> params,
         Authentication auth) {
 
-        return ResponseEntity.ok(nodeService.createOrUpdateNotebooks(projectId, refId, req, params, auth.getName()));
+        return nodeService.createOrUpdateNotebooks(projectId, refId, req, params, auth.getName());
     }
 }

@@ -5,10 +5,8 @@ import java.util.Map;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,25 +23,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
 public class ElementsController extends BaseController {
 
-    @GetMapping(value = {"", "/{elementId}"})
+    @GetMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ResponseEntity<? extends BaseResponse> handleGet(
+    public ElementsResponse getAllElements(
         @PathVariable String projectId,
         @PathVariable String refId,
-        @PathVariable(required = false) String elementId,
+        @RequestParam(required = false) Map<String, String> params) {
+
+        NodeService nodeService = getNodeService(projectId);
+        ElementsResponse res = nodeService.read(projectId, refId, "", params);
+        return res;
+    }
+
+    @GetMapping(value = "/{elementId}")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
+    public ElementsResponse getElement(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @PathVariable String elementId,
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
-        if (elementId != null) {
-            handleSingleResponse(res);
-        }
-        return ResponseEntity.ok(res);
+        handleSingleResponse(res);
+        return res;
     }
 
     @PostMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
-    public ResponseEntity<? extends BaseResponse> handlePost(
+    public ElementsResponse createOrUpdateElements(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
@@ -53,15 +61,14 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            response = nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
-            return ResponseEntity.ok(response);
+            return nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
         }
         throw new BadRequestException(response.addMessage("Empty"));
     }
 
     @PutMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ResponseEntity<? extends BaseResponse> handlePut(
+    public ElementsResponse getElements(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
@@ -70,15 +77,14 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            response = nodeService.read(projectId, refId, req, params);
-            return ResponseEntity.ok(response);
+            return nodeService.read(projectId, refId, req, params);
         }
         throw new BadRequestException(response.addMessage("Empty"));
     }
 
     @DeleteMapping(value = "/{elementId}")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
-    public ResponseEntity<? extends BaseResponse> handleDelete(
+    public ElementsResponse deleteElement(
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
@@ -86,18 +92,17 @@ public class ElementsController extends BaseController {
 
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
-        return ResponseEntity.ok(res);
+        return res;
     }
 
     @DeleteMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
-    public ResponseEntity<? extends BaseResponse> handleBulkDelete(
+    public ElementsResponse deleteElements(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
         Authentication auth) {
 
-        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, req, auth.getName());
-        return ResponseEntity.ok(res);
+        return getNodeService(projectId).delete(projectId, refId, req, auth.getName());
     }
 }

@@ -8,15 +8,18 @@ import org.openmbee.sdvc.json.CommitJson;
 
 public class CommitsResponse extends BaseResponse<CommitsResponse> {
 
+    private List<CommitJson> commits;
+
     public CommitsResponse() {
-        this.put(Constants.COMMIT_KEY, new ArrayList<CommitJson>());
+        this.commits = new ArrayList<>();
     }
 
     public List<CommitJson> getCommits() {
-        return (List<CommitJson>) this.get(Constants.COMMIT_KEY);
+        return commits;
     }
 
-    public void setCommits(List<CommitJson> commits) {
-        this.put(Constants.COMMIT_KEY, commits);
+    public CommitsResponse setCommits(List<CommitJson> commits) {
+        this.commits = commits;
+        return this;
     }
 }

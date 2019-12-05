@@ -2,11 +2,11 @@ package org.openmbee.sdvc.crud.services;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.config.Formats;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.json.BaseJson;
@@ -19,19 +19,17 @@ import org.springframework.stereotype.Service;
 public class NodePostHelper extends NodeOperation {
 
     public boolean isUpdated(BaseJson element, Map<String, Object> existing,
-                             Map<String, Object> rejection) {
+                             NodeChangeInfo info) {
 
         if (element.isPartialOf(existing)) {
-            rejection.put("message", "Is Equivalent");
-            rejection.put("code", 304);
-            rejection.put("element", element);
+            info.addRejection(new Rejection(element, 304, "Is Equivalent"));
             return false;
         }
         return true;
     }
 
     public boolean diffUpdateJson(BaseJson element, Map<String, Object> existing,
-                                  Map<String, Object> rejection) {
+                                  NodeChangeInfo info) {
 
         String jsonModified = element.getModified();
         Object existingModified = existing.get(BaseJson.MODIFIED);
@@ -40,9 +38,7 @@ public class NodePostHelper extends NodeOperation {
                 Date jsonModDate = Formats.SDF.parse(jsonModified);
                 Date existingModDate = Formats.SDF.parse(existingModified.toString());
                 if (jsonModDate.before(existingModDate)) {
-                    rejection.put("message", "Conflict Detected");
-                    rejection.put("code", 409);
-                    rejection.put("element", element);
+                    info.addRejection(new Rejection(element, 409, "Conflict Detected"));
                     return false;
                 }
             } catch (ParseException e) {
@@ -64,13 +60,10 @@ public class NodePostHelper extends NodeOperation {
             if (element == null) {
                 continue;
             }
-            Map<String, Object> rejected = new HashMap<>();
             boolean added = false;
             boolean updated = false;
             if (element.getId() == null || element.getId().isEmpty()) {
-                rejected.put("message", "Missing ID");
-                rejected.put("code", 400);
-                rejected.put("element", element);
+                info.addRejection(new Rejection(element, 400, "Missing ID"));
             } else {
                 Map<String, Object> elasticElement = info.getExistingElementMap()
                     .get(element.getId());
@@ -83,8 +76,8 @@ public class NodePostHelper extends NodeOperation {
 
                 if (!added) {
                     if (!overwriteJson) {
-                        if (n.isDeleted() || isUpdated(element, elasticElement, rejected)) {
-                            updated = diffUpdateJson(element, elasticElement, rejected);
+                        if (n.isDeleted() || isUpdated(element, elasticElement, info)) {
+                            updated = diffUpdateJson(element, elasticElement, info);
                         }
                     } else {
                         updated = true;
@@ -106,8 +99,6 @@ public class NodePostHelper extends NodeOperation {
                 info.getToSaveNodeMap().put(node.getNodeId(), node);
                 info.getUpdatedMap().put(element.getId(), element);
                 service.extraProcessPostedElement(element, node, info);
-            } else {
-                info.getRejected().add(rejected);
             }
         }
         return info;

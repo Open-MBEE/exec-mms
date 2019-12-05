@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.dao.BranchDAO;
@@ -205,11 +206,7 @@ public class NodeOperation {
     }
 
     protected void rejectNotFound(NodeGetInfo info, String nodeId) {
-        Map<String, Object> reject = new HashMap<>();
-        reject.put("code", 404);
-        reject.put("message", "not found");
-        reject.put("id", nodeId);
-        info.getRejected().add(reject);
+        info.addRejection(new Rejection(nodeId, 404, "Not Found"));
     }
 
     public static Map<String, ElementJson> convertJsonToMap(

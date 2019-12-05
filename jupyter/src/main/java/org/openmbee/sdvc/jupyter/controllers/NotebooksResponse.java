@@ -8,16 +8,18 @@ import org.openmbee.sdvc.jupyter.JupyterConstants;
 
 public class NotebooksResponse extends BaseResponse<NotebooksResponse> {
 
+    private List<ElementJson> notebooks;
+
     public NotebooksResponse() {
-        this.put(JupyterConstants.NOTEBOOKS, new ArrayList<ElementJson>());
+        this.notebooks = new ArrayList<>();
     }
 
     public List<ElementJson> getNotebooks() {
-        return (List<ElementJson>) this.get(JupyterConstants.NOTEBOOKS);
+        return notebooks;
     }
 
-    public NotebooksResponse setNotebooks(List<ElementJson> elements) {
-        this.put(JupyterConstants.NOTEBOOKS, elements);
+    public NotebooksResponse setNotebooks(List<ElementJson> notebooks) {
+        this.notebooks = notebooks;
         return this;
     }
 }

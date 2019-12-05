@@ -19,7 +19,7 @@ public class GroupsController extends BaseController {
         this.nodeService = nodeService;
     }
 
-    @GetMapping
+    //@GetMapping
     public ResponseEntity<?> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,

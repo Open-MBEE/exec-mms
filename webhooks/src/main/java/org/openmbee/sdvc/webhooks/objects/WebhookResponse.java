@@ -9,16 +9,18 @@ import java.util.List;
 
 public class WebhookResponse extends BaseResponse<WebhookResponse> {
 
+    private List<WebhookJson> webhooks;
+
     public WebhookResponse() {
-        this.put(Constants.WEBHOOK_KEY, new ArrayList<WebhookJson>());
+        this.webhooks = new ArrayList<>();
     }
 
     public List<WebhookJson> getWebhooks() {
-        return (List<WebhookJson>) this.get(Constants.WEBHOOK_KEY);
+        return webhooks;
     }
 
     public WebhookResponse setWebhooks(List<WebhookJson> webhooks) {
-        this.put(Constants.WEBHOOK_KEY, webhooks);
+        this.webhooks = webhooks;
         return this;
     }
 

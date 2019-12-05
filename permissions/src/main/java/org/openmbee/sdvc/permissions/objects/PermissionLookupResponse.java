@@ -2,12 +2,12 @@ package org.openmbee.sdvc.permissions.objects;
 
 import java.util.List;
 import java.util.Map;
+import org.openmbee.sdvc.core.objects.BaseResponse;
+import org.openmbee.sdvc.core.objects.Rejection;
 
-public class PermissionLookupResponse {
+public class PermissionLookupResponse extends BaseResponse<PermissionLookupResponse> {
 
     private List<PermissionLookup> lookups;
-
-    private List<Map> rejected;
 
     private boolean allPassed;
 
@@ -27,11 +27,4 @@ public class PermissionLookupResponse {
         this.lookups = lookups;
     }
 
-    public List<Map> getRejected() {
-        return rejected;
-    }
-
-    public void setRejected(List<Map> rejected) {
-        this.rejected = rejected;
-    }
 }

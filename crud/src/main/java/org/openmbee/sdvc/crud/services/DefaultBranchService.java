@@ -84,7 +84,7 @@ public class DefaultBranchService implements BranchService {
         branches.forEach(branch -> {
             refs.add(convertToJson(branch));
         });
-        branchesResponse.setBranches(refs);
+        branchesResponse.setRefs(refs);
         return branchesResponse;
     }
 
@@ -98,7 +98,7 @@ public class DefaultBranchService implements BranchService {
         Branch b = branches.get();
         List<RefJson> refs = new ArrayList<>();
         refs.add(convertToJson(b));
-        branchesResponse.setBranches(refs);
+        branchesResponse.setRefs(refs);
         if (b.isDeleted()) {
             throw new DeletedException(branchesResponse);
         }
@@ -178,7 +178,7 @@ public class DefaultBranchService implements BranchService {
         branchRepository.save(b);
         List<RefJson> refs = new ArrayList<>();
         refs.add(convertToJson(b));
-        branchesResponse.setBranches(refs);
+        branchesResponse.setRefs(refs);
         return branchesResponse;
     }
 

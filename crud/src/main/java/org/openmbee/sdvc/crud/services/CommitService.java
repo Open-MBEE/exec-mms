@@ -12,6 +12,7 @@ import java.util.Set;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Formats;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
@@ -96,11 +97,11 @@ public class CommitService {
             if (commit.isPresent()) {
                 res.getCommits().add(commit.get());
             } else {
-                res.setCode(404);
+                throw new NotFoundException(res);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            res.setCode(500);
+            throw new InternalErrorException(e);
         }
         return res;
     }
@@ -122,7 +123,7 @@ public class CommitService {
             res.getCommits().addAll(commitIndex.elementHistory(elementId, commitIds));
         } catch (Exception e) {
             e.printStackTrace();
-            res.setCode(500);
+            throw new InternalErrorException(e);
         }
         return res;
     }
@@ -138,7 +139,7 @@ public class CommitService {
             res.getCommits().addAll(commitIndex.findAllById(ids));
         } catch (Exception e) {
             e.printStackTrace();
-            res.setCode(500);
+            throw new InternalErrorException(e);
         }
         return res;
     }

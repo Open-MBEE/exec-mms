@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.crud.services.NodeOperation;
 import org.openmbee.sdvc.json.ElementJson;
@@ -69,17 +70,12 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
     public ElementsResponse readNotebooks(String projectId, String refId, ElementsRequest req,
             Map<String, String> params) {
         ElementsResponse res = this.read(projectId, refId, req, new HashMap<>());
-        List<Map> rejected = new ArrayList<>(res.getRejected());
+        List<Rejection> rejected = new ArrayList<>(res.getRejected());
         List<ElementJson> nonNotebooks = new ArrayList<>();
         for (ElementJson e: res.getElements()) {
             List<ElementJson> req2s = new ArrayList<>();
             if (!e.containsKey(JupyterConstants.CELLS) || e.get(JupyterConstants.CELLS) == null) {
-                Map<String, Object> reject = new HashMap<>();
-                reject.put("code", 400);
-                reject.put("message", "not a notebook");
-                reject.put("id", e.getId());
-                reject.put("element", e);
-                rejected.add(reject);
+                rejected.add(new Rejection(e, 400, "not a notebook"));
                 nonNotebooks.add(e);
                 continue;
             }

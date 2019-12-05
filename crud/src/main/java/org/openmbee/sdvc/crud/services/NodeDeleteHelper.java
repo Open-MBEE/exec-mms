@@ -1,9 +1,9 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.scoped.Node;
@@ -24,12 +24,7 @@ public class NodeDeleteHelper extends NodeOperation {
             Node node = info.getExistingNodeMap().get(nodeId);
             Map<String, Object> indexElement = info.getExistingElementMap().get(nodeId);
             if (node.isDeleted()) {
-                Map<String, Object> reject = new HashMap<>();
-                reject.put("code", 304);
-                reject.put("message", "Already deleted");
-                reject.put("id", nodeId);
-                reject.put("element", indexElement);
-                info.getRejected().add(reject);
+                info.addRejection(new Rejection(indexElement, 304, "Already deleted"));
                 continue;
             }
             info.getOldDocIds().add(node.getDocId());
