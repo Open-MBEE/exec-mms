@@ -53,7 +53,7 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
     public ElementsResponse readNotebooks(String projectId, String refId, String elementId, Map<String, String> params) {
         ElementsRequest req = new ElementsRequest();
         List<ElementJson> reqs = new ArrayList<>();
-        if (elementId == null) {
+        if (elementId == null || elementId.isEmpty()) {
             ContextHolder.setContext(projectId, refId);
             List<Node> notebooks = this.nodeRepository
                 .findAllByDeletedAndNodeType(false, JupyterNodeType.NOTEBOOK.getValue());
