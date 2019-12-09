@@ -7,6 +7,7 @@ import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,7 +50,7 @@ public class ElementsController extends BaseController {
         return res;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ElementsResponse createOrUpdateElements(
         @PathVariable String projectId,
@@ -66,7 +67,7 @@ public class ElementsController extends BaseController {
         throw new BadRequestException(response.addMessage("Empty"));
     }
 
-    @PutMapping
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ElementsResponse getElements(
         @PathVariable String projectId,
@@ -95,7 +96,7 @@ public class ElementsController extends BaseController {
         return res;
     }
 
-    @DeleteMapping
+    @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ElementsResponse deleteElements(
         @PathVariable String projectId,

@@ -7,6 +7,7 @@ import org.openmbee.sdvc.core.objects.CommitsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.crud.services.CommitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,7 +58,7 @@ public class CommitsController extends BaseController {
         return commitService.getElementCommits(projectId, refId, elementId, params);
     }
 
-    @PutMapping(value = "/commits")
+    @PutMapping(value = "/commits", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public CommitsResponse getCommits(
         @PathVariable String projectId,

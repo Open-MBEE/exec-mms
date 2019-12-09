@@ -13,6 +13,7 @@ import org.openmbee.sdvc.webhooks.json.WebhookJson;
 import org.openmbee.sdvc.webhooks.objects.WebhookRequest;
 import org.openmbee.sdvc.webhooks.objects.WebhookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +60,7 @@ public class WebhooksController {
         return response;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_WEBHOOKS', false)")
     public WebhookResponse createOrUpdateWebhooks(@PathVariable String projectId, @RequestBody WebhookRequest webhooksPost) {
@@ -92,7 +93,7 @@ public class WebhooksController {
         return response;
     }
 
-    @DeleteMapping
+    @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_WEBHOOKS', false)")
     public WebhookResponse deleteWebhooks(@PathVariable String projectId, @RequestBody WebhookRequest webhookRequest) {

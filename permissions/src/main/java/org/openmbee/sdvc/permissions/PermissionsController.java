@@ -3,6 +3,7 @@ package org.openmbee.sdvc.permissions;
 import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,7 @@ public class PermissionsController {
         this.permissionService = permissionService;
     }
 
-    @PostMapping(value = "/orgs/{orgId}/permissions")
+    @PostMapping(value = "/orgs/{orgId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateOrgPermissions(
@@ -40,7 +41,7 @@ public class PermissionsController {
         return ResponseEntity.ok("");
     }
 
-    @PostMapping(value = "/projects/{projectId}/permissions")
+    @PostMapping(value = "/projects/{projectId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateProjectPermissions(
@@ -62,7 +63,7 @@ public class PermissionsController {
         return ResponseEntity.ok("");
     }
 
-    @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions")
+    @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_UPDATE_PERMISSIONS', false)")
     public ResponseEntity<?> updateBranchPermissions(

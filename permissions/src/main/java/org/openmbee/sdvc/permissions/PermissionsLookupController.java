@@ -11,6 +11,7 @@ import org.openmbee.sdvc.permissions.objects.PermissionLookup;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupRequest;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +27,7 @@ public class PermissionsLookupController {
         this.mss = mss;
     }
 
-    @PostMapping(value = "/permissions")
+    @PostMapping(value = "/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     public PermissionLookupResponse lookupPermissions(@RequestBody PermissionLookupRequest req, Authentication auth) {
         PermissionLookupResponse res = new PermissionLookupResponse();
         List<PermissionLookup> lookups = new ArrayList<>();

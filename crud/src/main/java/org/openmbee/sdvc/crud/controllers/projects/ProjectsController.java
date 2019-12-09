@@ -18,6 +18,7 @@ import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -75,7 +76,7 @@ public class ProjectsController extends BaseController {
         return response;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("isAuthenticated()")
     public ProjectsResponse createOrUpdateProjects(

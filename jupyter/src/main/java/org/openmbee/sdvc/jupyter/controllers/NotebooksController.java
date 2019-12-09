@@ -4,6 +4,7 @@ import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -52,9 +53,9 @@ public class NotebooksController extends BaseController {
         return resn;
     }
 
-    @PutMapping
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public NotebooksResponse bulkGetNotebooks(
+    public NotebooksResponse getNotebooks(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
@@ -67,7 +68,7 @@ public class NotebooksController extends BaseController {
         return resn;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public NotebooksResponse createOrUpdateNotebooks(
         @PathVariable String projectId,

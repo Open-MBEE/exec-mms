@@ -6,6 +6,7 @@ import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
 import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
 import org.openmbee.sdvc.authenticator.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +33,7 @@ public class AuthenticationController {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    @PostMapping(value = "/authentication")
+    @PostMapping(value = "/authentication", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JwtAuthenticationResponse> createAuthenticationToken(
         @RequestBody
             JwtAuthenticationRequest authenticationRequest) {
@@ -49,7 +50,7 @@ public class AuthenticationController {
 
     }
 
-    @PostMapping(value = "/user")
+    @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("authentication.name == 'admin'")
     public ResponseEntity<?> createUser(@RequestBody JwtAuthenticationRequest req) {
         try {
