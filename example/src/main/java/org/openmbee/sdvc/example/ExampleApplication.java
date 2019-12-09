@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.example;
 
 import java.util.Arrays;
+import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +33,7 @@ public class ExampleApplication {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-            .ignoredParameterTypes(Authentication.class)
+            .ignoredParameterTypes(Authentication.class, Map.class)
             .apiInfo(apiInfo()).select()
             .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
             .paths(PathSelectors.any()).build()
