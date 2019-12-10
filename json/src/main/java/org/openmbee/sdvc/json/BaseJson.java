@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,81 +49,97 @@ public class BaseJson<T> extends HashMap<String, Object> {
         return (T) this;
     }
 
+    @JsonProperty(DOCID)
     public String getDocId() {
         return (String) this.get(DOCID);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(DOCID)
     public T setDocId(String docId) {
         this.put(DOCID, docId);
         return (T) this;
     }
 
+    @JsonProperty(PROJECTID)
     public String getProjectId() {
         return (String) this.get(PROJECTID);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(PROJECTID)
     public T setProjectId(String projectId) {
         this.put(PROJECTID, projectId);
         return (T) this;
     }
 
+    @JsonProperty(REFID)
     public String getRefId() {
         return (String) this.get(REFID);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(REFID)
     public T setRefId(String refId) {
         this.put(REFID, refId);
         return (T) this;
     }
 
+    @JsonProperty(MODIFIER)
     public String getModifier() {
         return (String) this.get(MODIFIER);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(MODIFIER)
     public T setModifier(String modifier) {
         this.put(MODIFIER, modifier);
         return (T) this;
     }
 
+    @JsonProperty(MODIFIED)
     public String getModified() {
         return (String) this.get(MODIFIED);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(MODIFIED)
     public T setModified(String modified) {
         this.put(MODIFIED, modified);
         return (T) this;
     }
 
+    @JsonProperty(CREATOR)
     public String getCreator() {
         return (String) this.get(CREATOR);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(CREATOR)
     public T setCreator(String creator) {
         this.put(CREATOR, creator);
         return (T) this;
     }
 
+    @JsonProperty(CREATED)
     public String getCreated() {
         return (String) this.get(CREATED);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(CREATED)
     public T setCreated(String created) {
         this.put(CREATED, created);
         return (T) this;
     }
 
+    @JsonProperty(COMMITID)
     public String getCommitId() {
         return (String) this.get(COMMITID);
     }
 
     @SuppressWarnings("unchecked")
+    @JsonProperty(COMMITID)
     public T setCommitId(String commitId) {
         this.put(COMMITID, commitId);
         return (T) this;
