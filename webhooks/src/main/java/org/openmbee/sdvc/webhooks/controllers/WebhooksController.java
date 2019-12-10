@@ -6,7 +6,6 @@ import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.dao.WebhookDAO;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
-import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.data.domains.global.Webhook;
 import org.openmbee.sdvc.webhooks.json.WebhookJson;
@@ -14,7 +13,6 @@ import org.openmbee.sdvc.webhooks.objects.WebhookRequest;
 import org.openmbee.sdvc.webhooks.objects.WebhookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +53,7 @@ public class WebhooksController {
             WebhookJson webhookJson = new WebhookJson();
             webhookJson.merge(convertToMap(webhook));
             webhookJson.setId(webhook.getId().toString());
+            webhookJson.setProjectId(projectId);
             response.getWebhooks().add(webhookJson);
         }
         return response;
@@ -74,21 +73,18 @@ public class WebhooksController {
 
         for (WebhookJson json: webhooksPost.getWebhooks()) {
             Optional<Webhook> existing = webhookExists(json, projectId);
-
+            Webhook hook;
             if (!existing.isPresent()) {
-                Webhook newWebhook = new Webhook();
-                newWebhook.setProject(project.get());
-                newWebhook.setUrl(json.getUrl());
-                webhookRepository.save(newWebhook);
-                json.setId(newWebhook.getId().toString());
-                response.getWebhooks().add(json);
+                hook = new Webhook();
+                hook.setProject(project.get());
             } else {
-                Webhook existingHook = existing.get();
-                existingHook.setUrl(json.getUrl());
-                webhookRepository.save(existingHook);
-                json.setId(existingHook.getId().toString());
-                response.getWebhooks().add(json);
+                hook = existing.get();
             }
+            hook.setUrl(json.getUrl());
+            webhookRepository.save(hook);
+            json.setId(hook.getId().toString());
+            json.setProjectId(projectId);
+            response.getWebhooks().add(json);
         }
         return response;
     }

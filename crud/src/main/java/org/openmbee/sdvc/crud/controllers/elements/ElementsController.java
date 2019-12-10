@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.ElementsRequest;
@@ -57,7 +58,7 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
         @RequestParam(required = false) Map<String, String> params,
-        Authentication auth) {
+        @Parameter(hidden = true) Authentication auth) {
 
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
@@ -89,7 +90,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
-        Authentication auth) {
+        @Parameter(hidden = true) Authentication auth) {
 
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
@@ -102,7 +103,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
-        Authentication auth) {
+        @Parameter(hidden = true) Authentication auth) {
 
         return getNodeService(projectId).delete(projectId, refId, req, auth.getName());
     }

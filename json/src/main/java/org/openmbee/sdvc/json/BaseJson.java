@@ -1,10 +1,12 @@
 package org.openmbee.sdvc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@JsonIgnoreProperties({"empty"})
 public class BaseJson<T> extends HashMap<String, Object> {
 
     public static final String ID = "id";

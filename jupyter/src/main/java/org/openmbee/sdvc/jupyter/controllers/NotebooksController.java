@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
@@ -75,7 +76,7 @@ public class NotebooksController extends BaseController {
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
         @RequestParam(required = false) Map<String, String> params,
-        Authentication auth) {
+        @Parameter(hidden = true) Authentication auth) {
 
         return nodeService.createOrUpdateNotebooks(projectId, refId, req, params, auth.getName());
     }
