@@ -1,3 +1,9 @@
+## Swagger codegen
+
+        ../gradlew generateSwaggerCode
+        
+Results in build/swagger-code-*
+
 ## Run command line api test
 
 1. run example app on localhost (see top level readme)

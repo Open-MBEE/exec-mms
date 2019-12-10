@@ -1,0 +1,2084 @@
+openapi: 3.0.1
+info:
+  title: MMS Example API
+  description: Documentation for MMS API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  version: 0.0.1
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+security:
+- basicAuth: []
+- bearerToken: []
+paths:
+  /healthcheck:
+    get:
+      tags:
+      - health-check-controller
+      operationId: healthcheck
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+  /projects/{projectId}/refs/{refId}/notebooks:
+    get:
+      tags:
+      - notebooks-controller
+      operationId: getAllNotebooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+    put:
+      tags:
+      - notebooks-controller
+      operationId: getNotebooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotebooksRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+    post:
+      tags:
+      - notebooks-controller
+      operationId: createOrUpdateNotebooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotebooksRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+  /projects/{projectId}/refs/{refId}/notebooks/{notebookId}:
+    get:
+      tags:
+      - notebooks-controller
+      operationId: getNotebook
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: notebookId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+  /permissions:
+    post:
+      tags:
+      - permissions-lookup-controller
+      operationId: lookupPermissions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth:
+                  $ref: '#/components/schemas/Authentication'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PermissionLookupResponse'
+  /orgs/{orgId}/permissions:
+    get:
+      tags:
+      - permissions-controller
+      operationId: getOrgPermissions
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+    post:
+      tags:
+      - permissions-controller
+      operationId: updateOrgPermissions
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseEntityObject'
+  /projects/{projectId}/permissions:
+    get:
+      tags:
+      - permissions-controller
+      operationId: getProjectPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+    post:
+      tags:
+      - permissions-controller
+      operationId: updateProjectPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseEntityObject'
+  /projects/{projectId}/refs/{refId}/permissions:
+    get:
+      tags:
+      - permissions-controller
+      operationId: getBranchPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+    post:
+      tags:
+      - permissions-controller
+      operationId: updateBranchPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseEntityObject'
+  /projects/{projectId}/webhooks:
+    get:
+      tags:
+      - webhooks-controller
+      operationId: getAllWebhooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+    post:
+      tags:
+      - webhooks-controller
+      operationId: createOrUpdateWebhooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+    delete:
+      tags:
+      - webhooks-controller
+      operationId: deleteWebhooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+  /user:
+    post:
+      tags:
+      - authentication-controller
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JwtAuthenticationRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: object
+  /authentication:
+    post:
+      tags:
+      - authentication-controller
+      operationId: createAuthenticationToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JwtAuthenticationRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationResponse'
+  /projects/{projectId}/commits/{commitId}:
+    get:
+      tags:
+      - commits-controller
+      operationId: getCommit
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}/refs/{refId}/commits:
+    get:
+      tags:
+      - commits-controller
+      operationId: getAllCommits
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}/refs/{refId}/elements/{elementId}/commits:
+    get:
+      tags:
+      - commits-controller
+      operationId: getElementCommits
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}/commits:
+    put:
+      tags:
+      - commits-controller
+      operationId: getCommits
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}:
+    get:
+      tags:
+      - projects-controller
+      operationId: getProject
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+    delete:
+      tags:
+      - projects-controller
+      operationId: deleteProject
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: hard
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+  /projects:
+    get:
+      tags:
+      - projects-controller
+      operationId: getAllProjects
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+    post:
+      tags:
+      - projects-controller
+      operationId: createOrUpdateProjects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+  /orgs:
+    get:
+      tags:
+      - orgs-controller
+      operationId: getAllOrgs
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+    post:
+      tags:
+      - orgs-controller
+      operationId: createOrUpdateOrgs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+  /orgs/{orgId}:
+    get:
+      tags:
+      - orgs-controller
+      operationId: getOrg
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+    delete:
+      tags:
+      - orgs-controller
+      operationId: deleteOrg
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+  /projects/{projectId}/refs/{refId}/elements:
+    get:
+      tags:
+      - elements-controller
+      operationId: getAllElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    put:
+      tags:
+      - elements-controller
+      operationId: getElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    post:
+      tags:
+      - elements-controller
+      operationId: createOrUpdateElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    delete:
+      tags:
+      - elements-controller
+      operationId: deleteElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+  /projects/{projectId}/refs/{refId}/elements/{elementId}:
+    get:
+      tags:
+      - elements-controller
+      operationId: getElement
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    delete:
+      tags:
+      - elements-controller
+      operationId: deleteElement
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+  /projects/{projectId}/refs:
+    get:
+      tags:
+      - branches-controller
+      operationId: getAllBranches
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BranchesResponse'
+    post:
+      tags:
+      - branches-controller
+      operationId: createBranches
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BranchesRequest'
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BranchesResponse'
+  /projects/{projectId}/refs/{refId}:
+    get:
+      tags:
+      - branches-controller
+      operationId: getBranch
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BranchesResponse'
+    delete:
+      tags:
+      - branches-controller
+      operationId: deleteBranch
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BranchesResponse'
+components:
+  schemas:
+    ElementJson:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        id:
+          type: string
+        _inRefIds:
+          type: array
+          items:
+            type: string
+        _refId:
+          type: string
+        _creator:
+          type: string
+        _docId:
+          type: string
+        _projectId:
+          type: string
+        _modifier:
+          type: string
+        _modified:
+          type: string
+        _created:
+          type: string
+        _commitId:
+          type: string
+      additionalProperties:
+        type: object
+    NotebooksResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        notebooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementJson'
+    Rejection:
+      type: object
+      properties:
+        object:
+          type: object
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    NotebooksRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        comment:
+          type: string
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementJson'
+        notebooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementJson'
+    PermissionLookup:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - ORG
+          - PROJECT
+          - BRANCH
+        orgId:
+          type: string
+        projectId:
+          type: string
+        refId:
+          type: string
+        privilege:
+          type: string
+          enum:
+          - ORG_READ
+          - ORG_EDIT
+          - ORG_UPDATE_PERMISSIONS
+          - ORG_READ_PERMISSIONS
+          - ORG_CREATE_PROJECT
+          - ORG_DELETE
+          - PROJECT_READ
+          - PROJECT_EDIT
+          - PROJECT_READ_COMMITS
+          - PROJECT_CREATE_BRANCH
+          - PROJECT_DELETE
+          - PROJECT_UPDATE_PERMISSIONS
+          - PROJECT_READ_PERMISSIONS
+          - PROJECT_CREATE_WEBHOOKS
+          - BRANCH_READ
+          - BRANCH_EDIT_CONTENT
+          - BRANCH_DELETE
+          - BRANCH_UPDATE_PERMISSIONS
+          - BRANCH_READ_PERMISSIONS
+        allowAnonIfPublic:
+          type: boolean
+        hasPrivilege:
+          type: boolean
+    PermissionLookupRequest:
+      type: object
+      properties:
+        lookups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionLookup'
+    Authentication:
+      type: object
+      properties:
+        credentials:
+          type: object
+        principal:
+          type: object
+        details:
+          type: object
+        authenticated:
+          type: boolean
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantedAuthority'
+        name:
+          type: string
+    GrantedAuthority:
+      type: object
+      properties:
+        authority:
+          type: string
+    PermissionLookupResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        lookups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionLookup'
+        allPassed:
+          type: boolean
+    Permission:
+      type: object
+      properties:
+        name:
+          type: string
+        role:
+          type: string
+    PermissionUpdateRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - MODIFY
+          - REPLACE
+          - REMOVE
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    PermissionsRequest:
+      type: object
+      properties:
+        users:
+          $ref: '#/components/schemas/PermissionUpdateRequest'
+        groups:
+          $ref: '#/components/schemas/PermissionUpdateRequest'
+        inherit:
+          type: boolean
+        public:
+          type: boolean
+    ContentDisposition:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        filename:
+          type: string
+        charset:
+          type: object
+          properties:
+            registered:
+              type: boolean
+        size:
+          type: integer
+          format: int64
+        creationDate:
+          type: string
+          format: date-time
+        modificationDate:
+          type: string
+          format: date-time
+        readDate:
+          type: string
+          format: date-time
+    HttpHeaders:
+      type: object
+      properties:
+        cacheControl:
+          type: string
+        host:
+          type: object
+          properties:
+            hostString:
+              type: string
+            address:
+              type: object
+              properties:
+                canonicalHostName:
+                  type: string
+                multicastAddress:
+                  type: boolean
+                anyLocalAddress:
+                  type: boolean
+                loopbackAddress:
+                  type: boolean
+                linkLocalAddress:
+                  type: boolean
+                siteLocalAddress:
+                  type: boolean
+                mcglobal:
+                  type: boolean
+                mcnodeLocal:
+                  type: boolean
+                mclinkLocal:
+                  type: boolean
+                mcsiteLocal:
+                  type: boolean
+                mcorgLocal:
+                  type: boolean
+                hostAddress:
+                  type: string
+                address:
+                  type: array
+                  items:
+                    type: string
+                    format: byte
+                hostName:
+                  type: string
+            port:
+              type: integer
+              format: int32
+            unresolved:
+              type: boolean
+            hostName:
+              type: string
+        contentLanguage:
+          type: object
+          properties:
+            script:
+              type: string
+            country:
+              type: string
+            variant:
+              type: string
+            extensionKeys:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            unicodeLocaleAttributes:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            unicodeLocaleKeys:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+            iso3Language:
+              type: string
+            iso3Country:
+              type: string
+            displayLanguage:
+              type: string
+            displayScript:
+              type: string
+            displayCountry:
+              type: string
+            displayVariant:
+              type: string
+            displayName:
+              type: string
+            language:
+              type: string
+        etag:
+          type: string
+        origin:
+          type: string
+        connection:
+          type: array
+          items:
+            type: string
+        accept:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaType'
+        acceptLanguage:
+          type: array
+          items:
+            type: object
+            properties:
+              range:
+                type: string
+              weight:
+                type: number
+                format: double
+        acceptLanguageAsLocales:
+          type: array
+          items:
+            type: object
+            properties:
+              script:
+                type: string
+              country:
+                type: string
+              variant:
+                type: string
+              extensionKeys:
+                uniqueItems: true
+                type: array
+                items:
+                  type: string
+              unicodeLocaleAttributes:
+                uniqueItems: true
+                type: array
+                items:
+                  type: string
+              unicodeLocaleKeys:
+                uniqueItems: true
+                type: array
+                items:
+                  type: string
+              iso3Language:
+                type: string
+              iso3Country:
+                type: string
+              displayLanguage:
+                type: string
+              displayScript:
+                type: string
+              displayCountry:
+                type: string
+              displayVariant:
+                type: string
+              displayName:
+                type: string
+              language:
+                type: string
+        accessControlAllowCredentials:
+          type: boolean
+        accessControlAllowHeaders:
+          type: array
+          items:
+            type: string
+        accessControlAllowMethods:
+          type: array
+          items:
+            type: string
+            enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+            - TRACE
+        accessControlAllowOrigin:
+          type: string
+        accessControlExposeHeaders:
+          type: array
+          items:
+            type: string
+        accessControlMaxAge:
+          type: integer
+          format: int64
+        accessControlRequestHeaders:
+          type: array
+          items:
+            type: string
+        accessControlRequestMethod:
+          type: string
+          enum:
+          - GET
+          - HEAD
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+          - TRACE
+        acceptCharset:
+          type: array
+          items:
+            type: object
+            properties:
+              registered:
+                type: boolean
+        bearerAuth:
+          type: string
+          writeOnly: true
+        contentDisposition:
+          $ref: '#/components/schemas/ContentDisposition'
+        expires:
+          type: integer
+          format: int64
+        ifMatch:
+          type: array
+          items:
+            type: string
+        ifNoneMatch:
+          type: array
+          items:
+            type: string
+        ifUnmodifiedSince:
+          type: integer
+          format: int64
+        pragma:
+          type: string
+        range:
+          type: array
+          items:
+            $ref: '#/components/schemas/HttpRange'
+        upgrade:
+          type: string
+        vary:
+          type: array
+          items:
+            type: string
+        contentLength:
+          type: integer
+          format: int64
+        lastModified:
+          type: integer
+          format: int64
+        contentType:
+          $ref: '#/components/schemas/MediaType'
+        date:
+          type: integer
+          format: int64
+        ifModifiedSince:
+          type: integer
+          format: int64
+        empty:
+          type: boolean
+        location:
+          type: string
+          format: uri
+        all:
+          type: object
+          additionalProperties:
+            type: string
+          writeOnly: true
+        allow:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+            - TRACE
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    HttpRange:
+      type: object
+    MediaType:
+      type: object
+      properties:
+        type:
+          type: string
+        subtype:
+          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+        qualityValue:
+          type: number
+          format: double
+        wildcardType:
+          type: boolean
+        wildcardSubtype:
+          type: boolean
+        charset:
+          type: object
+          properties:
+            registered:
+              type: boolean
+        concrete:
+          type: boolean
+    ResponseEntityObject:
+      type: object
+      properties:
+        headers:
+          type: object
+          properties:
+            cacheControl:
+              type: string
+            host:
+              type: object
+              properties:
+                hostString:
+                  type: string
+                address:
+                  type: object
+                  properties:
+                    canonicalHostName:
+                      type: string
+                    multicastAddress:
+                      type: boolean
+                    anyLocalAddress:
+                      type: boolean
+                    loopbackAddress:
+                      type: boolean
+                    linkLocalAddress:
+                      type: boolean
+                    siteLocalAddress:
+                      type: boolean
+                    mcglobal:
+                      type: boolean
+                    mcnodeLocal:
+                      type: boolean
+                    mclinkLocal:
+                      type: boolean
+                    mcsiteLocal:
+                      type: boolean
+                    mcorgLocal:
+                      type: boolean
+                    hostAddress:
+                      type: string
+                    address:
+                      type: array
+                      items:
+                        type: string
+                        format: byte
+                    hostName:
+                      type: string
+                port:
+                  type: integer
+                  format: int32
+                unresolved:
+                  type: boolean
+                hostName:
+                  type: string
+            contentLanguage:
+              type: object
+              properties:
+                script:
+                  type: string
+                country:
+                  type: string
+                variant:
+                  type: string
+                extensionKeys:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                unicodeLocaleAttributes:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                unicodeLocaleKeys:
+                  uniqueItems: true
+                  type: array
+                  items:
+                    type: string
+                iso3Language:
+                  type: string
+                iso3Country:
+                  type: string
+                displayLanguage:
+                  type: string
+                displayScript:
+                  type: string
+                displayCountry:
+                  type: string
+                displayVariant:
+                  type: string
+                displayName:
+                  type: string
+                language:
+                  type: string
+            etag:
+              type: string
+            origin:
+              type: string
+            connection:
+              type: array
+              items:
+                type: string
+            accept:
+              type: array
+              items:
+                $ref: '#/components/schemas/MediaType'
+            acceptLanguage:
+              type: array
+              items:
+                type: object
+                properties:
+                  range:
+                    type: string
+                  weight:
+                    type: number
+                    format: double
+            acceptLanguageAsLocales:
+              type: array
+              items:
+                type: object
+                properties:
+                  script:
+                    type: string
+                  country:
+                    type: string
+                  variant:
+                    type: string
+                  extensionKeys:
+                    uniqueItems: true
+                    type: array
+                    items:
+                      type: string
+                  unicodeLocaleAttributes:
+                    uniqueItems: true
+                    type: array
+                    items:
+                      type: string
+                  unicodeLocaleKeys:
+                    uniqueItems: true
+                    type: array
+                    items:
+                      type: string
+                  iso3Language:
+                    type: string
+                  iso3Country:
+                    type: string
+                  displayLanguage:
+                    type: string
+                  displayScript:
+                    type: string
+                  displayCountry:
+                    type: string
+                  displayVariant:
+                    type: string
+                  displayName:
+                    type: string
+                  language:
+                    type: string
+            accessControlAllowCredentials:
+              type: boolean
+            accessControlAllowHeaders:
+              type: array
+              items:
+                type: string
+            accessControlAllowMethods:
+              type: array
+              items:
+                type: string
+                enum:
+                - GET
+                - HEAD
+                - POST
+                - PUT
+                - PATCH
+                - DELETE
+                - OPTIONS
+                - TRACE
+            accessControlAllowOrigin:
+              type: string
+            accessControlExposeHeaders:
+              type: array
+              items:
+                type: string
+            accessControlMaxAge:
+              type: integer
+              format: int64
+            accessControlRequestHeaders:
+              type: array
+              items:
+                type: string
+            accessControlRequestMethod:
+              type: string
+              enum:
+              - GET
+              - HEAD
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+              - TRACE
+            acceptCharset:
+              type: array
+              items:
+                type: object
+                properties:
+                  registered:
+                    type: boolean
+            bearerAuth:
+              type: string
+              writeOnly: true
+            contentDisposition:
+              $ref: '#/components/schemas/ContentDisposition'
+            expires:
+              type: integer
+              format: int64
+            ifMatch:
+              type: array
+              items:
+                type: string
+            ifNoneMatch:
+              type: array
+              items:
+                type: string
+            ifUnmodifiedSince:
+              type: integer
+              format: int64
+            pragma:
+              type: string
+            range:
+              type: array
+              items:
+                $ref: '#/components/schemas/HttpRange'
+            upgrade:
+              type: string
+            vary:
+              type: array
+              items:
+                type: string
+            contentLength:
+              type: integer
+              format: int64
+            lastModified:
+              type: integer
+              format: int64
+            contentType:
+              $ref: '#/components/schemas/MediaType'
+            date:
+              type: integer
+              format: int64
+            ifModifiedSince:
+              type: integer
+              format: int64
+            empty:
+              type: boolean
+            location:
+              type: string
+              format: uri
+            all:
+              type: object
+              additionalProperties:
+                type: string
+              writeOnly: true
+            allow:
+              uniqueItems: true
+              type: array
+              items:
+                type: string
+                enum:
+                - GET
+                - HEAD
+                - POST
+                - PUT
+                - PATCH
+                - DELETE
+                - OPTIONS
+                - TRACE
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        body:
+          type: object
+        statusCode:
+          type: string
+          enum:
+          - 100 CONTINUE
+          - 101 SWITCHING_PROTOCOLS
+          - 102 PROCESSING
+          - 103 CHECKPOINT
+          - 200 OK
+          - 201 CREATED
+          - 202 ACCEPTED
+          - 203 NON_AUTHORITATIVE_INFORMATION
+          - 204 NO_CONTENT
+          - 205 RESET_CONTENT
+          - 206 PARTIAL_CONTENT
+          - 207 MULTI_STATUS
+          - 208 ALREADY_REPORTED
+          - 226 IM_USED
+          - 300 MULTIPLE_CHOICES
+          - 301 MOVED_PERMANENTLY
+          - 302 FOUND
+          - 302 MOVED_TEMPORARILY
+          - 303 SEE_OTHER
+          - 304 NOT_MODIFIED
+          - 305 USE_PROXY
+          - 307 TEMPORARY_REDIRECT
+          - 308 PERMANENT_REDIRECT
+          - 400 BAD_REQUEST
+          - 401 UNAUTHORIZED
+          - 402 PAYMENT_REQUIRED
+          - 403 FORBIDDEN
+          - 404 NOT_FOUND
+          - 405 METHOD_NOT_ALLOWED
+          - 406 NOT_ACCEPTABLE
+          - 407 PROXY_AUTHENTICATION_REQUIRED
+          - 408 REQUEST_TIMEOUT
+          - 409 CONFLICT
+          - 410 GONE
+          - 411 LENGTH_REQUIRED
+          - 412 PRECONDITION_FAILED
+          - 413 PAYLOAD_TOO_LARGE
+          - 413 REQUEST_ENTITY_TOO_LARGE
+          - 414 URI_TOO_LONG
+          - 414 REQUEST_URI_TOO_LONG
+          - 415 UNSUPPORTED_MEDIA_TYPE
+          - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+          - 417 EXPECTATION_FAILED
+          - 418 I_AM_A_TEAPOT
+          - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+          - 420 METHOD_FAILURE
+          - 421 DESTINATION_LOCKED
+          - 422 UNPROCESSABLE_ENTITY
+          - 423 LOCKED
+          - 424 FAILED_DEPENDENCY
+          - 426 UPGRADE_REQUIRED
+          - 428 PRECONDITION_REQUIRED
+          - 429 TOO_MANY_REQUESTS
+          - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+          - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+          - 500 INTERNAL_SERVER_ERROR
+          - 501 NOT_IMPLEMENTED
+          - 502 BAD_GATEWAY
+          - 503 SERVICE_UNAVAILABLE
+          - 504 GATEWAY_TIMEOUT
+          - 505 HTTP_VERSION_NOT_SUPPORTED
+          - 506 VARIANT_ALSO_NEGOTIATES
+          - 507 INSUFFICIENT_STORAGE
+          - 508 LOOP_DETECTED
+          - 509 BANDWIDTH_LIMIT_EXCEEDED
+          - 510 NOT_EXTENDED
+          - 511 NETWORK_AUTHENTICATION_REQUIRED
+        statusCodeValue:
+          type: integer
+          format: int32
+    PermissionResponse:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    PermissionsResponse:
+      type: object
+      properties:
+        inherit:
+          type: boolean
+        users:
+          $ref: '#/components/schemas/PermissionResponse'
+        groups:
+          $ref: '#/components/schemas/PermissionResponse'
+        public:
+          type: boolean
+    WebhookJson:
+      type: object
+      properties:
+        url:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        id:
+          type: string
+        _creator:
+          type: string
+        _docId:
+          type: string
+        _projectId:
+          type: string
+        _modifier:
+          type: string
+        _modified:
+          type: string
+        _created:
+          type: string
+      additionalProperties:
+        type: object
+    WebhookResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        webhooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookJson'
+    WebhookRequest:
+      type: object
+      properties:
+        webhooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookJson'
+    JwtAuthenticationRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    JwtAuthenticationResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    CommitJson:
+      type: object
+      properties:
+        source:
+          type: string
+        comment:
+          type: string
+        deleted:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        added:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        updated:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        type:
+          type: string
+        name:
+          type: string
+        id:
+          type: string
+        _refId:
+          type: string
+        _creator:
+          type: string
+        _docId:
+          type: string
+        _projectId:
+          type: string
+        _modifier:
+          type: string
+        _modified:
+          type: string
+        _created:
+          type: string
+        _commitId:
+          type: string
+      additionalProperties:
+        type: object
+    CommitsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        commits:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitJson'
+    CommitsRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        comment:
+          type: string
+        commits:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitJson'
+    ProjectJson:
+      type: object
+      properties:
+        projectType:
+          type: string
+        orgId:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        id:
+          type: string
+        _projectId:
+          type: string
+        _creator:
+          type: string
+        _docId:
+          type: string
+        _modifier:
+          type: string
+        _modified:
+          type: string
+        _created:
+          type: string
+      additionalProperties:
+        type: object
+    ProjectsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectJson'
+    ProjectsRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        comment:
+          type: string
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectJson'
+    OrgJson:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        id:
+          type: string
+        _creator:
+          type: string
+        _docId:
+          type: string
+        _modifier:
+          type: string
+        _modified:
+          type: string
+        _created:
+          type: string
+      additionalProperties:
+        type: object
+    OrganizationsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        orgs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgJson'
+    OrganizationsRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        comment:
+          type: string
+        orgs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgJson'
+    ElementsRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        comment:
+          type: string
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementJson'
+    ElementsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementJson'
+    BranchesResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            type: string
+        rejected:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rejection'
+        refs:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefJson'
+    RefJson:
+      type: object
+      properties:
+        status:
+          type: string
+        type:
+          type: string
+        deleted:
+          type: boolean
+        tag:
+          type: boolean
+        parentRefId:
+          type: string
+        parentCommitId:
+          type: string
+        description:
+          type: string
+        name:
+          type: string
+        id:
+          type: string
+        _refId:
+          type: string
+        _creator:
+          type: string
+        _docId:
+          type: string
+        _projectId:
+          type: string
+        _modifier:
+          type: string
+        _modified:
+          type: string
+        _created:
+          type: string
+        _commitId:
+          type: string
+      additionalProperties:
+        type: object
+    BranchesRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        comment:
+          type: string
+        refs:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefJson'
+  securitySchemes:
+    bearerToken:
+      type: apiKey
+      in: header
+      name: Authorization
+    #bearerToken: #this does not work for python code, but should, works with swagger-ui
+    # type: http
+    # scheme: bearer
+    # bearerFormat: JWT
+    basicAuth:
+      type: http
+      scheme: basic

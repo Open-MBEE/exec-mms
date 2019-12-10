@@ -4,7 +4,10 @@ buildscript {
     }
 }
 
-plugins { id "io.spring.dependency-management" }
+plugins {
+    id "io.spring.dependency-management"
+    id 'org.hidetake.swagger.generator' version '2.18.1'
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -33,6 +36,24 @@ dependencies {
     testCompile(
         'org.springframework.boot:spring-boot-starter-test'
     )
+    swaggerCodegen 'io.swagger.codegen.v3:swagger-codegen-cli:3.0.14'
+}
+
+swaggerSources {
+    mms {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'python'
+            configFile = file('openapi/python-config.json')
+        }
+    }
+    mmsDoc {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'html2'
+            configFile = file('openapi/python-config.json')
+        }
+    }
 }
 
 ext['elasticsearch.version'] = '7.1.1'
