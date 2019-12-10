@@ -13,7 +13,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -63,7 +62,7 @@ public class ExampleApplication {
         return new Docket(DocumentationType.SWAGGER_2)
             .ignoredParameterTypes(Authentication.class, Map.class)
             .apiInfo(apiInfo()).select()
-            .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
+            .apis(RequestHandlerSelectors.basePackage("org.openmbee"))
             .paths(PathSelectors.any()).build()
             .securitySchemes(Arrays.asList(
                 new BasicAuth("basicAuth"),
