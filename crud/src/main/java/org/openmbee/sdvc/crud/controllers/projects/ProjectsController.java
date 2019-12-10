@@ -44,7 +44,7 @@ public class ProjectsController extends BaseController {
 
     @GetMapping
     public ProjectsResponse getAllProjects(
-        Authentication auth) {
+        @Parameter(hidden = true) Authentication auth) {
 
         ProjectsResponse response = new ProjectsResponse();
         List<Project> allProjects = projectRepository.findAll();
