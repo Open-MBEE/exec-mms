@@ -57,8 +57,7 @@ public class BranchesController extends BaseController {
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public BranchesResponse getBranch(
         @PathVariable String projectId,
-        @PathVariable String refId,
-        Authentication auth) {
+        @PathVariable String refId) {
 
         return branchService.getBranch(projectId, refId);
     }
