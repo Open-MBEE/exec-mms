@@ -50,3 +50,7 @@ elasticsearch.limit.result=10000
 elasticsearch.limit.term=1000
 
 springdoc.swagger-ui.path=/v3/swagger-ui.html
+#For sorting endpoints alphabetically
+springdoc.swagger-ui.operationsSorter=alpha
+#For sorting tags alphabetically
+springdoc.swagger-ui.tagsSorter=alpha
