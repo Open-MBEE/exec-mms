@@ -6,6 +6,7 @@ import org.openmbee.sdvc.core.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 @Service("mss")
@@ -25,7 +26,11 @@ public class MethodSecurityService {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return false;
         }
-        if (permissionService.hasOrgPrivilege(privilege, authentication.getName(), getGroups(authentication), orgId)) {
+        Set<String> groups = new HashSet<>();
+        if (isAdmin(authentication, groups)) {
+            return true;
+        }
+        if (permissionService.hasOrgPrivilege(privilege, authentication.getName(), groups, orgId)) {
             return true;
         }
         return false;
@@ -38,7 +43,11 @@ public class MethodSecurityService {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return false;
         }
-        if (permissionService.hasProjectPrivilege(privilege, authentication.getName(), getGroups(authentication), projectId)) {
+        Set<String> groups = new HashSet<>();
+        if (isAdmin(authentication, groups)) {
+            return true;
+        }
+        if (permissionService.hasProjectPrivilege(privilege, authentication.getName(), groups, projectId)) {
             return true;
         }
         return false;
@@ -51,16 +60,24 @@ public class MethodSecurityService {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return false;
         }
-        if (permissionService.hasBranchPrivilege(privilege, authentication.getName(), getGroups(authentication), projectId, branchId)) {
+        Set<String> groups = new HashSet<>();
+        if (isAdmin(authentication, groups)) {
+            return true;
+        }
+        if (permissionService.hasBranchPrivilege(privilege, authentication.getName(), groups, projectId, branchId)) {
             return true;
         }
         return false;
     }
 
-    public static Set<String> getGroups(Authentication auth) {
-        Set<String> res = new HashSet<>();
-        auth.getAuthorities().forEach(ga ->res.add(ga.getAuthority()));
-        return res;
+    public static boolean isAdmin(Authentication auth, Set<String> groups) {
+        boolean isAdmin = false;
+        for (GrantedAuthority ga: auth.getAuthorities()) {
+            if ("mmsadmin".equals(ga.getAuthority())) {
+                isAdmin = true;
+            }
+            groups.add(ga.getAuthority());
+        }
+        return isAdmin;
     }
-
 }

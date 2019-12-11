@@ -27,7 +27,10 @@ public class UserDetailsImpl implements UserDetails {
                 authorities.add(new SimpleGrantedAuthority(group.getName()));
             }
         }
-
+        if (user.isAdmin()) {
+            authorities.add(new SimpleGrantedAuthority("mmsadmin"));
+        }
+        authorities.add(new SimpleGrantedAuthority("everyone"));
         return authorities;
     }
 

@@ -76,7 +76,7 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
         try {
             userDetailsService.loadUserByUsername(adminUsername);
         } catch (UsernameNotFoundException e) {
-            userDetailsService.register(adminUsername, adminPassword);
+            userDetailsService.register(adminUsername, adminPassword, true);
             logger.info(String.format("Creating root user: %s with specified password.",
                 adminUsername));
         }

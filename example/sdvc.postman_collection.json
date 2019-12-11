@@ -2615,6 +2615,62 @@
 					"response": []
 				},
 				{
+					"name": "reader cannot create users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "reader",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "reader",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"dummy\",\n\t\"password\": \"dummy\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/user",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "create writer user",
 					"event": [
 						{
@@ -4154,6 +4210,147 @@
 							],
 							"path": [
 								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new org as writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "26e45f03-c2c3-4f77-a556-5202744a4fcf",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{writerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"name\": \"writer\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/orgs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new project as writer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "26e45f03-c2c3-4f77-a556-5202744a4fcf",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{writerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"name\": \"writer\",\n\t\t\t\"orgId\": \"writer\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "admin can see all projects",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "26e45f03-c2c3-4f77-a556-5202744a4fcf",
+								"exec": [
+									"pm.test(\"sees 3 projects\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects.length).to.eql(3);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
 							]
 						}
 					},
