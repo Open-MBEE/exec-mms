@@ -8,17 +8,18 @@ import org.openmbee.sdvc.json.ProjectJson;
 
 public class ProjectsResponse extends BaseResponse<ProjectsResponse> {
 
+    private List<ProjectJson> projects;
+
     public ProjectsResponse() {
-        this.put(Constants.PROJECT_KEY, new ArrayList<ProjectJson>());
+        this.projects = new ArrayList<>();
     }
 
     public List<ProjectJson> getProjects() {
-        return (List<ProjectJson>) this.get(Constants.PROJECT_KEY);
+        return projects;
     }
 
     public ProjectsResponse setProjects(List<ProjectJson> projects) {
-        this.put(Constants.PROJECT_KEY, projects);
+        this.projects = projects;
         return this;
     }
-
 }

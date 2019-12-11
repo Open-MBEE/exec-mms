@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.security.MethodSecurityService;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.permissions.objects.PermissionLookup;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupRequest;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,13 +27,11 @@ public class PermissionsLookupController {
         this.mss = mss;
     }
 
-    @PostMapping(value = "/permissions")
-    public PermissionLookupResponse lookup(@RequestBody PermissionLookupRequest req, Authentication auth) {
+    @PostMapping(value = "/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public PermissionLookupResponse lookupPermissions(@RequestBody PermissionLookupRequest req, Authentication auth) {
         PermissionLookupResponse res = new PermissionLookupResponse();
         List<PermissionLookup> lookups = new ArrayList<>();
-        List<Map> rejected = new ArrayList<>();
         res.setLookups(lookups);
-        res.setRejected(rejected);
         res.setAllPassed(true);
         for (PermissionLookup lookup: req.getLookups()) {
             try {
@@ -57,11 +57,7 @@ public class PermissionsLookupController {
                     res.setAllPassed(false);
                 }
             } catch (PermissionException e) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("code", e.getCode().value());
-                map.put("message", e.getMessage());
-                map.put("lookup", lookup);
-                rejected.add(map);
+                res.addRejection(new Rejection(lookup, e.getCode().value(), e.getMessage()));
                 res.setAllPassed(false);
             }
         }

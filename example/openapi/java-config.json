@@ -1,0 +1,10 @@
+{
+    "groupId": "org.openmbee.mms",
+    "artifactId": "mms-client",
+    "artifactVersion": "0.0.1",
+    "library": "jersey2",
+    "java8": true,
+    "invokerPackage": "org.openmbee.mms",
+    "modelPackage": "org.openmbee.mms.model",
+    "apiPackage": "org.openmbee.mms.api"
+}

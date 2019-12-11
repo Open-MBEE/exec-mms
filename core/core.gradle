@@ -9,4 +9,8 @@ dependencies {
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+
+    compile 'io.swagger.core.v3:swagger-annotations:2.1.0'
+    //using @Parameter(hidden = true) to ignore Authentication params in controllers, until
+    //springdoc ignores it by default or controllers are moved out of modules
 }

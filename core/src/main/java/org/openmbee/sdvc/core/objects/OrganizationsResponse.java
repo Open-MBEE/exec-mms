@@ -8,15 +8,17 @@ import org.openmbee.sdvc.json.OrgJson;
 
 public class OrganizationsResponse extends BaseResponse<OrganizationsResponse> {
 
+    private List<OrgJson> orgs;
+
     public OrganizationsResponse() {
-        this.put(Constants.ORGANIZATION_KEY, new ArrayList<OrgJson>());
+        this.orgs = new ArrayList<>();
     }
 
     public List<OrgJson> getOrgs() {
-        return (List<OrgJson>) this.get(Constants.ORGANIZATION_KEY);
+        return orgs;
     }
 
     public void setOrgs(List<OrgJson> orgs) {
-        this.put(Constants.ORGANIZATION_KEY, orgs);
+        this.orgs = orgs;
     }
 }

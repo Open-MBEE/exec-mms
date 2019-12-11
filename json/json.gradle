@@ -2,4 +2,6 @@ apply plugin: 'io.spring.convention.spring-module'
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
+
 }

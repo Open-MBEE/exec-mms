@@ -4,7 +4,10 @@ buildscript {
     }
 }
 
-plugins { id "io.spring.dependency-management" }
+plugins {
+    id "io.spring.dependency-management"
+    id 'org.hidetake.swagger.generator' version '2.18.1'
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -27,11 +30,37 @@ dependencies {
         'org.postgresql:postgresql:42.2.5',
         //'mysql:mysql-connector-java:8.0.17',
         'io.springfox:springfox-swagger2:2.9.2',
-        'io.springfox:springfox-swagger-ui:2.9.2'
+        'io.springfox:springfox-swagger-ui:2.9.2',
+        'org.springdoc:springdoc-openapi-ui:1.2.17'
     )
     testCompile(
         'org.springframework.boot:spring-boot-starter-test'
     )
+    swaggerCodegen 'io.swagger.codegen.v3:swagger-codegen-cli:3.0.14'
+}
+
+swaggerSources {
+    python {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'python'
+            configFile = file('openapi/python-config.json')
+        }
+    }
+    java {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'java'
+            configFile = file('openapi/java-config.json')
+        }
+    }
+    doc {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'html2'
+            configFile = file('openapi/doc-config.json')
+        }
+    }
 }
 
 ext['elasticsearch.version'] = '7.1.1'

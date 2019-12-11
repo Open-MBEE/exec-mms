@@ -8,16 +8,19 @@ import org.openmbee.sdvc.json.RefJson;
 
 public class BranchesResponse extends BaseResponse<BranchesResponse> {
 
+    private List<RefJson> refs;
+
     public BranchesResponse() {
-        this.put(Constants.BRANCH_KEY, new ArrayList<RefJson>());
+        this.refs = new ArrayList<>();
     }
 
-    public List<RefJson> getBranches() {
-        return (List<RefJson>) this.get(Constants.BRANCH_KEY);
+    public List<RefJson> getRefs() {
+        return refs;
     }
 
-    public void setBranches(List<RefJson> refs) {
-        this.put(Constants.BRANCH_KEY, refs);
+    public BranchesResponse setRefs(List<RefJson> refs) {
+        this.refs = refs;
+        return this;
     }
 
 }

@@ -1,9 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.orgs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 
@@ -11,14 +9,14 @@ import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.dao.OrgDAO;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
 import org.openmbee.sdvc.core.objects.OrganizationsResponse;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.json.OrgJson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,60 +38,55 @@ public class OrgsController extends BaseController {
         this.organizationRepository = organizationRepository;
     }
 
-    @GetMapping(value = {"", "/{orgId}"})
+    @GetMapping
     @Transactional
-    @PreAuthorize("#orgId == null || @mss.hasOrgPrivilege(authentication, #orgId, 'ORG_READ', true)")
-    public ResponseEntity<?> handleGet(
-        @PathVariable(required = false) String orgId,
-        Authentication auth) {
+    public OrganizationsResponse getAllOrgs(
+        @Parameter(hidden = true) Authentication auth) {
 
         OrganizationsResponse response = new OrganizationsResponse();
-
-        if (orgId != null) {
-            logger.debug("OrgId given: ", orgId);
-            Optional<Organization> orgOption = organizationRepository.findByOrganizationId(orgId);
-            if (!orgOption.isPresent()) {
-                throw new NotFoundException(response.addMessage("Organization not found."));
-            }
-            OrgJson orgJson = new OrgJson();
-            orgJson.merge(convertToMap(orgOption.get()));
-            response.getOrgs().add(orgJson);
-        } else {
-            logger.debug("No OrgId given");
-            List<Organization> allOrgs = organizationRepository.findAll();
-            for (Organization org : allOrgs) {
-                if (mss.hasOrgPrivilege(auth, org.getOrganizationId(), Privileges.ORG_READ.name(), true)) {
-                    OrgJson orgJson = new OrgJson();
-                    orgJson.merge(convertToMap(org));
-                    response.getOrgs().add(orgJson);
-                }
+        List<Organization> allOrgs = organizationRepository.findAll();
+        for (Organization org : allOrgs) {
+            if (mss.hasOrgPrivilege(auth, org.getOrganizationId(), Privileges.ORG_READ.name(), true)) {
+                OrgJson orgJson = new OrgJson();
+                orgJson.merge(convertToMap(org));
+                response.getOrgs().add(orgJson);
             }
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    @PostMapping
+    @GetMapping(value = "/{orgId}")
+    @Transactional
+    @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_READ', true)")
+    public OrganizationsResponse getOrg(
+        @PathVariable String orgId) {
+
+        OrganizationsResponse response = new OrganizationsResponse();
+        Optional<Organization> orgOption = organizationRepository.findByOrganizationId(orgId);
+        if (!orgOption.isPresent()) {
+            throw new NotFoundException(response.addMessage("Organization not found."));
+        }
+        OrgJson orgJson = new OrgJson();
+        orgJson.merge(convertToMap(orgOption.get()));
+        response.getOrgs().add(orgJson);
+        return response;
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<? extends BaseResponse> handlePost(
+    public OrganizationsResponse createOrUpdateOrgs(
         @RequestBody OrganizationsRequest orgPost,
-        Authentication auth) {
+        @Parameter(hidden = true) Authentication auth) {
 
         OrganizationsResponse response = new OrganizationsResponse();
         if (orgPost.getOrgs().isEmpty()) {
             throw new BadRequestException(response.addMessage("No orgs provided"));
         }
 
-        List<Map> rejected = new ArrayList<>();
-        response.setRejected(rejected);
-
         for (OrgJson org : orgPost.getOrgs()) {
             if (org.getId() == null || org.getId().isEmpty()) {
-                Map<String, Object> rejection = new HashMap<>();
-                rejection.put("message", "Org id not provided");
-                rejection.put("code", 400);
-                rejection.put("org", org);
-                rejected.add(rejection);
+                response.addRejection(new Rejection(org, 400, "Org id not provided"));
                 continue;
             }
             Organization o = organizationRepository.findByOrganizationId(org.getId())
@@ -101,11 +94,7 @@ public class OrgsController extends BaseController {
             boolean newOrg = true;
             if (o.getId() != null) {
                 if (!mss.hasOrgPrivilege(auth, o.getOrganizationId(), Privileges.ORG_EDIT.name(), false)) {
-                    Map<String, Object> rejection = new HashMap<>();
-                    rejection.put("message", "No permission to update org");
-                    rejection.put("code", 403);
-                    rejection.put("org", org);
-                    rejected.add(rejection);
+                    response.addRejection(new Rejection(org, 403, "No permission to update org"));
                     continue;
                 }
                 newOrg = false;
@@ -123,13 +112,13 @@ public class OrgsController extends BaseController {
         if (orgPost.getOrgs().size() == 1) {
             handleSingleResponse(response);
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     @DeleteMapping(value = "/{orgId}")
     @Transactional
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_DELETE', false)")
-    public ResponseEntity<? extends BaseResponse> handleDelete(
+    public OrganizationsResponse deleteOrg(
         @PathVariable String orgId) {
 
         OrganizationsResponse response = new OrganizationsResponse();
@@ -142,6 +131,6 @@ public class OrgsController extends BaseController {
             throw new BadRequestException(response.addMessage("Organization is not empty"));
         }
         organizationRepository.delete(org);
-        return ResponseEntity.ok(response);
+        return response;
     }
 }

@@ -1,8 +1,10 @@
 package org.openmbee.sdvc.core.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.json.ElementJson;
 
@@ -20,7 +22,7 @@ public class NodeGetInfo {
 
     Map<String, ElementJson> activeElementMap;
 
-    List<Map> rejected;
+    List<Rejection> rejected;
 
 
     public Set<String> getReqIndexIds() {
@@ -70,13 +72,20 @@ public class NodeGetInfo {
         return this;
     }
 
-    public List<Map> getRejected() {
+    public List<Rejection> getRejected() {
         return rejected;
     }
 
-    public NodeGetInfo setRejected(List<Map> rejected) {
+    public NodeGetInfo setRejected(List<Rejection> rejected) {
         this.rejected = rejected;
         return this;
+    }
+
+    public void addRejection(Rejection rejection) {
+        if (this.rejected == null) {
+            this.rejected = new ArrayList<>();
+        }
+        this.rejected.add(rejection);
     }
 
 }

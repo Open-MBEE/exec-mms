@@ -3,6 +3,7 @@ package org.openmbee.sdvc.crud.services;
 import java.time.Instant;
 import java.util.*;
 
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
@@ -131,12 +132,7 @@ public class NodeGetHelper extends NodeOperation {
     }
 
     protected void rejectDeleted(NodeGetInfo info, String nodeId, ElementJson indexElement) {
-        Map<String, Object> reject = new HashMap<>();
-        reject.put("code", 410);
-        reject.put("message", "Element deleted");
-        reject.put("id", nodeId);
-        reject.put("element", indexElement);
-        info.getRejected().add(reject);
+        info.addRejection(new Rejection(indexElement, 410, "Element deleted"));
     }
 
     protected List<String> getRefCommitIds(Instant time) {

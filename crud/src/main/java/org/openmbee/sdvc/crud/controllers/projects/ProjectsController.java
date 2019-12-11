@@ -1,9 +1,8 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
 
@@ -12,15 +11,15 @@ import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.core.exceptions.DeletedException;
+import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,88 +42,74 @@ public class ProjectsController extends BaseController {
         this.projectRepository = projectRepository;
     }
 
-    @GetMapping(value = {"", "/{projectId}"})
-    @PreAuthorize("#projectId == null || @mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
-    public ResponseEntity<? extends BaseResponse> handleGet(
-        @PathVariable(required = false) String projectId,
-        Authentication auth) {
+    @GetMapping
+    public ProjectsResponse getAllProjects(
+        @Parameter(hidden = true) Authentication auth) {
 
         ProjectsResponse response = new ProjectsResponse();
-        if (projectId != null) {
-            Optional<Project> projectOption = projectRepository.findByProjectId(projectId);
-            if (!projectOption.isPresent()) {
-                throw new NotFoundException(response.addMessage("Project not found"));
-            }
-            ProjectJson projectJson = new ProjectJson();
-            projectJson.merge(convertToMap(projectOption.get()));
-            response.getProjects().add(projectJson);
-            if (projectOption.get().isDeleted()) {
-                throw new DeletedException(response);
-            }
-        } else {
-            List<Project> allProjects = projectRepository.findAll();
-            for (Project proj : allProjects) {
-                if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
-                    ProjectJson projectJson = new ProjectJson();
-                    projectJson.merge(convertToMap(proj));
-                    response.getProjects().add(projectJson);
-                }
+        List<Project> allProjects = projectRepository.findAll();
+        for (Project proj : allProjects) {
+            if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
+                ProjectJson projectJson = new ProjectJson();
+                projectJson.merge(convertToMap(proj));
+                response.getProjects().add(projectJson);
             }
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    @PostMapping
+    @GetMapping(value = "/{projectId}")
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
+    public ProjectsResponse getProject(
+        @PathVariable String projectId) {
+
+        ProjectsResponse response = new ProjectsResponse();
+        Optional<Project> projectOption = projectRepository.findByProjectId(projectId);
+        if (!projectOption.isPresent()) {
+            throw new NotFoundException(response.addMessage("Project not found"));
+        }
+        ProjectJson projectJson = new ProjectJson();
+        projectJson.merge(convertToMap(projectOption.get()));
+        response.getProjects().add(projectJson);
+        if (projectOption.get().isDeleted()) {
+            throw new DeletedException(response);
+        }
+        return response;
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<? extends BaseResponse> handlePost(
+    public ProjectsResponse createOrUpdateProjects(
         @RequestBody ProjectsRequest projectsPost,
-        Authentication auth) {
+        @Parameter(hidden = true) Authentication auth) {
 
         if (projectsPost.getProjects().isEmpty()) {
             throw new BadRequestException(new ProjectsResponse().addMessage("No projects provided"));
         }
 
         ProjectsResponse response = new ProjectsResponse();
-        List<Map> rejected = new ArrayList<>();
-        response.setRejected(rejected);
         for (ProjectJson json: projectsPost.getProjects()) {
             if (json.getProjectId().isEmpty()) {
-                Map<String, Object> rejection = new HashMap<>();
-                rejection.put("message", "Project id missing");
-                rejection.put("code", 400);
-                rejection.put("project", json);
-                rejected.add(rejection);
+                response.addRejection(new Rejection(json, 400, "Project id missing"));
                 continue;
             }
             ProjectService ps = getProjectService(json);
             if (!ps.exists(json.getProjectId())) {
                 try {
                     if (!mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
-                        Map<String, Object> rejection = new HashMap<>();
-                        rejection.put("message", "No permission to create project under org");
-                        rejection.put("code", 403);
-                        rejection.put("project", json);
-                        rejected.add(rejection);
+                        response.addRejection(new Rejection(json, 403, "No permission to create project under org"));
                         continue;
                     }
                     response.getProjects().add(ps.create(json));
                     permissionService.initProjectPerms(json.getProjectId(), true, auth.getName());
                 } catch (BadRequestException ex) {
-                    Map<String, Object> rejection = new HashMap<>();
-                    rejection.put("message", "Org to put project under is not found");
-                    rejection.put("code", 400);
-                    rejection.put("project", json);
-                    rejected.add(rejection);
+                    response.addRejection(new Rejection(json, 400, "Org to put project under is not found"));
                     continue;
                 }
             } else {
                 if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_EDIT.name(), false)) {
-                    Map<String, Object> rejection = new HashMap<>();
-                    rejection.put("message", "No permission to change project");
-                    rejection.put("code", 403);
-                    rejection.put("project", json);
-                    rejected.add(rejection);
+                    response.addRejection(new Rejection(json, 403, "No permission to change project"));
                     continue;
                 }
                 //TODO need to check delete perm on proj and create perm in new org if moving org, and reset project perms if org changed
@@ -134,13 +119,13 @@ public class ProjectsController extends BaseController {
         if (projectsPost.getProjects().size() == 1) {
             handleSingleResponse(response);
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     @DeleteMapping(value = "/{projectId}")
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_DELETE', false)")
-    public ResponseEntity<? extends BaseResponse> handleDelete(
+    public ProjectsResponse deleteProject(
         @PathVariable String projectId,
         @RequestParam(required = false, defaultValue = "false") boolean hard) {
 
@@ -160,7 +145,7 @@ public class ProjectsController extends BaseController {
         } else {
             projectRepository.save(project);
         }
-        return ResponseEntity.ok(response.setProjects(res));
+        return response.setProjects(res);
     }
 
     private ProjectService getProjectService(ProjectJson json) {

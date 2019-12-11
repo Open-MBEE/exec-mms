@@ -6,14 +6,13 @@ import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.dao.WebhookDAO;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
-import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.data.domains.global.Webhook;
 import org.openmbee.sdvc.webhooks.json.WebhookJson;
 import org.openmbee.sdvc.webhooks.objects.WebhookRequest;
 import org.openmbee.sdvc.webhooks.objects.WebhookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +44,7 @@ public class WebhooksController {
 
     @GetMapping
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
-    public ResponseEntity<? extends BaseResponse> handleGet(@PathVariable String projectId) {
+    public WebhookResponse getAllWebhooks(@PathVariable String projectId) {
 
         WebhookResponse response = new WebhookResponse();
         List<Webhook> webhooks = webhookRepository.findAllByProject_ProjectId(projectId);
@@ -54,50 +53,46 @@ public class WebhooksController {
             WebhookJson webhookJson = new WebhookJson();
             webhookJson.merge(convertToMap(webhook));
             webhookJson.setId(webhook.getId().toString());
+            webhookJson.setProjectId(projectId);
             response.getWebhooks().add(webhookJson);
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_WEBHOOKS', false)")
-    public ResponseEntity<? extends BaseResponse> handlePost(@PathVariable String projectId, @RequestBody WebhookRequest webhooksPost) {
+    public WebhookResponse createOrUpdateWebhooks(@PathVariable String projectId, @RequestBody WebhookRequest webhooksPost) {
 
         if (webhooksPost.getWebhooks().isEmpty()) {
             throw new BadRequestException(new WebhookResponse().addMessage("No web hooks provided"));
         }
 
         WebhookResponse response = new WebhookResponse();
-        List<Map> rejected = new ArrayList<>();
-        response.setRejected(rejected);
         Optional<Project> project = projectRepository.findByProjectId(projectId);
 
         for (WebhookJson json: webhooksPost.getWebhooks()) {
             Optional<Webhook> existing = webhookExists(json, projectId);
-
+            Webhook hook;
             if (!existing.isPresent()) {
-                Webhook newWebhook = new Webhook();
-                newWebhook.setProject(project.get());
-                newWebhook.setUrl(json.getUrl());
-                webhookRepository.save(newWebhook);
-                json.setId(newWebhook.getId().toString());
-                response.getWebhooks().add(json);
+                hook = new Webhook();
+                hook.setProject(project.get());
             } else {
-                Webhook existingHook = existing.get();
-                existingHook.setUrl(json.getUrl());
-                webhookRepository.save(existingHook);
-                json.setId(existingHook.getId().toString());
-                response.getWebhooks().add(json);
+                hook = existing.get();
             }
+            hook.setUrl(json.getUrl());
+            webhookRepository.save(hook);
+            json.setId(hook.getId().toString());
+            json.setProjectId(projectId);
+            response.getWebhooks().add(json);
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    @DeleteMapping
+    @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_WEBHOOKS', false)")
-    public ResponseEntity<? extends BaseResponse> handleDelete(@PathVariable String projectId, @RequestBody WebhookRequest webhookRequest) {
+    public WebhookResponse deleteWebhooks(@PathVariable String projectId, @RequestBody WebhookRequest webhookRequest) {
 
         // TODO: Determine which webhook to delete somehow. Maybe require webhook id.
 
@@ -117,7 +112,7 @@ public class WebhooksController {
                 response.addMessage(String.format("Web hook for project %s to %s deleted", projectId, webhook.getUrl()));
             }
         }
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     public Map<String, Object> convertToMap(Object obj) {

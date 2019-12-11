@@ -1,62 +1,52 @@
 package org.openmbee.sdvc.core.objects;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.config.Constants;
 
-public class BaseResponse<T> extends HashMap<String, Object> {
+public class BaseResponse<T> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
+    private List<String> messages;
+
+    private List<Rejection> rejected;
+
     @SuppressWarnings("unchecked")
     public List<String> getMessages() {
-        return (List<String>) this.get(Constants.MESSAGES);
+        return messages;
     }
 
     public T setMessages(List<String> messages) {
-        this.put(Constants.MESSAGES, messages);
+        this.messages = messages;
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
     public T addMessage(String message) {
-        if (this.get(Constants.MESSAGES) == null) {
+        if (this.messages == null) {
             this.setMessages(new ArrayList<>());
         }
         this.getMessages().add(message);
         return (T) this;
     }
 
-    public int getCode() {
-        return (int) this.get(Constants.CODE);
+    public List<Rejection> getRejected() {
+        return rejected;
     }
 
-    @SuppressWarnings("unchecked")
-    public T setCode(int code) {
-        this.put(Constants.CODE, code);
+    public T setRejected(List<Rejection> rejected) {
+        this.rejected = rejected;
         return (T) this;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    public List<Map> getRejected() {
-        return (List<Map>) this.get(Constants.REJECTED);
-    }
-
-    public T setRejected(List<Map> rejected) {
-        this.put(Constants.REJECTED, rejected);
+    public T addRejection(Rejection rejection) {
+        if (this.rejected == null) {
+            this.rejected = new ArrayList<>();
+        }
+        this.rejected.add(rejection);
         return (T) this;
     }
 }

@@ -8,18 +8,18 @@ import org.openmbee.sdvc.json.ElementJson;
 
 public class ElementsResponse extends BaseResponse<ElementsResponse> {
 
+    private List<ElementJson> elements;
+
     public ElementsResponse() {
-        this.put(Constants.ELEMENT_KEY, new ArrayList<ElementJson>());
+        this.elements = new ArrayList<>();
     }
 
     public List<ElementJson> getElements() {
-        return (List<ElementJson>) this.get(Constants.ELEMENT_KEY);
+        return elements;
     }
 
     public ElementsResponse setElements(List<ElementJson> elements) {
-        this.put(Constants.ELEMENT_KEY, elements);
+        this.elements = elements;
         return this;
     }
-
-
 }

@@ -18,7 +18,7 @@ public class DocumentsController {
         this.nodeService = nodeService;
     }
 
-    @GetMapping
+    //@GetMapping
     public ResponseEntity<?> handleGet(
         @PathVariable String projectId,
         @PathVariable String refId,

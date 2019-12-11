@@ -6,7 +6,7 @@ import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
 import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
 import org.openmbee.sdvc.authenticator.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,8 +32,8 @@ public class AuthenticationController {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    @PostMapping(value = "/authentication")
-    public ResponseEntity<JwtAuthenticationResponse> createAuthenticationToken(
+    @PostMapping(value = "/authentication", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public JwtAuthenticationResponse createAuthenticationToken(
         @RequestBody
             JwtAuthenticationRequest authenticationRequest) {
 
@@ -45,18 +45,18 @@ public class AuthenticationController {
         final UserDetailsImpl userDetails = userDetailsService
             .loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+        return new JwtAuthenticationResponse(token);
 
     }
 
-    @PostMapping(value = "/user")
+    @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("authentication.name == 'admin'")
-    public ResponseEntity<?> createUser(@RequestBody JwtAuthenticationRequest req) {
+    public Object createUser(@RequestBody JwtAuthenticationRequest req) {
         try {
             userDetailsService.loadUserByUsername(req.getUsername());
         } catch (UsernameNotFoundException e) {
             userDetailsService.register(req.getUsername(), req.getPassword());
         }
-        return ResponseEntity.ok("");
+        return "";
     }
 }

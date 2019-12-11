@@ -91,7 +91,7 @@ public class DefaultNodeService implements NodeService {
     public ElementsResponse read(String projectId, String refId, String id,
         Map<String, String> params) {
 
-        if (id != null) {
+        if (id != null && !id.isEmpty()) {
             logger.debug("ElementId given: {}", id);
 
             ElementsRequest req = buildRequest(id);
@@ -121,7 +121,7 @@ public class DefaultNodeService implements NodeService {
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
-        response.put("rejected", info.getRejected());
+        response.setRejected(info.getRejected());
         return response;
     }
 
