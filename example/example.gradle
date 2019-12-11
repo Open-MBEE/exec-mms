@@ -40,18 +40,25 @@ dependencies {
 }
 
 swaggerSources {
-    mms {
+    python {
         inputFile = file('openapi/api-docs.yaml')
         code {
             language = 'python'
             configFile = file('openapi/python-config.json')
         }
     }
-    mmsDoc {
+    java {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'java'
+            configFile = file('openapi/java-config.json')
+        }
+    }
+    doc {
         inputFile = file('openapi/api-docs.yaml')
         code {
             language = 'html2'
-            configFile = file('openapi/python-config.json')
+            configFile = file('openapi/doc-config.json')
         }
     }
 }
