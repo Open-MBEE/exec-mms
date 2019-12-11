@@ -21,6 +21,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
@@ -114,13 +115,14 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
                     newUser.setEmail(userData.getStringAttribute(userAttributesEmail));
                     newUser.setUsername(userData.getStringAttribute(userAttributesUsername));
                     newUser.setEnabled(true);
+                    newUser.setAdmin(false);
                     userRepository.save(newUser);
 
                     userOptional = Optional.of(newUser);
                 }
 
                 User user = userOptional.get();
-
+                user.setPassword(null);
                 String userDn = "uid=" + user.getUsername() + "," + providerBase;
 
                 List<Group> definedGroups = groupRepository.findAll();
@@ -145,7 +147,12 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
                 user.setGroups(addGroups);
                 userRepository.save(user);
                 
-                return AuthorityUtils.createAuthorityList(memberGroups.toArray(new String[0]));
+                List<GrantedAuthority> auths = AuthorityUtils.createAuthorityList(memberGroups.toArray(new String[0]));
+                if (user.isAdmin()) {
+                    auths.add(new SimpleGrantedAuthority("mmsadmin"));
+                }
+                auths.add(new SimpleGrantedAuthority("everyone"));
+                return auths;
             }
         }
 

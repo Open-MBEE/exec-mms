@@ -139,10 +139,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                auth:
-                  $ref: '#/components/schemas/Authentication'
+              $ref: '#/components/schemas/PermissionLookupRequest'
       responses:
         200:
           description: default response
@@ -970,28 +967,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PermissionLookup'
-    Authentication:
-      type: object
-      properties:
-        credentials:
-          type: object
-        principal:
-          type: object
-        details:
-          type: object
-        authenticated:
-          type: boolean
-        authorities:
-          type: array
-          items:
-            $ref: '#/components/schemas/GrantedAuthority'
-        name:
-          type: string
-    GrantedAuthority:
-      type: object
-      properties:
-        authority:
-          type: string
     PermissionLookupResponse:
       type: object
       properties:

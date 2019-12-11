@@ -1,9 +1,7 @@
 package org.openmbee.sdvc.permissions.objects;
 
 import java.util.List;
-import java.util.Map;
 import org.openmbee.sdvc.core.objects.BaseResponse;
-import org.openmbee.sdvc.core.objects.Rejection;
 
 public class PermissionLookupResponse extends BaseResponse<PermissionLookupResponse> {
 

@@ -50,12 +50,14 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("authentication.name == 'admin'")
+    @PreAuthorize("hasAuthority('mmsadmin')")
     public Object createUser(@RequestBody JwtAuthenticationRequest req) {
+        //TODO allow changing passwords for local users and create admin accounts
+        //TODO should allow admin authority string to be set via properties
         try {
             userDetailsService.loadUserByUsername(req.getUsername());
         } catch (UsernameNotFoundException e) {
-            userDetailsService.register(req.getUsername(), req.getPassword());
+            userDetailsService.register(req.getUsername(), req.getPassword(), false);
         }
         return "";
     }

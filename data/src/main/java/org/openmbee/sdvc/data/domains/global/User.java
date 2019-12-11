@@ -18,6 +18,7 @@ public class User extends Base {
     private String email;
     private String firstName;
     private String lastName;
+    private boolean admin;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
@@ -44,12 +45,12 @@ public class User extends Base {
     public User() {
     }
 
-    public User(String email, String username, String password, String firstName, String lastName) {
-        this.username = username;
+    public User(String email, String username, String password, String firstName, String lastName, boolean admin) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.admin = admin;
     }
 
     public String getUsername() {
@@ -154,6 +155,14 @@ public class User extends Base {
 
     public void setGroups(Collection<Group> groups) {
         this.groups = groups;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     @Override
