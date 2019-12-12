@@ -1361,13 +1361,9 @@ components:
             $ref: '#/components/schemas/RefJson'
   securitySchemes:
     bearerToken:
-      type: apiKey
-      in: header
-      name: Authorization
-    #bearerToken: #this does not work for python code, but should, works with swagger-ui
-    # type: http
-    # scheme: bearer
-    # bearerFormat: JWT
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
     basicAuth:
       type: http
       scheme: basic

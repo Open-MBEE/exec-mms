@@ -36,7 +36,7 @@ dependencies {
     testCompile(
         'org.springframework.boot:spring-boot-starter-test'
     )
-    swaggerCodegen 'io.swagger.codegen.v3:swagger-codegen-cli:3.0.14'
+    swaggerCodegen 'org.openapitools:openapi-generator-cli:4.2.2'
 }
 
 swaggerSources {

@@ -12,6 +12,16 @@ Swagger 3 UI at http://localhost:8080/v3/swagger-ui.html (not dependent on gradl
 
 yaml at http://localhost:8080/v3/api-docs.yaml - will need to fix securitySchemes for codegen
 
+### Fixes needed from generated yaml to use in codegen
+
+- add basic auth security scheme
+
+        basicAuth:
+          type: http
+          scheme: basic
+          
+- override authentication endpoint security with `security: []`
+
 ## Run command line api test
 
 1. run example app on localhost (see top level readme)
