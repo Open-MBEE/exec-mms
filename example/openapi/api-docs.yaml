@@ -361,6 +361,7 @@ paths:
       tags:
       - authentication-controller
       operationId: createAuthenticationToken
+      security: []
       requestBody:
         content:
           application/json:
