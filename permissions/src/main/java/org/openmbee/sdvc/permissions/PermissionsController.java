@@ -4,7 +4,6 @@ import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +24,7 @@ public class PermissionsController {
     @PostMapping(value = "/orgs/{orgId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_UPDATE_PERMISSIONS', false)")
-    public ResponseEntity<?> updateOrgPermissions(
+    public PermissionsResponse updateOrgPermissions(
         @PathVariable String orgId,
         @RequestBody PermissionsRequest req) {
 
@@ -38,13 +37,13 @@ public class PermissionsController {
         if (req.getPublic() != null) {
             permissionService.setOrgPublic(req.getPublic(), orgId);
         }
-        return ResponseEntity.ok("");
+        return new PermissionsResponse();
     }
 
     @PostMapping(value = "/projects/{projectId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_UPDATE_PERMISSIONS', false)")
-    public ResponseEntity<?> updateProjectPermissions(
+    public PermissionsResponse updateProjectPermissions(
         @PathVariable String projectId,
         @RequestBody PermissionsRequest req) {
 
@@ -60,13 +59,13 @@ public class PermissionsController {
         if (req.getInherit() != null) {
             permissionService.setProjectInherit(req.getInherit(), projectId);
         }
-        return ResponseEntity.ok("");
+        return new PermissionsResponse();
     }
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_UPDATE_PERMISSIONS', false)")
-    public ResponseEntity<?> updateBranchPermissions(
+    public PermissionsResponse updateBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody PermissionsRequest req) {
@@ -80,7 +79,7 @@ public class PermissionsController {
         if (req.getInherit() != null) {
             permissionService.setBranchInherit(req.getInherit(), projectId, refId);
         }
-        return ResponseEntity.ok("");
+        return new PermissionsResponse();
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")
