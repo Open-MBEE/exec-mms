@@ -851,35 +851,6 @@ components:
   schemas:
     ElementJson:
       type: object
-      properties:
-        type:
-          type: string
-        name:
-          type: string
-        id:
-          type: string
-        _inRefIds:
-          type: array
-          items:
-            type: string
-        _refId:
-          type: string
-        _creator:
-          type: string
-        _docId:
-          type: string
-        _projectId:
-          type: string
-        _modifier:
-          type: string
-        _modified:
-          type: string
-        _created:
-          type: string
-        _commitId:
-          type: string
-      additionalProperties:
-        type: object
     NotebooksResponse:
       type: object
       properties:
