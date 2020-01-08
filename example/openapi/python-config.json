@@ -1,5 +1,5 @@
 {
-    "packageName": "mms_client",
-    "projectName": "mms-client",
-    "packageVersion": "0.0.1"
+    "packageName": "mms_python_client",
+    "projectName": "mms-python-client",
+    "packageVersion": "4.0.0-alpha.1"
 }
