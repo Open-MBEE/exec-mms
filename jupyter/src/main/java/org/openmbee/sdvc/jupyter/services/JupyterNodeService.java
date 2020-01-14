@@ -69,7 +69,7 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
 
     public ElementsResponse readNotebooks(String projectId, String refId, ElementsRequest req,
             Map<String, String> params) {
-        ElementsResponse res = this.read(projectId, refId, req, new HashMap<>());
+        ElementsResponse res = this.read(projectId, refId, req, params);
         List<Rejection> rejected = new ArrayList<>(res.getRejected());
         List<ElementJson> nonNotebooks = new ArrayList<>();
         for (ElementJson e: res.getElements()) {

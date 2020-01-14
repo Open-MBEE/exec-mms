@@ -30,6 +30,7 @@ public class ElementsController extends BaseController {
     public ElementsResponse getAllElements(
         @PathVariable String projectId,
         @PathVariable String refId,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
@@ -43,6 +44,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
@@ -74,6 +76,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse response = new ElementsResponse();

@@ -41,6 +41,11 @@ paths:
         required: true
         schema:
           type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         200:
           description: default response
@@ -61,6 +66,11 @@ paths:
       - name: refId
         in: path
         required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
         schema:
           type: string
       requestBody:
@@ -121,6 +131,11 @@ paths:
       - name: notebookId
         in: path
         required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
         schema:
           type: string
       responses:
@@ -619,6 +634,11 @@ paths:
         required: true
         schema:
           type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         200:
           description: default response
@@ -639,6 +659,11 @@ paths:
       - name: refId
         in: path
         required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
         schema:
           type: string
       requestBody:
@@ -726,6 +751,11 @@ paths:
       - name: elementId
         in: path
         required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
         schema:
           type: string
       responses:

@@ -29,6 +29,7 @@ public class NotebooksController extends BaseController {
     public NotebooksResponse getAllNotebooks(
         @PathVariable String projectId,
         @PathVariable String refId,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, "", params);
@@ -44,6 +45,7 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String notebookId,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, notebookId, params);
@@ -60,6 +62,7 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse res = nodeService.readNotebooks(projectId, refId, req, params);

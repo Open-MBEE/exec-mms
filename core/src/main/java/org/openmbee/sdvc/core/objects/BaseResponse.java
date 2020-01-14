@@ -10,9 +10,9 @@ public class BaseResponse<T> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
-    private List<String> messages;
+    private List<String> messages = new ArrayList<>();
 
-    private List<Rejection> rejected;
+    private List<Rejection> rejected = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     public List<String> getMessages() {
