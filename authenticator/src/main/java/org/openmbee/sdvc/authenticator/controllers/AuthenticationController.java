@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.authenticator.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationRequest;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationResponse;
 import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
@@ -33,6 +34,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/authentication", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @SecurityRequirements(value = {})
     public JwtAuthenticationResponse createAuthenticationToken(
         @RequestBody
             JwtAuthenticationRequest authenticationRequest) {

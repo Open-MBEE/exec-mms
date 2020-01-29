@@ -36,11 +36,11 @@ A gradle wrapper is included in the root of this repository and can be called fr
 1. Copy the example properties file in `example/src/main/resources/` as `application.properties`
 1. Change values for all the appropriate properties. The example file holds sane values for most properties.
 1. Setup Run and Debug configurations. The command line run command is `./gradlew bootRun`
-1. Swagger ui at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+1. Swagger ui at [http://localhost:8080/v3/swagger-ui.html](http://localhost:8080/v3/swagger-ui.html)
 
 ## Running tests
 
-TBA
+See README in /example
 
 ## Built With
 

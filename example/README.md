@@ -20,7 +20,6 @@ yaml at http://localhost:8080/v3/api-docs.yaml - will need to fix securityScheme
           type: http
           scheme: basic
           
-- override authentication endpoint security with `security: []`
 - change schema of ElementJson to just `type: object` (otherwise client generation ignores `additionalProperties` unless using `python-experimental` which needs other changes)
 - TODO - `addtionalProperties` in openapi spec should be just `addtionalProperties: true` where it appears
 
