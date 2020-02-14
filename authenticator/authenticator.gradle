@@ -3,6 +3,7 @@ apply plugin: 'io.spring.convention.spring-module'
 dependencies {
     compile project(':rdb')
     compile project(':core')
+    compile project(':permissions')
 
     compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.6.RELEASE'
     compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.1.6.RELEASE'

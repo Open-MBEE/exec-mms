@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.authenticator.security;
+package org.openmbee.sdvc.permissions.users;
 
 import java.util.ArrayList;
 import java.util.Collection;
