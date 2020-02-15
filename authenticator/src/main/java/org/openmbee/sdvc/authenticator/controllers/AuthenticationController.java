@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationRequest;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationResponse;
 import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
-import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
 import org.openmbee.sdvc.authenticator.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,8 +44,7 @@ public class AuthenticationController {
                 authenticationRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        final UserDetailsImpl userDetails = userDetailsService
-            .loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         final String token = jwtTokenUtil.generateToken(userDetails);
         return new JwtAuthenticationResponse(token);
 

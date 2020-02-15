@@ -12,6 +12,7 @@ import javax.crypto.SecretKey;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -95,10 +96,11 @@ public class JwtTokenGenerator implements Serializable {
         return expirationDate.before(new Date());
     }
 
-    public String generateToken(UserDetailsImpl userDetails) {
+    public String generateToken(UserDetails userDetails) {
+        //can also put in authorities here
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-        claims.put(CLAIM_KEY_USERID, userDetails.getUser().getId());
+        claims.put(CLAIM_KEY_USERID, userDetails.getUsername());
         claims.put(CLAIM_KEY_ENABLED, userDetails.isEnabled());
         claims.put(CLAIM_KEY_CREATED, new Date());
         return generateToken(claims);
@@ -130,7 +132,7 @@ public class JwtTokenGenerator implements Serializable {
         return refreshedToken;
     }
 
-    public Boolean validateToken(String token, UserDetailsImpl userDetails) {
+    public Boolean validateToken(String token, UserDetails userDetails) {
         final String email = getUsernameFromToken(token);
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }

@@ -10,6 +10,7 @@ import org.openmbee.sdvc.authenticator.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,7 +43,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 String username = jwtTokenGenerator.getUsernameFromToken(authToken);
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetailsImpl userDetails = this.userDetailsService.loadUserByUsername(username);
+                    //possible to get authorities from jwt instead of looking up in db also, if authorities were included in jwt
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                     if (jwtTokenGenerator.validateToken(authToken, userDetails)) {
                         UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(userDetails, null,
