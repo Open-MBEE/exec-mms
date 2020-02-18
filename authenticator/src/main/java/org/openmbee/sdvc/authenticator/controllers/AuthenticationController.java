@@ -1,11 +1,8 @@
 package org.openmbee.sdvc.authenticator.controllers;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
-import org.openmbee.sdvc.authenticator.security.JwtAuthenticationRequest;
-import org.openmbee.sdvc.authenticator.security.JwtAuthenticationResponse;
-import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
-import org.openmbee.sdvc.permissions.users.UserDetailsImpl;
-import org.openmbee.sdvc.permissions.users.UserDetailsServiceImpl;
+import org.openmbee.sdvc.authenticator.security.*;
+import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +24,7 @@ public class AuthenticationController {
 
     @Autowired
     public AuthenticationController(AuthenticationManager authenticationManager,
-        UserDetailsServiceImpl userDetailsService, JwtTokenGenerator jwtTokenUtil) {
+                                    UserDetailsServiceImpl userDetailsService, JwtTokenGenerator jwtTokenUtil) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -52,7 +49,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('mmsadmin')")
+    @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
     public Object createUser(@RequestBody JwtAuthenticationRequest req) {
         //TODO allow changing passwords for local users and create admin accounts
         //TODO should allow admin authority string to be set via properties

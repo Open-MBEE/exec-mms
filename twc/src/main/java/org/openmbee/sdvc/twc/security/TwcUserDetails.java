@@ -1,19 +1,20 @@
-package org.openmbee.sdvc.permissions.users;
+package org.openmbee.sdvc.twc.security;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserDetailsImpl implements UserDetails {
+import java.util.ArrayList;
+import java.util.Collection;
+
+class TwcUserDetails implements UserDetails {
 
     private final User user;
 
-    public UserDetailsImpl(User user) {
+    public TwcUserDetails(User user) {
         this.user = user;
     }
 
@@ -28,9 +29,9 @@ public class UserDetailsImpl implements UserDetails {
             }
         }
         if (user.isAdmin()) {
-            authorities.add(new SimpleGrantedAuthority("mmsadmin"));
+            authorities.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
         }
-        authorities.add(new SimpleGrantedAuthority("everyone"));
+        authorities.add(new SimpleGrantedAuthority(AuthorizationConstants.EVERYONE));
         return authorities;
     }
 

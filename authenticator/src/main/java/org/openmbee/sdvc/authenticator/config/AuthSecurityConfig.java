@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationEntryPoint;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationTokenFilter;
-import org.openmbee.sdvc.permissions.users.UserDetailsServiceImpl;
+import org.openmbee.sdvc.authenticator.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

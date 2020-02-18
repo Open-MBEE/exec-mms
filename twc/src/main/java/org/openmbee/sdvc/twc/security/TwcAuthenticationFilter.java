@@ -7,14 +7,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openmbee.sdvc.core.utils.RestUtils;
-import org.openmbee.sdvc.permissions.users.UserDetailsImpl;
-import org.openmbee.sdvc.permissions.users.UserDetailsServiceImpl;
 import org.openmbee.sdvc.twc.config.TwcConfig;
 import org.openmbee.sdvc.twc.constants.TwcConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -23,7 +22,7 @@ public class TwcAuthenticationFilter extends BasicAuthenticationFilter {
 
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private TwcUserDetailsService userDetailsService;
 
 	@Autowired
 	private TwcConfig twcConfig;
@@ -45,7 +44,7 @@ public class TwcAuthenticationFilter extends BasicAuthenticationFilter {
 		    if(twcAuthProvider != null) {
                 String authenticatedUser = twcAuthProvider.getAuthentication(token);
                 if(authenticatedUser != null) {
-                    UserDetailsImpl userDetails = this.userDetailsService.loadUserByUsername(authenticatedUser);
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(authenticatedUser);
                     UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null,
                             userDetails.getAuthorities());

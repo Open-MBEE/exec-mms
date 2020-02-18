@@ -4,8 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.openmbee.sdvc.permissions.users.UserDetailsImpl;
-import org.openmbee.sdvc.permissions.users.UserDetailsServiceImpl;
 import org.openmbee.sdvc.twc.config.TwcConfig;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +24,7 @@ public class TwcAuthenticationFilterTest {
 	TwcConfig twcConfig;
 
 	@Mock
-	UserDetailsServiceImpl userDetailsService;
+    TwcUserDetailsService userDetailsService;
 
 	@Mock
 	TwcAuthenticationProvider twcAuthProvider;
@@ -149,7 +147,7 @@ public class TwcAuthenticationFilterTest {
 		FilterChain chain = mock(FilterChain.class);
 		when(twcConfig.getAuthNProvider(anyString())).thenReturn(twcAuthProvider);
 		when(twcAuthProvider.getAuthentication(anyString())).thenReturn("twcUser");
-		when(userDetailsService.loadUserByUsername("twcUser")).thenReturn(mock(UserDetailsImpl.class));
+		when(userDetailsService.loadUserByUsername("twcUser")).thenReturn(mock(TwcUserDetails.class));
 
 		try {
 

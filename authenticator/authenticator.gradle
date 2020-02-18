@@ -3,7 +3,6 @@ apply plugin: 'io.spring.convention.spring-module'
 dependencies {
     compile project(':rdb')
     compile project(':core')
-    compile project(':permissions')
 
     compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.6.RELEASE'
     compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.1.6.RELEASE'
@@ -13,4 +12,6 @@ dependencies {
     compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.5'
     runtime group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.10.5'
     runtime group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.10.5'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
 }
