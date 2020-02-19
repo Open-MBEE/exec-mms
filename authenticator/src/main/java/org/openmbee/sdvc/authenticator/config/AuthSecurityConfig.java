@@ -51,7 +51,16 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(){
+            //Turn off warnings for null/empty passwords
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                if (encodedPassword == null || encodedPassword.length() == 0) {
+                    return false;
+                }
+                return super.matches(rawPassword, encodedPassword);
+            }
+        };
     }
 
     @Bean

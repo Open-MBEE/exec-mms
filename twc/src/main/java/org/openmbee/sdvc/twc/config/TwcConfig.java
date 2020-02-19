@@ -27,6 +27,9 @@ public class TwcConfig {
     }
 
     public TwcAuthenticationProvider getAuthNProvider(String associatedTWC) {
+        if(associatedTWC == null)
+            return null;
+
         for(TeamworkCloud twc : getInstances()){
             if(twc.hasKnownName(associatedTWC)){
                 return new TwcAuthenticationProvider(restUtils, twc);

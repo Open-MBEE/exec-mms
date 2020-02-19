@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -24,11 +25,23 @@ public class TwcUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
 
+        User u;
         if (!user.isPresent()) {
-            throw new UsernameNotFoundException(
-                String.format("No user found with username '%s'.", username));
+            u = addUser(username);
+        } else {
+            u = user.get();
         }
-        return new TwcUserDetails(user.get());
+        return new TwcUserDetails(u);
+    }
+
+    @Transactional
+    public User addUser(String username) {
+        User user = new User();
+        user.setUsername(username);
+        //TODO: fill in user details from TWC
+        user.setEnabled(true);
+        userRepository.save(user);
+        return user;
     }
 
 }
