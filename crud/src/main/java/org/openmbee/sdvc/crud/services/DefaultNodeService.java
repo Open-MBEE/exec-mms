@@ -121,7 +121,7 @@ public class DefaultNodeService implements NodeService {
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
-        response.setRejected(info.getRejected());
+        response.setRejected(new ArrayList<>(info.getRejected().values()));
         return response;
     }
 
@@ -140,7 +140,7 @@ public class DefaultNodeService implements NodeService {
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
-        response.setRejected(info.getRejected());
+        response.setRejected(new ArrayList<>(info.getRejected().values()));
         return response;
     }
 
@@ -215,6 +215,18 @@ public class DefaultNodeService implements NodeService {
         return req;
     }
 
+    protected ElementsRequest buildRequest(Collection<String> ids) {
+        ElementsRequest req = new ElementsRequest();
+        List<ElementJson> list = new ArrayList<>();
+        for (String id: ids) {
+            ElementJson json = new ElementJson();
+            json.setId(id);
+            list.add(json);
+        }
+        req.setElements(list);
+        return req;
+    }
+
     @Override
     public ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user) {
         ContextHolder.setContext(projectId, refId);
@@ -227,7 +239,7 @@ public class DefaultNodeService implements NodeService {
         commitChanges(info);
 
         response.getElements().addAll(info.getDeletedMap().values());
-        response.setRejected(info.getRejected());
+        response.setRejected(new ArrayList<>(info.getRejected().values()));
         return response;
     }
 

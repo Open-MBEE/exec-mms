@@ -24,7 +24,7 @@ public class NodeDeleteHelper extends NodeOperation {
             Node node = info.getExistingNodeMap().get(nodeId);
             Map<String, Object> indexElement = info.getExistingElementMap().get(nodeId);
             if (node.isDeleted()) {
-                info.addRejection(new Rejection(indexElement, 304, "Already deleted"));
+                info.addRejection(nodeId, new Rejection(indexElement, 304, "Already deleted"));
                 continue;
             }
             info.getOldDocIds().add(node.getDocId());

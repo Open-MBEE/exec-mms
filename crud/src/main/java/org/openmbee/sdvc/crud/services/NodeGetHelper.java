@@ -134,7 +134,7 @@ public class NodeGetHelper extends NodeOperation {
     }
 
     protected void rejectDeleted(NodeGetInfo info, String nodeId, ElementJson indexElement) {
-        info.addRejection(new Rejection(indexElement, 410, "Element deleted"));
+        info.addRejection(nodeId, new Rejection(indexElement, 410, "Element deleted"));
     }
 
     protected List<String> getRefCommitIds(Instant time) {

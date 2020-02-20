@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import java.util.UUID;
 import org.openmbee.sdvc.core.config.Formats;
 import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
@@ -22,7 +23,7 @@ public class NodePostHelper extends NodeOperation {
                              NodeChangeInfo info) {
 
         if (element.isPartialOf(existing)) {
-            info.addRejection(new Rejection(element, 304, "Is Equivalent"));
+            info.addRejection(element.getId(), new Rejection(element, 304, "Is Equivalent"));
             return false;
         }
         return true;
@@ -38,7 +39,7 @@ public class NodePostHelper extends NodeOperation {
                 Date jsonModDate = Formats.SDF.parse(jsonModified);
                 Date existingModDate = Formats.SDF.parse(existingModified.toString());
                 if (jsonModDate.before(existingModDate)) {
-                    info.addRejection(new Rejection(element, 409, "Conflict Detected"));
+                    info.addRejection(element.getId(), new Rejection(element, 409, "Conflict Detected"));
                     return false;
                 }
             } catch (ParseException e) {
@@ -63,7 +64,7 @@ public class NodePostHelper extends NodeOperation {
             boolean added = false;
             boolean updated = false;
             if (element.getId() == null || element.getId().isEmpty()) {
-                info.addRejection(new Rejection(element, 400, "Missing ID"));
+                info.addRejection(UUID.randomUUID().toString(), new Rejection(element, 400, "Missing ID"));
             } else {
                 Map<String, Object> elasticElement = info.getExistingElementMap()
                     .get(element.getId());

@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.core.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,7 @@ public class NodeGetInfo {
 
     Map<String, ElementJson> activeElementMap;
 
-    List<Rejection> rejected;
+    Map<String, Rejection> rejected;
 
 
     public Set<String> getReqIndexIds() {
@@ -72,20 +73,20 @@ public class NodeGetInfo {
         return this;
     }
 
-    public List<Rejection> getRejected() {
+    public Map<String, Rejection> getRejected() {
         return rejected;
     }
 
-    public NodeGetInfo setRejected(List<Rejection> rejected) {
+    public NodeGetInfo setRejected(Map<String, Rejection> rejected) {
         this.rejected = rejected;
         return this;
     }
 
-    public void addRejection(Rejection rejection) {
+    public void addRejection(String id, Rejection rejection) {
         if (this.rejected == null) {
-            this.rejected = new ArrayList<>();
+            this.rejected = new HashMap<>();
         }
-        this.rejected.add(rejection);
+        this.rejected.put(id, rejection);
     }
 
 }

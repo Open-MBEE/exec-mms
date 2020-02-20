@@ -17,9 +17,9 @@ public enum CameoNodeType {
     PARAMETER(11),
     VIEW(12),
     VIEWPOINT(13),
-    SITEANDPACKAGE(14),
+    GROUP(14),
     HOLDINGBIN(15),
-    MOUNT(16);
+    PROJECTUSAGE(16);
 
     private static Map<Integer, CameoNodeType> map = new HashMap<>();
 
