@@ -20,6 +20,8 @@ public interface NodeService {
 
     void extraProcessDeletedElement(ElementJson element, Node node, NodeChangeInfo info);
 
+    void extraProcessGotElement(ElementJson element, Node node, NodeGetInfo info);
+
     ElementsResponse delete(String projectId, String refId, String id, String user);
 
     ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user);

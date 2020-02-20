@@ -117,7 +117,7 @@ public class DefaultNodeService implements NodeService {
         ContextHolder.setContext(projectId, refId);
         logger.info("params: " + params);
 
-        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId);
+        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId, this);
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
@@ -193,6 +193,10 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public void extraProcessDeletedElement(ElementJson element, Node node, NodeChangeInfo info) {
+    }
+
+    @Override
+    public void extraProcessGotElement(ElementJson element, Node node, NodeGetInfo info) {
     }
 
     @Override
