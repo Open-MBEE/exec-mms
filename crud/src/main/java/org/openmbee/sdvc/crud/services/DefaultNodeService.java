@@ -115,7 +115,6 @@ public class DefaultNodeService implements NodeService {
 
         String commitId = params.getOrDefault("commitId", null);
         ContextHolder.setContext(projectId, refId);
-        logger.info("params: " + params);
 
         NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId, this);
 
