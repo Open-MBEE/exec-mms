@@ -65,7 +65,11 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
                 curInfo = nodeGetHelper.processGetJson(reqNext.getElements(), "", this);
                 info.getActiveElementMap().putAll(curInfo.getActiveElementMap());
                 curInfo.getActiveElementMap().forEach((id, json) -> info.getRejected().remove(id));
-                //TODO maybe look at rejected to replace 404s with 410s if same element
+                curInfo.getRejected().forEach((id, rejection) -> {
+                    if (info.getRejected().containsKey(id) && rejection.getCode() == 410) {
+                        info.getRejected().put(id, rejection); //deleted element is better than not found
+                    }
+                });
                 i++;
             }
         }
@@ -79,7 +83,8 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
     @Override
     public void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info) {
         node.setNodeType(cameoHelper.getNodeType(element).getValue());
-        //TODO need to handle _childViews
+        //TODO need to handle _childViews? need to remove it at minimum if posted
+        List<Map<String, String>> postedChildViews = (List)element.remove(CameoConstants.CHILDVIEWS);
         //TODO move graph processing somewhere else/another interface
         Map<Integer, List<Pair<String, String>>> res = info.getEdgesToSave();
         String owner = (String) element.get("ownerId");
@@ -93,7 +98,8 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
 
     @Override
     public void extraProcessGotElement(ElementJson element, Node node, NodeGetInfo info) {
-        //TODO check if element is view, add in _childViews
+        //TODO check if element is view, add in _childViews?
+        //TODO extended info? (qualified name/id)
     }
 
     public ProjectJson getProjectUsages(String projectId, String refId, List<Pair<String, String>> saw) {

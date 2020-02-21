@@ -447,13 +447,13 @@
 							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"g\",\n\t\t\t\"name\": \"g\"\n\t\t}, {\n\t\t\t\"id\": \"h\", \n\t\t\t\"name\": \"h\"\n\t\t}, {\n\t\t\t\"id\": \"i\",\n\t\t\t\"name\": \"i\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
-							"raw": "{{host}}/projects/cameo_child2/refs/master/elements",
+							"raw": "{{host}}/projects/cameo_child3/refs/master/elements",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"projects",
-								"cameo_child2",
+								"cameo_child3",
 								"refs",
 								"master",
 								"elements"
@@ -680,6 +680,249 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\t\"elements\": [\n\t\t{   \"id\": \"a\" },\n\t\t{   \"id\": \"b\" },\n\t\t{   \"id\": \"c\" },\n\t\t{   \"id\": \"d\" },\n\t\t{   \"id\": \"e\" },\n\t\t{   \"id\": \"f\" },\n\t\t{   \"id\": \"g\" },\n\t\t{   \"id\": \"h\" },\n\t\t{   \"id\": \"i\" },\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements/a",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements",
+								"a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoChild",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child/refs/master/elements/x",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child",
+								"refs",
+								"master",
+								"elements",
+								"x"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoChild2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child2/refs/master/elements/d",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child2",
+								"refs",
+								"master",
+								"elements",
+								"d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoChild3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child3/refs/master/elements/g",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child3",
+								"refs",
+								"master",
+								"elements",
+								"g"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get missing and deleted elements from cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"response has 8 elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(8);",
+									"});",
+									"pm.test(\"rejected has 5 elements, a, d, x, g, should be 410 and missing is 404\",",
+									"   function() {",
+									"       var jsonData = pm.response.json();",
+									"       pm.expect(jsonData.rejected.length).to.eql(5);",
+									"       for (let r of jsonData.rejected) {",
+									"           if (r.object == 'missing') {",
+									"               pm.expect(r.code).to.eql(404);",
+									"           } else {",
+									"               pm.expect(r.code).to.eql(410);",
+									"           }",
+									"       }",
+									"   });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{   \"id\": \"a\" },\n\t\t{   \"id\": \"b\" },\n\t\t{   \"id\": \"c\" },\n\t\t{   \"id\": \"d\" },\n\t\t{   \"id\": \"e\" },\n\t\t{   \"id\": \"f\" },\n\t\t{   \"id\": \"g\" },\n\t\t{   \"id\": \"h\" },\n\t\t{   \"id\": \"i\" },\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t}, {\n\t\t\t\"id\": \"missing\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
