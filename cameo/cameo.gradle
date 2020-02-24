@@ -2,4 +2,6 @@ apply plugin: 'io.spring.convention.spring-module'
 
 dependencies {
     compile project(':crud')
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
 }

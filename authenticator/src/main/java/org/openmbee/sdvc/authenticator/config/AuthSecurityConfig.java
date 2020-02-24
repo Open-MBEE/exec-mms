@@ -4,13 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationEntryPoint;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationTokenFilter;
-import org.openmbee.sdvc.authenticator.services.UserDetailsServiceImpl;
+import org.openmbee.sdvc.authenticator.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -52,7 +51,16 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(){
+            //Turn off warnings for null/empty passwords
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                if (encodedPassword == null || encodedPassword.length() == 0) {
+                    return false;
+                }
+                return super.matches(rawPassword, encodedPassword);
+            }
+        };
     }
 
     @Bean

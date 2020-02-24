@@ -3,4 +3,6 @@ apply plugin: 'io.spring.convention.spring-module'
 dependencies {
     compile project(':core')
     compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.1.1'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
 }

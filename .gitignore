@@ -26,3 +26,6 @@ localhost-env.json
 /dist/
 /nbdist/
 /.nb-gradle/
+
+
+**/bin

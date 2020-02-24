@@ -1,0 +1,8 @@
+#Configuration for TWC
+#port is for REST interface
+#aliases are for clustered usages
+twc.instances[0].url=dev-twc-03.domain.com
+twc.instances[0].protocol=https
+twc.instances[0].port=8111
+twc.instances[0].aliases[0]=dev-twc-02.domain.com
+twc.instances[0].aliases[1]=dev-twc-01.domain.com

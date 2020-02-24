@@ -1,7 +1,4 @@
-package org.openmbee.sdvc.authenticator.security;
-
-import java.util.ArrayList;
-import java.util.Collection;
+package org.openmbee.sdvc.twc.security;
 
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.data.domains.global.Group;
@@ -10,11 +7,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserDetailsImpl implements UserDetails {
+import java.util.ArrayList;
+import java.util.Collection;
+
+class TwcUserDetails implements UserDetails {
 
     private final User user;
 
-    public UserDetailsImpl(User user) {
+    public TwcUserDetails(User user) {
         this.user = user;
     }
 
