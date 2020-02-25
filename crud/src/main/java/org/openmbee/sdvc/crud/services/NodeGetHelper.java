@@ -31,7 +31,9 @@ public class NodeGetHelper extends NodeOperation {
                 rejectDeleted(info, nodeId, indexElement);
                 continue;
             }
-            service.extraProcessGotElement(indexElement, info.getExistingNodeMap().get(nodeId), info);
+            if (service != null) {
+                service.extraProcessGotElement(indexElement, info.getExistingNodeMap().get(nodeId), info);
+            }
             info.getActiveElementMap().put(nodeId, indexElement);
         }
         return info;
