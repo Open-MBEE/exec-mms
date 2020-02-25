@@ -66,7 +66,6 @@ public class CameoConstants {
     public static final String SUBSTITUTIONIDS = "substitutionIds";
     public static final String SUPPLIERDEPENDENCYIDS = "supplierDependencyIds";
     public static final String SYNCELEMENTID = "syncElementId";
-    public static final String SYSMLID = "id";
     public static final String TARGET = "targetId";
     public static final String TEMPLATEBINDINGIDS = "templateBindingIds";
     public static final String TEMPLATEPARAMETERID = "templateParameterId";

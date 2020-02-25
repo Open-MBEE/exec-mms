@@ -889,13 +889,12 @@
 							"script": {
 								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
 								"exec": [
+									"var jsonData = pm.response.json();",
 									"pm.test(\"response has 8 elements\", function () {",
-									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.elements.length).to.eql(8);",
 									"});",
 									"pm.test(\"rejected has 5 elements, a, d, x, g, should be 410 and missing is 404\",",
 									"   function() {",
-									"       var jsonData = pm.response.json();",
 									"       pm.expect(jsonData.rejected.length).to.eql(5);",
 									"       for (let r of jsonData.rejected) {",
 									"           if (r.object == 'missing') {",
@@ -935,6 +934,54 @@
 								"refs",
 								"master",
 								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get mounts json",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 1 project\", function () {",
+									"    pm.expect(jsonData.projects.length).to.eql(1);",
+									"});",
+									"pm.test(\"project has 2 mounts\",",
+									"   function() {",
+									"       pm.expect(jsonData.projects[0]['_mounts'].length).to.eql(2);",
+									"   });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/mounts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"mounts"
 							]
 						}
 					},

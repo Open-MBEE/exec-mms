@@ -20,6 +20,7 @@ import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.cameo.CameoEdgeType;
+import org.openmbee.sdvc.json.MountJson;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -55,13 +56,13 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
             //continue looking in visible mounted projects for elements if not all found
             NodeGetInfo curInfo = info;
             List<Pair<String, String>> usages = new ArrayList<>();
-            getProjectUsages(projectId, refId, usages);
+            getProjectUsages(projectId, refId, commitId, usages);
 
             int i = 1; //0 is entry project, already gotten
             while (!curInfo.getRejected().isEmpty() && i < usages.size()) {
                 ElementsRequest reqNext = buildRequest(curInfo.getRejected().keySet());
                 ContextHolder.setContext(usages.get(i).getFirst(), usages.get(i).getSecond());
-                //TODO find the right commitId in child if commitId is present in params
+                //TODO use the right commitId in child if commitId is present in params
                 curInfo = nodeGetHelper.processGetJson(reqNext.getElements(), "", this);
                 info.getActiveElementMap().putAll(curInfo.getActiveElementMap());
                 curInfo.getActiveElementMap().forEach((id, json) -> info.getRejected().remove(id));
@@ -102,17 +103,18 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
         //TODO extended info? (qualified name/id)
     }
 
-    public ProjectJson getProjectUsages(String projectId, String refId, List<Pair<String, String>> saw) {
+    public MountJson getProjectUsages(String projectId, String refId, String commitId, List<Pair<String, String>> saw) {
         ContextHolder.setContext(projectId, refId);
         saw.add(Pair.of(projectId, refId));
-        List<Node> mountNodes = nodeRepository.findAllByDeletedAndNodeType(false, CameoNodeType.PROJECTUSAGE
-            .getValue());
+        List<Node> mountNodes = nodeRepository.findAllByNodeType(CameoNodeType.PROJECTUSAGE.getValue());
         Set<String> mountIds = new HashSet<>();
         mountNodes.forEach(n -> mountIds.add(n.getNodeId()));
-        ElementsResponse mountsJson = super.read(projectId, refId, buildRequest(mountIds), new HashMap<>());
+        Map<String, String> params = new HashMap<>();
+        params.put("commitId", commitId);
+        ElementsResponse mountsJson = super.read(projectId, refId, buildRequest(mountIds), params);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<ProjectJson> mountValues = new ArrayList<>();
+        List<MountJson> mountValues = new ArrayList<>();
         for (ElementJson mount: mountsJson.getElements()) {
             String mountedProjectId = (String)mount.get(CameoConstants.MOUNTEDELEMENTPROJECTID);
             String mountedRefId = (String)mount.get(CameoConstants.MOUNTEDREFID);
@@ -129,11 +131,10 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
             } catch (Exception e) {
                 continue;
             }
-            //doing a depth first traversal
-            mountValues.add(getProjectUsages(mountedProjectId, mountedRefId, saw));
+            //doing a depth first traversal TODO get appropriate commitId
+            mountValues.add(getProjectUsages(mountedProjectId, mountedRefId, "", saw));
         }
-        //TODO should get real project json here
-        ProjectJson res = new ProjectJson();
+        MountJson res = new MountJson();
         res.setId(projectId);
         res.setProjectId(projectId);
         res.setRefId(refId);
