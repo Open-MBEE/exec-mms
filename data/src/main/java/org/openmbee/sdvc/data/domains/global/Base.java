@@ -78,7 +78,7 @@ public abstract class Base implements Serializable {
                     case "String" :
                     case "DecimalFormat" :
                     case "BigDecimal":
-                        if (!current.equals(value)) {
+                        if ((current != null && !current.equals(value)) || (current == null && value != null)) {
                             return false;
                         }
 
