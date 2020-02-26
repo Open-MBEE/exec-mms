@@ -160,18 +160,4 @@ public class Project extends Base {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Project node = (Project) o;
-
-        return id.equals(node.id);
-    }
 }

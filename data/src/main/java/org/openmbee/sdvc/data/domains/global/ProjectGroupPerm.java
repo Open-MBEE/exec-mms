@@ -65,18 +65,4 @@ public class ProjectGroupPerm extends Base {
     public void setInherited(boolean inherited) {
         this.inherited = inherited;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ProjectGroupPerm node = (ProjectGroupPerm) o;
-
-        return id.equals(node.id);
-    }
 }

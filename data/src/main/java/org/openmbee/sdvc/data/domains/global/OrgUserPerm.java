@@ -53,18 +53,4 @@ public class OrgUserPerm extends Base {
     public void setRole(Role role) {
         this.role = role;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        OrgUserPerm node = (OrgUserPerm) o;
-
-        return id.equals(node.id);
-    }
 }

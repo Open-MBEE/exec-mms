@@ -41,18 +41,4 @@ public class Webhook extends Base {
     public void setUrl(String url) {
         this.url = url;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Webhook node = (Webhook) o;
-
-        return id.equals(node.id);
-    }
 }

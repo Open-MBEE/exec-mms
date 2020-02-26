@@ -65,18 +65,4 @@ public class BranchUserPerm extends Base {
     public void setInherited(boolean inherited) {
         this.inherited = inherited;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        BranchUserPerm node = (BranchUserPerm) o;
-
-        return id.equals(node.id);
-    }
 }
