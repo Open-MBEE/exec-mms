@@ -96,7 +96,7 @@ public class NodeOperation {
         info.setReqElementMap(reqElementMap);
         info.setReqIndexIds(indexIds);
         info.setToSaveNodeMap(new HashMap<>());
-        info.setRejected(new ArrayList<>());
+        info.setRejected(new HashMap<>());
         info.setNow(now);
         info.setOldDocIds(new HashSet<>());
         info.setEdgesToDelete(new HashMap<>());
@@ -169,7 +169,7 @@ public class NodeOperation {
     }
 
     protected void rejectNotFound(NodeGetInfo info, String nodeId) {
-        info.addRejection(new Rejection(nodeId, 404, "Not Found"));
+        info.addRejection(nodeId, new Rejection(nodeId, 404, "Not Found"));
     }
 
     public static Map<String, ElementJson> convertJsonToMap(
