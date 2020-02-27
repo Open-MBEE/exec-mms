@@ -37,18 +37,4 @@ public class Group extends Base {
     public void setUsers(Collection<User> users) {
         this.users = users;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Group node = (Group) o;
-
-        return id.equals(node.id);
-    }
 }

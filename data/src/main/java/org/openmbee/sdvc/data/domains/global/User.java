@@ -164,19 +164,4 @@ public class User extends Base {
     public void setAdmin(boolean admin) {
         this.admin = admin;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        User node = (User) o;
-
-        return id.equals(node.id);
-    }
-
 }
