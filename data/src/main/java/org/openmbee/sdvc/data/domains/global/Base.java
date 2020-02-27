@@ -101,7 +101,8 @@ public abstract class Base implements Serializable {
         Field[] fields = getClass().getDeclaredFields();
         for (Field field : fields) {
             try {
-                hash = hash + (seed * field.get(this).hashCode());
+                Object value = field.get(this);
+                hash = hash + (seed * (value != null ? value.hashCode() : 0));
             } catch (IllegalAccessException iae) {
                 //Intentionally muted
             }
