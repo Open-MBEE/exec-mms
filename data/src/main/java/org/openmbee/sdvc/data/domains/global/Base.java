@@ -81,6 +81,7 @@ public abstract class Base implements Serializable {
                         if ((current != null && !current.equals(value)) || (current == null && value != null)) {
                             return false;
                         }
+                        break;
 
                     default:
                         if (current != value) {
