@@ -1,10 +1,11 @@
-package org.openmbee.sdvc.authenticator.services;
+package org.openmbee.sdvc.authenticator.security;
 
 import java.util.Optional;
-import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
+
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

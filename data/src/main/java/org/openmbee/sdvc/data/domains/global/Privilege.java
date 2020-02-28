@@ -38,19 +38,4 @@ public class Privilege extends Base {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Privilege node = (Privilege) o;
-
-        return id.equals(node.id);
-    }
-
 }

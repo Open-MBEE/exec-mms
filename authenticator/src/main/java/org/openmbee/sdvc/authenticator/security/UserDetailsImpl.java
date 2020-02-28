@@ -3,6 +3,7 @@ package org.openmbee.sdvc.authenticator.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,9 +29,9 @@ public class UserDetailsImpl implements UserDetails {
             }
         }
         if (user.isAdmin()) {
-            authorities.add(new SimpleGrantedAuthority("mmsadmin"));
+            authorities.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
         }
-        authorities.add(new SimpleGrantedAuthority("everyone"));
+        authorities.add(new SimpleGrantedAuthority(AuthorizationConstants.EVERYONE));
         return authorities;
     }
 

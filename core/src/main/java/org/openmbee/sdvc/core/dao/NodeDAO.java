@@ -27,4 +27,6 @@ public interface NodeDAO extends BaseDAO {
     List<Node> findAllByDeleted(boolean deleted);
 
     List<Node> findAllByDeletedAndNodeType(boolean deleted, int nodeType);
+
+    List<Node> findAllByNodeType(int nodeType);
 }

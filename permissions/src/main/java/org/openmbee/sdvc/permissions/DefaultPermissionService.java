@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.transaction.Transactional;
+
+import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest.Permission;
@@ -552,7 +554,7 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     @Transactional
     public boolean hasOrgPrivilege(String privilege, String user, Set<String> groups, String orgId) {
-        if (groups.contains("mmsadmin")) return true;
+        if (groups.contains(AuthorizationConstants.MMSADMIN)) return true;
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
@@ -575,7 +577,7 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     @Transactional
     public boolean hasProjectPrivilege(String privilege, String user, Set<String> groups, String projectId) {
-        if (groups.contains("mmsadmin")) return true;
+        if (groups.contains(AuthorizationConstants.MMSADMIN)) return true;
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
@@ -598,7 +600,7 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     @Transactional
     public boolean hasBranchPrivilege(String privilege, String user, Set<String> groups, String projectId, String branchId) {
-        if (groups.contains("mmsadmin")) return true;
+        if (groups.contains(AuthorizationConstants.MMSADMIN)) return true;
         Optional<Privilege> priv = privRepo.findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "No such privilege");

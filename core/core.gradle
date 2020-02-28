@@ -13,4 +13,6 @@ dependencies {
     compile 'io.swagger.core.v3:swagger-annotations:2.1.0'
     //using @Parameter(hidden = true) to ignore Authentication params in controllers, until
     //springdoc ignores it by default or controllers are moved out of modules
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
 }

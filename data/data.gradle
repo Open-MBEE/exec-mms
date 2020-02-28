@@ -11,4 +11,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.7'
 
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.2.Final'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
 }

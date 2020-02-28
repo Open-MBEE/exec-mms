@@ -4,6 +4,7 @@ import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
+import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.rdb.repositories.GroupRepository;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
@@ -149,9 +150,9 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
                 
                 List<GrantedAuthority> auths = AuthorityUtils.createAuthorityList(memberGroups.toArray(new String[0]));
                 if (user.isAdmin()) {
-                    auths.add(new SimpleGrantedAuthority("mmsadmin"));
+                    auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
                 }
-                auths.add(new SimpleGrantedAuthority("everyone"));
+                auths.add(new SimpleGrantedAuthority(AuthorizationConstants.EVERYONE));
                 return auths;
             }
         }

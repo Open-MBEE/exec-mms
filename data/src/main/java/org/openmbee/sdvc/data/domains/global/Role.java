@@ -105,18 +105,4 @@ public class Role extends Base {
     public void setBranchGroups(Collection<BranchGroupPerm> branchGroups) {
         this.branchGroups = branchGroups;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Role node = (Role) o;
-
-        return id.equals(node.id);
-    }
 }

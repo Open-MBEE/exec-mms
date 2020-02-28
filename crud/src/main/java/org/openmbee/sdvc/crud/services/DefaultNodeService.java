@@ -115,13 +115,12 @@ public class DefaultNodeService implements NodeService {
 
         String commitId = params.getOrDefault("commitId", null);
         ContextHolder.setContext(projectId, refId);
-        logger.info("params: " + params);
 
-        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId);
+        NodeGetInfo info = nodeGetHelper.processGetJson(req.getElements(), commitId, this);
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
-        response.setRejected(info.getRejected());
+        response.setRejected(new ArrayList<>(info.getRejected().values()));
         return response;
     }
 
@@ -140,7 +139,7 @@ public class DefaultNodeService implements NodeService {
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
-        response.setRejected(info.getRejected());
+        response.setRejected(new ArrayList<>(info.getRejected().values()));
         return response;
     }
 
@@ -196,6 +195,10 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
+    public void extraProcessGotElement(ElementJson element, Node node, NodeGetInfo info) {
+    }
+
+    @Override
     public ElementsResponse delete(String projectId, String refId, String id, String user) {
         ElementsRequest req = buildRequest(id);
         return delete(projectId, refId, req, user);
@@ -207,6 +210,18 @@ public class DefaultNodeService implements NodeService {
         ElementsRequest req = new ElementsRequest();
         List<ElementJson> list = new ArrayList<>();
         list.add(json);
+        req.setElements(list);
+        return req;
+    }
+
+    protected ElementsRequest buildRequest(Collection<String> ids) {
+        ElementsRequest req = new ElementsRequest();
+        List<ElementJson> list = new ArrayList<>();
+        for (String id: ids) {
+            ElementJson json = new ElementJson();
+            json.setId(id);
+            list.add(json);
+        }
         req.setElements(list);
         return req;
     }
@@ -223,7 +238,7 @@ public class DefaultNodeService implements NodeService {
         commitChanges(info);
 
         response.getElements().addAll(info.getDeletedMap().values());
-        response.setRejected(info.getRejected());
+        response.setRejected(new ArrayList<>(info.getRejected().values()));
         return response;
     }
 

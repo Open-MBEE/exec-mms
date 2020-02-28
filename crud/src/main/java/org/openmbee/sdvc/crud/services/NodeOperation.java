@@ -17,7 +17,6 @@ import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.core.dao.CommitDAO;
-import org.openmbee.sdvc.data.domains.scoped.Edge;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
@@ -25,7 +24,6 @@ import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -98,7 +96,7 @@ public class NodeOperation {
         info.setReqElementMap(reqElementMap);
         info.setReqIndexIds(indexIds);
         info.setToSaveNodeMap(new HashMap<>());
-        info.setRejected(new ArrayList<>());
+        info.setRejected(new HashMap<>());
         info.setNow(now);
         info.setOldDocIds(new HashSet<>());
         info.setEdgesToDelete(new HashMap<>());
@@ -162,41 +160,6 @@ public class NodeOperation {
         n.setDeleted(true);
     }
 
-    public List<Edge> getEdgesToSave(NodeChangeInfo info) {
-        Set<String> toFind = new HashSet<>();
-        Map<String, Node> nodes = info.getToSaveNodeMap();
-        List<Edge> res = new ArrayList<>();
-        Map<Integer, List<Pair<String, String>>> edges = info.getEdgesToSave();
-        if (edges.isEmpty()) {
-            return res;
-        }
-        for (Map.Entry<Integer, List<Pair<String, String>>> entry : edges.entrySet()) {
-            for (Pair<String, String> pair : entry.getValue()) {
-                toFind.add(pair.getFirst());
-                toFind.add(pair.getSecond());
-            }
-        }
-        toFind.removeAll(nodes.keySet());
-        Map<String, Node> edgeNodes = convertNodesToMap(nodeRepository.findAllByNodeIds(toFind));
-        edgeNodes.putAll(nodes);
-
-        for (Map.Entry<Integer, List<Pair<String, String>>> entry : edges.entrySet()) {
-            for (Pair<String, String> pair : entry.getValue()) {
-                Node parent = edgeNodes.get(pair.getFirst());
-                Node child = edgeNodes.get(pair.getSecond());
-                if (parent == null || child == null) {
-                    continue; //TODO error or specific remedy?
-                }
-                Edge e = new Edge();
-                e.setParent(parent.getId());
-                e.setChild(child.getId());
-                e.setEdgeType(entry.getKey());
-                res.add(e); //TODO there's currently no unique constraint on parent child pair,
-            }
-        }
-        return res;
-    }
-
     public boolean existingNodeContainsNodeId(NodeGetInfo info, String nodeId) {
         if (!info.getExistingNodeMap().containsKey(nodeId)) {
             rejectNotFound(info, nodeId);
@@ -206,7 +169,7 @@ public class NodeOperation {
     }
 
     protected void rejectNotFound(NodeGetInfo info, String nodeId) {
-        info.addRejection(new Rejection(nodeId, 404, "Not Found"));
+        info.addRejection(nodeId, new Rejection(nodeId, 404, "Not Found"));
     }
 
     public static Map<String, ElementJson> convertJsonToMap(

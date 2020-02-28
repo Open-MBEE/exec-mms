@@ -75,18 +75,4 @@ public class Branch extends Base {
     public void setInherit(boolean inherit) {
         this.inherit = inherit;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Branch node = (Branch) o;
-
-        return id.equals(node.id);
-    }
 }

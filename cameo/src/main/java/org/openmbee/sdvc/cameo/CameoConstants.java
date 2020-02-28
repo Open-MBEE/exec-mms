@@ -1,7 +1,9 @@
 package org.openmbee.sdvc.cameo;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class CameoConstants {
 
@@ -64,7 +66,6 @@ public class CameoConstants {
     public static final String SUBSTITUTIONIDS = "substitutionIds";
     public static final String SUPPLIERDEPENDENCYIDS = "supplierDependencyIds";
     public static final String SYNCELEMENTID = "syncElementId";
-    public static final String SYSMLID = "id";
     public static final String TARGET = "targetId";
     public static final String TEMPLATEBINDINGIDS = "templateBindingIds";
     public static final String TEMPLATEPARAMETERID = "templateParameterId";
@@ -112,4 +113,15 @@ public class CameoConstants {
 
     public static final String VALUEPROPERTY = "_12_0_be00301_1164123483951_695645_2041";
     public static final String CONSTRAINTPROPERTY = "_11_5EAPbeta_be00301_1147767840464_372327_467";
+
+    public static final Set<String> VIEWSIDS;
+    static {
+        VIEWSIDS = new HashSet<>();
+        VIEWSIDS.add("_17_0_2_3_87b0275_1371477871400_792964_43374");
+        VIEWSIDS.add("_17_0_1_232f03dc_1325612611695_581988_21583");
+        VIEWSIDS.add("_11_5EAPbeta_be00301_1147420760998_43940_227");
+        VIEWSIDS.add("_18_0beta_9150291_1392290067481_33752_4359");
+        VIEWSIDS.add("_17_0_1_407019f_1332453225141_893756_11936");
+    }
+    public static final String DOCUMENTSID = "_17_0_2_3_87b0275_1371477871400_792964_43374";
 }

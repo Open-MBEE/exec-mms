@@ -86,19 +86,4 @@ public class Organization extends Base {
     public void setPublic(boolean aPublic) {
         isPublic = aPublic;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || id == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Organization node = (Organization) o;
-
-        return id.equals(node.id);
-    }
-
 }

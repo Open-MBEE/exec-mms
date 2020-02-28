@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
 
 @Service("cameoProjectService")
 public class CameoProjectService extends DefaultProjectService implements ProjectService {
-
+//TODO add holding bins and _pm root element on creation
 }

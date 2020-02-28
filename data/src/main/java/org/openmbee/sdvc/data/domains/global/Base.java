@@ -2,6 +2,7 @@ package org.openmbee.sdvc.data.domains.global;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -59,7 +60,54 @@ public abstract class Base implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        try {
+            Field[] fields = getClass().getDeclaredFields();
+            for (Field field : fields) {
+                Object current = field.get(this);
+                Object value = field.get(o);
+                switch(field.getType().toString()) {
+                    case "String" :
+                    case "DecimalFormat" :
+                    case "BigDecimal":
+                        if ((current != null && !current.equals(value)) || (current == null && value != null)) {
+                            return false;
+                        }
+                        break;
+
+                    default:
+                        if (current != value) {
+                            return false;
+                        }
+                }
+            }
+        } catch (IllegalAccessException iae) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public int hashCode() {
-        return (id == null) ? -1 : id.hashCode();
+        int seed = 42;
+        int hash = 0;
+        Field[] fields = getClass().getDeclaredFields();
+        for (Field field : fields) {
+            try {
+                Object value = field.get(this);
+                hash = hash + (seed * (value != null ? value.hashCode() : 0));
+            } catch (IllegalAccessException iae) {
+                //Intentionally muted
+            }
+        }
+        return hash;
     }
 }

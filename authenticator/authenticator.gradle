@@ -12,4 +12,6 @@ dependencies {
     compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.5'
     runtime group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.10.5'
     runtime group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.10.5'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
 }

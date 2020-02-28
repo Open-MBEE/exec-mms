@@ -7,6 +7,7 @@ import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
+import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;
@@ -18,7 +19,7 @@ import static org.openmbee.sdvc.core.config.ContextHolder.getContext;
 @Service
 public class NodeGetHelper extends NodeOperation {
 
-    public NodeGetInfo processGetJson(List<ElementJson> elements) {
+    public NodeGetInfo processGetJson(List<ElementJson> elements, NodeService service) {
         NodeGetInfo info = initInfo(elements, null);
 
         for (String nodeId : info.getReqElementMap().keySet()) {
@@ -30,14 +31,17 @@ public class NodeGetHelper extends NodeOperation {
                 rejectDeleted(info, nodeId, indexElement);
                 continue;
             }
+            if (service != null) {
+                service.extraProcessGotElement(indexElement, info.getExistingNodeMap().get(nodeId), info);
+            }
             info.getActiveElementMap().put(nodeId, indexElement);
         }
         return info;
     }
 
-    public NodeGetInfo processGetJson(List<ElementJson> elements, String commitId) {
+    public NodeGetInfo processGetJson(List<ElementJson> elements, String commitId, NodeService service) {
         if (commitId == null || commitId.isEmpty()) {
-            return processGetJson(elements);
+            return processGetJson(elements, service);
         }
 
         Optional<Commit> commit = commitRepository.findByCommitId(commitId);
@@ -87,12 +91,12 @@ public class NodeGetHelper extends NodeOperation {
         return info;
     }
 
-    public NodeGetInfo processGetJson(List<ElementJson> elements, Instant time) {
+    public NodeGetInfo processGetJson(List<ElementJson> elements, Instant time, NodeService service) {
         Optional<Branch> ref = branchRepository.findByBranchId(getContext().getBranchId());
         if (ref.isPresent()) {
             Optional<Commit> c = commitRepository.findLatestByRef(ref.get());
             if (c.isPresent()) {
-                return processGetJson(elements, c.get().getDocId());
+                return processGetJson(elements, c.get().getDocId(), service);
             } else {
                 throw new BadRequestException("invalid time");
             }
@@ -132,7 +136,7 @@ public class NodeGetHelper extends NodeOperation {
     }
 
     protected void rejectDeleted(NodeGetInfo info, String nodeId, ElementJson indexElement) {
-        info.addRejection(new Rejection(indexElement, 410, "Element deleted"));
+        info.addRejection(nodeId, new Rejection(indexElement, 410, "Element deleted"));
     }
 
     protected List<String> getRefCommitIds(Instant time) {
