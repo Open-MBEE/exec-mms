@@ -83,8 +83,8 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
     @Override
     public void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info) {
         node.setNodeType(cameoHelper.getNodeType(element).getValue());
-        //TODO need to handle _childViews? need to remove it at minimum if posted
-        List<Map<String, String>> postedChildViews = (List)element.remove(CameoConstants.CHILDVIEWS);
+        //remove _childViews if posted
+        element.remove(CameoConstants.CHILDVIEWS);
         //TODO move graph processing somewhere else/another interface
         Map<Integer, List<Pair<String, String>>> res = info.getEdgesToSave();
         String owner = (String) element.get("ownerId");

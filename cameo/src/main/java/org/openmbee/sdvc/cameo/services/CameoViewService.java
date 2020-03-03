@@ -9,6 +9,7 @@ import org.openmbee.sdvc.cameo.CameoNodeType;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
+import org.openmbee.sdvc.core.services.NodeChangeInfo;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -38,7 +39,7 @@ public class CameoViewService extends CameoNodeService {
                 List<Map> childViews = new ArrayList<>();
                 for (ElementJson attr : sorted) {
                     String childId = (String) attr.get(CameoConstants.TYPEID);
-                    if ("Property".equals(attr.getType()) && childId != null && !"".equals(childId)) {
+                    if ("Property".equals(attr.getType()) && childId != null && !childId.isEmpty()) {
                         Map<String, String> child = new HashMap<>();
                         child.put(BaseJson.ID, childId);
                         child.put(CameoConstants.AGGREGATION, (String) attr.get(CameoConstants.AGGREGATION));
@@ -50,5 +51,12 @@ public class CameoViewService extends CameoNodeService {
             }
         }
         return res;
+    }
+
+    @Override
+    public void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info) {
+        //TODO need to handle _childViews
+        List<Map<String, String>> postedChildViews = (List)element.remove(CameoConstants.CHILDVIEWS);
+        super.extraProcessPostedElement(element, node, info);
     }
 }

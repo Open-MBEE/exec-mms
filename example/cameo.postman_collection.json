@@ -989,6 +989,274 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "getViews",
+			"item": [
+				{
+					"name": "add leaf view to cameoChlid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview1\",\n\t\t\t\"name\": \"leafview1\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add leaf view to cameoChlid2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview2\",\n\t\t\t\"name\": \"leafview2\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child2/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child2",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add views to cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(5);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview3\",\n\t\t\t\"name\": \"leafview3\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t},\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"name\": \"parentdoc\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_2_3_87b0275_1371477871400_792964_43374\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": [\"prop1\", \"prop2\", \"prop3\"]\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop1\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview1\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop2\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview2\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop3\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview3\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get documents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has parentdoc with _childViews\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.documents.length).to.eql(1);",
+									"    pm.expect(jsonData.documents[0]['_childViews']).to.eql([",
+									"        {",
+									"        \"id\": \"leafview1\",",
+									"        \"aggregation\": \"composite\",",
+									"        \"propertyId\": \"prop1\"",
+									"        },",
+									"        {",
+									"        \"id\": \"leafview2\",",
+									"        \"aggregation\": \"composite\",",
+									"        \"propertyId\": \"prop2\"",
+									"        },",
+									"        {",
+									"        \"id\": \"leafview3\",",
+									"        \"aggregation\": \"composite\",",
+									"        \"propertyId\": \"prop3\"",
+									"        }",
+									"        ])",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/documents",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"documents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get views",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has views with _childViews\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(4);",
+									"    for (let v of jsonData.elements) {",
+									"        if (v.id == \"parentdoc\") {",
+									"            pm.expect(v._childViews.length).to.eql(3);",
+									"        } else {",
+									"            pm.expect(v._childViews.length).to.eql(0);",
+									"        }",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\"id\": \"leafview1\"},\n\t\t{\"id\": \"leafview2\"},\n\t\t{\"id\": \"leafview3\"},\n\t\t{\"id\": \"parentdoc\"}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/views",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"views"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"auth": {
