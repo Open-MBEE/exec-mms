@@ -4,10 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
@@ -78,21 +75,19 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     public List<Node> insertAll(List<Node> nodes) {
-        try {
+        try (Connection rawConn = Objects.requireNonNull(getConn().getDataSource()).getConnection(); PreparedStatement ps = rawConn.prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});) {
             //jdbctemplate doesn't have read generated keys for batch, need to use raw jdbc, depends on driver
-            Connection rawConn = getConn().getDataSource().getConnection();
-            PreparedStatement ps = rawConn
-                .prepareStatement(String.format(INSERT_SQL, getSuffix()), new String[]{"id"});
             for (Node n : nodes) {
                 prepareStatement(ps, n);
                 ps.addBatch();
             }
             ps.executeBatch();
-            ResultSet rs = ps.getGeneratedKeys();
-            int i = 0;
-            while (rs.next()) {
-                nodes.get(i).setId(rs.getLong(1));
-                i++;
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                int i = 0;
+                while (rs.next()) {
+                    nodes.get(i).setId(rs.getLong(1));
+                    i++;
+                }
             }
 
             return nodes;
