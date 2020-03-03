@@ -21,7 +21,6 @@ import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.cameo.CameoEdgeType;
 import org.openmbee.sdvc.json.MountJson;
-import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.Authentication;
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Service;
 @Service("cameoNodeService")
 public class CameoNodeService extends DefaultNodeService implements NodeService {
 
-    private CameoHelper cameoHelper;
+    protected CameoHelper cameoHelper;
     private MethodSecurityService mss;
 
     @Autowired
@@ -99,7 +98,6 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
 
     @Override
     public void extraProcessGotElement(ElementJson element, Node node, NodeGetInfo info) {
-        //TODO check if element is view, add in _childViews?
         //TODO extended info? (qualified name/id)
     }
 

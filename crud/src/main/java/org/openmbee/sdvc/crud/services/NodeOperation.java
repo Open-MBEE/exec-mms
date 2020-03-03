@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -197,5 +198,16 @@ public class NodeOperation {
             }
         }
         return result;
+    }
+
+    public static List<ElementJson> sort(List<String> ids, List<ElementJson> orig) {
+        Map<String, ElementJson> map = convertJsonToMap(orig);
+        List<ElementJson> ret = new ArrayList<>();
+        for (String id: ids) {
+            if (map.containsKey(id)) {
+                ret.add(map.get(id));
+            }
+        }
+        return ret;
     }
 }
