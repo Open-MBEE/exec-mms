@@ -17,9 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private JwtTokenGenerator jwtTokenGenerator;
 
     private final String AUTHORIZATION = "Authorization";
