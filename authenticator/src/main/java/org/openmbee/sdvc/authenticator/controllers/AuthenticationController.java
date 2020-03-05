@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationRequest;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationResponse;
 import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
-import org.openmbee.sdvc.authenticator.services.UserDetailsServiceImpl;
+import org.openmbee.sdvc.authenticator.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
