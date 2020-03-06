@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.core.objects;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionResponse {
@@ -51,5 +52,12 @@ public class PermissionResponse {
 
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    public static PermissionResponse getDefaultResponse() {
+        PermissionResponse res = new PermissionResponse();
+        List<PermissionResponse.Permission> perms = new ArrayList<>();
+        res.setPermissions(perms);
+        return res;
     }
 }
