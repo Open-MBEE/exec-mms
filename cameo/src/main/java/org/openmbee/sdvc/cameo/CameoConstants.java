@@ -89,6 +89,10 @@ public class CameoConstants {
     public static final String SITECHARACTERIZATIONID = "_groupId";
     public static final String SITES = "_sites";
     public static final String SLOTS = "_slots";
+    public static final String HOLDING_BIN_PREFIX = "holding_bin_";
+    public static final String VIEW_INSTANCES_BIN_PREFIX = "view_instances_bin_";
+    public static final String PACKAGE_TYPE = "Package";
+    public static final String PUBLIC_VISIBILITY = "public";
 
     public static final Map<String, String> STEREOTYPEIDS;
     static {
