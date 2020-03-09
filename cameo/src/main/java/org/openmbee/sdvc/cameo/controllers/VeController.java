@@ -95,11 +95,12 @@ public class VeController extends BaseController {
 
     @GetMapping("/groups")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ResponseEntity<?> getGroups(
+    public GroupsResponse getGroups(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestParam(required = false) Map<String, String> params) {
 
-        return ResponseEntity.ok(null);
+        ElementsResponse groups = cameoViewService.getGroups(projectId, refId, params);
+        return (new GroupsResponse()).setGroups(groups.getElements());
     }
 }

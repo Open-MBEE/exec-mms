@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
@@ -209,5 +210,30 @@ public class NodeOperation {
             }
         }
         return ret;
+    }
+
+    public Optional<ElementJson> getFirstRelationshipOfType(ElementJson e, Integer type, String relkey) {
+        //TODO to use some graph interface sometime
+        //only for latest graph
+        String nextId = (String)e.get(relkey);
+        if (nextId == null || nextId.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<Node> nextNode = nodeRepository.findByNodeId(nextId);
+        while (nextNode.isPresent() && !nextNode.get().isDeleted()) {
+            Optional<ElementJson> nextJson = nodeIndex.findById(nextNode.get().getDocId());
+            if (!nextJson.isPresent()) {
+                return Optional.empty();
+            }
+            if (type.equals(nextNode.get().getNodeType())) {
+                return nextJson;
+            }
+            nextId = (String)nextJson.get().get(relkey);
+            if (nextId == null || nextId.isEmpty()) {
+                return Optional.empty();
+            }
+            nextNode = nodeRepository.findByNodeId(nextId);
+        }
+        return Optional.empty();
     }
 }
