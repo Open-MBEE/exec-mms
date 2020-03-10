@@ -45,9 +45,9 @@ public class CameoProjectService extends DefaultProjectService implements Projec
         return projectJson;
     }
 
-    private static ElementJson createNode(String sysmlid, String name, ProjectJson projectJson) {
+    private static ElementJson createNode(String id, String name, ProjectJson projectJson) {
         ElementJson e = new ElementJson();
-        e.setId(sysmlid);
+        e.setId(id);
         e.setCreator(projectJson.getCreator());
         e.setCreated(projectJson.getCreated());
         e.setModifier(projectJson.getModifier());
