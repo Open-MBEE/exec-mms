@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "efd8b2a0-797e-4632-acd1-b99b8950b567",
+		"_postman_id": "03ebdffd-89f0-4136-9ced-8f719f50b6f0",
 		"name": "sdvc",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -179,7 +179,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects",
@@ -247,7 +247,7 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.projects.length).to.eql(2);",
 									"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
-									"    pm.expect(jsonData.projects[0].projectType).to.eql('cameo');",
+									"    pm.expect(jsonData.projects[0].projectType).to.eql('default');",
 									"    pm.expect(jsonData.projects[1].id).to.eql('bb');",
 									"    pm.expect(jsonData.projects[1].projectType).to.eql('jupyter');",
 									"});"
@@ -603,6 +603,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/commits",
 							"host": [
@@ -648,6 +652,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/elements/x/commits",
 							"host": [
@@ -694,6 +702,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/elements/y/commits",
 							"host": [
@@ -739,6 +751,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/elements/z/commits",
 							"host": [
@@ -777,6 +793,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/commits/{{commitId1}}",
 							"host": [
@@ -923,6 +943,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/elements",
 							"host": [
@@ -1113,6 +1137,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/commits",
 							"host": [
@@ -1160,6 +1188,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/commits",
 							"host": [
@@ -1206,6 +1238,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/elements/x/commits",
 							"host": [
@@ -1253,6 +1289,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/elements/y/commits",
 							"host": [
@@ -1299,6 +1339,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/elements/z/commits",
 							"host": [
@@ -1531,6 +1575,10 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/elements/x",
 							"host": [
@@ -1567,6 +1615,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/elements/x",
 							"host": [
@@ -1803,7 +1855,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cc\", \n\t\t\t\"name\": \"cc\",\n\t\t\t\"orgId\": \"b\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cc\", \n\t\t\t\"name\": \"cc\",\n\t\t\t\"orgId\": \"b\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects",
@@ -2522,6 +2574,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/permissions",
 							"host": [
@@ -2560,6 +2616,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa",
 							"host": [
@@ -2776,6 +2836,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/permissions",
 							"host": [
@@ -2814,6 +2878,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/permissions",
 							"host": [
@@ -2897,6 +2965,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/permissions",
 							"host": [
@@ -2997,6 +3069,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/elements",
 							"host": [
@@ -3097,6 +3173,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/refa/elements",
 							"host": [
@@ -3147,6 +3227,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects",
 							"host": [
@@ -3243,6 +3327,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/elements",
 							"host": [
@@ -3393,6 +3481,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/writer/permissions",
 							"host": [
@@ -3588,6 +3680,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/master/elements",
 							"host": [
@@ -3714,6 +3810,10 @@
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs/writer/permissions",
 							"host": [
@@ -3917,6 +4017,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/aa/permissions",
 							"host": [
@@ -3968,6 +4072,10 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects/bb/permissions",
 							"host": [
@@ -4344,6 +4452,10 @@
 								"disabled": true
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{host}}/projects",
 							"host": [
