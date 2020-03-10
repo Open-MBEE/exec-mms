@@ -58,21 +58,6 @@ public class CameoProjectService extends DefaultProjectService implements Projec
         e.put(CameoConstants.ISGROUP, false);
         e.put(CameoConstants.DOCUMENTATION, "");
         e.put(CameoConstants.VISIBILITY, CameoConstants.PUBLIC_VISIBILITY);
-        //TODO Which fields need to be filled in?  Commented out blank ones from donbot src
-//        e.put(CameoConstants.URI, null);
-//        e.put(CameoConstants.APPLIEDSTEREOTYPEIDS, new JsonArray());
-//        e.put(CameoConstants.APPLIEDSTEREOTYPEINSTANCEID, JsonNull.INSTANCE);
-//        e.put(CameoConstants.CLIENTDEPENDENCYIDS, new JsonArray());
-//        e.put(CameoConstants.ELEMENTIMPORTIDS, new JsonArray());
-//        e.put(CameoConstants.MDEXTENSIONSIDS, new JsonArray());
-//        e.put(CameoConstants.NAMEEXPRESSION, JsonNull.INSTANCE);
-//        e.put(CameoConstants.PACKAGEIMPORTIDS, new JsonArray());
-//        e.put(CameoConstants.PACKAGEMERGEIDS, new JsonArray());
-//        e.put(CameoConstants.PROFILEAPPLICATIONIDS, new JsonArray());
-//        e.put(CameoConstants.SUPPLIERDEPENDENCYIDS, new JsonArray());
-//        e.put(CameoConstants.SYNCELEMENTID, JsonNull.INSTANCE);
-//        e.put(CameoConstants.TEMPLATEBINDINGIDS, new JsonArray());
-//        e.put(CameoConstants.TEMPLATEPARAMETERID, JsonNull.INSTANCE);
         return e;
     }
 }
