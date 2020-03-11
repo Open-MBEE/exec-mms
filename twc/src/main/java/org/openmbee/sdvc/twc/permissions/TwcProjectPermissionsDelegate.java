@@ -80,4 +80,20 @@ public class TwcProjectPermissionsDelegate implements PermissionsDelegate {
     public void recalculateInheritedPerms() {
         //Do nothing, permission inheritance will be handled by TWC
     }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public TeamworkCloud getTeamworkCloud() {
+        return teamworkCloud;
+    }
+
+    public String getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
 }
