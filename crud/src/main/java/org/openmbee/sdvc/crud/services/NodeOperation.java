@@ -107,8 +107,9 @@ public class NodeOperation {
         return info;
     }
 
-    public void processElementAdded(ElementJson e, Node n, CommitJson cmjs) {
-        processElementAddedOrUpdated(e, n, cmjs);
+    public void processElementAdded(ElementJson e, Node n, NodeChangeInfo info) {
+        CommitJson cmjs = info.getCommitJson();
+        processElementAddedOrUpdated(e, n, info);
 
         e.setCreator(cmjs.getCreator()); //Only set on creation of new element
         e.setCreated(cmjs.getCreated());
@@ -123,18 +124,20 @@ public class NodeOperation {
         n.setInitialCommit(e.getDocId());
     }
 
-    public void processElementUpdated(ElementJson e, Node n, CommitJson cmjs) {
-        processElementAddedOrUpdated(e, n, cmjs);
+    public void processElementUpdated(ElementJson e, Node n, NodeChangeInfo info) {
+        processElementAddedOrUpdated(e, n, info);
 
+        info.getOldDocIds().add(n.getDocId());
         Map<String, Object> newObj = new HashMap<>();
         newObj.put(CommitJson.PREVIOUS, n.getDocId());
         newObj.put(CommitJson.TYPE, "Element");
         newObj.put(BaseJson.DOCID, e.getDocId());
         newObj.put(BaseJson.ID, e.getId());
-        cmjs.getUpdated().add(newObj);
+        info.getCommitJson().getUpdated().add(newObj);
     }
 
-    public void processElementAddedOrUpdated(ElementJson e, Node n, CommitJson cmjs) {
+    public void processElementAddedOrUpdated(ElementJson e, Node n, NodeChangeInfo info) {
+        CommitJson cmjs = info.getCommitJson();
         e.setProjectId(cmjs.getProjectId());
         e.setRefId(cmjs.getRefId());
         List<String> inRefIds = new ArrayList<>();
@@ -150,15 +153,19 @@ public class NodeOperation {
         n.setLastCommit(cmjs.getId());
         n.setDeleted(false);
         n.setNodeType(0);
+
+        info.getToSaveNodeMap().put(e.getId(), n);
+        info.getUpdatedMap().put(e.getId(), e);
     }
 
-    public void processElementDeleted(ElementJson e, Node n, CommitJson cmjs) {
+    public void processElementDeleted(ElementJson e, Node n, NodeChangeInfo info) {
         Map<String, Object> newObj = new HashMap<>();
         newObj.put(CommitJson.PREVIOUS, n.getDocId());
         newObj.put(CommitJson.TYPE, "Element");
         newObj.put(BaseJson.ID, e.getId());
-        cmjs.getDeleted().add(newObj);
-
+        info.getCommitJson().getDeleted().add(newObj);
+        info.getOldDocIds().add(n.getDocId());
+        info.getToSaveNodeMap().put(n.getNodeId(), n);
         n.setDeleted(true);
     }
 

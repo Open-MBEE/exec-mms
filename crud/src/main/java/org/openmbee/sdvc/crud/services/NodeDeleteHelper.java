@@ -27,11 +27,9 @@ public class NodeDeleteHelper extends NodeOperation {
                 info.addRejection(nodeId, new Rejection(indexElement, 304, "Already deleted"));
                 continue;
             }
-            info.getOldDocIds().add(node.getDocId());
             ElementJson request = info.getReqElementMap().get(nodeId);
             request.putAll(indexElement);
-            info.getToSaveNodeMap().put(nodeId, node);
-            processElementDeleted(request, node, info.getCommitJson());
+            processElementDeleted(request, node, info);
             service.extraProcessDeletedElement(request, node, info);
             //TODO remove edges?
             info.getDeletedMap().put(nodeId, request);
