@@ -101,6 +101,14 @@ public class ProjectsController extends BaseController {
                         response.addRejection(new Rejection(json, 403, "No permission to create project under org"));
                         continue;
                     }
+
+                    if(json.getCreator() == null || json.getCreator().isEmpty()) {
+                        json.setCreator(auth.getName());
+                    }
+                    if(json.getModifier() == null || json.getModifier().isEmpty()) {
+                        json.setModifier(auth.getName());
+                    }
+
                     response.getProjects().add(ps.create(json));
                     permissionService.initProjectPerms(json.getProjectId(), true, auth.getName());
                 } catch (BadRequestException ex) {
