@@ -68,7 +68,8 @@ public class CameoViewService extends CameoNodeService {
         List<Node> groups = this.nodeRepository.findAllByNodeType(CameoNodeType.GROUP.getValue());
         ElementsResponse res = this.read(projectId, refId, buildRequest(nodeGetHelper.convertNodesToMap(groups).keySet()), params);
         for (ElementJson e: res.getElements()) {
-            Optional<ElementJson> parent = nodeGetHelper.getFirstRelationshipOfType(e, CameoNodeType.GROUP.getValue(), CameoConstants.OWNERID);
+            Optional<ElementJson> parent = nodeGetHelper.getFirstRelationshipOfType(e,
+                CameoNodeType.GROUP.getValue(), CameoConstants.OWNERID);
             if (parent.isPresent()) {
                 e.put("_parentId", parent.get().getId());
             }
@@ -106,8 +107,9 @@ public class CameoViewService extends CameoNodeService {
             }
             oldPropertiesTypeMapping.put(typeId, oldData);
         }
-        ElementsResponse oldTypeJsons = this.read(element.getProjectId(), element.getRefId(), buildRequest(oldPropertiesTypeMapping.keySet()),
-            Collections.EMPTY_MAP); //include project usages when finding types
+        //include project usages when finding types
+        ElementsResponse oldTypeJsons = this.read(element.getProjectId(), element.getRefId(),
+            buildRequest(oldPropertiesTypeMapping.keySet()), Collections.EMPTY_MAP);
         for (ElementJson oldType: oldTypeJsons.getElements()) {
             oldPropertiesTypeMapping.get(oldType.getId()).setTypeJson(oldType);
             oldPropertiesTypeMapping.get(oldType.getId()).setView(cameoHelper.isView(oldType));
@@ -116,44 +118,43 @@ public class CameoViewService extends CameoNodeService {
         //      no type or types that're not views
 
         //go through requested _childView changes
-        Optional<ElementJson> p = nodePostHelper.getFirstRelationshipOfType(element, CameoNodeType.PACKAGE.getValue(), CameoConstants.OWNERID);
-        String packageId = p.isPresent() ? p.get().getId() : "holding_bin"; //get first package owner to put association in
+        //get the first package element that's in the owner chain of parent class
+        //  cameo/sysml1 requires associations to be placed in the first owning package, is this rule still valid?
+        Optional<ElementJson> p = nodePostHelper.getFirstRelationshipOfType(element,
+            CameoNodeType.PACKAGE.getValue(), CameoConstants.OWNERID);
+        String packageId = p.isPresent() ? p.get().getId() : CameoConstants.HOLDING_BIN_PREFIX + element.getProjectId();
         List<PropertyData> newProperties = new ArrayList<>();
-        Map<String, PropertyData> newPropertiesTypeMapping = new HashMap<>();
         List<String> newAttributeIds = new ArrayList<>();
         for (Map<String, String> newChildView: newChildViews) {
             String typeId = newChildView.get(ElementJson.ID);
             if (oldPropertiesTypeMapping.containsKey(typeId)) {
-                newProperties.add(oldPropertiesTypeMapping.get(typeId));
-                newPropertiesTypeMapping.put(typeId, oldPropertiesTypeMapping.get(typeId));
-                newAttributeIds.add(oldPropertiesTypeMapping.get(typeId).getPropertyNode().getNodeId());
-                continue; //existing property and type, reuse
+                //existing property and type, reuse
+                PropertyData data = oldPropertiesTypeMapping.get(typeId);
+                newProperties.add(data);
+                newAttributeIds.add(data.getPropertyNode().getNodeId());
+                continue;
             }
             //create new properties and association
-            PropertyData newProperty = createElementsForView(newChildView.get(CameoConstants.AGGREGATION), typeId, element.getId(), packageId, info);
+            PropertyData newProperty = createElementsForView(newChildView.get(CameoConstants.AGGREGATION),
+                typeId, element.getId(), packageId, info);
             newProperties.add(newProperty);
-            newPropertiesTypeMapping.put(typeId, newProperty);
             newAttributeIds.add(newProperty.getPropertyNode().getNodeId());
         }
         //go through old attributes and add back any that wasn't to a view and delete ones that's to a view but not in newProperties
+        List<PropertyData> toDelete = new ArrayList<>();
         for (PropertyData oldProperty: oldProperties) {
             if (!oldProperty.isView()) {
                 newProperties.add(oldProperty);
-                if (oldProperty.getTypeJson() != null) {
-                    newPropertiesTypeMapping.put(oldProperty.getTypeJson().getId(), oldProperty);
-                }
                 newAttributeIds.add(oldProperty.getPropertyNode().getNodeId());
                 continue;
             }
-            if (newPropertiesTypeMapping.containsKey(oldProperty.getTypeJson().getId())) {
+            if (newProperties.contains(oldProperty)) {
                 continue; //already added
             }
-            //delete oldProperty and associated things
-            Node oldPropertyNode = oldProperty.getPropertyNode();
-            ElementJson oldPropertyJson = oldProperty.getPropertyJson();
-            nodePostHelper.processElementDeleted(oldPropertyJson, oldPropertyNode, info);
-            //TODO need to get association and association property and delete those too
+            toDelete.add(oldProperty);
         }
+        deletePropertyElements(toDelete, info);
+        //new derived ownedAttributeIds based on changes
         element.put(CameoConstants.OWNEDATTRIBUTEIDS, newAttributeIds);
         super.extraProcessPostedElement(element, node, info);
     }
@@ -166,9 +167,12 @@ public class CameoViewService extends CameoNodeService {
         String newPropertyId = UUID.randomUUID().toString();
         String newAssocId = UUID.randomUUID().toString();
         String newAssocPropertyId = UUID.randomUUID().toString();
-        ElementJson newPropertyJson = cameoHelper.createProperty(newPropertyId, "", parentId, aggregation, typeId,newAssocId);
-        ElementJson newAssocJson = cameoHelper.createAssociation(newAssocId, packageId, newAssocPropertyId, newPropertyId);
-        ElementJson newAssocPropertyJson = cameoHelper.createProperty(newAssocPropertyId, "", newAssocJson.getId(), "none", parentId, newAssocId);
+        ElementJson newPropertyJson = cameoHelper.createProperty(newPropertyId, "", parentId,
+            aggregation, typeId, newAssocId);
+        ElementJson newAssocJson = cameoHelper.createAssociation(newAssocId, packageId,
+            newAssocPropertyId, newPropertyId);
+        ElementJson newAssocPropertyJson = cameoHelper.createProperty(newAssocPropertyId, "",
+            newAssocId, "none", parentId, newAssocId);
         nodePostHelper.processElementAdded(newPropertyJson, newPropertyNode, info);
         nodePostHelper.processElementAdded(newAssocJson, newAssocNode, info);
         nodePostHelper.processElementAdded(newAssocPropertyJson, newAssocPropertyNode, info);
@@ -184,5 +188,16 @@ public class CameoViewService extends CameoNodeService {
         newProperty.setAssocPropertyJson(newAssocPropertyJson);
         newProperty.setView(true);
         return newProperty;
+    }
+
+    private void deletePropertyElements(List<PropertyData> properties, NodeChangeInfo info) {
+        for (PropertyData oldProperty: properties) {
+            Node oldPropertyNode = oldProperty.getPropertyNode();
+            ElementJson oldPropertyJson = oldProperty.getPropertyJson();
+            nodePostHelper.processElementDeleted(oldPropertyJson, oldPropertyNode, info);
+            //get association and association property and delete those too (and any asis??)
+            //TODO may help if we have graph query for this instead of getting them one by one
+
+        }
     }
 }

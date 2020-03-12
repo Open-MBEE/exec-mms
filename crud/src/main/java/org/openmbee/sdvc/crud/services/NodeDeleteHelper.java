@@ -31,7 +31,6 @@ public class NodeDeleteHelper extends NodeOperation {
             request.putAll(indexElement);
             processElementDeleted(request, node, info);
             service.extraProcessDeletedElement(request, node, info);
-            //TODO remove edges?
             info.getDeletedMap().put(nodeId, request);
         }
         return info;
