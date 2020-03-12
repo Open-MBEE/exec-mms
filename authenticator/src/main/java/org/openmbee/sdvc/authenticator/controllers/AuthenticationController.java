@@ -1,8 +1,12 @@
 package org.openmbee.sdvc.authenticator.controllers;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.openmbee.sdvc.authenticator.security.*;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.exceptions.UnauthorizedException;
+import org.openmbee.sdvc.core.utils.AuthenticationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +56,7 @@ public class AuthenticationController {
     @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
     public Object createUser(@RequestBody JwtAuthenticationRequest req) {
-        //TODO allow changing passwords for local users and create admin accounts
+        //TODO allow create admin accounts
         //TODO should allow admin authority string to be set via properties
         try {
             userDetailsService.loadUserByUsername(req.getUsername());
@@ -60,4 +65,29 @@ public class AuthenticationController {
         }
         return "";
     }
+
+    @PostMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public Object updatePassword(@RequestBody JwtAuthenticationRequest req,
+                                 @Parameter(hidden = true) Authentication auth) {
+        final String requester = auth.getName();
+        final boolean requesterAdmin = AuthenticationUtils.hasGroup(auth, AuthorizationConstants.MMSADMIN);
+
+        try {
+            if(requesterAdmin || requester.equals(req.getUsername())){
+                userDetailsService.changeUserPassword(req.getUsername(), req.getPassword());
+            } else {
+                throw new UnauthorizedException("Not authorized");
+            }
+
+        } catch (UsernameNotFoundException e) {
+            if(requesterAdmin) {
+                throw new NotFoundException("User not found");
+            } else {
+                throw new UnauthorizedException("Not authorized");
+            }
+        }
+        return "";
+    }
+
 }

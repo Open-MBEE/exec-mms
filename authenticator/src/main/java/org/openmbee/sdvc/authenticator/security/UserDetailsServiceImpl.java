@@ -49,4 +49,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public void changeUserPassword(String username, String password) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if(! userOptional.isPresent()) {
+                throw new UsernameNotFoundException(
+                    String.format("No user found with username '%s'.", username));
+        }
+        User user = userOptional.get();
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
 }
