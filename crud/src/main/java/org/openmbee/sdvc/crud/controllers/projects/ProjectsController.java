@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects")
 public class ProjectsController extends BaseController {
 
-    private static final String PROJECT_ID_VALID_PATTERN = "^[\\w-]{1,62}$";
+    private static final String PROJECT_ID_VALID_PATTERN = "^[\\w-]+$";
 
     ProjectDAO projectRepository;
 

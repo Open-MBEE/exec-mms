@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects/{projectId}/refs")
 public class BranchesController extends BaseController {
 
+    private static final String BRANCH_ID_VALID_PATTERN = "^[\\w-]+$";
+
     private BranchService branchService;
 
     @Autowired
@@ -77,6 +79,15 @@ public class BranchesController extends BaseController {
         BranchesResponse response = new BranchesResponse();
         for (RefJson branch : projectsPost.getRefs()) {
             try {
+                if (branch.getId() == null || branch.getId().isEmpty()) {
+                    response.addRejection(new Rejection(branch, 400, "Branch id missing"));
+                    continue;
+                }
+                if(! isBranchIdValid(branch.getId())) {
+                    response.addRejection(new Rejection(branch, 400, "Branch id is invalid."));
+                    continue;
+                }
+
                 RefJson res = branchService.createBranch(projectId, branch);
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
                 response.getRefs().add(res);
@@ -98,5 +109,9 @@ public class BranchesController extends BaseController {
         @PathVariable String refId) {
 
         return branchService.deleteBranch(projectId, refId);
+    }
+
+    static boolean isBranchIdValid(String branchId) {
+        return branchId != null && branchId.matches(BRANCH_ID_VALID_PATTERN);
     }
 }

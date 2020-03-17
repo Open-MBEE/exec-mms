@@ -19,8 +19,7 @@ public class ProjectsControllerTest {
         checkGood("project-1234");
         checkGood("_A-project");
         checkGood("000000000000000000000");
-        checkGood("project-with62characters00000000000000000000000000000000000000");
-        checkFail("project-withmorethan62characters0000000000000000000000000000000");
+        checkGood("project-with64characters0000000000000000000000000000000000000000");
         checkFail("project with spaces");
         checkFail("specialcharacters!");
     }
