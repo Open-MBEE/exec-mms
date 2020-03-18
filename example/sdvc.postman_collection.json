@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "03ebdffd-89f0-4136-9ced-8f719f50b6f0",
+		"_postman_id": "e89527ff-6a2a-41e3-8cfb-3365ffd7354b",
 		"name": "sdvc",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -222,6 +222,47 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"bb\", \n\t\t\t\"name\": \"bb\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"jupyter\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "try to add invalid project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"invalid project\", \n\t\t\t\"name\": \"invalid project\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects",
@@ -906,6 +947,49 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"refa\",\n\t\t\t\"name\": \"refa\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/aa/refs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"aa",
+								"refs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create invalid branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"invalid branch id\",\n\t\t\t\"name\": \"invalid branch\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects/aa/refs",

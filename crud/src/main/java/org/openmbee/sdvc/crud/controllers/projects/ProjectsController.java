@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects")
 public class ProjectsController extends BaseController {
 
+    private static final String PROJECT_ID_VALID_PATTERN = "^[\\w-]+$";
+
     ProjectDAO projectRepository;
 
     @Autowired
@@ -94,6 +96,11 @@ public class ProjectsController extends BaseController {
                 response.addRejection(new Rejection(json, 400, "Project id missing"));
                 continue;
             }
+            if(! isProjectIdValid(json.getProjectId())) {
+                response.addRejection(new Rejection(json, 400, "Project id is invalid."));
+                continue;
+            }
+
             ProjectService ps = getProjectService(json);
             if (!ps.exists(json.getProjectId())) {
                 try {
@@ -129,6 +136,7 @@ public class ProjectsController extends BaseController {
         }
         return response;
     }
+
 
     @DeleteMapping(value = "/{projectId}")
     @Transactional
@@ -167,5 +175,9 @@ public class ProjectsController extends BaseController {
             json.setProjectType(type);
         }
         return serviceFactory.getProjectService(type);
+    }
+
+    static boolean isProjectIdValid(String projectId) {
+        return projectId != null && projectId.matches(PROJECT_ID_VALID_PATTERN);
     }
 }
