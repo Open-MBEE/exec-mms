@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.cameo.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +29,8 @@ public class CameoViewService extends CameoNodeService {
         List<Node> documents = this.nodeRepository.findAllByNodeType(CameoNodeType.DOCUMENT.getValue());
         ElementsResponse res = this.getViews(projectId, refId, buildRequest(nodeGetHelper.convertNodesToMap(documents).keySet()), params);
         for (ElementJson e: res.getElements()) {
-            Optional<ElementJson> parent = nodeGetHelper.getFirstRelationshipOfType(e, CameoNodeType.GROUP.getValue(), CameoConstants.OWNERID);
+            Optional<ElementJson> parent = nodeGetHelper.getFirstRelationshipOfType(e,
+                Arrays.asList(CameoNodeType.GROUP.getValue()), CameoConstants.OWNERID);
             if (parent.isPresent()) {
                 e.put("_groupId", parent.get().getId());
             }
@@ -75,7 +77,7 @@ public class CameoViewService extends CameoNodeService {
         ElementsResponse res = this.read(projectId, refId, buildRequest(nodeGetHelper.convertNodesToMap(groups).keySet()), params);
         for (ElementJson e: res.getElements()) {
             Optional<ElementJson> parent = nodeGetHelper.getFirstRelationshipOfType(e,
-                CameoNodeType.GROUP.getValue(), CameoConstants.OWNERID);
+                Arrays.asList(CameoNodeType.GROUP.getValue()), CameoConstants.OWNERID);
             if (parent.isPresent()) {
                 e.put("_parentId", parent.get().getId());
             }
@@ -128,7 +130,7 @@ public class CameoViewService extends CameoNodeService {
         //get the first package element that's in the owner chain of parent class
         //  cameo/sysml1 requires associations to be placed in the first owning package, is this rule still valid?
         Optional<ElementJson> p = nodePostHelper.getFirstRelationshipOfType(element,
-            CameoNodeType.PACKAGE.getValue(), CameoConstants.OWNERID);
+            Arrays.asList(CameoNodeType.PACKAGE.getValue(), CameoNodeType.GROUP.getValue()), CameoConstants.OWNERID);
         String packageId = p.isPresent() ? p.get().getId() : CameoConstants.HOLDING_BIN_PREFIX + element.getProjectId();
         List<PropertyData> newProperties = new ArrayList<>();
         List<String> newAttributeIds = new ArrayList<>();

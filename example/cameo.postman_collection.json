@@ -1165,7 +1165,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview3\",\n\t\t\t\"name\": \"leafview3\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t},\n\t\t{\n\t\t\t\"id\": \"docPackage\",\n\t\t\t\"name\": \"docPackage\",\n\t\t\t\"type\": \"Package\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"name\": \"parentdoc\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_2_3_87b0275_1371477871400_792964_43374\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": [\"prop1\", \"prop2\", \"prop3\"],\n\t\t\t\"ownerId\": \"docPackage\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop1\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview1\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop2\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview2\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop3\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview3\"\n\t\t}\n\t]\n}"
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview3\",\n\t\t\t\"name\": \"leafview3\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t},\n\t\t{\n\t\t\t\"id\": \"docPackage\",\n\t\t\t\"name\": \"docPackage\",\n\t\t\t\"type\": \"Package\",\n\t\t\t\"_isGroup\": true\n\t\t},\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"name\": \"parentdoc\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_2_3_87b0275_1371477871400_792964_43374\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": [\"prop1\", \"prop2\", \"prop3\"],\n\t\t\t\"ownerId\": \"docPackage\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop1\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview1\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop2\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview2\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop3\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview3\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
@@ -1326,6 +1326,8 @@
 									"var assocId = '';",
 									"var assocPropertyId = '';",
 									"var commitId = '';",
+									"var propertyCount = 0;",
+									"var associationCount = 0;",
 									"pm.test(\"2 properties and association are created\", function() {",
 									"    var propertyCount = 0;",
 									"    var associationCount = 0;",
@@ -1453,6 +1455,198 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "add new view to parent view and remove a child 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 5 elements\", function () {",
+									"    pm.expect(jsonData.elements.length).to.eql(5);",
+									"});",
+									"var propertyId = '';",
+									"var assocId = '';",
+									"var assocPropertyId = '';",
+									"var commitId = '';",
+									"var propertyCount = 0;",
+									"var associationCount = 0;",
+									"pm.test(\"2 properties and association are created\", function() {",
+									"    var propertyCount = 0;",
+									"    var associationCount = 0;",
+									"    for (let e of jsonData.elements) {",
+									"        if (e.type == \"Property\") {",
+									"            if (e.aggregation == 'composite') {",
+									"                propertyId = e.id;",
+									"            } else {",
+									"                assocPropertyId = e.id;",
+									"            }",
+									"            propertyCount++;",
+									"        } else if (e.type == \"Association\") {",
+									"            associationCount++;",
+									"            pm.expect(e.ownerId).to.eql('docPackage');",
+									"            assocId = e.id;",
+									"            commitId = e._commitId;",
+									"        }",
+									"    }",
+									"    pm.expect(propertyCount).to.eql(2);",
+									"    pm.expect(associationCount).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"parentdoc view has updated _childViews returned\", function() {",
+									"     for (let e of jsonData.elements) {",
+									"        if (e.id == \"parentdoc\") {",
+									"            pm.expect(e['_childViews']).to.eql([",
+									"                {",
+									"                    \"id\": \"leafview1\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop1\"",
+									"                },",
+									"                {",
+									"                    \"id\": \"leafview2\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop2\"",
+									"                },",
+									"                {",
+									"                    \"id\": \"leafview5\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": propertyId",
+									"                }",
+									"            ]);",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.environment.set(\"propertyId2\", propertyId);",
+									"pm.environment.set(\"assocId2\", assocId);",
+									"pm.environment.set(\"assocPropertyId2\", assocPropertyId);",
+									"pm.environment.set(\"childViewsPostCommitId2\", commitId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview5\",\n\t\t\t\"name\": \"leafview5\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t},\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"_childViews\": [\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview1\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview2\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview5\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/views",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"views"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check commit 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05736c0e-c3e9-46b7-aea8-d1b407b8c73a",
+								"exec": [
+									"var jsonData = pm.response.json().commits[0];",
+									"pm.test(\"commit has 1 update for parentdoc\", function () {",
+									"    pm.expect(jsonData.updated.length).to.eql(1);",
+									"    pm.expect(jsonData.updated[0].id).to.eql('parentdoc');",
+									"});",
+									"pm.test(\"commit has 4 added\", function() {",
+									"    pm.expect(jsonData.added.length).to.eql(4);",
+									"});",
+									"pm.test(\"commit has 3 deleted\", function() {",
+									"    pm.expect(jsonData.deleted.length).to.eql(3);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/commits/{{childViewsPostCommitId2}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"commits",
+								"{{childViewsPostCommitId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get deleted props and assocs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has 3 deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.rejected.length).to.eql(3);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\"id\": \"{{propertyId}}\"},\n\t\t{\"id\": \"{{assocId}}\"},\n\t\t{\"id\": \"{{assocPropertyId}}\"}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [
@@ -1475,6 +1669,164 @@
 							""
 						]
 					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "groups",
+			"item": [
+				{
+					"name": "add group under docPackage group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"group1\",\n\t\t\t\"name\": \"group1\",\n\t\t\t\"type\": \"Package\",\n\t\t\t\"_isGroup\": true,\n\t\t\t\"ownerId\": \"docPackage\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 2 groups\", function () {",
+									"    pm.expect(jsonData.groups.length).to.eql(2);",
+									"    for (var g of jsonData.groups) {",
+									"        if (g.id == 'group1') {",
+									"            pm.expect(g._parentId).to.eql('docPackage');",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/groups",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get document with group key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 1 document with group key\", function () {",
+									"    pm.expect(jsonData.documents.length).to.eql(1);",
+									"    pm.expect(jsonData.documents[0]._groupId).to.eql('docPackage');",
+									"    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/documents",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"documents"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}

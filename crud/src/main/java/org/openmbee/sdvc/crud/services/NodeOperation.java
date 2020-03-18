@@ -219,7 +219,8 @@ public class NodeOperation {
         return ret;
     }
 
-    public Optional<ElementJson> getFirstRelationshipOfType(ElementJson e, Integer type, String relkey) {
+    //find first element of type in types following e's relkey (assuming relkey's value is an element id)
+    public Optional<ElementJson> getFirstRelationshipOfType(ElementJson e, List<Integer> types, String relkey) {
         //TODO to use some graph interface sometime
         //only for latest graph
         String nextId = (String)e.get(relkey);
@@ -232,7 +233,7 @@ public class NodeOperation {
             if (!nextJson.isPresent()) {
                 return Optional.empty();
             }
-            if (type.equals(nextNode.get().getNodeType())) {
+            if (types.contains(nextNode.get().getNodeType())) {
                 return nextJson;
             }
             nextId = (String)nextJson.get().get(relkey);
