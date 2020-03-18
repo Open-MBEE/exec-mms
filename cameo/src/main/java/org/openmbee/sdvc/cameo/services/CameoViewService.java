@@ -3,9 +3,11 @@ package org.openmbee.sdvc.cameo.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.openmbee.sdvc.cameo.CameoConstants;
 import org.openmbee.sdvc.cameo.CameoNodeType;
@@ -191,13 +193,33 @@ public class CameoViewService extends CameoNodeService {
     }
 
     private void deletePropertyElements(List<PropertyData> properties, NodeChangeInfo info) {
+        Set<String> assocToDelete = new HashSet<>();
         for (PropertyData oldProperty: properties) {
             Node oldPropertyNode = oldProperty.getPropertyNode();
             ElementJson oldPropertyJson = oldProperty.getPropertyJson();
             nodePostHelper.processElementDeleted(oldPropertyJson, oldPropertyNode, info);
-            //get association and association property and delete those too (and any asis??)
-            //TODO may help if we have graph query for this instead of getting them one by one
-
+            String assocId = (String)oldPropertyJson.get(CameoConstants.ASSOCIATIONID);
+            if (assocId == null) {
+                continue;
+            }
+            assocToDelete.add(assocId);
         }
+        Set<String> assocPropToDelete = new HashSet<>();
+        NodeGetInfo assocInfo = nodeGetHelper.processGetJson(buildRequest(assocToDelete).getElements(), null);
+        for (ElementJson assocJson: assocInfo.getActiveElementMap().values()) {
+            Node assocNode = assocInfo.getExistingNodeMap().get(assocJson.getId());
+            nodePostHelper.processElementDeleted(assocJson, assocNode, info);
+            List<String> ownedEndIds = (List<String>)assocJson.get(CameoConstants.OWNEDENDIDS);
+            if (ownedEndIds == null) {
+                continue;
+            }
+            assocPropToDelete.addAll(ownedEndIds);
+        }
+        NodeGetInfo assocPropInfo = nodeGetHelper.processGetJson(buildRequest(assocPropToDelete).getElements(), null);
+        for (ElementJson assocPropJson: assocPropInfo.getActiveElementMap().values()) {
+            Node assocPropNode = assocPropInfo.getExistingNodeMap().get(assocPropJson.getId());
+            nodePostHelper.processElementDeleted(assocPropJson, assocPropNode, info);
+        }
+        //TODO may help if we have graph query for this instead of getting them by layers
     }
 }
