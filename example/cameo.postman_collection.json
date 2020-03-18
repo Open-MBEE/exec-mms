@@ -1647,6 +1647,74 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "reorder childviews without delete or adds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 1 element\", function () {",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									"pm.test(\"parentdoc view has updated _childViews returned\", function() {",
+									"        pm.expect(jsonData.elements[0]['_childViews']).to.eql([",
+									"                {",
+									"                    \"id\": \"leafview5\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": pm.environment.get(\"propertyId2\")",
+									"                },",
+									"                 {",
+									"                    \"id\": \"leafview1\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop1\"",
+									"                },",
+									"                 {",
+									"                    \"id\": \"leafview2\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop2\"",
+									"                }",
+									"            ]);",
+									"        pm.expect(jsonData.elements[0].ownedAttributeIds).to.eql([pm.environment.get('propertyId2'), 'prop1', 'prop2']);",
+									"        ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"_childViews\": [\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview5\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview1\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview2\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/views",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"views"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [
