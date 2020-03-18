@@ -143,7 +143,7 @@ public class DefaultNodeService implements NodeService {
         return response;
     }
 
-    @Transactional
+    //@Transactional
     protected void commitChanges(NodeChangeInfo info) {
         //TODO: Test rollback on IndexDAO failure
         TransactionDefinition def = new DefaultTransactionDefinition();

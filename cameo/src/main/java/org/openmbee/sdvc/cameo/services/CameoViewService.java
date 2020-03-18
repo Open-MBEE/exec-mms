@@ -42,6 +42,11 @@ public class CameoViewService extends CameoNodeService {
 
     public ElementsResponse getViews(String projectId, String refId, ElementsRequest req, Map<String, String> params) {
         ElementsResponse res = this.read(projectId, refId, req, params);
+        addChildViews(res, params);
+        return res;
+    }
+
+    public void addChildViews(ElementsResponse res, Map<String, String> params) {
         for (ElementJson element: res.getElements()) {
             if (cameoHelper.isView(element)) {
                 List<String> ownedAttributeIds = (List) element.get(CameoConstants.OWNEDATTRIBUTEIDS);
@@ -62,7 +67,6 @@ public class CameoViewService extends CameoNodeService {
                 element.put(CameoConstants.CHILDVIEWS, childViews);
             }
         }
-        return res;
     }
 
     public ElementsResponse getGroups(String projectId, String refId, Map<String, String> params) {
@@ -118,7 +122,8 @@ public class CameoViewService extends CameoNodeService {
         }
         //now oldProperties is a list of existing property data in existing order (can include ones with
         //      no type or types that're not views
-
+        //reset context since previous type finding could have looked in submodules
+        ContextHolder.setContext(element.getProjectId(), element.getRefId());
         //go through requested _childView changes
         //get the first package element that's in the owner chain of parent class
         //  cameo/sysml1 requires associations to be placed in the first owning package, is this rule still valid?

@@ -90,7 +90,9 @@ public class VeController extends BaseController {
         @RequestParam(required = false) Map<String, String> params,
         @Parameter(hidden = true) Authentication auth) {
 
-        return cameoViewService.createOrUpdate(projectId, refId, req, params, auth.getName());
+        ElementsResponse res = cameoViewService.createOrUpdate(projectId, refId, req, params, auth.getName());
+        cameoViewService.addChildViews(res, params);
+        return res;
     }
 
     @GetMapping("/groups")
