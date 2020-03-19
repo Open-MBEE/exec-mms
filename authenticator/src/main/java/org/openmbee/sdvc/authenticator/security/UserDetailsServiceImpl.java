@@ -2,6 +2,7 @@ package org.openmbee.sdvc.authenticator.security;
 
 import java.util.Optional;
 
+import org.openmbee.sdvc.core.exceptions.ForbiddenException;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,4 +50,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public void changeUserPassword(String username, String password) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if(! userOptional.isPresent()) {
+            throw new UsernameNotFoundException(
+                    String.format("No user found with username '%s'.", username));
+        }
+
+        User user = userOptional.get();
+        if(user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new ForbiddenException("Cannot change or set passwords for external users.");
+        }
+
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
 }
