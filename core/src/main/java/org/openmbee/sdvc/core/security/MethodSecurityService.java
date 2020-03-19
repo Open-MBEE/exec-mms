@@ -3,6 +3,7 @@ package org.openmbee.sdvc.core.security;
 import java.util.HashSet;
 import java.util.Set;
 import org.openmbee.sdvc.core.services.PermissionService;
+import org.openmbee.sdvc.core.utils.AuthenticationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +26,7 @@ public class MethodSecurityService {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return false;
         }
-        if (permissionService.hasOrgPrivilege(privilege, authentication.getName(), getGroups(authentication), orgId)) {
+        if (permissionService.hasOrgPrivilege(privilege, authentication.getName(), AuthenticationUtils.getGroups(authentication), orgId)) {
             return true;
         }
         return false;
@@ -38,7 +39,7 @@ public class MethodSecurityService {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return false;
         }
-        if (permissionService.hasProjectPrivilege(privilege, authentication.getName(), getGroups(authentication), projectId)) {
+        if (permissionService.hasProjectPrivilege(privilege, authentication.getName(), AuthenticationUtils.getGroups(authentication), projectId)) {
             return true;
         }
         return false;
@@ -51,16 +52,12 @@ public class MethodSecurityService {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return false;
         }
-        if (permissionService.hasBranchPrivilege(privilege, authentication.getName(), getGroups(authentication), projectId, branchId)) {
+        if (permissionService.hasBranchPrivilege(privilege, authentication.getName(), AuthenticationUtils.getGroups(authentication), projectId, branchId)) {
             return true;
         }
         return false;
     }
 
-    public static Set<String> getGroups(Authentication auth) {
-        Set<String> res = new HashSet<>();
-        auth.getAuthorities().forEach(ga ->res.add(ga.getAuthority()));
-        return res;
-    }
+
 
 }
