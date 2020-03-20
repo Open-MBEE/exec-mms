@@ -23,8 +23,8 @@ public class TwcMetadataService {
 
     public void updateTwcMetadata(Project project, TwcMetadata metadata) {
         updateTwcMetadata(project, TwcConstants.HOST_KEY, metadata.getHost());
-        updateTwcMetadata(project, TwcConstants.WORKSPACE_ID_KEY, metadata.getHost());
-        updateTwcMetadata(project, TwcConstants.RESOURCE_ID_KEY, metadata.getHost());
+        updateTwcMetadata(project, TwcConstants.WORKSPACE_ID_KEY, metadata.getWorkspaceId());
+        updateTwcMetadata(project, TwcConstants.RESOURCE_ID_KEY, metadata.getResourceId());
     }
 
     private void updateTwcMetadata(Project project, String fieldKey, String value) {
