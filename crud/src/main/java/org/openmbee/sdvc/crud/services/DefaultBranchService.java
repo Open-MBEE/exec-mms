@@ -123,22 +123,19 @@ public class DefaultBranchService implements BranchService {
             b.setParentRefId(Constants.MASTER_BRANCH);
         }
 
+        //This service cannot create branches from historic versions
         if (branch.getParentCommitId() != null) {
-            Optional<Commit> parentCommit = commitRepository
-                .findByCommitId(branch.getParentCommitId());
+            throw new BadRequestException("Internal Error: Invalid branch creation logic.");
+        }
+
+        Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
+        if (ref.isPresent()) {
+            Optional<Commit> parentCommit = commitRepository.findLatestByRef(ref.get());
             parentCommit.ifPresent(parent -> {
                 b.setParentCommit(parent.getId());
             });
         }
-        if (b.getParentCommit() == null){
-            Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
-            if (ref.isPresent()) {
-                Optional<Commit> parentCommit = commitRepository.findLatestByRef(ref.get());
-                parentCommit.ifPresent(parent -> {
-                    b.setParentCommit(parent.getId());
-                });
-            }
-        }
+
         if (b.getParentCommit() == null) {
             throw new BadRequestException("Parent branch or commit cannot be determined");
             //creating more branches are not allowed until there's at least 1 commit, same as git
