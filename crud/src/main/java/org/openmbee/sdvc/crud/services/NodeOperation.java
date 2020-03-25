@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
@@ -106,8 +107,9 @@ public class NodeOperation {
         return info;
     }
 
-    public void processElementAdded(ElementJson e, Node n, CommitJson cmjs) {
-        processElementAddedOrUpdated(e, n, cmjs);
+    public void processElementAdded(ElementJson e, Node n, NodeChangeInfo info) {
+        CommitJson cmjs = info.getCommitJson();
+        processElementAddedOrUpdated(e, n, info);
 
         e.setCreator(cmjs.getCreator()); //Only set on creation of new element
         e.setCreated(cmjs.getCreated());
@@ -122,18 +124,20 @@ public class NodeOperation {
         n.setInitialCommit(e.getDocId());
     }
 
-    public void processElementUpdated(ElementJson e, Node n, CommitJson cmjs) {
-        processElementAddedOrUpdated(e, n, cmjs);
+    public void processElementUpdated(ElementJson e, Node n, NodeChangeInfo info) {
+        processElementAddedOrUpdated(e, n, info);
 
+        info.getOldDocIds().add(n.getDocId());
         Map<String, Object> newObj = new HashMap<>();
         newObj.put(CommitJson.PREVIOUS, n.getDocId());
         newObj.put(CommitJson.TYPE, "Element");
         newObj.put(BaseJson.DOCID, e.getDocId());
         newObj.put(BaseJson.ID, e.getId());
-        cmjs.getUpdated().add(newObj);
+        info.getCommitJson().getUpdated().add(newObj);
     }
 
-    public void processElementAddedOrUpdated(ElementJson e, Node n, CommitJson cmjs) {
+    public void processElementAddedOrUpdated(ElementJson e, Node n, NodeChangeInfo info) {
+        CommitJson cmjs = info.getCommitJson();
         e.setProjectId(cmjs.getProjectId());
         e.setRefId(cmjs.getRefId());
         List<String> inRefIds = new ArrayList<>();
@@ -149,15 +153,19 @@ public class NodeOperation {
         n.setLastCommit(cmjs.getId());
         n.setDeleted(false);
         n.setNodeType(0);
+
+        info.getToSaveNodeMap().put(e.getId(), n);
+        info.getUpdatedMap().put(e.getId(), e);
     }
 
-    public void processElementDeleted(ElementJson e, Node n, CommitJson cmjs) {
+    public void processElementDeleted(ElementJson e, Node n, NodeChangeInfo info) {
         Map<String, Object> newObj = new HashMap<>();
         newObj.put(CommitJson.PREVIOUS, n.getDocId());
         newObj.put(CommitJson.TYPE, "Element");
         newObj.put(BaseJson.ID, e.getId());
-        cmjs.getDeleted().add(newObj);
-
+        info.getCommitJson().getDeleted().add(newObj);
+        info.getOldDocIds().add(n.getDocId());
+        info.getToSaveNodeMap().put(n.getNodeId(), n);
         n.setDeleted(true);
     }
 
@@ -209,5 +217,31 @@ public class NodeOperation {
             }
         }
         return ret;
+    }
+
+    //find first element of type in types following e's relkey (assuming relkey's value is an element id)
+    public Optional<ElementJson> getFirstRelationshipOfType(ElementJson e, List<Integer> types, String relkey) {
+        //TODO to use some graph interface sometime
+        //only for latest graph
+        String nextId = (String)e.get(relkey);
+        if (nextId == null || nextId.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<Node> nextNode = nodeRepository.findByNodeId(nextId);
+        while (nextNode.isPresent() && !nextNode.get().isDeleted()) {
+            Optional<ElementJson> nextJson = nodeIndex.findById(nextNode.get().getDocId());
+            if (!nextJson.isPresent()) {
+                return Optional.empty();
+            }
+            if (types.contains(nextNode.get().getNodeType())) {
+                return nextJson;
+            }
+            nextId = (String)nextJson.get().get(relkey);
+            if (nextId == null || nextId.isEmpty()) {
+                return Optional.empty();
+            }
+            nextNode = nodeRepository.findByNodeId(nextId);
+        }
+        return Optional.empty();
     }
 }
