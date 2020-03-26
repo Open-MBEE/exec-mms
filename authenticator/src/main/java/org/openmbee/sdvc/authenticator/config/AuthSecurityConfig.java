@@ -4,44 +4,27 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationEntryPoint;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationTokenFilter;
-import org.openmbee.sdvc.authenticator.security.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@PropertySource("classpath:application.properties")
-@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
 @EnableTransactionManagement
-public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class AuthSecurityConfig {
 
     private static Logger logger = LogManager.getLogger(AuthSecurityConfig.class);
-    @Autowired
-    public UserDetailsServiceImpl userDetailsService;
-    @Value("${sdvc.admin.username}")
-    private String adminUsername;
-    @Value("${sdvc.admin.password}")
-    private String adminPassword;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    public AuthSecurityConfig() {
+    }
+
+    public void setAuthConfig(HttpSecurity http) throws Exception {
         http.exceptionHandling()
             .authenticationEntryPoint(new JwtAuthenticationEntryPoint()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -50,48 +33,7 @@ public abstract class AuthSecurityConfig extends WebSecurityConfigurerAdapter im
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(){
-            //Turn off warnings for null/empty passwords
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                if (encodedPassword == null || encodedPassword.length() == 0) {
-                    return false;
-                }
-                return super.matches(rawPassword, encodedPassword);
-            }
-        };
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
-    @Bean
     public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() throws Exception {
         return new JwtAuthenticationTokenFilter();
     }
-
-    @Autowired
-    public void configureDaoAuth(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authenticationProvider());
-    }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        try {
-            userDetailsService.loadUserByUsername(adminUsername);
-        } catch (UsernameNotFoundException e) {
-            userDetailsService.register(adminUsername, adminPassword, true);
-            logger.info(String.format("Creating root user: %s with specified password.",
-                adminUsername));
-        }
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
 }

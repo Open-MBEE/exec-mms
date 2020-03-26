@@ -2,7 +2,7 @@
 sdvc.admin.username=test
 sdvc.admin.password=test
 
-jwt.secret=abc123
+jwt.secret=make_me_something_really_long
 jwt.expiration=86400
 jwt.header=Authorization
 
