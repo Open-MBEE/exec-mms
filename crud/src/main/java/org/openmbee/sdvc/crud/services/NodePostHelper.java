@@ -89,16 +89,11 @@ public class NodePostHelper extends NodeOperation {
             // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
             if (added) {
                 Node node = new Node();
-                processElementAdded(element, node, info.getCommitJson());
-                info.getToSaveNodeMap().put(node.getNodeId(), node);
-                info.getUpdatedMap().put(element.getId(), element);
+                processElementAdded(element, node, info);
                 service.extraProcessPostedElement(element, node, info);
             } else if (updated) {
                 Node node = info.getExistingNodeMap().get(element.getId());
-                info.getOldDocIds().add(node.getDocId());
-                processElementUpdated(element, node, info.getCommitJson());
-                info.getToSaveNodeMap().put(node.getNodeId(), node);
-                info.getUpdatedMap().put(element.getId(), element);
+                processElementUpdated(element, node, info);
                 service.extraProcessPostedElement(element, node, info);
             }
         }

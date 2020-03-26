@@ -195,7 +195,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
                         return false;
                     }
                 }
-            } else if (!value1.equals(value2)) {
+            } else if (value1 != null && !value1.equals(value2)) {
                 return false;
             }
         }

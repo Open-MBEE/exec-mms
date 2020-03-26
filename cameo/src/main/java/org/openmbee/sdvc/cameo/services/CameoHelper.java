@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.cameo.services;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -70,5 +71,92 @@ public class CameoHelper {
             return isGroup;
         }
         return false;
+    }
+
+    public ElementJson createProperty(String id, String name, String ownerId, String aggregation, String typeId, String assocId) {
+        ElementJson res = new ElementJson();
+        res.put(ElementJson.ID, id);
+        res.put(CameoConstants.NAME, name);
+        res.put(CameoConstants.NAMEEXPRESSION, null);
+        res.put(CameoConstants.TYPE, "Property");
+        res.put(CameoConstants.OWNERID, ownerId);
+        res.put(CameoConstants.TYPEID, typeId);
+        res.put(CameoConstants.AGGREGATION, aggregation);
+        res.put(CameoConstants.ASSOCIATIONID, assocId);
+        List<String> asIds = new ArrayList<>();
+        //TODO not needed?? asIds.add(CameoConstants.PROPERTYSIDS.get(aggregation));
+        res.put(CameoConstants.APPLIEDSTEREOTYPEIDS, asIds);
+        res.put(CameoConstants.DOCUMENTATION, "");
+        res.put(CameoConstants.MDEXTENSIONSIDS, new ArrayList());
+        res.put(CameoConstants.SYNCELEMENTID, null);
+        res.put(CameoConstants.APPLIEDSTEREOTYPEINSTANCEID, null);
+        res.put(CameoConstants.CLIENTDEPENDENCYIDS, new ArrayList());
+        res.put(CameoConstants.SUPPLIERDEPENDENCYIDS, new ArrayList());
+        res.put(CameoConstants.VISIBILITY, "private");
+        res.put(CameoConstants.ISLEAF, false);
+        res.put(CameoConstants.ISSTATIC, false);
+        res.put(CameoConstants.ISORDERED, false);
+        res.put(CameoConstants.ISUNIQUE, true);
+        res.put(CameoConstants.LOWERVALUE, null);
+        res.put(CameoConstants.UPPERVALUE, null);
+        res.put(CameoConstants.ISREADONLY, false);
+        res.put(CameoConstants.TEMPLATEPARAMETERID, null);
+        res.put(CameoConstants.ENDIDS, new ArrayList());
+        res.put(CameoConstants.DEPLOYMENTIDS, new ArrayList());
+        res.put(CameoConstants.ASSOCIATIONENDID, null);
+        res.put(CameoConstants.QUALIFIERIDS, new ArrayList());
+        res.put(CameoConstants.DATATYPEID, null);
+        res.put(CameoConstants.DEFAULTVALUE, null);
+        res.put(CameoConstants.INTERFACEID, null);
+        res.put(CameoConstants.ISDERIVED, false);
+        res.put(CameoConstants.ISDERIVEDUNION, false);
+        res.put(CameoConstants.ISID, false);
+        res.put(CameoConstants.REDEFINEDPROPERTYIDS, new ArrayList());
+        res.put(CameoConstants.SUBSETTEDPROPERTYIDS, new ArrayList());
+        return res;
+    }
+
+    public ElementJson createAssociation(String id, String ownerId, String ownedEnd, String memberEnd2) {
+        ElementJson association = new ElementJson();
+        List<String> memberEndIds = new ArrayList<>();
+        memberEndIds.add(ownedEnd);
+        memberEndIds.add(memberEnd2);
+        List<String> ownedEndIds = new ArrayList<>();
+        ownedEndIds.add(ownedEnd);
+
+        association.put(ElementJson.ID, id);
+        association.put(CameoConstants.NAME, "");
+        association.put(CameoConstants.NAMEEXPRESSION, null);
+        association.put(CameoConstants.TYPE, "Association");
+        association.put(CameoConstants.OWNERID, ownerId);
+        association.put(CameoConstants.MEMBERENDIDS, memberEndIds);
+        association.put(CameoConstants.OWNEDENDIDS, ownedEndIds);
+        // Default Fields
+        association.put(CameoConstants.DOCUMENTATION, "");
+        association.put(CameoConstants.MDEXTENSIONSIDS, new ArrayList());
+        association.put(CameoConstants.SYNCELEMENTID, null);
+        association.put(CameoConstants.APPLIEDSTEREOTYPEIDS, new ArrayList());
+        association.put(CameoConstants.APPLIEDSTEREOTYPEINSTANCEID, null);
+        association.put(CameoConstants.CLIENTDEPENDENCYIDS, new ArrayList());
+        association.put(CameoConstants.SUPPLIERDEPENDENCYIDS, new ArrayList());
+        association.put(CameoConstants.NAMEEXPRESSION, null);
+        association.put(CameoConstants.VISIBILITY, "public");
+        association.put(CameoConstants.TEMPLATEPARAMETERID, null);
+        association.put(CameoConstants.ELEMENTIMPORTIDS, new ArrayList());
+        association.put(CameoConstants.PACKAGEIMPORTIDS, new ArrayList());
+        association.put(CameoConstants.ISLEAF, false);
+        association.put(CameoConstants.TEMPLATEBINDINGIDS, new ArrayList());
+        association.put(CameoConstants.USECASEIDS, new ArrayList());
+        association.put(CameoConstants.REPRESENTATIONID, null);
+        association.put(CameoConstants.COLLABORATIONUSEIDS, new ArrayList());
+        association.put(CameoConstants.GENERALIZATIONIDS, new ArrayList());
+        association.put(CameoConstants.POWERTYPEEXTENTIDS, new ArrayList());
+        association.put(CameoConstants.ISABSTRACT, false);
+        association.put(CameoConstants.ISFINALSPECIALIZATION, false);
+        association.put(CameoConstants.REDEFINEDCLASSIFIERIDS, new ArrayList());
+        association.put(CameoConstants.SUBSTITUTIONIDS, new ArrayList());
+        association.put(CameoConstants.ISDERIVED, false);
+        association.put(CameoConstants.NAVIGABLEOWNEDENDIDS, new ArrayList());
+        return association;
     }
 }
