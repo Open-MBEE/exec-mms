@@ -17,9 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private JwtTokenGenerator jwtTokenGenerator;
 
     private final String AUTHORIZATION = "Authorization";
@@ -39,17 +36,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
             if (!authToken.isEmpty()) {
                 String username = jwtTokenGenerator.getUsernameFromToken(authToken);
-
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetailsImpl userDetails = this.userDetailsService.loadUserByUsername(username);
-                    if (jwtTokenGenerator.validateToken(authToken, userDetails)) {
-                        UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null,
-                                userDetails.getAuthorities());
-                        authentication.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null && jwtTokenGenerator.validateToken(authToken)) {
+                    UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(username, null, jwtTokenGenerator.getAuthoritiesFromToken(authToken));
+                    authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
 
