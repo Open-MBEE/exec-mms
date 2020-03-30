@@ -1,6 +1,9 @@
 package org.openmbee.sdvc.permissions;
 
 import javax.transaction.Transactional;
+
+import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
+import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
 import org.openmbee.sdvc.core.services.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,62 +27,68 @@ public class PermissionsController {
     @PostMapping(value = "/orgs/{orgId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_UPDATE_PERMISSIONS', false)")
-    public PermissionsResponse updateOrgPermissions(
+    public PermissionUpdatesResponse updateOrgPermissions(
         @PathVariable String orgId,
         @RequestBody PermissionsRequest req) {
 
+        PermissionUpdatesResponse response = new PermissionUpdatesResponse();
+
         if (req.getGroups() != null) {
-            permissionService.updateOrgGroupPerms(req.getGroups(), orgId);
+            response.setGroups(permissionService.updateOrgGroupPerms(req.getGroups(), orgId));
         }
         if (req.getUsers() != null) {
-            permissionService.updateOrgUserPerms(req.getUsers(), orgId);
+            response.setUsers(permissionService.updateOrgUserPerms(req.getUsers(), orgId));
         }
         if (req.getPublic() != null) {
-            permissionService.setOrgPublic(req.getPublic(), orgId);
+            response.setPublic(permissionService.setOrgPublic(req.getPublic(), orgId));
         }
-        return new PermissionsResponse();
+        return response;
     }
 
     @PostMapping(value = "/projects/{projectId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_UPDATE_PERMISSIONS', false)")
-    public PermissionsResponse updateProjectPermissions(
+    public PermissionUpdatesResponse updateProjectPermissions(
         @PathVariable String projectId,
         @RequestBody PermissionsRequest req) {
 
+        PermissionUpdatesResponseBuilder builder = new PermissionUpdatesResponseBuilder();
+
         if (req.getGroups() != null) {
-            permissionService.updateProjectGroupPerms(req.getGroups(), projectId);
+            builder.addGroups(permissionService.updateProjectGroupPerms(req.getGroups(), projectId));
         }
         if (req.getUsers() != null) {
-            permissionService.updateProjectUserPerms(req.getUsers(), projectId);
+            builder.addUsers(permissionService.updateProjectUserPerms(req.getUsers(), projectId));
         }
         if (req.getPublic() != null) {
-            permissionService.setProjectPublic(req.getPublic(), projectId);
+            builder.setPublic(permissionService.setProjectPublic(req.getPublic(), projectId));
         }
         if (req.getInherit() != null) {
-            permissionService.setProjectInherit(req.getInherit(), projectId);
+            builder.add(permissionService.setProjectInherit(req.getInherit(), projectId));
         }
-        return new PermissionsResponse();
+        return builder.getPermissionUpdatesReponse();
     }
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_UPDATE_PERMISSIONS', false)")
-    public PermissionsResponse updateBranchPermissions(
+    public PermissionUpdatesResponse updateBranchPermissions(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody PermissionsRequest req) {
 
+        PermissionUpdatesResponseBuilder builder = new PermissionUpdatesResponseBuilder();
+
         if (req.getGroups() != null) {
-            permissionService.updateBranchGroupPerms(req.getGroups(), projectId, refId);
+            builder.addGroups(permissionService.updateBranchGroupPerms(req.getGroups(), projectId, refId));
         }
         if (req.getUsers() != null) {
-            permissionService.updateBranchUserPerms(req.getUsers(), projectId, refId);
+            builder.addUsers(permissionService.updateBranchUserPerms(req.getUsers(), projectId, refId));
         }
         if (req.getInherit() != null) {
-            permissionService.setBranchInherit(req.getInherit(), projectId, refId);
+            builder.add(permissionService.setBranchInherit(req.getInherit(), projectId, refId));
         }
-        return new PermissionsResponse();
+        return builder.getPermissionUpdatesReponse();
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")

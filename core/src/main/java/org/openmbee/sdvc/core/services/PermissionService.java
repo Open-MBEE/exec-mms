@@ -3,6 +3,8 @@ package org.openmbee.sdvc.core.services;
 import java.util.Set;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
+import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
+import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
 
 public interface PermissionService {
 
@@ -12,25 +14,25 @@ public interface PermissionService {
 
     void initBranchPerms(String projectId, String branchId, boolean inherit, String creator);
 
-    void updateOrgUserPerms(PermissionUpdateRequest req, String orgId);
+    PermissionUpdateResponse updateOrgUserPerms(PermissionUpdateRequest req, String orgId);
 
-    void updateOrgGroupPerms(PermissionUpdateRequest req, String orgId);
+    PermissionUpdateResponse updateOrgGroupPerms(PermissionUpdateRequest req, String orgId);
 
-    void updateProjectUserPerms(PermissionUpdateRequest req, String projectId);
+    PermissionUpdateResponse updateProjectUserPerms(PermissionUpdateRequest req, String projectId);
 
-    void updateProjectGroupPerms(PermissionUpdateRequest req, String projectId);
+    PermissionUpdateResponse updateProjectGroupPerms(PermissionUpdateRequest req, String projectId);
 
-    void updateBranchUserPerms(PermissionUpdateRequest req, String projectId, String branchId);
+    PermissionUpdateResponse updateBranchUserPerms(PermissionUpdateRequest req, String projectId, String branchId);
 
-    void updateBranchGroupPerms(PermissionUpdateRequest req, String projectId, String branchId);
+    PermissionUpdateResponse updateBranchGroupPerms(PermissionUpdateRequest req, String projectId, String branchId);
 
-    void setProjectInherit(boolean isInherit, String projectId);
+    PermissionUpdatesResponse setProjectInherit(boolean isInherit, String projectId);
 
-    void setBranchInherit(boolean isInherit, String projectId, String branchId);
+    PermissionUpdatesResponse setBranchInherit(boolean isInherit, String projectId, String branchId);
 
-    void setOrgPublic(boolean isPublic, String orgId);
+    boolean setOrgPublic(boolean isPublic, String orgId);
 
-    void setProjectPublic(boolean isPublic, String projectId);
+    boolean setProjectPublic(boolean isPublic, String projectId);
 
     boolean hasOrgPrivilege(String privilege, String user, Set<String> groups, String orgId);
 

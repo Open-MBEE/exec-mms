@@ -1,8 +1,10 @@
 package org.openmbee.sdvc.permissions.delegation;
 
+import org.openmbee.sdvc.core.builders.PermissionUpdateResponseBuilder;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
+import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
 import org.openmbee.sdvc.data.domains.global.*;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.rdb.repositories.*;
@@ -99,7 +101,8 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
     }
 
     @Override
-    public void updateUserPermissions(PermissionUpdateRequest req) {
+    public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
+        PermissionUpdateResponseBuilder responseBuilder = new PermissionUpdateResponseBuilder();
 
         switch(req.getAction()) {
             case MODIFY:
@@ -116,9 +119,13 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
                         if (!role.get().equals(e.getRole())) {
                             e.setRole(role.get());
                             orgUserPermRepo.save(e);
+                            responseBuilder.addPermissionUpdate(req.getAction(), user.get().getUsername(), role.get().getName(),
+                                organization.getOrganizationId(), organization.getOrganizationName(), false);
                         }
                     } else {
                         orgUserPermRepo.save(new OrgUserPerm(organization, user.get(), role.get()));
+                        responseBuilder.addPermissionUpdate(req.getAction(), user.get().getUsername(), role.get().getName(),
+                            organization.getOrganizationId(), organization.getOrganizationName(), false);
                     }
                 }
                 break;
@@ -132,18 +139,26 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
                         continue;
                     }
                     orgUserPermRepo.save(new OrgUserPerm(organization, user.get(), role.get()));
+                    responseBuilder.addPermissionUpdate(req.getAction(), user.get().getUsername(), role.get().getName(),
+                        organization.getOrganizationId(), organization.getOrganizationName(), false);
                 }
                 break;
             case REMOVE:
                 Set<String> users = new HashSet<>();
-                req.getPermissions().forEach(p -> users.add(p.getName()));
+                req.getPermissions().forEach(p -> {
+                    users.add(p.getName());
+                    responseBuilder.addPermissionUpdate(req.getAction(), p.getName(), null,
+                        organization.getOrganizationId(), organization.getOrganizationName(), false);
+                });
                 orgUserPermRepo.deleteByOrganizationAndUser_UsernameIn(organization, users);
                 break;
         }
+        return responseBuilder.getPermissionUpdateReponse();
     }
 
     @Override
-    public void updateGroupPermissions(PermissionUpdateRequest req) {
+    public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
+        PermissionUpdateResponseBuilder responseBuilder = new PermissionUpdateResponseBuilder();
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
@@ -157,9 +172,13 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
                         if (!pair.getSecond().equals(e.getRole())) {
                             e.setRole(pair.getSecond());
                             orgGroupPermRepo.save(e);
+                            responseBuilder.addPermissionUpdate(req.getAction(), pair.getFirst().getName(), pair.getSecond().getName(),
+                                organization.getOrganizationId(), organization.getOrganizationName(), false);
                         }
                     } else {
                         orgGroupPermRepo.save(new OrgGroupPerm(organization, pair.getFirst(), pair.getSecond()));
+                        responseBuilder.addPermissionUpdate(req.getAction(), pair.getFirst().getName(), pair.getSecond().getName(),
+                            organization.getOrganizationId(), organization.getOrganizationName(), false);
                     }
                 }
                 break;
@@ -171,14 +190,21 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
                         continue;
                     }
                     orgGroupPermRepo.save(new OrgGroupPerm(organization, pair.getFirst(), pair.getSecond()));
+                    responseBuilder.addPermissionUpdate(req.getAction(), pair.getFirst().getName(), pair.getSecond().getName(),
+                        organization.getOrganizationId(), organization.getOrganizationName(), false);
                 }
                 break;
             case REMOVE:
                 Set<String> groups = new HashSet<>();
-                req.getPermissions().forEach(p -> groups.add(p.getName()));
+                req.getPermissions().forEach(p -> {
+                    groups.add(p.getName());
+                    responseBuilder.addPermissionUpdate(req.getAction(), p.getName(), null,
+                        organization.getOrganizationId(), organization.getOrganizationName(), false);
+                });
                 orgGroupPermRepo.deleteByOrganizationAndGroup_NameIn(organization, groups);
                 break;
         }
+        return responseBuilder.getPermissionUpdateReponse();
     }
 
     @Override
@@ -208,8 +234,9 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
     }
 
     @Override
-    public void recalculateInheritedPerms() {
+    public PermissionUpdateResponse recalculateInheritedPerms() {
         //Do nothing, can't inherit permissions
+        return new PermissionUpdateResponseBuilder().getPermissionUpdateReponse();
     }
 
     @Override
