@@ -20,6 +20,8 @@ repositories {
 
 dependencies {
     compile(
+        project(':authenticator'),
+        project(':localuser'),
         project(':ldap'),
         project(':cameo'),
         project(':elastic'),

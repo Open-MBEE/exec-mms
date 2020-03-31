@@ -3,23 +3,21 @@ package org.openmbee.sdvc.ldap;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.rdb.repositories.GroupRepository;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.ldap.filter.*;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,11 +28,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @PropertySource("classpath:application.properties")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
-public abstract class LdapSecurityConfig extends AuthSecurityConfig {
+public class LdapSecurityConfig {
 
-    private static Logger logger = LogManager.getLogger(AuthSecurityConfig.class);
+    private static Logger logger = LogManager.getLogger(LdapSecurityConfig.class);
 
     @Value("${ldap.provider.url}")
     private String providerUrl;
@@ -80,20 +77,24 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
     }
 
     @Autowired
-    public void configureLdapAuth(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureLdapAuth(AuthenticationManagerBuilder auth,
+        LdapAuthoritiesPopulator ldapAuthoritiesPopulator, BaseLdapPathContextSource contextSource)
+        throws Exception {
+        logger.error("LDAP IS HAPPENING!!!");
         /*
             see this article : https://spring.io/guides/gs/authenticating-ldap/
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
             We need to delegate the creation of the contextSource out of the builder-configuration.
         */
         auth.ldapAuthentication().userDnPatterns(userDnPattern).groupSearchBase(groupSearchBase)
-            .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter).rolePrefix("")
-            .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator())
-            .contextSource(contextSource());
+            .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
+            .rolePrefix("")
+            .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator)
+            .contextSource(contextSource);
     }
 
     @Bean
-    LdapAuthoritiesPopulator ldapAuthoritiesPopulator() {
+    LdapAuthoritiesPopulator ldapAuthoritiesPopulator(@Qualifier("contextSource") BaseLdapPathContextSource baseContextSource) {
 
         /*
           Specificity here : we don't get the Role by reading the members of available groups (which is implemented by
@@ -103,8 +104,8 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
 
             SpringSecurityLdapTemplate ldapTemplate;
 
-            private CustomLdapAuthoritiesPopulator(ContextSource contextSource) {
-                ldapTemplate = new SpringSecurityLdapTemplate(contextSource);
+            private CustomLdapAuthoritiesPopulator(BaseLdapPathContextSource ldapContextSource) {
+                ldapTemplate = new SpringSecurityLdapTemplate(ldapContextSource);
             }
 
             @Override
@@ -134,11 +135,14 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
                 }
 
                 AndFilter andFilter = new AndFilter();
-                HardcodedFilter groupsFilter = new HardcodedFilter(groupSearchFilter.replace("{0}", userDn));
+                HardcodedFilter groupsFilter = new HardcodedFilter(
+                    groupSearchFilter.replace("{0}", userDn));
                 andFilter.and(groupsFilter);
                 andFilter.and(orFilter);
 
-                Set<String> memberGroups = ldapTemplate.searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""}, groupRoleAttribute);
+                Set<String> memberGroups = ldapTemplate
+                    .searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""},
+                        groupRoleAttribute);
 
                 Set<Group> addGroups = new HashSet<>();
                 for (String memberGroup : memberGroups) {
@@ -147,8 +151,9 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
                 }
                 user.setGroups(addGroups);
                 userRepository.save(user);
-                
-                List<GrantedAuthority> auths = AuthorityUtils.createAuthorityList(memberGroups.toArray(new String[0]));
+
+                List<GrantedAuthority> auths = AuthorityUtils
+                    .createAuthorityList(memberGroups.toArray(new String[0]));
                 if (user.isAdmin()) {
                     auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
                 }
@@ -157,7 +162,7 @@ public abstract class LdapSecurityConfig extends AuthSecurityConfig {
             }
         }
 
-        return new CustomLdapAuthoritiesPopulator(contextSource());
+        return new CustomLdapAuthoritiesPopulator(baseContextSource);
 
     }
 
