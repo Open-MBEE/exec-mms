@@ -12,7 +12,6 @@ import java.util.Set;
 
 public class TwcProjectPermissionsDelegate implements PermissionsDelegate {
 
-    @Autowired
     private RestUtils restUtils;
 
     private Project project;
@@ -25,6 +24,11 @@ public class TwcProjectPermissionsDelegate implements PermissionsDelegate {
         this.teamworkCloud = teamworkCloud;
         this.workspaceId = workspaceId;
         this.resourceId = resourceId;
+    }
+
+    @Autowired
+    public void setRestUtils(RestUtils restUtils) {
+        this.restUtils = restUtils;
     }
 
     @Override

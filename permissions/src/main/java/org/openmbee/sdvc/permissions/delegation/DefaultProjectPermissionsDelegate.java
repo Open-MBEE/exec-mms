@@ -16,31 +16,10 @@ import java.util.Set;
 
 public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
 
-    @Autowired
     private ProjectUserPermRepository projectUserPermRepo;
-
-    @Autowired
     private ProjectGroupPermRepository projectGroupPermRepo;
-
-    @Autowired
-    private PrivilegeRepository privRepo;
-
-    @Autowired
-    private UserRepository userRepo;
-
-    @Autowired
-    private RoleRepository roleRepo;
-
-    @Autowired
     private ProjectRepository projectRepo;
-
-    @Autowired
-    private GroupRepository groupRepo;
-
-    @Autowired
     private OrgGroupPermRepository orgGroupPermRepo;
-
-    @Autowired
     private OrgUserPermRepository orgUserPermRepo;
 
     private Project project;
@@ -49,10 +28,35 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
         this.project = project;
     }
 
+    @Autowired
+    public void setProjectUserPermRepo(ProjectUserPermRepository projectUserPermRepo) {
+        this.projectUserPermRepo = projectUserPermRepo;
+    }
+
+    @Autowired
+    public void setProjectGroupPermRepo(ProjectGroupPermRepository projectGroupPermRepo) {
+        this.projectGroupPermRepo = projectGroupPermRepo;
+    }
+
+    @Autowired
+    public void setProjectRepo(ProjectRepository projectRepo) {
+        this.projectRepo = projectRepo;
+    }
+
+    @Autowired
+    public void setOrgGroupPermRepo(OrgGroupPermRepository orgGroupPermRepo) {
+        this.orgGroupPermRepo = orgGroupPermRepo;
+    }
+
+    @Autowired
+    public void setOrgUserPermRepo(OrgUserPermRepository orgUserPermRepo) {
+        this.orgUserPermRepo = orgUserPermRepo;
+    }
+
     @Override
     public boolean hasPermission(String user, Set<String> groups, String privilege) {
 
-        Optional<Privilege> priv = privRepo.findByName(privilege);
+        Optional<Privilege> priv = getPrivRepo().findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
         }
@@ -76,8 +80,8 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
 
     @Override
     public void initializePermissions(String creator, boolean inherit) {
-        Optional<User> user = userRepo.findByUsername(creator);
-        Optional<Role> role = roleRepo.findByName("ADMIN");
+        Optional<User> user = getUserRepo().findByUsername(creator);
+        Optional<Role> role = getRoleRepo().findByName("ADMIN");
 
         if (!user.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
@@ -112,8 +116,8 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
                         continue;
@@ -133,8 +137,8 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
             case REPLACE:
                 projectUserPermRepo.deleteByProjectAndInherited(project, false);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
                         continue;
@@ -234,15 +238,5 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
                 projectGroupPermRepo.save(new ProjectGroupPerm(project, p.getGroup(), p.getRole(), true));
             }
         }
-    }
-
-    @Override
-    protected GroupRepository getGroupRepo() {
-        return groupRepo;
-    }
-
-    @Override
-    protected RoleRepository getRoleRepo() {
-        return roleRepo;
     }
 }

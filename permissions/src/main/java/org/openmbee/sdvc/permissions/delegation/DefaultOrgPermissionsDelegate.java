@@ -15,26 +15,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
-    @Autowired
+
     private OrganizationRepository orgRepo;
-
-    @Autowired
     private OrgUserPermRepository orgUserPermRepo;
-
-    @Autowired
     private OrgGroupPermRepository orgGroupPermRepo;
-
-    @Autowired
-    private PrivilegeRepository privRepo;
-
-    @Autowired
-    private UserRepository userRepo;
-
-    @Autowired
-    private RoleRepository roleRepo;
-
-    @Autowired
-    private GroupRepository groupRepo;
 
     private Organization organization;
 
@@ -42,10 +26,25 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
         this.organization = organization;
     }
 
+    @Autowired
+    public void setOrgRepo(OrganizationRepository orgRepo) {
+        this.orgRepo = orgRepo;
+    }
+
+    @Autowired
+    public void setOrgUserPermRepo(OrgUserPermRepository orgUserPermRepo) {
+        this.orgUserPermRepo = orgUserPermRepo;
+    }
+
+    @Autowired
+    public void setOrgGroupPermRepo(OrgGroupPermRepository orgGroupPermRepo) {
+        this.orgGroupPermRepo = orgGroupPermRepo;
+    }
+
     @Override
     public boolean hasPermission(String user, Set<String> groups, String privilege) {
 
-        Optional<Privilege> priv = privRepo.findByName(privilege);
+        Optional<Privilege> priv = getPrivRepo().findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
         }
@@ -71,8 +70,8 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
             throw new IllegalArgumentException("Cannot inherit permissions for an Org");
         }
 
-        Optional<User> user = userRepo.findByUsername(creator);
-        Optional<Role> role = roleRepo.findByName(AuthorizationConstants.ADMIN);
+        Optional<User> user = getUserRepo().findByUsername(creator);
+        Optional<Role> role = getRoleRepo().findByName(AuthorizationConstants.ADMIN);
 
         if (!user.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
@@ -104,8 +103,8 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
                         continue;
@@ -125,8 +124,8 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
             case REPLACE:
                 orgUserPermRepo.deleteByOrganization(organization);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
                         continue;
@@ -212,13 +211,4 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
         //Do nothing, can't inherit permissions
     }
 
-    @Override
-    protected GroupRepository getGroupRepo() {
-        return groupRepo;
-    }
-
-    @Override
-    protected RoleRepository getRoleRepo() {
-        return roleRepo;
-    }
 }
