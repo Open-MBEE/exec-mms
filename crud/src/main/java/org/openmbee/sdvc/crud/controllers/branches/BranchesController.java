@@ -88,7 +88,16 @@ public class BranchesController extends BaseController {
                     continue;
                 }
 
-                RefJson res = branchService.createBranch(projectId, branch);
+                RefJson res;
+
+                if(branch.getParentCommitId() == null || branch.getParentCommitId().isEmpty()) {
+                    res = branchService.createBranch(projectId, branch);
+                } else {
+                    //TODO implement branching from historical commit
+                    response.addRejection(new Rejection(branch, 400, "Branching from historical commits is not implemented."));
+                    continue;
+                }
+
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
                 response.getRefs().add(res);
             } catch (SdvcException e) {

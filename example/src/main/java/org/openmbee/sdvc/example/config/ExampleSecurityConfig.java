@@ -2,20 +2,24 @@ package org.openmbee.sdvc.example.config;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.ldap.LdapSecurityConfig;
+import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import static org.springframework.http.HttpHeaders.*;
@@ -27,15 +31,21 @@ import static org.springframework.http.HttpMethod.*;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
 @EnableAsync
-public class ExampleSecurityConfig extends LdapSecurityConfig {
+public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implements
+    WebMvcConfigurer {
+
     private static Logger logger = LogManager.getLogger(ExampleSecurityConfig.class);
 
+    @Autowired
+    AuthSecurityConfig authSecurityConfig;
+
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    public void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http.csrf().disable().authorizeRequests().anyRequest().permitAll().and().httpBasic();
         http.headers().cacheControl();
         http.addFilterAfter(corsFilter(), ExceptionTranslationFilter.class);
+        authSecurityConfig.setAuthConfig(http);
     }
 
     @Bean
@@ -43,6 +53,12 @@ public class ExampleSecurityConfig extends LdapSecurityConfig {
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseTrailingSlashMatch(true);
         return requestMappingHandlerMapping;
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Override
