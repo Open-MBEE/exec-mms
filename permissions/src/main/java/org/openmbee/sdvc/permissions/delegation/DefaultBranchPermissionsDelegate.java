@@ -16,43 +16,46 @@ import java.util.Set;
 
 public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
 
-    @Autowired
     private BranchRepository branchRepo;
-
-    @Autowired
-    private UserRepository userRepo;
-
-    @Autowired
-    private GroupRepository groupRepo;
-
-    @Autowired
-    private RoleRepository roleRepo;
-
-    @Autowired
     private BranchUserPermRepository branchUserPermRepo;
-
-    @Autowired
     private BranchGroupPermRepository branchGroupPermRepo;
-
-    @Autowired
-    private PrivilegeRepository privRepo;
-
-    @Autowired
     private ProjectGroupPermRepository projectGroupPermRepo;
-
-    @Autowired
     private ProjectUserPermRepository projectUserPermRepo;
-
     private Branch branch;
 
     public DefaultBranchPermissionsDelegate(Branch branch) {
         this.branch = branch;
     }
 
+    @Autowired
+    public void setBranchRepo(BranchRepository branchRepo) {
+        this.branchRepo = branchRepo;
+    }
+
+    @Autowired
+    public void setBranchUserPermRepo(BranchUserPermRepository branchUserPermRepo) {
+        this.branchUserPermRepo = branchUserPermRepo;
+    }
+
+    @Autowired
+    public void setBranchGroupPermRepo(BranchGroupPermRepository branchGroupPermRepo) {
+        this.branchGroupPermRepo = branchGroupPermRepo;
+    }
+
+    @Autowired
+    public void setProjectGroupPermRepo(ProjectGroupPermRepository projectGroupPermRepo) {
+        this.projectGroupPermRepo = projectGroupPermRepo;
+    }
+
+    @Autowired
+    public void setProjectUserPermRepo(ProjectUserPermRepository projectUserPermRepo) {
+        this.projectUserPermRepo = projectUserPermRepo;
+    }
+
     @Override
     public boolean hasPermission(String user, Set<String> groups, String privilege) {
 
-        Optional<Privilege> priv = privRepo.findByName(privilege);
+        Optional<Privilege> priv = getPrivRepo().findByName(privilege);
         if (!priv.isPresent()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
         }
@@ -75,8 +78,8 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     @Override
     public void initializePermissions(String creator, boolean inherit) {
 
-        Optional<User> user = userRepo.findByUsername(creator);
-        Optional<Role> role = roleRepo.findByName("ADMIN");
+        Optional<User> user = getUserRepo().findByUsername(creator);
+        Optional<Role> role = getRoleRepo().findByName("ADMIN");
 
         if (!user.isPresent()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
@@ -112,8 +115,8 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
                         continue;
@@ -133,8 +136,8 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
             case REPLACE:
                 branchUserPermRepo.deleteByBranchAndInherited(branch, false);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = userRepo.findByUsername(p.getName());
-                    Optional<Role> role = roleRepo.findByName(p.getRole());
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
                         continue;
@@ -234,15 +237,5 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
                 branchGroupPermRepo.save(new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true));
             }
         }
-    }
-
-    @Override
-    protected GroupRepository getGroupRepo() {
-        return groupRepo;
-    }
-
-    @Override
-    protected RoleRepository getRoleRepo() {
-        return roleRepo;
     }
 }
