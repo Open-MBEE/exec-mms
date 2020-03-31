@@ -78,7 +78,7 @@ public class LdapSecurityConfig {
 
     @Autowired
     public void configureLdapAuth(AuthenticationManagerBuilder auth,
-        LdapAuthoritiesPopulator ldapAuthoritiesPopulator, BaseLdapPathContextSource contextSource)
+        LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
         throws Exception {
         logger.error("LDAP IS HAPPENING!!!");
         /*
