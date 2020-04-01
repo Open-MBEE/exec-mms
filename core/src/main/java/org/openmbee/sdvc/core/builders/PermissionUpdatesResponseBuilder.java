@@ -20,21 +20,21 @@ public class PermissionUpdatesResponseBuilder {
         return this;
     }
 
-    public PermissionUpdatesResponseBuilder addUsers(PermissionUpdateResponse users) {
-        usersBuilder.add(users);
+    public PermissionUpdatesResponseBuilder insert(PermissionUpdatesResponse permissionUpdatesResponse) {
+        this.inherit = or(this.inherit, permissionUpdatesResponse.getInherit());
+        this.isPublic = or(this.isPublic, permissionUpdatesResponse.getPublic());
+        this.insertUsers(permissionUpdatesResponse.getUsers());
+        this.insertGroups(permissionUpdatesResponse.getGroups());
         return this;
     }
 
-    public PermissionUpdatesResponseBuilder addGroups(PermissionUpdateResponse groups) {
-        groupsBuilder.add(groups);
+    public PermissionUpdatesResponseBuilder insertUsers(PermissionUpdateResponse permissionUpdateResponse) {
+        usersBuilder.insert(permissionUpdateResponse);
         return this;
     }
 
-    public PermissionUpdatesResponseBuilder add(PermissionUpdatesResponse permissionUpdatesResponse) {
-        this.inherit = this.inherit || permissionUpdatesResponse.getInherit();
-        this.isPublic = this.isPublic || permissionUpdatesResponse.getPublic();
-        this.addUsers(permissionUpdatesResponse.getUsers());
-        this.addGroups(permissionUpdatesResponse.getGroups());
+    public PermissionUpdatesResponseBuilder insertGroups(PermissionUpdateResponse permissionUpdateResponse) {
+        groupsBuilder.insert(permissionUpdateResponse);
         return this;
     }
 
@@ -42,9 +42,26 @@ public class PermissionUpdatesResponseBuilder {
         PermissionUpdatesResponse permissionUpdatesResponse = new PermissionUpdatesResponse();
         permissionUpdatesResponse.setInherit(this.inherit);
         permissionUpdatesResponse.setPublic(this.isPublic);
-        permissionUpdatesResponse.setUsers(usersBuilder.getPermissionUpdateReponse());
-        permissionUpdatesResponse.setGroups(groupsBuilder.getPermissionUpdateReponse());
+        permissionUpdatesResponse.setUsers(usersBuilder.getPermissionUpdateResponse());
+        permissionUpdatesResponse.setGroups(groupsBuilder.getPermissionUpdateResponse());
         return permissionUpdatesResponse;
     }
 
+    public PermissionUpdateResponseBuilder getUsers() {
+        return usersBuilder;
+    }
+
+    public PermissionUpdateResponseBuilder getGroups() {
+        return groupsBuilder;
+    }
+
+    private Boolean or(Boolean a, Boolean b) {
+        if(a == b) {
+            return a;
+        }
+        if(a == null) {
+            return b;
+        }
+        return a || b;
+    }
 }

@@ -1,10 +1,12 @@
 package org.openmbee.sdvc.permissions.delegation;
 
 import org.openmbee.sdvc.core.builders.PermissionUpdateResponseBuilder;
+import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
+import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
 import org.openmbee.sdvc.data.domains.global.*;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.rdb.repositories.*;
@@ -113,23 +115,28 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
                         continue;
                     }
                     Optional<OrgUserPerm> exist = orgUserPermRepo.findByOrganizationAndUser(organization, user.get());
+                    OrgUserPerm p1;
                     if (exist.isPresent()) {
-                        OrgUserPerm e = exist.get();
-                        if (!role.get().equals(e.getRole())) {
-                            e.setRole(role.get());
-                            orgUserPermRepo.save(e);
-                            responseBuilder.addPermissionUpdate(req.getAction(), user.get().getUsername(), role.get().getName(),
-                                organization.getOrganizationId(), organization.getOrganizationName(), false);
+                        p1 = exist.get();
+                        if (!role.get().equals(p1.getRole())) {
+                            responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE, p1);
+                            p1.setRole(role.get());
+                            orgUserPermRepo.save(p1);
+                        } else {
+                            continue;
                         }
                     } else {
-                        orgUserPermRepo.save(new OrgUserPerm(organization, user.get(), role.get()));
-                        responseBuilder.addPermissionUpdate(req.getAction(), user.get().getUsername(), role.get().getName(),
-                            organization.getOrganizationId(), organization.getOrganizationName(), false);
+                        p1 = new OrgUserPerm(organization, user.get(), role.get());
+                        orgUserPermRepo.save(p1);
                     }
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p1);
                 }
                 break;
             case REPLACE:
+                responseBuilder.insertPermissionUpdates_OrgUserPerm(PermissionUpdateResponse.Action.REMOVE,
+                    orgUserPermRepo.findAllByOrganization(organization));
                 orgUserPermRepo.deleteByOrganization(organization);
+
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
                     Optional<User> user = getUserRepo().findByUsername(p.getName());
                     Optional<Role> role = getRoleRepo().findByName(p.getRole());
@@ -137,22 +144,27 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
                         //throw exception or skip
                         continue;
                     }
-                    orgUserPermRepo.save(new OrgUserPerm(organization, user.get(), role.get()));
-                    responseBuilder.addPermissionUpdate(req.getAction(), user.get().getUsername(), role.get().getName(),
-                        organization.getOrganizationId(), organization.getOrganizationName(), false);
+                    OrgUserPerm p1 = new OrgUserPerm(organization, user.get(), role.get());
+                    orgUserPermRepo.save(p1);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p1);
                 }
                 break;
             case REMOVE:
                 Set<String> users = new HashSet<>();
                 req.getPermissions().forEach(p -> {
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    if(! user.isPresent()) {
+                        //throw or skip;
+                        return;
+                    }
                     users.add(p.getName());
-                    responseBuilder.addPermissionUpdate(req.getAction(), p.getName(), null,
-                        organization.getOrganizationId(), organization.getOrganizationName(), false);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE,
+                        orgUserPermRepo.findByOrganizationAndUser(organization, user.get()).orElse(null));
                 });
                 orgUserPermRepo.deleteByOrganizationAndUser_UsernameIn(organization, users);
                 break;
         }
-        return responseBuilder.getPermissionUpdateReponse();
+        return responseBuilder.getPermissionUpdateResponse();
     }
 
     @Override
@@ -166,44 +178,54 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
                         continue;
                     }
                     Optional<OrgGroupPerm> exist = orgGroupPermRepo.findByOrganizationAndGroup(organization, pair.getFirst());
+                    OrgGroupPerm p1;
                     if (exist.isPresent()) {
-                        OrgGroupPerm e = exist.get();
-                        if (!pair.getSecond().equals(e.getRole())) {
-                            e.setRole(pair.getSecond());
-                            orgGroupPermRepo.save(e);
-                            responseBuilder.addPermissionUpdate(req.getAction(), pair.getFirst().getName(), pair.getSecond().getName(),
-                                organization.getOrganizationId(), organization.getOrganizationName(), false);
+                        p1 = exist.get();
+                        if (!pair.getSecond().equals(p1.getRole())) {
+                            responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE, p1);
+                            p1.setRole(pair.getSecond());
+                            orgGroupPermRepo.save(p1);
+                        } else {
+                            continue;
                         }
                     } else {
-                        orgGroupPermRepo.save(new OrgGroupPerm(organization, pair.getFirst(), pair.getSecond()));
-                        responseBuilder.addPermissionUpdate(req.getAction(), pair.getFirst().getName(), pair.getSecond().getName(),
-                            organization.getOrganizationId(), organization.getOrganizationName(), false);
+                        p1 = new OrgGroupPerm(organization, pair.getFirst(), pair.getSecond());
+                        orgGroupPermRepo.save(p1);
                     }
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p1);
                 }
                 break;
             case REPLACE:
+                responseBuilder.insertPermissionUpdates_OrgGroupPerm(PermissionUpdateResponse.Action.REMOVE,
+                    orgGroupPermRepo.findAllByOrganization(organization));
                 orgGroupPermRepo.deleteByOrganization(organization);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
                     Pair<Group, Role> pair = getGroupAndRole(p);
                     if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    orgGroupPermRepo.save(new OrgGroupPerm(organization, pair.getFirst(), pair.getSecond()));
-                    responseBuilder.addPermissionUpdate(req.getAction(), pair.getFirst().getName(), pair.getSecond().getName(),
-                        organization.getOrganizationId(), organization.getOrganizationName(), false);
+                    OrgGroupPerm p1 = new OrgGroupPerm(organization, pair.getFirst(), pair.getSecond());
+                    orgGroupPermRepo.save(p1);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p1);
                 }
                 break;
             case REMOVE:
                 Set<String> groups = new HashSet<>();
                 req.getPermissions().forEach(p -> {
+                    Optional<Group> group = getGroupRepo().findByName(p.getName());
+                    if(! group.isPresent()) {
+                        //throw or skip
+                        return;
+                    }
+
                     groups.add(p.getName());
-                    responseBuilder.addPermissionUpdate(req.getAction(), p.getName(), null,
-                        organization.getOrganizationId(), organization.getOrganizationName(), false);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE,
+                        orgGroupPermRepo.findByOrganizationAndGroup(organization, group.get()).orElse(null));
                 });
                 orgGroupPermRepo.deleteByOrganizationAndGroup_NameIn(organization, groups);
                 break;
         }
-        return responseBuilder.getPermissionUpdateReponse();
+        return responseBuilder.getPermissionUpdateResponse();
     }
 
     @Override
@@ -233,9 +255,9 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
     }
 
     @Override
-    public PermissionUpdateResponse recalculateInheritedPerms() {
+    public PermissionUpdatesResponse recalculateInheritedPerms() {
         //Do nothing, can't inherit permissions
-        return new PermissionUpdateResponseBuilder().getPermissionUpdateReponse();
+        return new PermissionUpdatesResponseBuilder().getPermissionUpdatesReponse();
     }
 
 }

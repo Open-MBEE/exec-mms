@@ -14,13 +14,13 @@ public interface PermissionService {
 
     void initBranchPerms(String projectId, String branchId, boolean inherit, String creator);
 
-    PermissionUpdateResponse updateOrgUserPerms(PermissionUpdateRequest req, String orgId);
+    PermissionUpdatesResponse updateOrgUserPerms(PermissionUpdateRequest req, String orgId);
 
-    PermissionUpdateResponse updateOrgGroupPerms(PermissionUpdateRequest req, String orgId);
+    PermissionUpdatesResponse updateOrgGroupPerms(PermissionUpdateRequest req, String orgId);
 
-    PermissionUpdateResponse updateProjectUserPerms(PermissionUpdateRequest req, String projectId);
+    PermissionUpdatesResponse updateProjectUserPerms(PermissionUpdateRequest req, String projectId);
 
-    PermissionUpdateResponse updateProjectGroupPerms(PermissionUpdateRequest req, String projectId);
+    PermissionUpdatesResponse updateProjectGroupPerms(PermissionUpdateRequest req, String projectId);
 
     PermissionUpdateResponse updateBranchUserPerms(PermissionUpdateRequest req, String projectId, String branchId);
 

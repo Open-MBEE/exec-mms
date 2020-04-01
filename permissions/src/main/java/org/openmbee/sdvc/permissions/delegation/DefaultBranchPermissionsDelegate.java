@@ -1,8 +1,12 @@
 package org.openmbee.sdvc.permissions.delegation;
 
+import org.openmbee.sdvc.core.builders.PermissionUpdateResponseBuilder;
+import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
+import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
+import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
 import org.openmbee.sdvc.data.domains.global.*;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.rdb.repositories.*;
@@ -10,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -111,7 +116,9 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
-    public void updateUserPermissions(PermissionUpdateRequest req) {
+    public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
+        PermissionUpdateResponseBuilder responseBuilder = new PermissionUpdateResponseBuilder();
+
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
@@ -122,18 +129,26 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
                         continue;
                     }
                     Optional<BranchUserPerm> exist = branchUserPermRepo.findByBranchAndUserAndInheritedIsFalse(branch, user.get());
+                    BranchUserPerm perm;
                     if (exist.isPresent()) {
-                        BranchUserPerm e = exist.get();
-                        if (!role.get().equals(e.getRole())) {
-                            e.setRole(role.get());
-                            branchUserPermRepo.save(e);
+                        perm = exist.get();
+                        if (!role.get().equals(perm.getRole())) {
+                            responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE, perm);
+                            perm.setRole(role.get());
+                            branchUserPermRepo.save(perm);
+                        } else {
+                            continue;
                         }
                     } else {
-                        branchUserPermRepo.save(new BranchUserPerm(branch, user.get(), role.get(), false));
+                        perm = new BranchUserPerm(branch, user.get(), role.get(), false);
+                        branchUserPermRepo.save(perm);
                     }
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
                 }
                 break;
             case REPLACE:
+                responseBuilder.insertPermissionUpdates_BranchUserPerm(PermissionUpdateResponse.Action.REMOVE,
+                    branchUserPermRepo.findAllByBranchAndInherited(branch, false));
                 branchUserPermRepo.deleteByBranchAndInherited(branch, false);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
                     Optional<User> user = getUserRepo().findByUsername(p.getName());
@@ -142,19 +157,34 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
                         //throw exception or skip
                         continue;
                     }
-                    branchUserPermRepo.save(new BranchUserPerm(branch, user.get(), role.get(), false));
+                    BranchUserPerm perm = new BranchUserPerm(branch, user.get(), role.get(), false);
+                    branchUserPermRepo.save(perm);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
                 }
                 break;
             case REMOVE:
                 Set<String> users = new HashSet<>();
-                req.getPermissions().forEach(p -> users.add(p.getName()));
+                req.getPermissions().forEach(p -> {
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    if(! user.isPresent()) {
+                        //throw or skip;
+                        return;
+                    }
+
+                    users.add(p.getName());
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE,
+                        branchUserPermRepo.findByBranchAndUserAndInheritedIsFalse(branch, user.get()).orElse(null));
+                });
                 branchUserPermRepo.deleteByBranchAndUser_UsernameInAndInheritedIsFalse(branch, users);
                 break;
         }
+        return responseBuilder.getPermissionUpdateResponse();
     }
 
     @Override
-    public void updateGroupPermissions(PermissionUpdateRequest req) {
+    public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
+        PermissionUpdateResponseBuilder responseBuilder = new PermissionUpdateResponseBuilder();
+
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
@@ -163,33 +193,54 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
                         continue;
                     }
                     Optional<BranchGroupPerm> exist = branchGroupPermRepo.findByBranchAndGroupAndInheritedIsFalse(branch, pair.getFirst());
+                    BranchGroupPerm perm;
                     if (exist.isPresent()) {
-                        BranchGroupPerm e = exist.get();
-                        if (!pair.getSecond().equals(e.getRole())) {
-                            e.setRole(pair.getSecond());
-                            branchGroupPermRepo.save(e);
+                        perm = exist.get();
+                        if (!pair.getSecond().equals(perm.getRole())) {
+                            responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE, perm);
+                            perm.setRole(pair.getSecond());
+                            branchGroupPermRepo.save(perm);
+                        } else {
+                            continue;
                         }
                     } else {
-                        branchGroupPermRepo.save(new BranchGroupPerm(branch, pair.getFirst(), pair.getSecond(), false));
+                        perm = new BranchGroupPerm(branch, pair.getFirst(), pair.getSecond(), false);
+                        branchGroupPermRepo.save(perm);
                     }
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
                 }
                 break;
             case REPLACE:
+                responseBuilder.insertPermissionUpdates_BranchGroupPerm(PermissionUpdateResponse.Action.REMOVE,
+                    branchGroupPermRepo.findAllByBranchAndInherited(branch, false));
                 branchGroupPermRepo.deleteByBranchAndInherited(branch, false);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
                     Pair<Group, Role> pair = getGroupAndRole(p);
                     if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    branchGroupPermRepo.save(new BranchGroupPerm(branch, pair.getFirst(), pair.getSecond(), false));
+                    BranchGroupPerm perm = new BranchGroupPerm(branch, pair.getFirst(), pair.getSecond(), false);
+                    branchGroupPermRepo.save(perm);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
                 }
                 break;
             case REMOVE:
                 Set<String> groups = new HashSet<>();
-                req.getPermissions().forEach(p -> groups.add(p.getName()));
+                req.getPermissions().forEach(p -> {
+                    Optional<Group> group = getGroupRepo().findByName(p.getName());
+                    if(! group.isPresent()) {
+                        //throw or skip
+                        return;
+                    }
+
+                    groups.add(p.getName());
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE,
+                        branchGroupPermRepo.findByBranchAndGroupAndInheritedIsFalse(branch, group.get()).orElse(null));
+                });
                 branchGroupPermRepo.deleteByBranchAndGroup_NameInAndInheritedIsFalse(branch, groups);
                 break;
         }
+        return responseBuilder.getPermissionUpdateResponse();
     }
 
     @Override
@@ -219,23 +270,40 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
-    public void recalculateInheritedPerms() {
-        branchUserPermRepo.deleteAll(branchUserPermRepo.findAllByBranchAndInherited(branch, true));
-        branchGroupPermRepo.deleteAll(branchGroupPermRepo.findAllByBranchAndInherited(branch, true));
+    public PermissionUpdatesResponse recalculateInheritedPerms() {
+        PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
+
+        Collection<BranchUserPerm> branchUserPerms = branchUserPermRepo.findAllByBranchAndInherited(branch, true);
+        branchUserPermRepo.deleteAll(branchUserPerms);
+        responseBuilder.getUsers().insertPermissionUpdates_BranchUserPerm(PermissionUpdateResponse.Action.REMOVE, branchUserPerms);
+
+        Collection<BranchGroupPerm> branchGroupPerms = branchGroupPermRepo.findAllByBranchAndInherited(branch, true);
+        branchGroupPermRepo.deleteAll(branchGroupPerms);
+        responseBuilder.getGroups().insertPermissionUpdates_BranchGroupPerm(PermissionUpdateResponse.Action.REMOVE, branchGroupPerms);
+
         if (branch.isInherit()) {
             for (ProjectUserPerm p: projectUserPermRepo.findAllByProject(branch.getProject())) {
-                branchUserPermRepo.save(new BranchUserPerm(branch, p.getUser(), p.getRole(), true));
+                BranchUserPerm perm = new BranchUserPerm(branch, p.getUser(), p.getRole(), true);
+                branchUserPermRepo.save(perm);
+                responseBuilder.getUsers().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
             }
             for (ProjectGroupPerm p: projectGroupPermRepo.findAllByProject(branch.getProject())) {
-                branchGroupPermRepo.save(new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true));
+                BranchGroupPerm perm = new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true);
+                branchGroupPermRepo.save(perm);
+                responseBuilder.getGroups().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
             }
         } else {
             for (ProjectUserPerm p: projectUserPermRepo.findAllByProjectAndRole_Name(branch.getProject(), AuthorizationConstants.ADMIN)) {
-                branchUserPermRepo.save(new BranchUserPerm(branch, p.getUser(), p.getRole(), true));
+                BranchUserPerm perm = new BranchUserPerm(branch, p.getUser(), p.getRole(), true);
+                branchUserPermRepo.save(perm);
+                responseBuilder.getUsers().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
             }
             for (ProjectGroupPerm p: projectGroupPermRepo.findAllByProjectAndRole_Name(branch.getProject(), AuthorizationConstants.ADMIN)) {
-                branchGroupPermRepo.save(new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true));
+                BranchGroupPerm perm = new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true);
+                branchGroupPermRepo.save(perm);
+                responseBuilder.getGroups().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
             }
         }
+        return responseBuilder.getPermissionUpdatesReponse();
     }
 }

@@ -31,18 +31,18 @@ public class PermissionsController {
         @PathVariable String orgId,
         @RequestBody PermissionsRequest req) {
 
-        PermissionUpdatesResponse response = new PermissionUpdatesResponse();
+        PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
 
         if (req.getGroups() != null) {
-            response.setGroups(permissionService.updateOrgGroupPerms(req.getGroups(), orgId));
+            responseBuilder.insert(permissionService.updateOrgGroupPerms(req.getGroups(), orgId));
         }
         if (req.getUsers() != null) {
-            response.setUsers(permissionService.updateOrgUserPerms(req.getUsers(), orgId));
+            responseBuilder.insert(permissionService.updateOrgUserPerms(req.getUsers(), orgId));
         }
         if (req.getPublic() != null) {
-            response.setPublic(permissionService.setOrgPublic(req.getPublic(), orgId));
+            responseBuilder.setPublic(permissionService.setOrgPublic(req.getPublic(), orgId));
         }
-        return response;
+        return responseBuilder.getPermissionUpdatesReponse();
     }
 
     @PostMapping(value = "/projects/{projectId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -52,21 +52,21 @@ public class PermissionsController {
         @PathVariable String projectId,
         @RequestBody PermissionsRequest req) {
 
-        PermissionUpdatesResponseBuilder builder = new PermissionUpdatesResponseBuilder();
+        PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
 
         if (req.getGroups() != null) {
-            builder.addGroups(permissionService.updateProjectGroupPerms(req.getGroups(), projectId));
+            responseBuilder.insert(permissionService.updateProjectGroupPerms(req.getGroups(), projectId));
         }
         if (req.getUsers() != null) {
-            builder.addUsers(permissionService.updateProjectUserPerms(req.getUsers(), projectId));
+            responseBuilder.insert(permissionService.updateProjectUserPerms(req.getUsers(), projectId));
         }
         if (req.getPublic() != null) {
-            builder.setPublic(permissionService.setProjectPublic(req.getPublic(), projectId));
+            responseBuilder.setPublic(permissionService.setProjectPublic(req.getPublic(), projectId));
         }
         if (req.getInherit() != null) {
-            builder.add(permissionService.setProjectInherit(req.getInherit(), projectId));
+            responseBuilder.insert(permissionService.setProjectInherit(req.getInherit(), projectId));
         }
-        return builder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesReponse();
     }
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -77,18 +77,18 @@ public class PermissionsController {
         @PathVariable String refId,
         @RequestBody PermissionsRequest req) {
 
-        PermissionUpdatesResponseBuilder builder = new PermissionUpdatesResponseBuilder();
+        PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
 
         if (req.getGroups() != null) {
-            builder.addGroups(permissionService.updateBranchGroupPerms(req.getGroups(), projectId, refId));
+            responseBuilder.insertGroups(permissionService.updateBranchGroupPerms(req.getGroups(), projectId, refId));
         }
         if (req.getUsers() != null) {
-            builder.addUsers(permissionService.updateBranchUserPerms(req.getUsers(), projectId, refId));
+            responseBuilder.insertUsers(permissionService.updateBranchUserPerms(req.getUsers(), projectId, refId));
         }
         if (req.getInherit() != null) {
-            builder.add(permissionService.setBranchInherit(req.getInherit(), projectId, refId));
+            responseBuilder.insert(permissionService.setBranchInherit(req.getInherit(), projectId, refId));
         }
-        return builder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesReponse();
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")
