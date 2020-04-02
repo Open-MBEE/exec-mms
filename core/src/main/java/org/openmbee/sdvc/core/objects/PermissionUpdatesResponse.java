@@ -1,7 +1,7 @@
 package org.openmbee.sdvc.core.objects;
 
 
-import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class PermissionUpdatesResponse {
 
@@ -10,6 +10,7 @@ public class PermissionUpdatesResponse {
     private PermissionUpdateResponse users;
     private PermissionUpdateResponse groups;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public Boolean getInherit() {
         return inherit;
     }
@@ -18,6 +19,7 @@ public class PermissionUpdatesResponse {
         this.inherit = inherit;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public Boolean getPublic() {
         return isPublic;
     }

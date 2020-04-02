@@ -1,5 +1,7 @@
 package org.openmbee.sdvc.core.objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 public class PermissionUpdateResponse {
@@ -31,6 +33,7 @@ public class PermissionUpdateResponse {
 
         public PermissionUpdate(Action action, String name, String role, String orgId, String orgName,
                                 String projectId, String projectName, String branchId, boolean inherited) {
+            this.action = action;
             this.name = name;
             this.role = role;
             this.orgId = orgId;
@@ -81,6 +84,7 @@ public class PermissionUpdateResponse {
             this.orgName = orgName;
         }
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         public String getProjectId() {
             return projectId;
         }
@@ -89,6 +93,7 @@ public class PermissionUpdateResponse {
             this.projectId = projectId;
         }
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         public String getProjectName() {
             return projectName;
         }
@@ -97,6 +102,7 @@ public class PermissionUpdateResponse {
             this.projectName = projectName;
         }
 
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         public String getBranchId() {
             return branchId;
         }

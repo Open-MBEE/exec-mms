@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
+import java.util.Objects;
 import javax.persistence.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -163,5 +164,24 @@ public class User extends Base {
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return isAdmin() == user.isAdmin() &&
+            isEnabled() == user.isEnabled() &&
+            Objects.equals(getUsername(), user.getUsername()) &&
+            Objects.equals(getEmail(), user.getEmail()) &&
+            Objects.equals(getFirstName(), user.getFirstName()) &&
+            Objects.equals(getLastName(), user.getLastName()) &&
+            Objects.equals(getPassword(), user.getPassword());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUsername(), getEmail(), getFirstName(), getLastName(), isAdmin(), getPassword(), isEnabled());
     }
 }

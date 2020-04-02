@@ -281,29 +281,31 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
         branchGroupPermRepo.deleteAll(branchGroupPerms);
         responseBuilder.getGroups().insertPermissionUpdates_BranchGroupPerm(PermissionUpdateResponse.Action.REMOVE, branchGroupPerms);
 
+        Set<BranchUserPerm> userPermissions = new HashSet<>();
+        Set<BranchGroupPerm> groupPermissions = new HashSet<>();
+
         if (branch.isInherit()) {
             for (ProjectUserPerm p: projectUserPermRepo.findAllByProject(branch.getProject())) {
-                BranchUserPerm perm = new BranchUserPerm(branch, p.getUser(), p.getRole(), true);
-                branchUserPermRepo.save(perm);
-                responseBuilder.getUsers().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
+                userPermissions.add(new BranchUserPerm(branch, p.getUser(), p.getRole(), true));
             }
             for (ProjectGroupPerm p: projectGroupPermRepo.findAllByProject(branch.getProject())) {
-                BranchGroupPerm perm = new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true);
-                branchGroupPermRepo.save(perm);
-                responseBuilder.getGroups().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
+                groupPermissions.add(new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true));
             }
         } else {
             for (ProjectUserPerm p: projectUserPermRepo.findAllByProjectAndRole_Name(branch.getProject(), AuthorizationConstants.ADMIN)) {
-                BranchUserPerm perm = new BranchUserPerm(branch, p.getUser(), p.getRole(), true);
-                branchUserPermRepo.save(perm);
-                responseBuilder.getUsers().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
+                userPermissions.add(new BranchUserPerm(branch, p.getUser(), p.getRole(), true));
             }
             for (ProjectGroupPerm p: projectGroupPermRepo.findAllByProjectAndRole_Name(branch.getProject(), AuthorizationConstants.ADMIN)) {
-                BranchGroupPerm perm = new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true);
-                branchGroupPermRepo.save(perm);
-                responseBuilder.getGroups().insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, perm);
+                groupPermissions.add(new BranchGroupPerm(branch, p.getGroup(), p.getRole(), true));
             }
         }
+
+        branchUserPermRepo.saveAll(userPermissions);
+        responseBuilder.getUsers().insertPermissionUpdates_BranchUserPerm(PermissionUpdateResponse.Action.ADD, userPermissions);
+
+        branchGroupPermRepo.saveAll(groupPermissions);
+        responseBuilder.getGroups().insertPermissionUpdates_BranchGroupPerm(PermissionUpdateResponse.Action.ADD, groupPermissions);
+
         return responseBuilder.getPermissionUpdatesReponse();
     }
 }

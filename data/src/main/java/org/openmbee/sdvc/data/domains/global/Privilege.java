@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.data.domains.global;
 
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,5 +38,18 @@ public class Privilege extends Base {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Privilege privilege = (Privilege) o;
+        return Objects.equals(getName(), privilege.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName());
     }
 }

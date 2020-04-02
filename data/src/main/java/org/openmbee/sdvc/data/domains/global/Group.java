@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import java.util.Collection;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -36,5 +37,18 @@ public class Group extends Base {
 
     public void setUsers(Collection<User> users) {
         this.users = users;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return Objects.equals(getName(), group.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName());
     }
 }

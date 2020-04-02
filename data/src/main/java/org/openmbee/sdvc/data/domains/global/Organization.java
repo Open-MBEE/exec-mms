@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -85,5 +86,18 @@ public class Organization extends Base {
 
     public void setPublic(boolean aPublic) {
         isPublic = aPublic;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Organization that = (Organization) o;
+        return Objects.equals(getOrganizationId(), that.getOrganizationId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getOrganizationId());
     }
 }

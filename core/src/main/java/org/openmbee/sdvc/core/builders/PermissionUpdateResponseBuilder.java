@@ -27,12 +27,13 @@ public class PermissionUpdateResponseBuilder {
             return Objects.equals(getPermissionUpdate().getBranchId(), that.getPermissionUpdate().getBranchId())
                 && Objects.equals(getPermissionUpdate().getProjectId(), that.getPermissionUpdate().getProjectId())
                 && Objects.equals(getPermissionUpdate().getOrgId(), that.getPermissionUpdate().getOrgId())
-                && Objects.equals(getPermissionUpdate().getName(), that.getPermissionUpdate().getName());
+                && Objects.equals(getPermissionUpdate().getName(), that.getPermissionUpdate().getName())
+                && Objects.equals(getPermissionUpdate().isInherited(), that.getPermissionUpdate().isInherited());
         }
         @Override
         public int hashCode() {
             return Objects.hash(getPermissionUpdate().getBranchId(), getPermissionUpdate().getProjectId(),
-                getPermissionUpdate().getOrgId(), getPermissionUpdate().getName());
+                getPermissionUpdate().getOrgId(), getPermissionUpdate().getName(), getPermissionUpdate().isInherited());
         }
     }
 
