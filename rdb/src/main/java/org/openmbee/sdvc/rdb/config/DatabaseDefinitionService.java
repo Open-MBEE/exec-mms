@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.MultiTenancyStrategy;
@@ -23,6 +22,7 @@ import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.data.domains.scoped.NodeType;
+import org.openmbee.sdvc.rdb.datasources.CrudDataSources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
@@ -41,7 +41,7 @@ public class DatabaseDefinitionService {
     private static final String INITIAL_REF = "INSERT INTO branches (id, branchid, branchname, tag, deleted, timestamp) VALUES (0, 'master', 'master', false, false, NOW());";
 
     protected final Logger logger = LogManager.getLogger(getClass());
-    private Map<String, DataSource> crudDataSources;
+    private CrudDataSources crudDataSources;
     private Environment env;
 
     @Autowired
@@ -51,7 +51,7 @@ public class DatabaseDefinitionService {
 
     @Autowired
     public void setCrudDataSources(
-        @Qualifier("crudDataSources") Map<String, DataSource> crudDataSources) {
+        @Qualifier("crudDataSources") CrudDataSources crudDataSources) {
         this.crudDataSources = crudDataSources;
     }
 
@@ -60,7 +60,7 @@ public class DatabaseDefinitionService {
         //TODO sanitize projectId? or reject if not valid id
         String queryString = String.format("CREATE DATABASE \"_%s\"", project.getProjectId());
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
-            crudDataSources.get(ContextHolder.getContext().getKey()));
+            crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
         try {
             jdbcTemplate.execute(queryString);
@@ -89,22 +89,6 @@ public class DatabaseDefinitionService {
     }
 
     public void generateProjectSchemaFromModels(Project project) throws SQLException {
-
-        String connectionString = project.getConnectionString();
-        if (connectionString == null || connectionString.equals("")) {
-            connectionString =
-                env.getProperty("spring.datasource.url") + "/_" + project.getProjectId();
-        }
-
-        DataSource ds = PersistenceJPAConfig
-            .buildDatasource(connectionString,
-                env.getProperty("spring.datasource.username"),
-                env.getProperty("spring.datasource.password"),
-                env.getProperty("spring.datasource.driver-class-name",
-                    "org.postgresql.Driver"));
-
-        this.crudDataSources.put(project.getProjectId(), ds);
-
         ContextHolder.setContext(project.getProjectId());
 
         MetadataSources metadata = new MetadataSources(
@@ -125,7 +109,7 @@ public class DatabaseDefinitionService {
             .createOnly(EnumSet.of(TargetType.DATABASE),
                 metadata.getMetadataBuilder().build());
 
-        try (Connection conn = ds.getConnection()) {
+        try (Connection conn = crudDataSources.getDataSource(project).getConnection()) {
            /* TODO rethink if project itself should be a node
             try (PreparedStatement ps = conn.prepareStatement(INITIAL_PROJECT)) {
                 ps.setString(1, project.getProjectId());
@@ -172,7 +156,7 @@ public class DatabaseDefinitionService {
         }
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
-            crudDataSources.get(ContextHolder.getContext().getKey()));
+            crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
 
         jdbcTemplate.execute("BEGIN");
 
