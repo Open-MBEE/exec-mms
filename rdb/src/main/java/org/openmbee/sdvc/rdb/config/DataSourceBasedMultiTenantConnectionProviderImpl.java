@@ -18,8 +18,7 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl extends
     private CrudDataSources crudDataSources;
 
     @Autowired
-    public void setCrudDataSources(
-        @Qualifier("crudDataSources") CrudDataSources crudDataSources) {
+    public void setCrudDataSources(CrudDataSources crudDataSources) {
         this.crudDataSources = crudDataSources;
     }
 

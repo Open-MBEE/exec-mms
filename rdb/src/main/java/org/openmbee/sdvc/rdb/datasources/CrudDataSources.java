@@ -4,6 +4,7 @@ import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.rdb.config.PersistenceJPAConfig;
 import org.openmbee.sdvc.rdb.exceptions.RdbException;
 import org.openmbee.sdvc.rdb.repositories.ProjectRepository;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 import static org.openmbee.sdvc.core.config.ContextObject.DEFAULT_PROJECT;
 
-public class CrudDataSources {
+public class CrudDataSources implements InitializingBean {
     private Environment env;
     private ProjectRepository projectRepository;
     private Map<String, DataSource> targetDataSources = new HashMap<>();
@@ -30,20 +31,15 @@ public class CrudDataSources {
         this.projectRepository = projectRepository;
     }
 
-    public CrudDataSources() {
+    public CrudDataSources() {}
 
-        DataSource defaultDs = PersistenceJPAConfig
-            .buildDatasource(env.getProperty("spring.datasource.url") + "/" +
-                    env.getProperty("spring.datasource.database"),
-                env.getProperty("spring.datasource.username"),
-                env.getProperty("spring.datasource.password"),
-                env.getProperty("spring.datasource.driver-class-name",
-                    "org.postgresql.Driver"));
-
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        DataSource defaultDs = buildDataSource(env.getProperty("spring.datasource.url") + "/" +
+            env.getProperty("spring.datasource.database"));
         targetDataSources.put(DEFAULT_PROJECT, defaultDs);
 
         List<Project> projects = projectRepository.findAll();
-
         for (Project project : projects) {
             addDataSource(project);
         }
@@ -74,29 +70,29 @@ public class CrudDataSources {
         return targetDataSources.remove(projectId) != null;
     }
 
-    private DataSource addDataSource(String projectId) {
-        Optional<Project> project = projectRepository.findByProjectId(projectId);
-
-        if(! project.isPresent()) {
-            throw new RdbException("Project id " + projectId + " not found");
-        }
-
-        return addDataSource(project.get());
-    }
-
-    private DataSource addDataSource(Project project) {
+    public DataSource addDataSource(Project project) {
         String url = project.getConnectionString();
         if (url == null || url.isEmpty()) {
             url = env.getProperty("spring.datasource.url") + "/_" + project.getProjectId();
         }
-
-        DataSource dataSource = PersistenceJPAConfig.buildDatasource(url,
-                env.getProperty("spring.datasource.username"),
-                env.getProperty("spring.datasource.password"),
-                env.getProperty("spring.datasource.driver-class-name",
-                    "org.postgresql.Driver"));
-
+        DataSource dataSource = buildDataSource(url);
         targetDataSources.put(project.getProjectId(), dataSource);
         return dataSource;
+    }
+
+    private DataSource addDataSource(String projectId) {
+        Optional<Project> project = projectRepository.findByProjectId(projectId);
+        if(! project.isPresent()) {
+            throw new RdbException("Project id " + projectId + " not found");
+        }
+        return addDataSource(project.get());
+    }
+
+    private DataSource buildDataSource(String url) {
+        return PersistenceJPAConfig.buildDatasource(url,
+            env.getProperty("spring.datasource.username"),
+            env.getProperty("spring.datasource.password"),
+            env.getProperty("spring.datasource.driver-class-name",
+                "org.postgresql.Driver"));
     }
 }

@@ -50,8 +50,7 @@ public class DatabaseDefinitionService {
     }
 
     @Autowired
-    public void setCrudDataSources(
-        @Qualifier("crudDataSources") CrudDataSources crudDataSources) {
+    public void setCrudDataSources(CrudDataSources crudDataSources) {
         this.crudDataSources = crudDataSources;
     }
 
@@ -89,6 +88,8 @@ public class DatabaseDefinitionService {
     }
 
     public void generateProjectSchemaFromModels(Project project) throws SQLException {
+        crudDataSources.addDataSource(project);
+
         ContextHolder.setContext(project.getProjectId());
 
         MetadataSources metadata = new MetadataSources(

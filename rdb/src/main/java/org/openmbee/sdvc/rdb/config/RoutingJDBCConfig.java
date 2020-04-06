@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RoutingJDBCConfig {
 
-    @Bean(name = "crudDataSources")
+    @Bean
     public CrudDataSources crudDataSources() {
         return new CrudDataSources();
     }

@@ -13,8 +13,7 @@ public abstract class BaseDAOImpl {
     public PlatformTransactionManager transactionManager;
 
     @Autowired
-    public void setCrudDataSources(
-        @Qualifier("crudDataSources") CrudDataSources crudDataSources) {
+    public void setCrudDataSources(CrudDataSources crudDataSources) {
         this.crudDataSources = crudDataSources;
     }
 
