@@ -1,8 +1,7 @@
 package org.openmbee.sdvc.rdb.repositories;
 
-import java.util.Map;
-import javax.sql.DataSource;
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.rdb.datasources.CrudDataSources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,12 +9,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 public abstract class BaseDAOImpl {
 
-    private Map<String, DataSource> crudDataSources;
+    private CrudDataSources crudDataSources;
     public PlatformTransactionManager transactionManager;
 
     @Autowired
-    public void setCrudDataSources(
-        @Qualifier("crudDataSources") Map<String, DataSource> crudDataSources) {
+    public void setCrudDataSources(CrudDataSources crudDataSources) {
         this.crudDataSources = crudDataSources;
     }
 
@@ -30,7 +28,7 @@ public abstract class BaseDAOImpl {
     }
 
     public JdbcTemplate getConn() {
-        return new JdbcTemplate(crudDataSources.get(ContextHolder.getContext().getKey()));
+        return new JdbcTemplate(crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
     }
 
     public String getSuffix() {
