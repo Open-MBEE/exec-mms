@@ -5,10 +5,12 @@ import org.openmbee.sdvc.twc.TeamworkCloud;
 import org.openmbee.sdvc.twc.security.TwcAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import java.util.List;
 
+@Configuration
 @PropertySource("classpath:application.properties")
 @ConfigurationProperties("twc")
 public class TwcConfig {

@@ -16,23 +16,33 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 
-public class TwcAuthenticationFilter extends BasicAuthenticationFilter {
+public class TwcAuthenticationFilter extends OncePerRequestFilter {
 
-
-    @Autowired
     private TwcUserDetailsService userDetailsService;
-
-	@Autowired
 	private TwcConfig twcConfig;
 
+    public TwcUserDetailsService getUserDetailsService() {
+        return userDetailsService;
+    }
 
-	public TwcAuthenticationFilter(AuthenticationManager authenticationManager) {
-		super(authenticationManager);
-	}
+    @Autowired
+    public void setUserDetailsService(TwcUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
-	@Override
+    public TwcConfig getTwcConfig() {
+        return twcConfig;
+    }
+
+    @Autowired
+    public void setTwcConfig(TwcConfig twcConfig) {
+        this.twcConfig = twcConfig;
+    }
+
+    @Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
