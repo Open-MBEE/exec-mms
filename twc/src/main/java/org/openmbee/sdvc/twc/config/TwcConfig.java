@@ -37,4 +37,13 @@ public class TwcConfig {
         }
         return null;
     }
+
+    public TeamworkCloud getTeamworkCloud(String twcUrl) {
+        for(TeamworkCloud twc : getInstances()) {
+            if (twc.hasKnownName(twcUrl)) {
+                return twc;
+            }
+        }
+        return null;
+    }
 }
