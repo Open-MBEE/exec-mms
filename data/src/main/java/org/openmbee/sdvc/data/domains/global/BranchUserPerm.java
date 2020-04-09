@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.Objects;
 
 @Entity
 @Table(name = "branch_user_perms",
@@ -65,21 +64,5 @@ public class BranchUserPerm extends Base {
 
     public void setInherited(boolean inherited) {
         this.inherited = inherited;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BranchUserPerm that = (BranchUserPerm) o;
-        return isInherited() == that.isInherited() &&
-            getBranch().equals(that.getBranch()) &&
-            getUser().equals(that.getUser()) &&
-            getRole().equals(that.getRole());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getBranch(), getUser(), getRole(), isInherited());
     }
 }

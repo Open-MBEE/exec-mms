@@ -1,7 +1,6 @@
 package org.openmbee.sdvc.data.domains.global;
 
 import java.util.Collection;
-import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -75,20 +74,5 @@ public class Branch extends Base {
 
     public void setInherit(boolean inherit) {
         this.inherit = inherit;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Branch branch = (Branch) o;
-        return
-            Objects.equals(getProject(), branch.getProject()) &&
-            Objects.equals(getBranchId(), branch.getBranchId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getProject(), getBranchId());
     }
 }

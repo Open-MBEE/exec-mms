@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.Objects;
 
 @Entity
 @Table(name = "project_group_perms",
@@ -65,21 +64,5 @@ public class ProjectGroupPerm extends Base {
 
     public void setInherited(boolean inherited) {
         this.inherited = inherited;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ProjectGroupPerm that = (ProjectGroupPerm) o;
-        return isInherited() == that.isInherited() &&
-            Objects.equals(getProject(), that.getProject()) &&
-            Objects.equals(getGroup(), that.getGroup()) &&
-            Objects.equals(getRole(), that.getRole());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getProject(), getGroup(), getRole(), isInherited());
     }
 }

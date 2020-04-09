@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.Objects;
 
 @Entity
 @Table(name = "org_group_perms",
@@ -53,20 +52,5 @@ public class OrgGroupPerm extends Base {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrgGroupPerm that = (OrgGroupPerm) o;
-        return Objects.equals(getOrganization(), that.getOrganization()) &&
-            Objects.equals(getGroup(), that.getGroup()) &&
-            Objects.equals(getRole(), that.getRole());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getOrganization(), getGroup(), getRole());
     }
 }
