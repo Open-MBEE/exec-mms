@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,8 +44,7 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping
-    public ProjectsResponse getAllProjects(
-        @Parameter(hidden = true) Authentication auth) {
+    public ProjectsResponse getAllProjects(Authentication auth) {
 
         ProjectsResponse response = new ProjectsResponse();
         List<Project> allProjects = projectRepository.findAll();
@@ -84,7 +82,7 @@ public class ProjectsController extends BaseController {
     @PreAuthorize("isAuthenticated()")
     public ProjectsResponse createOrUpdateProjects(
         @RequestBody ProjectsRequest projectsPost,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
 
         if (projectsPost.getProjects().isEmpty()) {
             throw new BadRequestException(new ProjectsResponse().addMessage("No projects provided"));

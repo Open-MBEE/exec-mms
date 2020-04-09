@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.localuser.controllers;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.exceptions.UnauthorizedException;
@@ -42,7 +41,7 @@ public class LocalUserController {
     @PostMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public Object updatePassword(@RequestBody UserCreateRequest req,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
         final String requester = auth.getName();
         final boolean requesterAdmin = AuthenticationUtils
             .hasGroup(auth, AuthorizationConstants.MMSADMIN);

@@ -1,11 +1,13 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.json.ElementJson;
 
 public class NotebooksRequest extends ElementsRequest {
 
+    @Schema(required=true)
     private List<ElementJson> notebooks;
 
     public List<ElementJson> getNotebooks() {

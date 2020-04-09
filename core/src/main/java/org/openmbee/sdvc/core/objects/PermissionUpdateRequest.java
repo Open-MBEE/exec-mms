@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.core.objects;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 public class PermissionUpdateRequest {
@@ -28,8 +29,10 @@ public class PermissionUpdateRequest {
         }
     }
 
+    @Schema(required=true)
     private Action action;
 
+    @Schema(required=true)
     private List<Permission> permissions;
 
     public Action getAction() {

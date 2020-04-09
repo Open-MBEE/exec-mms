@@ -2,7 +2,7 @@ package org.openmbee.sdvc.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({BaseJson.REFID, BaseJson.COMMITID, "empty"})
+@JsonIgnoreProperties({BaseJson.REFID, BaseJson.COMMITID, BaseJson.TYPE, "empty"})
 public class ProjectJson extends BaseJson<ProjectJson> {
 
     public static final String ORGID = "orgId";

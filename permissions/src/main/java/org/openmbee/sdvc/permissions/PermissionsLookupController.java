@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.permissions;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import org.openmbee.sdvc.core.objects.Rejection;
@@ -29,7 +28,7 @@ public class PermissionsLookupController {
     @PostMapping(value = "/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     public PermissionLookupResponse lookupPermissions(
             @RequestBody PermissionLookupRequest req,
-            @Parameter(hidden = true) Authentication auth) {
+            Authentication auth) {
         PermissionLookupResponse res = new PermissionLookupResponse();
         List<PermissionLookup> lookups = new ArrayList<>();
         res.setLookups(lookups);

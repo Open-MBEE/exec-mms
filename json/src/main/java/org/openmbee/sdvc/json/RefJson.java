@@ -1,5 +1,11 @@
 package org.openmbee.sdvc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+
+@JsonIgnoreProperties({"empty", BaseJson.COMMITID, "tag"})
 public class RefJson extends BaseJson<RefJson> {
 
     public static final String PARENT_REF_ID = "parentRefId";
@@ -27,6 +33,7 @@ public class RefJson extends BaseJson<RefJson> {
         return this;
     }
 
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getStatus() {
         return (String) this.get(STATUS);
     }
@@ -36,12 +43,14 @@ public class RefJson extends BaseJson<RefJson> {
         return this;
     }
 
-    public String getType() {
-        return (String) this.get(TYPE);
+    @JsonProperty("type")
+    public RefType getRefType() {
+        return RefType.valueOf((String) this.get(TYPE));
     }
 
-    public RefJson setType(String type) {
-        this.put(TYPE, type);
+    @JsonProperty("type")
+    public RefJson setRefType(RefType type) {
+        this.put(TYPE, type.name());
         return this;
     }
 
@@ -58,6 +67,7 @@ public class RefJson extends BaseJson<RefJson> {
         return this;
     }
 
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public boolean isDeleted() {
         return (Boolean) this.getOrDefault(DELETED, false);
     }

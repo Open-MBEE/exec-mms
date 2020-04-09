@@ -1,6 +1,8 @@
 package org.openmbee.sdvc.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import java.util.List;
 
 public class ElementJson extends BaseJson<ElementJson> {
@@ -8,6 +10,7 @@ public class ElementJson extends BaseJson<ElementJson> {
     public static final String INREFIDS = "_inRefIds";
 
     @JsonProperty(INREFIDS)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public List<String> getInRefIds() {
         return (List<String>) this.get(INREFIDS);
     }

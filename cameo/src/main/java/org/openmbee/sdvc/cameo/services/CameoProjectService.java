@@ -48,10 +48,6 @@ public class CameoProjectService extends DefaultProjectService implements Projec
     private static ElementJson createNode(String id, String name, ProjectJson projectJson) {
         ElementJson e = new ElementJson();
         e.setId(id);
-        e.setCreator(projectJson.getCreator());
-        e.setCreated(projectJson.getCreated());
-        e.setModifier(projectJson.getModifier());
-        e.setModified(projectJson.getModified());
         e.setName(name);
         e.put(CameoConstants.OWNERID, projectJson.getProjectId());
         e.put(CameoConstants.TYPE, CameoConstants.PACKAGE_TYPE);

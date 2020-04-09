@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 
@@ -205,11 +204,9 @@ public class DefaultNodeService implements NodeService {
     }
 
     protected ElementsRequest buildRequest(String id) {
-        ElementJson json = new ElementJson();
-        json.setId(id);
         ElementsRequest req = new ElementsRequest();
         List<ElementJson> list = new ArrayList<>();
-        list.add(json);
+        list.add(new ElementJson().setId(id));
         req.setElements(list);
         return req;
     }
@@ -218,9 +215,7 @@ public class DefaultNodeService implements NodeService {
         ElementsRequest req = new ElementsRequest();
         List<ElementJson> list = new ArrayList<>();
         for (String id: ids) {
-            ElementJson json = new ElementJson();
-            json.setId(id);
-            list.add(json);
+            list.add(new ElementJson().setId(id));
         }
         req.setElements(list);
         return req;

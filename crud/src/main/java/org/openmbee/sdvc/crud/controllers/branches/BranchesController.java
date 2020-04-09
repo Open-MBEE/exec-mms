@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -41,7 +40,7 @@ public class BranchesController extends BaseController {
     @GetMapping
     public BranchesResponse getAllBranches(
         @PathVariable String projectId,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
 
         BranchesResponse res = branchService.getBranches(projectId);
         if (!permissionService.isProjectPublic(projectId)) {
@@ -71,7 +70,7 @@ public class BranchesController extends BaseController {
     public BranchesResponse createBranches(
         @PathVariable String projectId,
         @RequestBody BranchesRequest projectsPost,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
 
         if (projectsPost.getRefs().isEmpty()) {
             throw new BadRequestException(new BranchesResponse().addMessage("Empty request"));
