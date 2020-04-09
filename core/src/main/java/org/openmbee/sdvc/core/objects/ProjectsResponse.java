@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.core.objects;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.openmbee.sdvc.json.ProjectJson;
 
 public class ProjectsResponse extends BaseResponse<ProjectsResponse> {
 
+    @Schema(required=true)
     private List<ProjectJson> projects;
 
     public ProjectsResponse() {
