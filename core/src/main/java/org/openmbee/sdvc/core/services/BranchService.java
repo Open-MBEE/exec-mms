@@ -1,15 +1,15 @@
 package org.openmbee.sdvc.core.services;
 
-import org.openmbee.sdvc.core.objects.BranchesResponse;
+import org.openmbee.sdvc.core.objects.RefsResponse;
 import org.openmbee.sdvc.json.RefJson;
 
 public interface BranchService {
 
-    BranchesResponse getBranches(String projectId);
+    RefsResponse getBranches(String projectId);
 
-    BranchesResponse getBranch(String projectId, String id);
+    RefsResponse getBranch(String projectId, String id);
 
     RefJson createBranch(String projectId, RefJson branch);
 
-    BranchesResponse deleteBranch(String projectId, String id);
+    RefsResponse deleteBranch(String projectId, String id);
 }

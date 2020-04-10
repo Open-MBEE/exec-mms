@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.orgs;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/orgs")
+@Tag(name = "Orgs")
 public class OrgsController extends BaseController {
 
     OrgDAO organizationRepository;

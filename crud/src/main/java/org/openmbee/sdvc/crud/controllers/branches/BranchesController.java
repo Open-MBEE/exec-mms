@@ -1,12 +1,13 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.exceptions.SdvcException;
-import org.openmbee.sdvc.core.objects.BranchesRequest;
-import org.openmbee.sdvc.core.objects.BranchesResponse;
+import org.openmbee.sdvc.core.objects.RefsRequest;
+import org.openmbee.sdvc.core.objects.RefsResponse;
 import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.BranchService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs")
+@Tag(name = "Refs")
 public class BranchesController extends BaseController {
 
     private static final String BRANCH_ID_VALID_PATTERN = "^[\\w-]+$";
@@ -38,11 +40,11 @@ public class BranchesController extends BaseController {
     }
 
     @GetMapping
-    public BranchesResponse getAllBranches(
+    public RefsResponse getAllRefs(
         @PathVariable String projectId,
         Authentication auth) {
 
-        BranchesResponse res = branchService.getBranches(projectId);
+        RefsResponse res = branchService.getBranches(projectId);
         if (!permissionService.isProjectPublic(projectId)) {
             List<RefJson> filtered = new ArrayList<>();
             for (RefJson ref: res.getRefs()) {
@@ -57,7 +59,7 @@ public class BranchesController extends BaseController {
 
     @GetMapping(value = "/{refId}")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public BranchesResponse getBranch(
+    public RefsResponse getBranch(
         @PathVariable String projectId,
         @PathVariable String refId) {
 
@@ -67,15 +69,15 @@ public class BranchesController extends BaseController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_BRANCH', false)")
-    public BranchesResponse createBranches(
+    public RefsResponse createBranches(
         @PathVariable String projectId,
-        @RequestBody BranchesRequest projectsPost,
+        @RequestBody RefsRequest projectsPost,
         Authentication auth) {
 
         if (projectsPost.getRefs().isEmpty()) {
-            throw new BadRequestException(new BranchesResponse().addMessage("Empty request"));
+            throw new BadRequestException(new RefsResponse().addMessage("Empty request"));
         }
-        BranchesResponse response = new BranchesResponse();
+        RefsResponse response = new RefsResponse();
         for (RefJson branch : projectsPost.getRefs()) {
             try {
                 if (branch.getId() == null || branch.getId().isEmpty()) {
@@ -112,7 +114,7 @@ public class BranchesController extends BaseController {
     @DeleteMapping("/{refId}")
     @Transactional
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_DELETE', false)")
-    public BranchesResponse deleteBranch(
+    public RefsResponse deleteBranch(
         @PathVariable String projectId,
         @PathVariable String refId) {
 

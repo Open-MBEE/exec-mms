@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.cameo.controllers;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.Map;
 import org.openmbee.sdvc.cameo.services.CameoViewService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}")
+@Tag(name = "Views")
 public class VeController extends BaseController {
 
     private CameoViewService cameoViewService;

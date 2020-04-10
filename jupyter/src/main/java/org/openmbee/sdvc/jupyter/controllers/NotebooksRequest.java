@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
@@ -19,6 +20,7 @@ public class NotebooksRequest extends ElementsRequest {
     }
 
     @Override
+    @JsonIgnore
     public List<ElementJson> getElements() {
         return notebooks;
     }

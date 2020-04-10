@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.permissions;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import org.openmbee.sdvc.core.objects.Rejection;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Auth")
 public class PermissionsLookupController {
 
     MethodSecurityService mss;

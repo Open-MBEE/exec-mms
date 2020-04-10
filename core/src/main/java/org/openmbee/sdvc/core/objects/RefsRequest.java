@@ -1,27 +1,21 @@
 package org.openmbee.sdvc.core.objects;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.openmbee.sdvc.json.RefJson;
 
-public class BranchesResponse extends BaseResponse<BranchesResponse> {
+public class RefsRequest extends BaseRequest {
 
-    @Schema(required=true)
     private List<RefJson> refs;
 
-    public BranchesResponse() {
-        this.refs = new ArrayList<>();
-    }
-
+    @Schema(required=true)
     public List<RefJson> getRefs() {
         return refs;
     }
 
-    public BranchesResponse setRefs(List<RefJson> refs) {
+    public void setRefs(List<RefJson> refs) {
         this.refs = refs;
-        return this;
     }
 
 }

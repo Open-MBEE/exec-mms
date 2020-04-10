@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.commits;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.CommitsRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}")
+@Tag(name = "Commits")
 public class CommitsController extends BaseController {
 
     private CommitService commitService;

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
-import org.openmbee.sdvc.core.objects.BranchesResponse;
+import org.openmbee.sdvc.core.objects.RefsResponse;
 import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.BranchService;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
@@ -76,9 +76,9 @@ public class DefaultBranchService implements BranchService {
         this.eventPublisher = eventPublisher;
     }
 
-    public BranchesResponse getBranches(String projectId) {
+    public RefsResponse getBranches(String projectId) {
         ContextHolder.setContext(projectId);
-        BranchesResponse branchesResponse = new BranchesResponse();
+        RefsResponse branchesResponse = new RefsResponse();
         List<Branch> branches = this.branchRepository.findAll();
         List<RefJson> refs = new ArrayList<>();
         branches.forEach(branch -> {
@@ -88,9 +88,9 @@ public class DefaultBranchService implements BranchService {
         return branchesResponse;
     }
 
-    public BranchesResponse getBranch(String projectId, String id) {
+    public RefsResponse getBranch(String projectId, String id) {
         ContextHolder.setContext(projectId);
-        BranchesResponse branchesResponse = new BranchesResponse();
+        RefsResponse branchesResponse = new RefsResponse();
         Optional<Branch> branches = this.branchRepository.findByBranchId(id);
         if (!branches.isPresent()) {
             throw new NotFoundException(branchesResponse);
@@ -160,9 +160,9 @@ public class DefaultBranchService implements BranchService {
         }
     }
 
-    public BranchesResponse deleteBranch(String projectId, String id) {
+    public RefsResponse deleteBranch(String projectId, String id) {
         ContextHolder.setContext(projectId);
-        BranchesResponse branchesResponse = new BranchesResponse();
+        RefsResponse branchesResponse = new RefsResponse();
         if ("master".equals(id)) {
             throw new BadRequestException(branchesResponse.addMessage("Cannot delete master"));
         }

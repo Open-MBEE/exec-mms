@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.ElementsRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
+@Tag(name = "Elements")
 public class ElementsController extends BaseController {
 
     @GetMapping

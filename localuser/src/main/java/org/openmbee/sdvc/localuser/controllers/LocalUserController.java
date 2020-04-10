@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.localuser.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.exceptions.UnauthorizedException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Auth")
 public class LocalUserController {
 
     private UserDetailsServiceImpl userDetailsService;

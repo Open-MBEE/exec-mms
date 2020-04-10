@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.projects;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects")
+@Tag(name = "Projects")
 public class ProjectsController extends BaseController {
 
     private static final String PROJECT_ID_VALID_PATTERN = "^[\\w-]+$";
