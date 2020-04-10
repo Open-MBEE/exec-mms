@@ -59,7 +59,7 @@ public class BranchesController extends BaseController {
 
     @GetMapping(value = "/{refId}")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public RefsResponse getBranch(
+    public RefsResponse getRef(
         @PathVariable String projectId,
         @PathVariable String refId) {
 
@@ -69,7 +69,7 @@ public class BranchesController extends BaseController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_BRANCH', false)")
-    public RefsResponse createBranches(
+    public RefsResponse createRefs(
         @PathVariable String projectId,
         @RequestBody RefsRequest projectsPost,
         Authentication auth) {
@@ -114,7 +114,7 @@ public class BranchesController extends BaseController {
     @DeleteMapping("/{refId}")
     @Transactional
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_DELETE', false)")
-    public RefsResponse deleteBranch(
+    public RefsResponse deleteRef(
         @PathVariable String projectId,
         @PathVariable String refId) {
 
