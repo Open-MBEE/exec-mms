@@ -16,7 +16,7 @@ paths:
   /healthcheck:
     get:
       tags:
-      - health-check-controller
+      - Monitor
       operationId: healthcheck
       responses:
         200:
@@ -571,6 +571,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebhookResponse'
+  /projects/{projectId}/refs:
+    get:
+      tags:
+      - Refs
+      operationId: getAllRefs
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefsResponse'
+    post:
+      tags:
+      - Refs
+      operationId: createRefs
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefsResponse'
   /projects/{projectId}/refs/{refId}:
     get:
       tags:
@@ -609,47 +650,6 @@ paths:
         required: true
         schema:
           type: string
-      responses:
-        200:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RefsResponse'
-  /projects/{projectId}/refs:
-    get:
-      tags:
-      - Refs
-      operationId: getAllRefs
-      parameters:
-      - name: projectId
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RefsResponse'
-    post:
-      tags:
-      - Refs
-      operationId: createRefs
-      parameters:
-      - name: projectId
-        in: path
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefsRequest'
-        required: true
       responses:
         200:
           description: default response
@@ -755,66 +755,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommitsResponse'
-  /projects/{projectId}/refs/{refId}/elements/{elementId}:
-    get:
-      tags:
-      - Elements
-      operationId: getElement
-      parameters:
-      - name: projectId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: refId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: elementId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: commitId
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        200:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ElementsResponse'
-    delete:
-      tags:
-      - Elements
-      operationId: deleteElement
-      parameters:
-      - name: projectId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: refId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: elementId
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ElementsResponse'
   /projects/{projectId}/refs/{refId}/elements:
     get:
       tags:
@@ -932,6 +872,95 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ElementsResponse'
+  /projects/{projectId}/refs/{refId}/elements/{elementId}:
+    get:
+      tags:
+      - Elements
+      operationId: getElement
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    delete:
+      tags:
+      - Elements
+      operationId: deleteElement
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+  /orgs:
+    get:
+      tags:
+      - Orgs
+      operationId: getAllOrgs
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+    post:
+      tags:
+      - Orgs
+      operationId: createOrUpdateOrgs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
   /orgs/{orgId}:
     get:
       tags:
@@ -960,35 +989,6 @@ paths:
         required: true
         schema:
           type: string
-      responses:
-        200:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationsResponse'
-  /orgs:
-    get:
-      tags:
-      - Orgs
-      operationId: getAllOrgs
-      responses:
-        200:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationsResponse'
-    post:
-      tags:
-      - Orgs
-      operationId: createOrUpdateOrgs
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrganizationsRequest'
-        required: true
       responses:
         200:
           description: default response
@@ -1093,11 +1093,11 @@ components:
     MountJson:
       type: object
       properties:
-        name:
+        type:
           type: string
         id:
           type: string
-        type:
+        name:
           type: string
         _projectId:
           type: string
@@ -1111,10 +1111,10 @@ components:
         _docId:
           type: string
           readOnly: true
-        _modifier:
+        _created:
           type: string
           readOnly: true
-        _created:
+        _modifier:
           type: string
           readOnly: true
         _commitId:
@@ -1175,11 +1175,11 @@ components:
     ElementJson:
       type: object
       properties:
-        name:
+        type:
           type: string
         id:
           type: string
-        type:
+        name:
           type: string
         _inRefIds:
           type: array
@@ -1199,10 +1199,10 @@ components:
         _docId:
           type: string
           readOnly: true
-        _modifier:
+        _created:
           type: string
           readOnly: true
-        _created:
+        _modifier:
           type: string
           readOnly: true
         _commitId:
@@ -1428,9 +1428,9 @@ components:
       properties:
         url:
           type: string
-        id:
-          type: string
         type:
+          type: string
+        id:
           type: string
         _projectId:
           type: string
@@ -1438,10 +1438,10 @@ components:
         _creator:
           type: string
           readOnly: true
-        _modifier:
+        _created:
           type: string
           readOnly: true
-        _created:
+        _modifier:
           type: string
           readOnly: true
         _modified:
@@ -1484,28 +1484,28 @@ components:
       - type
       type: object
       properties:
-        parentCommitId:
-          type: string
         description:
           type: string
-        status:
-          type: string
-          readOnly: true
         parentRefId:
           type: string
           default: master
         deleted:
           type: boolean
           readOnly: true
-        name:
+        parentCommitId:
           type: string
-        id:
+        status:
           type: string
+          readOnly: true
         type:
           type: string
           enum:
           - Branch
           - Tag
+        id:
+          type: string
+        name:
+          type: string
         _projectId:
           type: string
           readOnly: true
@@ -1518,10 +1518,10 @@ components:
         _docId:
           type: string
           readOnly: true
-        _modifier:
+        _created:
           type: string
           readOnly: true
-        _created:
+        _modifier:
           type: string
           readOnly: true
         _modified:
@@ -1570,9 +1570,9 @@ components:
     CommitAddedJson:
       type: object
       properties:
-        id:
-          type: string
         type:
+          type: string
+        id:
           type: string
         _docId:
           type: string
@@ -1584,9 +1584,9 @@ components:
         previousDocId:
           type: string
           readOnly: true
-        id:
-          type: string
         type:
+          type: string
+        id:
           type: string
       readOnly: true
     CommitJson:
@@ -1595,9 +1595,6 @@ components:
       type: object
       properties:
         comment:
-          type: string
-          readOnly: true
-        source:
           type: string
           readOnly: true
         deleted:
@@ -1615,6 +1612,9 @@ components:
           readOnly: true
           items:
             $ref: '#/components/schemas/CommitUpdatedJson'
+        source:
+          type: string
+          readOnly: true
         id:
           type: string
         _projectId:
@@ -1645,9 +1645,9 @@ components:
         previousDocId:
           type: string
           readOnly: true
-        id:
-          type: string
         type:
+          type: string
+        id:
           type: string
         _docId:
           type: string
@@ -1693,9 +1693,9 @@ components:
       - name
       type: object
       properties:
-        name:
-          type: string
         id:
+          type: string
+        name:
           type: string
         _creator:
           type: string
@@ -1703,10 +1703,10 @@ components:
         _docId:
           type: string
           readOnly: true
-        _modifier:
+        _created:
           type: string
           readOnly: true
-        _created:
+        _modifier:
           type: string
           readOnly: true
         _modified:
@@ -1757,6 +1757,8 @@ components:
       - orgId
       type: object
       properties:
+        orgId:
+          type: string
         projectType:
           type: string
           description: Acceptable values depends on the specific build and implementation
@@ -1764,11 +1766,9 @@ components:
             to default. This can influence the project's underlying schema used and
             additional validation or processing when getting or updating elements.
           default: default
-        orgId:
+        id:
           type: string
         name:
-          type: string
-        id:
           type: string
         _projectId:
           type: string
@@ -1779,10 +1779,10 @@ components:
         _docId:
           type: string
           readOnly: true
-        _modifier:
+        _created:
           type: string
           readOnly: true
-        _created:
+        _modifier:
           type: string
           readOnly: true
         _modified:
