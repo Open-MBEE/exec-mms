@@ -8,7 +8,7 @@ import org.openmbee.sdvc.json.ProjectJson;
 
 public class ProjectsResponse extends BaseResponse<ProjectsResponse> {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<ProjectJson> projects;
 
     public ProjectsResponse() {

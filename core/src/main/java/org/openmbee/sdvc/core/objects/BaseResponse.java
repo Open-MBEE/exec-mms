@@ -10,10 +10,10 @@ public class BaseResponse<T> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     private List<String> messages = new ArrayList<>();
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     private List<Rejection> rejected = new ArrayList<>();
 
     @SuppressWarnings("unchecked")

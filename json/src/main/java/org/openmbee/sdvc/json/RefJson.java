@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 
 @JsonIgnoreProperties({"empty", BaseJson.COMMITID, "tag"})
+@Schema(requiredProperties = {BaseJson.TYPE, BaseJson.NAME})
 public class RefJson extends BaseJson<RefJson> {
 
     public static final String PARENT_REF_ID = "parentRefId";
@@ -15,6 +16,7 @@ public class RefJson extends BaseJson<RefJson> {
     public static final String DESCRIPTION = "description";
     public static final String DELETED = "deleted";
 
+    @Schema(defaultValue = "master")
     public String getParentRefId() {
         return (String) this.get(PARENT_REF_ID);
     }

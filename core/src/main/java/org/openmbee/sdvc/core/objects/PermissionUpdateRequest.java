@@ -29,10 +29,10 @@ public class PermissionUpdateRequest {
         }
     }
 
-    @Schema(required=true)
+    @Schema(required = true)
     private Action action;
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<Permission> permissions;
 
     public Action getAction() {

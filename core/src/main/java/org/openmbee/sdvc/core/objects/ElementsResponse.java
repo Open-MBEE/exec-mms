@@ -8,7 +8,7 @@ import org.openmbee.sdvc.json.ElementJson;
 
 public class ElementsResponse extends BaseResponse<ElementsResponse> {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<ElementJson> elements;
 
     public ElementsResponse() {

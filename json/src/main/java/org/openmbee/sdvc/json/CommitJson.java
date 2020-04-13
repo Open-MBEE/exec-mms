@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties({"empty", BaseJson.NAME, BaseJson.MODIFIER, BaseJson.MODIFIED, BaseJson.TYPE})
+@Schema(requiredProperties = {BaseJson.ID})
 public class CommitJson extends BaseJson<CommitJson> {
 
     public static final String COMMENT = "comment";

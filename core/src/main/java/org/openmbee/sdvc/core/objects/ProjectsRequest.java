@@ -7,7 +7,7 @@ import org.openmbee.sdvc.json.ProjectJson;
 
 public class ProjectsRequest extends BaseRequest {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<ProjectJson> projects;
 
     public List<ProjectJson> getProjects() {

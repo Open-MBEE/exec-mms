@@ -7,7 +7,7 @@ import org.openmbee.sdvc.json.OrgJson;
 
 public class OrganizationsRequest extends BaseRequest {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<OrgJson> orgs;
 
     public List<OrgJson> getOrgs() {

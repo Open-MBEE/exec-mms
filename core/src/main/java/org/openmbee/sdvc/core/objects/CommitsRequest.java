@@ -7,7 +7,7 @@ import org.openmbee.sdvc.json.CommitJson;
 
 public class CommitsRequest extends BaseRequest {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<CommitJson> commits;
 
     public List<CommitJson> getCommits() {

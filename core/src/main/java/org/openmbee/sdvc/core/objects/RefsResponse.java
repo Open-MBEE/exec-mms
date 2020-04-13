@@ -8,7 +8,7 @@ import org.openmbee.sdvc.json.RefJson;
 
 public class RefsResponse extends BaseResponse<RefsResponse> {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<RefJson> refs;
 
     public RefsResponse() {

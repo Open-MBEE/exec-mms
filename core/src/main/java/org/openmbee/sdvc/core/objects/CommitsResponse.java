@@ -8,7 +8,7 @@ import org.openmbee.sdvc.json.CommitJson;
 
 public class CommitsResponse extends BaseResponse<CommitsResponse> {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<CommitJson> commits;
 
     public CommitsResponse() {

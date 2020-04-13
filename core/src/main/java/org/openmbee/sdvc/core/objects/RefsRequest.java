@@ -9,7 +9,7 @@ public class RefsRequest extends BaseRequest {
 
     private List<RefJson> refs;
 
-    @Schema(required=true)
+    @Schema(required = true)
     public List<RefJson> getRefs() {
         return refs;
     }

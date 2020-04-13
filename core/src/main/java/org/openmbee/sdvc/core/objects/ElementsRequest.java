@@ -7,7 +7,7 @@ import org.openmbee.sdvc.json.ElementJson;
 
 public class ElementsRequest extends BaseRequest {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<ElementJson> elements;
 
     public List<ElementJson> getElements() {

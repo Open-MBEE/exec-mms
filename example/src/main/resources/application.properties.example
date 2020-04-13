@@ -54,3 +54,4 @@ springdoc.swagger-ui.path=/v3/swagger-ui.html
 springdoc.swagger-ui.operationsSorter=alpha
 #For sorting tags alphabetically
 springdoc.swagger-ui.tagsSorter=alpha
+springdoc.default-produces-media-type=application/json

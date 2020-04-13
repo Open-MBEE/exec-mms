@@ -8,7 +8,7 @@ import org.openmbee.sdvc.json.OrgJson;
 
 public class OrganizationsResponse extends BaseResponse<OrganizationsResponse> {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<OrgJson> orgs;
 
     public OrganizationsResponse() {
