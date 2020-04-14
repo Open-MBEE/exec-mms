@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public abstract class BaseRequest {
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     private String source;
 
-    @Schema(nullable=true)
+    @Schema(nullable = true)
     private String comment;
 
     public String getSource() {
