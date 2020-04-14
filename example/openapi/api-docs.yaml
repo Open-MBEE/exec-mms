@@ -1129,8 +1129,7 @@ components:
         _modified:
           type: string
           readOnly: true
-      additionalProperties:
-        type: object
+      additionalProperties: true
     ElementsRequest:
       required:
       - elements
@@ -1228,8 +1227,7 @@ components:
         _modified:
           type: string
           readOnly: true
-      additionalProperties:
-        type: object
+      additionalProperties: true
     MountsResponse:
       type: object
       properties:
@@ -1447,10 +1445,7 @@ components:
         _modified:
           type: string
           readOnly: true
-      additionalProperties:
-        required:
-        - url
-        type: object
+      additionalProperties: true
     WebhookResponse:
       type: object
       properties:
@@ -1527,11 +1522,7 @@ components:
         _modified:
           type: string
           readOnly: true
-      additionalProperties:
-        required:
-        - name
-        - type
-        type: object
+      additionalProperties: true
     RefsResponse:
       required:
       - refs
@@ -1635,10 +1626,7 @@ components:
         _commitId:
           type: string
           readOnly: true
-      additionalProperties:
-        required:
-        - id
-        type: object
+      additionalProperties: true
     CommitUpdatedJson:
       type: object
       properties:
@@ -1706,10 +1694,7 @@ components:
         _modified:
           type: string
           readOnly: true
-      additionalProperties:
-        required:
-        - name
-        type: object
+      additionalProperties: true
     OrganizationsResponse:
       required:
       - orgs
@@ -1782,11 +1767,7 @@ components:
         _modified:
           type: string
           readOnly: true
-      additionalProperties:
-        required:
-        - name
-        - orgId
-        type: object
+      additionalProperties: true
     ProjectsResponse:
       required:
       - projects
