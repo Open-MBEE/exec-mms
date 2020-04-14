@@ -490,7 +490,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PermissionsResponse'
   /permissions:
-    post:
+    put:
       tags:
       - Auth
       operationId: lookupPermissions
