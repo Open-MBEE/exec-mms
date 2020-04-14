@@ -685,7 +685,7 @@ paths:
     get:
       tags:
       - Commits
-      operationId: getAllCommits
+      operationId: getRefCommits
       parameters:
       - name: projectId
         in: path
@@ -695,6 +695,16 @@ paths:
       - name: refId
         in: path
         required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: maxTimestamp
+        in: query
+        required: false
         schema:
           type: string
       responses:
