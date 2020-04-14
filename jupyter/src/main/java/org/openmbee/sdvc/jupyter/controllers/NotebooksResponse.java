@@ -8,7 +8,7 @@ import org.openmbee.sdvc.json.ElementJson;
 
 public class NotebooksResponse extends BaseResponse<NotebooksResponse> {
 
-    @Schema(required=true)
+    @Schema(required = true)
     private List<ElementJson> notebooks;
 
     public NotebooksResponse() {
