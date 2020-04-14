@@ -7,9 +7,9 @@ public class JwtAuthenticationRequest implements Serializable {
 
     private static final long serialVersionUID = -849270125785286560L;
 
-    @Schema(required=true)
+    @Schema(required = true)
     private String username;
-    @Schema(required=true)
+    @Schema(required = true)
     private String password;
 
     public JwtAuthenticationRequest() {
