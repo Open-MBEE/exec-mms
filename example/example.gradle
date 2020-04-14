@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     id "io.spring.dependency-management"
-    id 'org.hidetake.swagger.generator' version '2.18.1'
+    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 apply plugin: 'java'
@@ -38,7 +38,7 @@ dependencies {
     testCompile(
         'org.springframework.boot:spring-boot-starter-test'
     )
-    swaggerCodegen 'org.openapitools:openapi-generator-cli:4.2.2'
+    swaggerCodegen 'org.openapitools:openapi-generator-cli:4.3.0'
 }
 
 swaggerSources {
