@@ -1100,7 +1100,7 @@ components:
           type: string
         password:
           type: string
-    ElementJson:
+    Element:
       type: object
       properties:
         name:
@@ -1154,7 +1154,7 @@ components:
         elements:
           type: array
           items:
-            $ref: '#/components/schemas/ElementJson'
+            $ref: '#/components/schemas/Element'
     ElementsResponse:
       required:
       - elements
@@ -1174,7 +1174,7 @@ components:
         elements:
           type: array
           items:
-            $ref: '#/components/schemas/ElementJson'
+            $ref: '#/components/schemas/Element'
     Rejection:
       type: object
       properties:
@@ -1203,8 +1203,8 @@ components:
         groups:
           type: array
           items:
-            $ref: '#/components/schemas/ElementJson'
-    MountJson:
+            $ref: '#/components/schemas/Element'
+    Mount:
       type: object
       properties:
         name:
@@ -1255,7 +1255,7 @@ components:
         projects:
           type: array
           items:
-            $ref: '#/components/schemas/MountJson'
+            $ref: '#/components/schemas/Mount'
     DocumentsResponse:
       type: object
       properties:
@@ -1273,7 +1273,7 @@ components:
         documents:
           type: array
           items:
-            $ref: '#/components/schemas/ElementJson'
+            $ref: '#/components/schemas/Element'
     NotebooksResponse:
       required:
       - notebooks
@@ -1293,7 +1293,7 @@ components:
         notebooks:
           type: array
           items:
-            $ref: '#/components/schemas/ElementJson'
+            $ref: '#/components/schemas/Element'
     NotebooksRequest:
       required:
       - notebooks
@@ -1308,7 +1308,7 @@ components:
         notebooks:
           type: array
           items:
-            $ref: '#/components/schemas/ElementJson'
+            $ref: '#/components/schemas/Element'
     Permission:
       type: object
       properties:
@@ -1429,7 +1429,7 @@ components:
             $ref: '#/components/schemas/PermissionLookup'
         allPassed:
           type: boolean
-    WebhookJson:
+    Webhook:
       required:
       - url
       type: object
@@ -1473,7 +1473,7 @@ components:
         webhooks:
           type: array
           items:
-            $ref: '#/components/schemas/WebhookJson'
+            $ref: '#/components/schemas/Webhook'
     WebhookRequest:
       required:
       - webhooks
@@ -1482,8 +1482,8 @@ components:
         webhooks:
           type: array
           items:
-            $ref: '#/components/schemas/WebhookJson'
-    RefJson:
+            $ref: '#/components/schemas/Webhook'
+    Ref:
       required:
       - name
       - type
@@ -1552,7 +1552,7 @@ components:
         refs:
           type: array
           items:
-            $ref: '#/components/schemas/RefJson'
+            $ref: '#/components/schemas/Ref'
     RefsRequest:
       required:
       - refs
@@ -1567,8 +1567,8 @@ components:
         refs:
           type: array
           items:
-            $ref: '#/components/schemas/RefJson'
-    CommitAddedJson:
+            $ref: '#/components/schemas/Ref'
+    CommitAdded:
       type: object
       properties:
         id:
@@ -1579,7 +1579,7 @@ components:
           type: string
           readOnly: true
       readOnly: true
-    CommitDeletedJson:
+    CommitDeleted:
       type: object
       properties:
         previousDocId:
@@ -1590,7 +1590,7 @@ components:
         type:
           type: string
       readOnly: true
-    CommitJson:
+    Commit:
       required:
       - id
       type: object
@@ -1605,17 +1605,17 @@ components:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/CommitDeletedJson'
+            $ref: '#/components/schemas/CommitDeleted'
         added:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/CommitAddedJson'
+            $ref: '#/components/schemas/CommitAdded'
         updated:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/CommitUpdatedJson'
+            $ref: '#/components/schemas/CommitUpdated'
         id:
           type: string
         _projectId:
@@ -1637,7 +1637,7 @@ components:
           type: string
           readOnly: true
       additionalProperties: true
-    CommitUpdatedJson:
+    CommitUpdated:
       type: object
       properties:
         previousDocId:
@@ -1659,7 +1659,7 @@ components:
         commits:
           type: array
           items:
-            $ref: '#/components/schemas/CommitJson'
+            $ref: '#/components/schemas/Commit'
     CommitsResponse:
       required:
       - commits
@@ -1679,8 +1679,8 @@ components:
         commits:
           type: array
           items:
-            $ref: '#/components/schemas/CommitJson'
-    OrgJson:
+            $ref: '#/components/schemas/Commit'
+    Org:
       required:
       - name
       type: object
@@ -1724,7 +1724,7 @@ components:
         orgs:
           type: array
           items:
-            $ref: '#/components/schemas/OrgJson'
+            $ref: '#/components/schemas/Org'
     OrganizationsRequest:
       required:
       - orgs
@@ -1739,8 +1739,8 @@ components:
         orgs:
           type: array
           items:
-            $ref: '#/components/schemas/OrgJson'
-    ProjectJson:
+            $ref: '#/components/schemas/Org'
+    Project:
       required:
       - name
       - orgId
@@ -1797,7 +1797,7 @@ components:
         projects:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectJson'
+            $ref: '#/components/schemas/Project'
     ProjectsRequest:
       required:
       - projects
@@ -1812,7 +1812,7 @@ components:
         projects:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectJson'
+            $ref: '#/components/schemas/Project'
   securitySchemes:
     bearerToken:
       type: http
