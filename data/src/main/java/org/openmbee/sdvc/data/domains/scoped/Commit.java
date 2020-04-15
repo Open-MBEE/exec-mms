@@ -29,7 +29,6 @@ public class Commit implements Serializable {
 
     private String comment;
 
-    @Column(columnDefinition = "smallint")
     private CommitType commitType;
 
     public Long getId() {

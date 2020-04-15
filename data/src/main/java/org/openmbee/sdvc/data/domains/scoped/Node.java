@@ -22,8 +22,6 @@ public class Node {
     private String lastCommit;
     private String initialCommit;
     private boolean deleted;
-
-    @Column(columnDefinition = "smallint")
     private Integer nodeType;
 
     public Node() {

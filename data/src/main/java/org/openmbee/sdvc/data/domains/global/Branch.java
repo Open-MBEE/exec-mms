@@ -11,7 +11,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(name = "branches",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"branchid","project_id"})
+        @UniqueConstraint(columnNames = {"branchId","project_id"})
     })
 public class Branch extends Base {
 

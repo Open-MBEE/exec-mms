@@ -27,8 +27,8 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         this.branchesOperations = branchesOperations;
     }
 
-    private final String INSERT_SQL = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    private final String UPDATE_SQL = "UPDATE branches SET description = ?, branchId = ?, branchName = ?, parentRefId = ?, parentCommit = ?, timestamp = ?, tag = ?, deleted = ? WHERE id = ?";
+    private final String INSERT_SQL = "INSERT INTO \"branches\" (\"description\", \"branchId\", \"branchName\", \"parentRefId\", \"parentCommit\", \"timestamp\", \"tag\", \"deleted\") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String UPDATE_SQL = "UPDATE \"branches\" SET \"description\" = ?, \"branchId\" = ?, \"branchName\" = ?, \"parentRefId\" = ?, \"parentCommit\" = ?, \"timestamp\" = ?, \"tag\" = ?, \"deleted\" = ? WHERE \"id\" = ?";
 
     public Branch save(Branch branch) {
 
@@ -62,7 +62,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     }
 
     public Optional<Branch> findById(long id) {
-        String sql = "SELECT * FROM branches WHERE id = ?";
+        String sql = "SELECT * FROM \"branches\" WHERE \"id\" = ?";
 
         List<Branch> l = getConn()
             .query(sql, new Object[]{id}, new BranchRowMapper());
@@ -70,7 +70,7 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     }
 
     public Optional<Branch> findByBranchId(String branchId) {
-        String sql = "SELECT * FROM branches WHERE branchId = ?";
+        String sql = "SELECT * FROM \"branches\" WHERE \"branchId\" = ?";
 
         List<Branch> l = getConn()
             .query(sql, new Object[]{branchId}, new BranchRowMapper());
@@ -78,13 +78,13 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     }
 
     public List<Branch> findAll() {
-        String sql = "SELECT * FROM branches WHERE deleted = false";
+        String sql = "SELECT * FROM \"branches\" WHERE \"deleted\" = false";
 
         return getConn().query(sql, new BranchRowMapper());
     }
 
     public void delete(Branch branch) {
-        String sql = "UPDATE branches SET deleted = true WHERE branchId = ?";
+        String sql = "UPDATE \"branches\" SET \"deleted\" = true WHERE \"branchId\" = ?";
 
         getConn().update(sql, branch.getBranchId());
     }

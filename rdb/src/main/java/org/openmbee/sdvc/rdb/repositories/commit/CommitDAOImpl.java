@@ -32,7 +32,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     }
 
     public Commit save(Commit commit) {
-        String sql = "INSERT INTO commits (commitType, creator, docid, branchId, timestamp, comment) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO \"commits\" (\"commitType\", \"creator\", \"docId\", \"branchId\", \"timestamp\", \"comment\") VALUES (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         getConn().update(new PreparedStatementCreator() {
@@ -58,7 +58,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     }
 
     public Optional<Commit> findById(long id) {
-        String sql = "SELECT * FROM commits WHERE id = ?";
+        String sql = "SELECT * FROM \"commits\" WHERE \"id\" = ?";
 
         List<Commit> l = getConn()
             .query(sql, new Object[]{id}, new CommitRowMapper());
@@ -67,7 +67,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     }
 
     public Optional<Commit> findByCommitId(String commitId) {
-        String sql = "SELECT * FROM commits WHERE docid = ?";
+        String sql = "SELECT * FROM \"commits\" WHERE \"docId\" = ?";
 
         List<Commit> l = getConn()
             .query(sql, new Object[]{commitId}, new CommitRowMapper());
@@ -76,7 +76,7 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
     }
 
     public List<Commit> findAll() {
-        String sql = "SELECT * FROM commits ORDER BY timestamp DESC";
+        String sql = "SELECT * FROM \"commits\" ORDER BY \"timestamp\" DESC";
         return getConn().query(sql, new CommitRowMapper());
     }
 
@@ -85,9 +85,9 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         int timestampCol = 0;
         int limitCol = 0;
         int currentExtraCol = 2;
-        StringBuilder query = new StringBuilder("SELECT * FROM commits WHERE branchid = ?");
+        StringBuilder query = new StringBuilder("SELECT * FROM \"commits\" WHERE \"branchId\" = ?");
         if (cid != null && cid != 0) {
-            query.append(" AND timestamp <= (SELECT timestamp FROM commits WHERE id = ?)");
+            query.append(" AND \"timestamp\" <= (SELECT \"timestamp\" FROM \"commits\" WHERE \"id\" = ?)");
             commitCol = currentExtraCol;
             currentExtraCol++;
         }
@@ -97,11 +97,11 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
                 //timestamp in db that has microseconds
                 timestamp = timestamp.plusMillis(1);
             }
-            query.append(" AND timestamp <= ?");
+            query.append(" AND \"timestamp\" <= ?");
             timestampCol = currentExtraCol;
             currentExtraCol++;
         }
-        query.append(" ORDER BY timestamp DESC");
+        query.append(" ORDER BY \"timestamp\" DESC");
         if (limit != 0) {
             query.append(" LIMIT ?");
             limitCol = currentExtraCol;

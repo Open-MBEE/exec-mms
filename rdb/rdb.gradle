@@ -3,8 +3,8 @@ apply plugin: 'io.spring.convention.spring-module'
 dependencies {
     compile project(':core')
     compile project(':data')
-    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.1.10.RELEASE'
-    compile group: 'org.springframework', name: 'spring-aspects', version: '5.1.9.RELEASE'
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.2.6.RELEASE'
+    compile group: 'org.springframework', name: 'spring-aspects', version: '5.2.5.RELEASE'
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 
 }

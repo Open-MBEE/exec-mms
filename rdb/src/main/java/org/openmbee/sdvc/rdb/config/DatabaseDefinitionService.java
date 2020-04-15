@@ -34,11 +34,11 @@ import org.springframework.stereotype.Service;
 public class DatabaseDefinitionService {
 
     private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
-    private static final String COPY_SQL = "INSERT INTO %s SELECT * FROM %s";
-    private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(id) FROM %s), 1), true)";
+    private static final String COPY_SQL = "INSERT INTO \"%s\" SELECT * FROM \"%s\"";
+    private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(\"id\") FROM \"%s\"), 1), true)";
 
-    private static final String INITIAL_PROJECT = "INSERT INTO nodes (id, nodeid, docid, initialcommit, lastcommit, nodetype, deleted) VALUES (0, ?, ?, ?, ?, ?, false)";
-    private static final String INITIAL_REF = "INSERT INTO branches (id, branchid, branchname, tag, deleted, timestamp) VALUES (0, 'master', 'master', false, false, NOW());";
+    private static final String INITIAL_PROJECT = "INSERT INTO \"nodes\" (\"id\", \"nodeId\", \"docId\", \"initialCommit\", \"lastCommit\", \"nodeType\", \"deleted\") VALUES (0, ?, ?, ?, ?, ?, false)";
+    private static final String INITIAL_REF = "INSERT INTO \"branches\" (\"id\", \"branchId\", \"branchName\", \"tag\", \"deleted\", \"timestamp\") VALUES (0, 'master', 'master', false, false, NOW());";
 
     protected final Logger logger = LogManager.getLogger(getClass());
     private CrudDataSources crudDataSources;
@@ -192,6 +192,7 @@ public class DatabaseDefinitionService {
         properties.put("hibernate.physical_naming_strategy",
             "org.openmbee.sdvc.rdb.config.SuffixedPhysicalNamingStrategy");
 
+        properties.put("hibernate.globally_quoted_identifiers", true);
         return properties;
     }
 }

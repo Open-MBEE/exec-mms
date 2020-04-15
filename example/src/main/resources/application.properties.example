@@ -30,6 +30,7 @@ spring.datasource.initialization-mode=always
 
 # The SQL dialect makes Hibernate generate better SQL for the chosen database
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL94Dialect
+spring.jpa.properties.hibernate.globally_quoted_identifiers=true
 #spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL57Dialect
 #spring.jpa.properties.hibernate.dialect.storage_engine=innodb
 
