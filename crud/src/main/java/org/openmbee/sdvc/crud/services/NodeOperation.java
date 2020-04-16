@@ -21,9 +21,6 @@ import org.openmbee.sdvc.core.dao.CommitDAO;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
-import org.openmbee.sdvc.json.BaseJson;
-import org.openmbee.sdvc.json.CommitAddedJson;
-import org.openmbee.sdvc.json.CommitDeletedJson;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.CommitUpdatedJson;
 import org.openmbee.sdvc.json.ElementJson;
@@ -116,7 +113,7 @@ public class NodeOperation {
         e.setCreator(cmjs.getCreator()); //Only set on creation of new element
         e.setCreated(cmjs.getCreated());
 
-        CommitAddedJson newObj = new CommitAddedJson()
+        CommitUpdatedJson newObj = new CommitUpdatedJson()
             .setDocId(e.getDocId())
             .setId(e.getId())
             .setType("Element");
@@ -162,7 +159,7 @@ public class NodeOperation {
     }
 
     public void processElementDeleted(ElementJson e, Node n, NodeChangeInfo info) {
-        CommitDeletedJson newObj = new CommitDeletedJson()
+        CommitUpdatedJson newObj = new CommitUpdatedJson()
             .setPreviousDocId(n.getDocId())
             .setId(e.getId())
             .setType("Element");

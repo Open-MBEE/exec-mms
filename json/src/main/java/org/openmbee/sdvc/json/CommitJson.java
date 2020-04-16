@@ -15,7 +15,6 @@ public class CommitJson extends BaseJson<CommitJson> {
     public static final String ADDED = "added";
     public static final String DELETED = "deleted";
     public static final String UPDATED = "updated";
-    public static final String PREVIOUS = "previousDocId";
     public static final String SOURCE = "source";
 
     @Schema(accessMode = AccessMode.READ_ONLY)
@@ -28,7 +27,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = CommitAddedJson.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = CommitUpdatedJson.class))
     public List<Map<String, Object>> getAdded() {
         return (List<Map<String, Object>>) this.get(ADDED);
     }
@@ -38,7 +37,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = CommitDeletedJson.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = CommitUpdatedJson.class))
     public List<Map<String, Object>> getDeleted() {
         return (List<Map<String, Object>>) this.get(DELETED);
     }
