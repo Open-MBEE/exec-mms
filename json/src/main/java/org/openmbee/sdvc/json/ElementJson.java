@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import java.util.List;
 
+@Schema(name = "Element")
 public class ElementJson extends BaseJson<ElementJson> {
 
     public static final String INREFIDS = "_inRefIds";

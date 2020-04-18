@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties({"empty", BaseJson.NAME, BaseJson.MODIFIER, BaseJson.MODIFIED, BaseJson.TYPE})
-@Schema(requiredProperties = {BaseJson.ID})
+@Schema(name = "Commit", requiredProperties = {BaseJson.ID})
 public class CommitJson extends BaseJson<CommitJson> {
 
     public static final String COMMENT = "comment";
@@ -27,7 +27,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = CommitUpdatedJson.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementUpdated.class))
     public List<Map<String, Object>> getAdded() {
         return (List<Map<String, Object>>) this.get(ADDED);
     }
@@ -37,7 +37,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = CommitUpdatedJson.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementUpdated.class))
     public List<Map<String, Object>> getDeleted() {
         return (List<Map<String, Object>>) this.get(DELETED);
     }
@@ -47,7 +47,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = CommitUpdatedJson.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementUpdated.class))
     public List<Map<String, Object>> getUpdated() {
         return (List<Map<String, Object>>) this.get(UPDATED);
     }

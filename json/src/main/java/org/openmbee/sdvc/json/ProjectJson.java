@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonIgnoreProperties({BaseJson.REFID, BaseJson.COMMITID, BaseJson.TYPE, "empty"})
-@Schema(requiredProperties = {ProjectJson.ORGID, BaseJson.NAME})
+@Schema(name = "Project", requiredProperties = {ProjectJson.ORGID, BaseJson.NAME})
 public class ProjectJson extends BaseJson<ProjectJson> {
 
     public static final String ORGID = "orgId";
