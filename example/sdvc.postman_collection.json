@@ -179,7 +179,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"name\": \"aa\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects",
@@ -221,7 +221,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"bb\", \n\t\t\t\"name\": \"bb\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"jupyter\"\n\t\t}\n\t]\n}"
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"bb\", \n\t\t\t\"name\": \"bb\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"schema\": \"jupyter\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects",
@@ -262,7 +262,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"invalid project\", \n\t\t\t\"name\": \"invalid project\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"invalid project\", \n\t\t\t\"name\": \"invalid project\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects",
@@ -288,9 +288,9 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.projects.length).to.eql(2);",
 									"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
-									"    pm.expect(jsonData.projects[0].projectType).to.eql('default');",
+									"    pm.expect(jsonData.projects[0].schema).to.eql('default');",
 									"    pm.expect(jsonData.projects[1].id).to.eql('bb');",
-									"    pm.expect(jsonData.projects[1].projectType).to.eql('jupyter');",
+									"    pm.expect(jsonData.projects[1].schema).to.eql('jupyter');",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1939,7 +1939,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cc\", \n\t\t\t\"name\": \"cc\",\n\t\t\t\"orgId\": \"b\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cc\", \n\t\t\t\"name\": \"cc\",\n\t\t\t\"orgId\": \"b\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
 						},
 						"url": {
 							"raw": "{{host}}/projects",
