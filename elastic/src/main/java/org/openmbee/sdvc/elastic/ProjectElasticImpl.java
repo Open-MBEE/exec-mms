@@ -4,21 +4,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.openmbee.sdvc.core.dao.ProjectIndex;
+import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProjectElasticImpl implements ProjectIndex {
+public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implements ProjectIndex {
 
-    protected RestHighLevelClient client;
+    protected ProjectJson newInstance() {
+        return new ProjectJson();
+    }
 
     @Autowired
     public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
@@ -62,16 +66,16 @@ public class ProjectElasticImpl implements ProjectIndex {
     }
 
     private String getCommitMapping() throws IOException {
-        InputStream in = new ClassPathResource("/elastic_mappings/commit.json")
+        InputStream in = new ClassPathResource("elastic_mappings/commit.json")
             .getInputStream();
         return read(in);
     }
 
     private String getNodeMapping(String type) throws IOException {
-        InputStream in = new ClassPathResource("/elastic_mappings/" + type + "_node.json")
+        InputStream in = new ClassPathResource("elastic_mappings/" + type + "_node.json")
             .getInputStream();
         if (in == null) {
-            in = new ClassPathResource("/elastic_mappings/default_node.json")
+            in = new ClassPathResource("elastic_mappings/default_node.json")
                 .getInputStream();
         }
         return read(in);
@@ -86,5 +90,16 @@ public class ProjectElasticImpl implements ProjectIndex {
             text = scanner.useDelimiter("\\A").next();
         }
         return text;
+    }
+
+    @Override
+    public void update(ProjectJson json) {
+        try {
+            UpdateRequest request = new UpdateRequest(this.getIndex() + "_node", json.getProjectId());
+            request.docAsUpsert(true).doc(json);
+            client.update(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

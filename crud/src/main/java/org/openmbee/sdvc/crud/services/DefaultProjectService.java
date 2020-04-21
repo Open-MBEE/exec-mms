@@ -65,6 +65,7 @@ public class DefaultProjectService implements ProjectService {
         try {
             projectRepository.save(proj);
             projectIndex.create(proj.getProjectId(), project.getProjectType());
+            projectIndex.update(project);
             eventPublisher.ifPresent((pub) -> pub.publish(
                 EventObject.create(project.getId(), "master", "project_created", project)));
             return project;
@@ -90,6 +91,8 @@ public class DefaultProjectService implements ProjectService {
                 }
             }
             projectRepository.save(proj);
+            projectIndex.update(project);
+
             return project;
         }
         throw new InternalErrorException("Could not update project");
