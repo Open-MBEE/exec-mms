@@ -153,10 +153,10 @@
 					"script": {
 						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
 						"exec": [
-							"pm.test(\"admin as 3 permissions - 2 inherited and 1 not\", function () {",
+							"pm.test(\"admin as 2 permissions - 1 inherited and 1 not\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.inherit).to.eql(true);",
-							"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(2);",
 							"    pm.expect(jsonData.public).to.eql(false);",
 							"});"
 						],
@@ -413,10 +413,10 @@
 					"script": {
 						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
 						"exec": [
-							"pm.test(\"branch should have 4 inherited perms and 1 non inherited\", function () {",
+							"pm.test(\"branch should have 3 inherited perms and 1 non inherited\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.inherit).to.eql(true);",
-							"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(4);",
 							"    pm.expect(jsonData.public).to.eql(false);",
 							"});"
 						],
@@ -547,10 +547,10 @@
 					"script": {
 						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
 						"exec": [
-							"pm.test(\"branch has 5 perms\", function () {",
+							"pm.test(\"branch has 4 perms\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.inherit).to.eql(true);",
-							"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(4);",
 							"    pm.expect(jsonData.public).to.eql(false);",
 							"});"
 						],
@@ -634,10 +634,10 @@
 					"script": {
 						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
 						"exec": [
-							"pm.test(\"branch has 3 perms\", function () {",
+							"pm.test(\"branch has 2 perms\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.inherit).to.eql(false);",
-							"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(2);",
 							"    pm.expect(jsonData.public).to.eql(false);",
 							"});"
 						],
@@ -1150,10 +1150,10 @@
 					"script": {
 						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
 						"exec": [
-							"pm.test(\"branch has 5 perms\", function () {",
+							"pm.test(\"branch has 4 perms\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.inherit).to.eql(true);",
-							"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(4);",
 							"    pm.expect(jsonData.public).to.eql(false);",
 							"});"
 						],
@@ -1479,10 +1479,10 @@
 					"script": {
 						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
 						"exec": [
-							"pm.test(\"branch has 4 perms\", function () {",
+							"pm.test(\"branch has 3 perms\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.inherit).to.eql(true);",
-							"    pm.expect(jsonData.users.permissions.length).to.eql(4);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
 							"    pm.expect(jsonData.public).to.eql(true);",
 							"});"
 						],

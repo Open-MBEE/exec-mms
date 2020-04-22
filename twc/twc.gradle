@@ -1,5 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'io.spring.convention.spring-module'
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.8.2"
+}
 
 dependencies {
     compile project(':rdb')
