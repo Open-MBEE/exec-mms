@@ -6,6 +6,62 @@
 	},
 	"item": [
 		{
+			"name": "login using admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "217210a9-1489-4057-b89f-bc0b44111569",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "add org permissions-a",
 			"event": [
 				{
@@ -2119,7 +2175,14 @@
 		}
 	],
 	"auth": {
-		"type": "bearer"
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
 	},
 	"event": [
 		{
