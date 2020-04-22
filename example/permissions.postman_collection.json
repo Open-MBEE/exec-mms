@@ -1,0 +1,2209 @@
+{
+	"info": {
+		"_postman_id": "47ebb4f5-8f6e-42ac-b215-b6cdfd433ea9",
+		"name": "permissions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login using admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "217210a9-1489-4057-b89f-bc0b44111569",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add org permissions-a",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+						"exec": [
+							"pm.test(\"response has org permissions-a\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('permissions-a');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"permissions-a\",\n\t\t\t\"name\": \"permissions-a\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add project permissions-aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project permissions-aa\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('permissions-aa');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"permissions-aa\", \n\t\t\t\"name\": \"permissions-aa\",\n\t\t\t\"orgId\": \"permissions-a\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch master on permissions-aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"admin as 3 permissions - 2 inherited and 1 not\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check anonymous is rejected for project permissions-aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1b237e80-4487-4562-ba7b-274f0ef94a21",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create reader user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"reader\",\n\t\"password\": \"reader\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reader cannot create users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "reader",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "reader",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"dummy\",\n\t\"password\": \"dummy\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create writer user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"writer\",\n\t\"password\": \"writer\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add reader to project permissions-aa with READER role and writer to permissions-aa with WRITER role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38bab316-eff8-43a8-91fc-b2dc283b306e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"READER\"\n            },\n            {\n                \"name\": \"writer\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch master on permissions-aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"branch should have 4 inherited perms and 1 non inherited\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add elements to permissions-aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch permissions-refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+						"exec": [
+							"pm.test(\"branch created with right parentRef and commit id\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.refs[0].id).to.eql('permissions-refa');",
+							"    pm.expect(jsonData.refs[0].parentRefId).to.eql('master');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"permissions-refa\",\n\t\t\t\"name\": \"permissions-refa\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch permissions-refa on permissions-aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"branch has 5 perms\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/permissions-refa/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"permissions-refa",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set branch permissions-refa to not inherit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "032dc39f-2291-4a2b-9adb-78928a617403",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"inherit\": false\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/permissions-refa/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"permissions-refa",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch permissions-refa on permissions-aa again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"branch has 3 perms\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(false);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/permissions-refa/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"permissions-refa",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login as reader",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f99a1f7c-6557-418a-8c0d-61a81be9f1aa",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"readerToken\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"reader\",\n\t\"password\": \"reader\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "can read elements from project permissions-aa branch master as reader",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+						"exec": [
+							"pm.test(\"response has 3 elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{readerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cannot post elements to permissions-aa as reader",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{readerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"readerElement\",\n\t\t\t\"name\": \"not good\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cannot read branch permissions-refa as reader since not inherit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{readerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/permissions-refa/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"permissions-refa",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get projects list as reader",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"can only see project permissions-aa\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects.length).to.eql(1);",
+							"    pm.expect(jsonData.projects[0].id).to.eql('permissions-aa');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{readerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f99a1f7c-6557-418a-8c0d-61a81be9f1aa",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"writerToken\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"writer\",\n\t\"password\": \"writer\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "can read elements from project permissions-aa branch master as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+						"exec": [
+							"pm.test(\"response has 3 elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update x on branch master as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});",
+							"",
+							"pm.environment.set(\"commitWriter\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updatedByWriter\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch on project aa as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
+						"exec": [
+							"pm.test(\"branch created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.refs[0].id).to.eql('writer');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"name\": \"writer\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch writer as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"branch has 5 perms\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(5);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/writer/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"writer",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "give reader write access on writer branch as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/writer/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"writer",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "can post elements to writer branch as reader",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+						"exec": [
+							"",
+							"pm.test(\"element created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0].id).to.eql('readerElement');",
+							"});   ",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{readerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"readerElement\",\n\t\t\t\"name\": \"reader\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/writer/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"writer",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "make project permissions-aa public as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "032dc39f-2291-4a2b-9adb-78928a617403",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"public\": true\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get project permissions-aa element without auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "76ef9638-6735-4659-906a-ffb4f18d4080",
+						"exec": [
+							"pm.test(\"got 3 elements from project permissions-aa as anon\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove reader perms on branch writer as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\": {\n    \t\"action\": \"REMOVE\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/writer/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"writer",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove reader perms on project permissions-aa as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\": {\n    \t\"action\": \"REMOVE\",\n        \"permissions\": [\n            {\n                \"name\": \"reader\",\n                \"role\": \"READER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"branch has 4 perms\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(4);",
+							"    pm.expect(jsonData.public).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/writer/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"writer",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "give ldap group to org a with writer role as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "032dc39f-2291-4a2b-9adb-78928a617403",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"groups\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"{{ldapGroup}}\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs/permissions-a/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"permissions-a",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login as ldap user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f99a1f7c-6557-418a-8c0d-61a81be9f1aa",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"ldapToken\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{ldapUser}}\",\n\t\"password\": \"{{ldapPass}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "can post elements to writer branch as ldap user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8ca68864-be77-4515-b62d-d1f7d463a82e",
+						"exec": [
+							"",
+							"pm.test(\"element created\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0].id).to.eql('ldapUserElement');",
+							"});   ",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ldapToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"ldapUserElement\",\n\t\t\t\"name\": \"ldapUserUpdated\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/refs/writer/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"refs",
+						"writer",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on project permissions-aa as ldap user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"project has 1 group perm\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.groups.permissions.length).to.eql(1);",
+							"    pm.expect(jsonData.public).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ldapToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-aa/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-aa",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add project permissions-bb jupyter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project permissions-bb\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('permissions-bb');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"permissions-bb\", \n\t\t\t\"name\": \"permissions-bb\",\n\t\t\t\"orgId\": \"permissions-a\",\n\t\t\t\"projectType\": \"jupyter\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on project permissions-bb as ldap user using basic auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"project has 1 group perm\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.groups.permissions.length).to.eql(1);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{ldapPass}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{ldapUser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/permissions-bb/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"permissions-bb",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "permission lookup as ldap user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"true for first and false for second\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
+							"    pm.expect(jsonData.lookups[1].hasPrivilege).to.eql(false);",
+							"    pm.expect(jsonData.allPassed).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ldapToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"lookups\": [\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"permissions-aa\",\n\t\t\t\"refId\": \"writer\",\n\t\t\t\"privilege\": \"BRANCH_EDIT_CONTENT\",\n\t\t\t\"allowAnonIfPublic\": false\n\t\t},\n\t\t{\n\t\t\t\"type\": \"PROJECT\",\n\t\t\t\"projectId\": \"permissions-aa\",\n\t\t\t\"privilege\": \"PROJECT_DELETE\",\n\t\t\t\"allowAnonIfPublic\": false\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "permission lookup as anon",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"true for first and false for second\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
+							"    pm.expect(jsonData.lookups[1].hasPrivilege).to.eql(false);",
+							"    pm.expect(jsonData.allPassed).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"lookups\": [\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"permissions-aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_READ\",\n\t\t\t\"allowAnonIfPublic\": true\n\t\t},\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"permissions-aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_EDIT_CONTENT\",\n\t\t\t\"allowAnonIfPublic\": false\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "permission lookup as writer with bad data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"true for first and 1 rejected\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
+							"    pm.expect(jsonData.rejected.length).to.eql(1);",
+							"    pm.expect(jsonData.allPassed).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"lookups\": [\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"permissions-aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_READ\",\n\t\t\t\"allowAnonIfPublic\": true\n\t\t},\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"permissions-aaa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_EDIT_CONTENT\",\n\t\t\t\"allowAnonIfPublic\": false\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "permission lookup as writer all pass",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"all true\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.lookups[0].hasPrivilege).to.eql(true);",
+							"    pm.expect(jsonData.lookups[1].hasPrivilege).to.eql(true);",
+							"    pm.expect(jsonData.allPassed).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"lookups\": [\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"permissions-aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_READ\",\n\t\t\t\"allowAnonIfPublic\": true\n\t\t},\n\t\t{\n\t\t\t\"type\": \"BRANCH\",\n\t\t\t\"projectId\": \"permissions-aa\",\n\t\t\t\"refId\": \"master\",\n\t\t\t\"privilege\": \"BRANCH_EDIT_CONTENT\",\n\t\t\t\"allowAnonIfPublic\": false\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create new org as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "26e45f03-c2c3-4f77-a556-5202744a4fcf",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"name\": \"writer\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create new project as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "26e45f03-c2c3-4f77-a556-5202744a4fcf",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"name\": \"writer\",\n\t\t\t\"orgId\": \"writer\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin can see all projects",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "26e45f03-c2c3-4f77-a556-5202744a4fcf",
+						"exec": [
+							"pm.test(\"sees 3 projects\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects.length).to.eql(3);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "a38d93e6-1de5-4875-8f80-a5a6cec3dcd4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "0866a69c-ea90-48f6-bedf-269b559b40d8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

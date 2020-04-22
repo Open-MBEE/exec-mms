@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
-    private final String INSERT_SQL = "INSERT INTO nodes%s (nodeid, docid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
-    private final String UPDATE_SQL = "UPDATE nodes%s SET nodeid = ?, docid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
+    private final String INSERT_SQL = "INSERT INTO \"nodes%s\" (nodeid, docid, lastcommit, initialcommit, deleted, nodetype) VALUES (?, ?, ?, ?, ?, ?)";
+    private final String UPDATE_SQL = "UPDATE \"nodes%s\" SET nodeid = ?, docid = ?, lastcommit = ?, initialcommit = ?, deleted = ?, nodetype = ? WHERE id = ?";
 
     public Node save(Node node) throws InvalidDataAccessApiUsageException, DataRetrievalFailureException {
         if (node.getId() == null) {
@@ -114,7 +114,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     public void deleteAll(List<Node> nodes) {
-        String deleteSql = String.format("DELETE FROM nodes%s WHERE id = ?", getSuffix());
+        String deleteSql = String.format("DELETE FROM \"nodes%s\" WHERE id = ?", getSuffix());
         getConn().batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -129,7 +129,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     public Optional<Node> findById(long id) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE id = ?",
+        String sql = String.format("SELECT * FROM \"nodes%s\" WHERE id = ?",
             getSuffix());
 
         List<Node> l = getConn()
@@ -139,7 +139,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
     }
 
     public Optional<Node> findByNodeId(String nodeId) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE nodeid = ?",
+        String sql = String.format("SELECT * FROM \"nodes%s\" WHERE nodeid = ?",
             getSuffix());
 
         List<Node> l = getConn()
@@ -152,30 +152,30 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
         if (ids == null || ids.isEmpty()) {
             return new ArrayList<>();
         }
-        String sql = String.format("SELECT * FROM nodes%s WHERE nodeid IN (%s)",
+        String sql = String.format("SELECT * FROM \"nodes%s\" WHERE nodeid IN (%s)",
             getSuffix(), "'" + String.join("','", ids) + "'");
         return getConn().query(sql, new NodeRowMapper());
     }
 
     public List<Node> findAll() {
-        String sql = String.format("SELECT * FROM nodes%s", getSuffix());
+        String sql = String.format("SELECT * FROM \"nodes%s\"", getSuffix());
         return getConn().query(sql, new NodeRowMapper());
     }
 
     public List<Node> findAllByDeleted(boolean deleted) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE deleted = ?",
+        String sql = String.format("SELECT * FROM \"nodes%s\" WHERE deleted = ?",
             getSuffix());
         return getConn().query(sql, new Object[]{deleted}, new NodeRowMapper());
     }
 
     public List<Node> findAllByDeletedAndNodeType(boolean deleted, int nodeType) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE deleted = ? AND nodetype = ?",
+        String sql = String.format("SELECT * FROM \"nodes%s\" WHERE deleted = ? AND nodetype = ?",
             getSuffix());
         return getConn().query(sql, new Object[]{deleted, nodeType}, new NodeRowMapper());
     }
 
     public List<Node> findAllByNodeType(int nodeType) {
-        String sql = String.format("SELECT * FROM nodes%s WHERE nodetype = ?",
+        String sql = String.format("SELECT * FROM \"nodes%s\" WHERE nodetype = ?",
             getSuffix());
         return getConn().query(sql, new Object[]{nodeType}, new NodeRowMapper());
     }

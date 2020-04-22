@@ -376,7 +376,7 @@ public class DefaultPermissionService implements PermissionService {
 
             }
         }
-        return branch.get();
+        return branch.orElse(null);
     }
 
     private PermissionsDelegate getPermissionsDelegate(final Organization organization) {
