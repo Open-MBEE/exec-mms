@@ -1,8 +1,13 @@
 package org.openmbee.sdvc.permissions.delegation;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.openmbee.sdvc.core.builders.PermissionUpdateResponseBuilder;
+import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
+import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
+import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
 import org.openmbee.sdvc.data.domains.global.*;
 import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.rdb.repositories.*;
@@ -10,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
 
@@ -112,7 +115,9 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
     }
 
     @Override
-    public void updateUserPermissions(PermissionUpdateRequest req) {
+    public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
+        PermissionUpdateResponseBuilder responseBuilder = new PermissionUpdateResponseBuilder();
+
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
@@ -123,18 +128,26 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
                         continue;
                     }
                     Optional<ProjectUserPerm> exist = projectUserPermRepo.findByProjectAndUserAndInheritedIsFalse(project, user.get());
+                    ProjectUserPerm p1;
                     if (exist.isPresent()) {
-                        ProjectUserPerm e = exist.get();
-                        if (!role.get().equals(e.getRole())) {
-                            e.setRole(role.get());
-                            projectUserPermRepo.save(e);
+                        p1 = exist.get();
+                        if (!role.get().equals(p1.getRole())) {
+                            responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE, p1);
+                            p1.setRole(role.get());
+                            projectUserPermRepo.save(p1);
+                        } else {
+                            continue;
                         }
                     } else {
-                        projectUserPermRepo.save(new ProjectUserPerm(project, user.get(), role.get(), false));
+                        p1 = new ProjectUserPerm(project, user.get(), role.get(), false);
+                        projectUserPermRepo.save(p1);
                     }
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p1);
                 }
                 break;
             case REPLACE:
+                responseBuilder.insertPermissionUpdates_ProjectUserPerm(PermissionUpdateResponse.Action.REMOVE,
+                    projectUserPermRepo.findAllByProjectAndInherited(project, false));
                 projectUserPermRepo.deleteByProjectAndInherited(project, false);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
                     Optional<User> user = getUserRepo().findByUsername(p.getName());
@@ -143,19 +156,34 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
                         //throw exception or skip
                         continue;
                     }
-                    projectUserPermRepo.save(new ProjectUserPerm(project, user.get(), role.get(), false));
+                    ProjectUserPerm p2 = new ProjectUserPerm(project, user.get(), role.get(), false);
+                    projectUserPermRepo.save(p2);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p2);
                 }
                 break;
             case REMOVE:
                 Set<String> users = new HashSet<>();
-                req.getPermissions().forEach(p -> users.add(p.getName()));
+                req.getPermissions().forEach(p -> {
+                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    if(! user.isPresent()) {
+                        //throw or skip;
+                        return;
+                    }
+
+                    users.add(p.getName());
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE,
+                        projectUserPermRepo.findByProjectAndUserAndInheritedIsFalse(project, user.get()).orElse(null));
+                });
                 projectUserPermRepo.deleteByProjectAndUser_UsernameInAndInheritedIsFalse(project, users);
                 break;
         }
+        return responseBuilder.getPermissionUpdateResponse();
     }
 
     @Override
-    public void updateGroupPermissions(PermissionUpdateRequest req) {
+    public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
+        PermissionUpdateResponseBuilder responseBuilder = new PermissionUpdateResponseBuilder();
+
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
@@ -164,33 +192,54 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
                         continue;
                     }
                     Optional<ProjectGroupPerm> exist = projectGroupPermRepo.findByProjectAndGroupAndInheritedIsFalse(project, pair.getFirst());
+                    ProjectGroupPerm p1;
                     if (exist.isPresent()) {
-                        ProjectGroupPerm e = exist.get();
-                        if (!pair.getSecond().equals(e.getRole())) {
-                            e.setRole(pair.getSecond());
-                            projectGroupPermRepo.save(e);
+                        p1 = exist.get();
+                        if (!pair.getSecond().equals(p1.getRole())) {
+                            responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE, p1);
+                            p1.setRole(pair.getSecond());
+                            projectGroupPermRepo.save(p1);
+                        } else {
+                            continue;
                         }
                     } else {
-                        projectGroupPermRepo.save(new ProjectGroupPerm(project, pair.getFirst(), pair.getSecond(), false));
+                        p1 = new ProjectGroupPerm(project, pair.getFirst(), pair.getSecond(), false);
+                        projectGroupPermRepo.save(p1);
                     }
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p1);
                 }
                 break;
             case REPLACE:
+                responseBuilder.insertPermissionUpdates_ProjectGroupPerm(PermissionUpdateResponse.Action.REMOVE,
+                    projectGroupPermRepo.findAllByProjectAndInherited(project, false));
                 projectGroupPermRepo.deleteByProjectAndInherited(project, false);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
                     Pair<Group, Role> pair = getGroupAndRole(p);
                     if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    projectGroupPermRepo.save(new ProjectGroupPerm(project, pair.getFirst(), pair.getSecond(), false));
+                    ProjectGroupPerm p1 = new ProjectGroupPerm(project, pair.getFirst(), pair.getSecond(), false);
+                    projectGroupPermRepo.save(p1);
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.ADD, p1);
                 }
                 break;
             case REMOVE:
                 Set<String> groups = new HashSet<>();
-                req.getPermissions().forEach(p -> groups.add(p.getName()));
+                req.getPermissions().forEach(p -> {
+                    Optional<Group> group = getGroupRepo().findByName(p.getName());
+                    if(! group.isPresent()) {
+                        //throw or skip
+                        return;
+                    }
+
+                    groups.add(p.getName());
+                    responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE,
+                        projectGroupPermRepo.findByProjectAndGroupAndInheritedIsFalse(project, group.get()).orElse(null));
+                });
                 projectGroupPermRepo.deleteByProjectAndGroup_NameInAndInheritedIsFalse(project, groups);
                 break;
         }
+        return responseBuilder.getPermissionUpdateResponse();
     }
 
     @Override
@@ -219,24 +268,124 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
         return res;
     }
 
+    private interface Wrapper<T>{
+        T getPerm();
+    }
+
+    private class ProjectUserPermWrapper implements Wrapper<ProjectUserPerm> {
+        private ProjectUserPerm perm;
+
+        public ProjectUserPermWrapper(ProjectUserPerm perm) {
+            this.perm = perm;
+        }
+
+        @Override
+        public ProjectUserPerm getPerm() {
+            return perm;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProjectUserPermWrapper that = (ProjectUserPermWrapper) o;
+            EqualsBuilder e = new EqualsBuilder();
+            e.append(perm.getProject().getProjectId(), that.perm.getProject().getProjectId());
+            e.append(perm.getUser().getUsername(), that.perm.getUser().getUsername());
+            e.append(perm.getRole().getName(), that.perm.getRole().getName());
+            e.append(perm.isInherited(), that.perm.isInherited());
+            return e.isEquals();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(perm.getProject().getProjectId(), perm.getUser().getUsername(),
+                perm.getRole().getName(), perm.isInherited());
+        }
+    }
+
+    private class ProjectGroupPermWrapper implements Wrapper<ProjectGroupPerm> {
+        private ProjectGroupPerm perm;
+
+        public ProjectGroupPermWrapper(ProjectGroupPerm perm) {
+            this.perm = perm;
+        }
+
+        @Override
+        public ProjectGroupPerm getPerm() {
+            return perm;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProjectGroupPermWrapper that = (ProjectGroupPermWrapper) o;
+            EqualsBuilder e = new EqualsBuilder();
+            e.append(perm.getProject().getProjectId(), that.perm.getProject().getProjectId());
+            e.append(perm.getGroup().getName(), that.perm.getGroup().getName());
+            e.append(perm.getRole().getName(), that.perm.getRole().getName());
+            e.append(perm.isInherited(), that.perm.isInherited());
+            return e.isEquals();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(perm.getProject().getProjectId(), perm.getGroup().getName(),
+                perm.getRole().getName(), perm.isInherited());
+        }
+    }
+
+    private class PermissionSet<T> {
+        private Map<Wrapper<T>, T> map = new HashMap<>();
+
+        public void add(Wrapper<T> obj) {
+            map.put(obj, obj.getPerm());
+        }
+
+        public Collection<T> getAll() {
+            return map.values();
+        }
+    }
+
+
     @Override
-    public void recalculateInheritedPerms() {
-        projectUserPermRepo.deleteAll(projectUserPermRepo.findAllByProjectAndInherited(project, true));
-        projectGroupPermRepo.deleteAll(projectGroupPermRepo.findAllByProjectAndInherited(project, true));
+    public PermissionUpdatesResponse recalculateInheritedPerms() {
+        PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
+
+        List<ProjectUserPerm> projectUserPermList = projectUserPermRepo.findAllByProjectAndInherited(project, true);
+        projectUserPermRepo.deleteAll(projectUserPermList);
+        responseBuilder.getUsers().insertPermissionUpdates_ProjectUserPerm(PermissionUpdateResponse.Action.REMOVE, projectUserPermList);
+
+        List<ProjectGroupPerm> projectGroupPermList = projectGroupPermRepo.findAllByProjectAndInherited(project, true);
+        projectGroupPermRepo.deleteAll(projectGroupPermList);
+        responseBuilder.getGroups().insertPermissionUpdates_ProjectGroupPerm(PermissionUpdateResponse.Action.REMOVE, projectGroupPermList);
+
+        PermissionSet<ProjectUserPerm> userPermissions = new PermissionSet<>();
+        PermissionSet<ProjectGroupPerm> groupPermissions = new PermissionSet<>();
+
         if (project.isInherit()) {
             for (OrgUserPerm p: orgUserPermRepo.findAllByOrganization(project.getOrganization())) {
-                projectUserPermRepo.save(new ProjectUserPerm(project, p.getUser(), p.getRole(), true));
+                userPermissions.add(new ProjectUserPermWrapper(new ProjectUserPerm(project, p.getUser(), p.getRole(), true)));
             }
             for (OrgGroupPerm p: orgGroupPermRepo.findAllByOrganization(project.getOrganization())) {
-                projectGroupPermRepo.save(new ProjectGroupPerm(project, p.getGroup(), p.getRole(), true));
+                groupPermissions.add(new ProjectGroupPermWrapper(new ProjectGroupPerm(project, p.getGroup(), p.getRole(), true)));
             }
         } else {
             for (OrgUserPerm p: orgUserPermRepo.findAllByOrganizationAndRole_Name(project.getOrganization(), AuthorizationConstants.ADMIN)) {
-                projectUserPermRepo.save(new ProjectUserPerm(project, p.getUser(), p.getRole(), true));
+                userPermissions.add(new ProjectUserPermWrapper(new ProjectUserPerm(project, p.getUser(), p.getRole(), true)));
             }
             for (OrgGroupPerm p: orgGroupPermRepo.findAllByOrganizationAndRole_Name(project.getOrganization(), AuthorizationConstants.ADMIN)) {
-                projectGroupPermRepo.save(new ProjectGroupPerm(project, p.getGroup(), p.getRole(), true));
+                groupPermissions.add(new ProjectGroupPermWrapper(new ProjectGroupPerm(project, p.getGroup(), p.getRole(), true)));
             }
         }
+
+        projectUserPermRepo.saveAll(userPermissions.getAll());
+        responseBuilder.getUsers().insertPermissionUpdates_ProjectUserPerm(PermissionUpdateResponse.Action.ADD, userPermissions.getAll());
+
+        projectGroupPermRepo.saveAll(groupPermissions.getAll());
+        responseBuilder.getGroups().insertPermissionUpdates_ProjectGroupPerm(PermissionUpdateResponse.Action.ADD, groupPermissions.getAll());
+
+        return responseBuilder.getPermissionUpdatesReponse();
     }
 }

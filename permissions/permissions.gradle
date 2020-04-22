@@ -3,4 +3,6 @@ apply plugin: 'io.spring.convention.spring-module'
 dependencies {
     compile project(':core')
     compile project(':rdb')
+
+    compile 'org.apache.commons:commons-lang3:3.10'
 }

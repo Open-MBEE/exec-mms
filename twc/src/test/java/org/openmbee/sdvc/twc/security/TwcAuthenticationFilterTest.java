@@ -30,7 +30,7 @@ public class TwcAuthenticationFilterTest {
 	TwcAuthenticationProvider twcAuthProvider;
 
 	@InjectMocks
-	TwcAuthenticationFilter filter = new TwcAuthenticationFilter(mock(AuthenticationManager.class));
+	TwcAuthenticationFilter filter = new TwcAuthenticationFilter();
 
 	@Test
 	public void testNoHeadersProvided() {
