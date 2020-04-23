@@ -1845,7 +1845,7 @@
 						}
 					]
 				},
-				"method": "POST",
+				"method": "PUT",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -1893,7 +1893,7 @@
 				"auth": {
 					"type": "noauth"
 				},
-				"method": "POST",
+				"method": "PUT",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -1948,7 +1948,7 @@
 						}
 					]
 				},
-				"method": "POST",
+				"method": "PUT",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -2003,7 +2003,7 @@
 						}
 					]
 				},
-				"method": "POST",
+				"method": "PUT",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -2138,9 +2138,9 @@
 					"script": {
 						"id": "26e45f03-c2c3-4f77-a556-5202744a4fcf",
 						"exec": [
-							"pm.test(\"sees 3 projects\", function () {",
+							"pm.test(\"sees at least 3 projects\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.projects.length).to.eql(3);",
+							"    pm.expect(jsonData.projects.length).to.be.at.least(3);",
 							"});"
 						],
 						"type": "text/javascript"
