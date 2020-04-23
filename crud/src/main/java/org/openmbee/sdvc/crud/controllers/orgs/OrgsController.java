@@ -3,8 +3,6 @@ package org.openmbee.sdvc.crud.controllers.orgs;
 import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import java.util.Optional;
-import javax.transaction.Transactional;
-
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.dao.OrgDAO;
 import org.openmbee.sdvc.core.objects.OrganizationsRequest;
@@ -19,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

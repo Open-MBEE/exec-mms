@@ -5,8 +5,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.transaction.Transactional;
-
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.delegation.PermissionsDelegateFactory;
@@ -22,6 +20,7 @@ import org.openmbee.sdvc.rdb.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("defaultPermissionService")
 public class DefaultPermissionService implements PermissionService {

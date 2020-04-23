@@ -1,15 +1,13 @@
-apply plugin: 'java'
-apply plugin: 'io.spring.convention.spring-module'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+
+Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
-    compile project(':rdb')
-    compile project(':core')
+    implementation project(':rdb')
 
-    compile group: 'org.springframework.boot', name: 'spring-boot', version: '2.1.7.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.6.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.1.6.RELEASE'
-    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-    compile 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.1.1'
+    //TODO: Why is elastic search a dependency?
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.1.1'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
+    testImplementation commonDependencies.'spring-boot-starter-test'
 }

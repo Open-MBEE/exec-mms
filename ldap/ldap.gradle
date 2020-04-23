@@ -1,9 +1,10 @@
-apply plugin: 'io.spring.convention.spring-module'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+
+Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
-    compile project(':rdb')
-    compile project(':core')
-    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.6.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-ldap', version: '5.1.6.RELEASE'
+    implementation project(':rdb')
 
+    implementation commonDependencies.'spring-security-ldap'
 }

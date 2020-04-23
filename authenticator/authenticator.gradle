@@ -1,17 +1,19 @@
-apply plugin: 'io.spring.convention.spring-module'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+
+Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
-    compile project(':rdb')
-    compile project(':core')
+    implementation project(':rdb')
+    api project(':core')
 
-    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.6.RELEASE'
-    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.1.6.RELEASE'
+    api commonDependencies.'spring-security-web'
 
-    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.5'
 
-    compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.5'
-    runtime group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.10.5'
-    runtime group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.10.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.10.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.10.5'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
+    testImplementation commonDependencies.'spring-boot-starter-test'
 }

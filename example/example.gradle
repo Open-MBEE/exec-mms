@@ -14,12 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compile(
+    implementation(
         project(':authenticator'),
         project(':localuser'),
         project(':ldap'),
@@ -33,7 +29,7 @@ dependencies {
         //'mysql:mysql-connector-java:8.0.17',
         'org.springdoc:springdoc-openapi-ui:1.2.29'
     )
-    testCompile(
+    testImplementation(
         'org.springframework.boot:spring-boot-starter-test'
     )
     swaggerCodegen 'org.openapitools:openapi-generator-cli:4.2.2'

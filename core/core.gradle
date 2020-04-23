@@ -1,18 +1,18 @@
-apply plugin: 'io.spring.convention.spring-module'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+
+Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
-    compile project(':data')
-    compile project(':json')
+    api project(':data')
+    api project(':json')
 
-    compile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.9.RELEASE'
-    compile group: 'org.springframework', name: 'spring-tx', version: '5.1.9.RELEASE'
+    api commonDependencies.'spring-security-config'
+    api commonDependencies.'spring-webmvc'
+    api commonDependencies.'spring-tx'
+    api commonDependencies.'log4j'
+    api commonDependencies.'log4j-api'
+    api commonDependencies.'swagger-annotations'
 
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
-
-    compile 'io.swagger.core.v3:swagger-annotations:2.1.0'
-    //using @Parameter(hidden = true) to ignore Authentication params in controllers, until
-    //springdoc ignores it by default or controllers are moved out of modules
-
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
+    testImplementation commonDependencies.'spring-boot-starter-test'
 }
