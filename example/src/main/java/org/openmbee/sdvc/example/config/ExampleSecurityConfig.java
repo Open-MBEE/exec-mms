@@ -41,7 +41,6 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
         http.csrf().disable().authorizeRequests().anyRequest().permitAll().and().httpBasic();
         http.headers().cacheControl();
         http.addFilterAfter(corsFilter(), ExceptionTranslationFilter.class);

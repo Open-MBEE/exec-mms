@@ -19,25 +19,26 @@ ext.milestoneBuild = !(snapshotBuild || releaseBuild)
 
 ext {
     commonDependencies = [
-        'log4j'                         : 'org.apache.logging.log4j:log4j-core:2.13.1',
-        'log4j-api'                     : 'org.apache.logging.log4j:log4j-api:2.13.1',
         'swagger-annotations'           : 'io.swagger.core.v3:swagger-annotations:2.1.2',
-        'spring-beans'                  : 'org.springframework:spring-beans:5.2.5.RELEASE',
-        'spring-context'                : 'org.springframework:spring-context:5.2.5.RELEASE',
-        'spring-security-core'          : 'org.springframework.security:spring-security-core:5.1.6.RELEASE',
-        'spring-security-config'        : 'org.springframework.security:spring-security-config:5.1.6.RELEASE',
-        'spring-security-web'           : 'org.springframework.security:spring-security-web:5.1.6.RELEASE',
-        'spring-security-ldap'          : 'org.springframework.security:spring-security-ldap:5.1.6.RELEASE',
-        'spring-tx'                     : 'org.springframework:spring-tx:5.2.5.RELEASE',
-        'spring-webmvc'                 : 'org.springframework:spring-webmvc:5.1.9.RELEASE',
-        'spring-data-commons'           : 'org.springframework.data:spring-data-commons:2.2.6.RELEASE',
-        'spring-data-jpa'               : 'org.springframework.data:spring-data-jpa:2.1.10.RELEASE',
-        'jackson-annotations'           : 'com.fasterxml.jackson.core:jackson-annotations:2.9.7',
-        'jackson-databind'              : 'com.fasterxml.jackson.core:jackson-databind:2.9.7',
-        'jackson-datatype-hibernate5'   : 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.9.7',
-        'jackson-datatype-jsr310'       : 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7',
-        'hibernate-core'                : 'org.hibernate:hibernate-core:5.4.2.Final',
-        'spring-boot-starter-test'  : 'org.springframework.boot:spring-boot-starter-test:2.2.4.RELEASE'
+        'hibernate-core'                : 'org.hibernate:hibernate-core:5.4.14.Final',
+        'servlet-api'                   : 'javax.servlet:javax.servlet-api:4.0.1',
+        'log4j'                         : "org.apache.logging.log4j:log4j-core:$log4jVersion",
+        'log4j-api'                     : "org.apache.logging.log4j:log4j-api:$log4jVersion",
+        'spring-boot'                   : "org.springframework.boot:spring-boot:$springBootVersion",
+        'spring-security-core'          : "org.springframework.security:spring-security-core:$springSecurityVersion",
+        'spring-security-config'        : "org.springframework.security:spring-security-config:$springSecurityVersion",
+        'spring-security-web'           : "org.springframework.security:spring-security-web:$springSecurityVersion",
+        'spring-security-ldap'          : "org.springframework.security:spring-security-ldap:$springSecurityVersion",
+        'spring-tx'                     : "org.springframework:spring-tx:$springFrameworkVersion",
+        'spring-webmvc'                 : "org.springframework:spring-webmvc:$springFrameworkVersion",
+        'spring-aspects'                : "org.springframework:spring-aspects:$springFrameworkVersion",
+        'spring-data-commons'           : "org.springframework.data:spring-data-commons:$springDataVersion",
+        'spring-data-jpa'               : "org.springframework.data:spring-data-jpa:$springDataVersion",
+        'jackson-annotations'           : "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
+        'jackson-databind'              : "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+        'jackson-datatype-hibernate5'   : "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:$jacksonVersion",
+        'jackson-datatype-jsr310'       : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
+        'spring-boot-starter-test'      : 'org.springframework.boot:spring-boot-starter-test:2.2.4.RELEASE'
     ]
 }
 

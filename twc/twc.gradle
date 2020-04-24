@@ -8,6 +8,9 @@ dependencies {
 
     //TODO: Why is elastic search a dependency?
     implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.1.1'
+    implementation commonDependencies.'servlet-api'
+    implementation commonDependencies.'spring-boot'
+    implementation commonDependencies.'spring-security-web'
 
     testImplementation commonDependencies.'spring-boot-starter-test'
 }
