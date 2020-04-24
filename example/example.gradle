@@ -24,6 +24,7 @@ dependencies {
         project(':jupyter'),
         project(':permissions'),
         project(':webhooks'),
+        project(':twc'),
         'org.springframework.boot:spring-boot-starter-web',
         'org.postgresql:postgresql:42.2.5',
         //'mysql:mysql-connector-java:8.0.17',
