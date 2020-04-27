@@ -237,7 +237,10 @@ public class DefaultPermissionService implements PermissionService {
     @Transactional
     public boolean isProjectInherit(String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
-        return project.map(Project::isInherit).orElse(false);
+        if (!project.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "project " + projectId + " not found");
+        }
+        return project.get().isInherit();
     }
 
     @Override
@@ -251,14 +254,20 @@ public class DefaultPermissionService implements PermissionService {
     @Transactional
     public boolean isOrgPublic(String orgId) {
         Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
-        return organization.map(Organization::isPublic).orElse(false);
+        if (!organization.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "org " + orgId + " not found");
+        }
+        return organization.get().isPublic();
     }
 
     @Override
     @Transactional
     public boolean isProjectPublic(String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
-        return project.map(Project::isPublic).orElse(false);
+        if (!project.isPresent()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "project " + projectId + " not found");
+        }
+        return project.get().isPublic();
     }
 
     @Override
