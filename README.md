@@ -49,7 +49,7 @@ See README in /example
 
 ## Contributing
 
-TBA
+To learn how you can get involved in a variety of ways, please see [Contibuting to OpenMBEE](https://www.openmbee.org/contribute).
 
 ## Versioning
 
