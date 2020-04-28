@@ -1,17 +1,19 @@
 package org.openmbee.sdvc.core.objects;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.core.config.Constants;
 
 public class BaseResponse<T> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
+    @Schema(nullable = true)
     private List<String> messages = new ArrayList<>();
 
+    @Schema(nullable = true)
     private List<Rejection> rejected = new ArrayList<>();
 
     @SuppressWarnings("unchecked")

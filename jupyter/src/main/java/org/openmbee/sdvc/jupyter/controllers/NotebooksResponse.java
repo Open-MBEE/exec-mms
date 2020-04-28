@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.json.ElementJson;
-import org.openmbee.sdvc.jupyter.JupyterConstants;
 
 public class NotebooksResponse extends BaseResponse<NotebooksResponse> {
 

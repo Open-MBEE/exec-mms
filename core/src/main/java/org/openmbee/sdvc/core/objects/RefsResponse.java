@@ -3,14 +3,13 @@ package org.openmbee.sdvc.core.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.json.RefJson;
 
-public class BranchesResponse extends BaseResponse<BranchesResponse> {
+public class RefsResponse extends BaseResponse<RefsResponse> {
 
     private List<RefJson> refs;
 
-    public BranchesResponse() {
+    public RefsResponse() {
         this.refs = new ArrayList<>();
     }
 
@@ -18,7 +17,7 @@ public class BranchesResponse extends BaseResponse<BranchesResponse> {
         return refs;
     }
 
-    public BranchesResponse setRefs(List<RefJson> refs) {
+    public RefsResponse setRefs(List<RefJson> refs) {
         this.refs = refs;
         return this;
     }

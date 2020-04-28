@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.permissions;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Auth")
 public class PermissionsController {
 
     PermissionService permissionService;

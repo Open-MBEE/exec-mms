@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.jupyter.controllers;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.jupyter.services.JupyterNodeService;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}/notebooks")
+@Tag(name = "Notebooks")
 public class NotebooksController extends BaseController {
 
     private JupyterNodeService nodeService;

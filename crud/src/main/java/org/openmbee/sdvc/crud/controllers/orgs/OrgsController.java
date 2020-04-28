@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.orgs;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/orgs")
+@Tag(name = "Orgs")
 public class OrgsController extends BaseController {
 
     OrgDAO organizationRepository;
@@ -40,8 +41,7 @@ public class OrgsController extends BaseController {
 
     @GetMapping
     @Transactional
-    public OrganizationsResponse getAllOrgs(
-        @Parameter(hidden = true) Authentication auth) {
+    public OrganizationsResponse getAllOrgs( Authentication auth) {
 
         OrganizationsResponse response = new OrganizationsResponse();
         List<Organization> allOrgs = organizationRepository.findAll();
@@ -77,7 +77,7 @@ public class OrgsController extends BaseController {
     @PreAuthorize("isAuthenticated()")
     public OrganizationsResponse createOrUpdateOrgs(
         @RequestBody OrganizationsRequest orgPost,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
 
         OrganizationsResponse response = new OrganizationsResponse();
         if (orgPost.getOrgs().isEmpty()) {

@@ -1,9 +1,12 @@
 package org.openmbee.sdvc.webhooks.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.openmbee.sdvc.json.BaseJson;
 
-@JsonIgnoreProperties({BaseJson.COMMITID, BaseJson.REFID, "empty"})
+@JsonIgnoreProperties({BaseJson.COMMITID, BaseJson.REFID, BaseJson.DOCID, BaseJson.NAME, "empty",
+    BaseJson.MODIFIED, BaseJson.MODIFIER})
+@Schema(name = "Webhook", requiredProperties = {WebhookJson.URL})
 public class WebhookJson extends BaseJson<WebhookJson> {
 
     public static final String URL = "url";

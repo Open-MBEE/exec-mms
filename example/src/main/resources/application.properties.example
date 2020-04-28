@@ -49,12 +49,6 @@ elasticsearch.limit.insert=80
 elasticsearch.limit.result=10000
 elasticsearch.limit.term=1000
 
-springdoc.swagger-ui.path=/v3/swagger-ui.html
-#For sorting endpoints alphabetically
-springdoc.swagger-ui.operationsSorter=alpha
-#For sorting tags alphabetically
-springdoc.swagger-ui.tagsSorter=alpha
-
 #Configuration for TWC
 #port is for REST interface
 #aliases are for clustered usages
@@ -63,3 +57,11 @@ twc.instances[0].protocol=https
 twc.instances[0].port=8111
 twc.instances[0].aliases[0]=dev-twc-02.domain.com
 twc.instances[0].aliases[1]=dev-twc-01.domain.com
+
+springdoc.swagger-ui.path=/v3/swagger-ui.html
+#For sorting endpoints alphabetically
+springdoc.swagger-ui.operationsSorter=alpha
+#For sorting tags alphabetically
+springdoc.swagger-ui.tagsSorter=alpha
+springdoc.default-produces-media-type=application/json
+springdoc.swagger-ui.displayOperationId=true

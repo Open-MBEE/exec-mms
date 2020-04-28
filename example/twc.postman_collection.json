@@ -77,7 +77,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"tt\", \n\t\t\t\"name\": \"tt\",\n\t\t\t\"orgId\": \"tt\",\n\t\t\t\"projectType\": \"cameo\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"tt\", \n\t\t\t\"name\": \"tt\",\n\t\t\t\"orgId\": \"tt\",\n\t\t\t\"schema\": \"cameo\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects",

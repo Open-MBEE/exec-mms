@@ -1,13 +1,17 @@
 package org.openmbee.sdvc.core.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 import org.openmbee.sdvc.json.RefJson;
 
-public class BranchesRequest extends BaseRequest {
+@JsonIgnoreProperties({"source", "comment"})
+public class RefsRequest extends BaseRequest {
 
     private List<RefJson> refs;
 
+    @Schema(required = true)
     public List<RefJson> getRefs() {
         return refs;
     }
@@ -15,6 +19,5 @@ public class BranchesRequest extends BaseRequest {
     public void setRefs(List<RefJson> refs) {
         this.refs = refs;
     }
-
 
 }

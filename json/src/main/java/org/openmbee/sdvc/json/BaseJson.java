@@ -2,6 +2,8 @@ package org.openmbee.sdvc.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +54,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(DOCID)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getDocId() {
         return (String) this.get(DOCID);
     }
@@ -64,6 +67,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(PROJECTID)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getProjectId() {
         return (String) this.get(PROJECTID);
     }
@@ -76,6 +80,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(REFID)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getRefId() {
         return (String) this.get(REFID);
     }
@@ -88,6 +93,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(MODIFIER)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getModifier() {
         return (String) this.get(MODIFIER);
     }
@@ -100,6 +106,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(MODIFIED)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getModified() {
         return (String) this.get(MODIFIED);
     }
@@ -112,6 +119,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(CREATOR)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getCreator() {
         return (String) this.get(CREATOR);
     }
@@ -124,6 +132,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(CREATED)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getCreated() {
         return (String) this.get(CREATED);
     }
@@ -136,6 +145,7 @@ public class BaseJson<T> extends HashMap<String, Object> {
     }
 
     @JsonProperty(COMMITID)
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getCommitId() {
         return (String) this.get(COMMITID);
     }
