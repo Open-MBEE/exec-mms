@@ -22,7 +22,7 @@ import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
 import org.openmbee.sdvc.json.CommitJson;
-import org.openmbee.sdvc.json.ElementUpdated;
+import org.openmbee.sdvc.json.ElementVersion;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -113,7 +113,7 @@ public class NodeOperation {
         e.setCreator(cmjs.getCreator()); //Only set on creation of new element
         e.setCreated(cmjs.getCreated());
 
-        ElementUpdated newObj = new ElementUpdated()
+        ElementVersion newObj = new ElementVersion()
             .setDocId(e.getDocId())
             .setId(e.getId())
             .setType("Element");
@@ -128,7 +128,7 @@ public class NodeOperation {
         processElementAddedOrUpdated(e, n, info);
 
         info.getOldDocIds().add(previousDocId);
-        ElementUpdated newObj= new ElementUpdated()
+        ElementVersion newObj= new ElementVersion()
             .setPreviousDocId(previousDocId)
             .setDocId(e.getDocId())
             .setId(e.getId())
@@ -159,7 +159,7 @@ public class NodeOperation {
     }
 
     public void processElementDeleted(ElementJson e, Node n, NodeChangeInfo info) {
-        ElementUpdated newObj = new ElementUpdated()
+        ElementVersion newObj = new ElementVersion()
             .setPreviousDocId(n.getDocId())
             .setId(e.getId())
             .setType("Element");

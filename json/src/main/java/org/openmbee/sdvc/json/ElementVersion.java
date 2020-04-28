@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 
 @JsonIgnoreProperties({"empty", BaseJson.REFID, BaseJson.COMMITID, BaseJson.PROJECTID,
     BaseJson.CREATOR, BaseJson.CREATED, BaseJson.MODIFIER, BaseJson.MODIFIED, BaseJson.NAME})
-public class ElementUpdated extends BaseJson<ElementUpdated> {
+public class ElementVersion extends BaseJson<ElementVersion> {
 
     public static final String PREVIOUS = "_previousDocId";
 
@@ -18,7 +18,7 @@ public class ElementUpdated extends BaseJson<ElementUpdated> {
     }
 
     @JsonProperty(PREVIOUS)
-    public ElementUpdated setPreviousDocId(String previousDocId) {
+    public ElementVersion setPreviousDocId(String previousDocId) {
         this.put(PREVIOUS, previousDocId);
         return this;
     }

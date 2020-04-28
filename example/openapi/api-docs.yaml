@@ -1614,17 +1614,17 @@ components:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/ElementUpdated'
+            $ref: '#/components/schemas/ElementVersion'
         added:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/ElementUpdated'
+            $ref: '#/components/schemas/ElementVersion'
         updated:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/ElementUpdated'
+            $ref: '#/components/schemas/ElementVersion'
         comment:
           type: string
           readOnly: true
@@ -1661,7 +1661,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Commit'
-    ElementUpdated:
+    ElementVersion:
       type: object
       properties:
         id:

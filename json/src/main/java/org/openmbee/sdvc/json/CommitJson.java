@@ -27,7 +27,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementUpdated.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementVersion.class))
     public List<Map<String, Object>> getAdded() {
         return (List<Map<String, Object>>) this.get(ADDED);
     }
@@ -37,7 +37,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementUpdated.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementVersion.class))
     public List<Map<String, Object>> getDeleted() {
         return (List<Map<String, Object>>) this.get(DELETED);
     }
@@ -47,7 +47,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
-    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementUpdated.class))
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementVersion.class))
     public List<Map<String, Object>> getUpdated() {
         return (List<Map<String, Object>>) this.get(UPDATED);
     }
