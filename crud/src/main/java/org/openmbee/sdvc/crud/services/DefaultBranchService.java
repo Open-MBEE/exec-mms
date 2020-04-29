@@ -3,10 +3,12 @@ package org.openmbee.sdvc.crud.services;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.dao.BranchIndexDAO;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.objects.BranchesResponse;
 import org.openmbee.sdvc.core.objects.EventObject;
@@ -35,6 +37,8 @@ public class DefaultBranchService implements BranchService {
     protected final Logger logger = LogManager.getLogger(getClass());
 
     private BranchDAO branchRepository;
+
+    private BranchIndexDAO branchIndex;
 
     private CommitDAO commitRepository;
 
@@ -72,6 +76,11 @@ public class DefaultBranchService implements BranchService {
     }
 
     @Autowired
+    public void setBranchIndex(BranchIndexDAO branchIndex) {
+        this.branchIndex = branchIndex;
+    }
+
+    @Autowired
     public void setEventPublisher(Optional<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
@@ -80,11 +89,12 @@ public class DefaultBranchService implements BranchService {
         ContextHolder.setContext(projectId);
         BranchesResponse branchesResponse = new BranchesResponse();
         List<Branch> branches = this.branchRepository.findAll();
-        List<RefJson> refs = new ArrayList<>();
+        Set<String> docIds = new HashSet<>();
         branches.forEach(branch -> {
-            refs.add(convertToJson(branch));
+            docIds.add(branch.getDocId());
         });
-        branchesResponse.setRefs(refs);
+        //TODO: Paginate?
+        branchesResponse.setRefs(branchIndex.findAllById(docIds));
         return branchesResponse;
     }
 
@@ -110,16 +120,25 @@ public class DefaultBranchService implements BranchService {
         Instant now = Instant.now();
         ContextHolder.setContext(projectId);
         Branch b = new Branch();
+
         b.setBranchId(branch.getId());
         b.setBranchName(branch.getName());
         b.setDescription(branch.getDescription());
         b.setTag(branch.isTag());
         b.setTimestamp(Instant.now());
+
+        if (branch.getDocId() == null) {
+            String uuid = UUID.randomUUID().toString();
+            branch.setDocId(uuid);
+            b.setDocId(uuid);
+        }
+
         logger.info("Saving branch: {}", branch.getId());
 
         if (branch.getParentRefId() != null) {
             b.setParentRefId(branch.getParentRefId());
         } else {
+            branch.setParentRefId(Constants.MASTER_BRANCH);
             b.setParentRefId(Constants.MASTER_BRANCH);
         }
 
@@ -127,6 +146,8 @@ public class DefaultBranchService implements BranchService {
         if (branch.getParentCommitId() != null) {
             throw new BadRequestException("Internal Error: Invalid branch creation logic.");
         }
+
+        branchIndex.update(branch);
 
         Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
         if (ref.isPresent()) {
@@ -174,6 +195,9 @@ public class DefaultBranchService implements BranchService {
         b.setDeleted(true);
         branchRepository.save(b);
         List<RefJson> refs = new ArrayList<>();
+
+        branchIndex.deleteById(b.getDocId());
+
         refs.add(convertToJson(b));
         branchesResponse.setRefs(refs);
         return branchesResponse;

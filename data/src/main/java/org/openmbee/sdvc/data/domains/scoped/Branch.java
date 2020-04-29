@@ -21,6 +21,7 @@ public class Branch {
 
     @Column(unique = true)
     private String branchId;
+    private String docId;
     private String branchName;
 
     private String parentRefId;
@@ -35,11 +36,12 @@ public class Branch {
 
     }
 
-    public Branch(String description, String branchId, String branchName, String parentRef,
+    public Branch(String description, String branchId, String branchName, String docId, String parentRef,
         Long parentCommit, Instant timestamp, boolean tag, boolean deleted) {
         setDescription(description);
         setBranchId(branchId);
         setBranchName(branchName);
+        setDocId(docId);
         setParentRefId(parentRef);
         setParentCommit(parentCommit);
         setTimestamp(timestamp);
@@ -77,6 +79,14 @@ public class Branch {
 
     public void setBranchName(String branchName) {
         this.branchName = branchName;
+    }
+
+    public String getDocId() {
+        return docId;
+    }
+
+    public void setDocId(String docId) {
+        this.docId = docId;
     }
 
     public Instant getTimestamp() {
