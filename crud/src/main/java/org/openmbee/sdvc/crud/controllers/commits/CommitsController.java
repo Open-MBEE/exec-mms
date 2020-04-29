@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.commits;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.CommitsRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}")
+@Tag(name = "Commits")
 public class CommitsController extends BaseController {
 
     private CommitService commitService;
@@ -30,9 +32,11 @@ public class CommitsController extends BaseController {
 
     @GetMapping(value = "/refs/{refId}/commits")
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
-    public CommitsResponse getAllCommits(
+    public CommitsResponse getRefCommits(
         @PathVariable String projectId,
         @PathVariable String refId,
+        @RequestParam(required = false) String limit,
+        @RequestParam(required = false) String maxTimestamp,
         @RequestParam(required = false) Map<String, String> params) {
 
         return commitService.getRefCommits(projectId, refId, params);

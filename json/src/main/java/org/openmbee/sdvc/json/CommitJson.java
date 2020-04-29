@@ -1,18 +1,23 @@
 package org.openmbee.sdvc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import java.util.List;
 import java.util.Map;
 
+@JsonIgnoreProperties({"empty", BaseJson.NAME, BaseJson.MODIFIER, BaseJson.MODIFIED, BaseJson.TYPE})
+@Schema(name = "Commit", requiredProperties = {BaseJson.ID})
 public class CommitJson extends BaseJson<CommitJson> {
 
     public static final String COMMENT = "comment";
     public static final String ADDED = "added";
     public static final String DELETED = "deleted";
     public static final String UPDATED = "updated";
-    public static final String PREVIOUS = "previousDocId";
-    public static final String TYPE = "type";
     public static final String SOURCE = "source";
 
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getComment() {
         return (String) this.get(COMMENT);
     }
@@ -22,6 +27,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementVersion.class))
     public List<Map<String, Object>> getAdded() {
         return (List<Map<String, Object>>) this.get(ADDED);
     }
@@ -31,6 +37,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementVersion.class))
     public List<Map<String, Object>> getDeleted() {
         return (List<Map<String, Object>>) this.get(DELETED);
     }
@@ -40,6 +47,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
+    @ArraySchema(schema = @Schema(accessMode = AccessMode.READ_ONLY, implementation = ElementVersion.class))
     public List<Map<String, Object>> getUpdated() {
         return (List<Map<String, Object>>) this.get(UPDATED);
     }
@@ -49,6 +57,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         return this;
     }
 
+    @Schema(accessMode = AccessMode.READ_ONLY)
     public String getSource() {
         return (String) this.get(SOURCE);
     }

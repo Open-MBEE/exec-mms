@@ -1,10 +1,19 @@
 {
     "groupId": "org.openmbee.mms",
-    "artifactId": "mms-client",
-    "artifactVersion": "0.0.1",
+    "artifactId": "mms-java-client",
+    "artifactVersion": "4.0.0-RC1",
+    "artifactUrl": "https://github.com/Open-MBEE/mms",
+    "artifactDescription": "Java OpenAPI Client for MMS",
     "library": "jersey2",
     "java8": true,
+    "dateLibrary": "java8",
+    "developerEmail": "openmbeee@gmail.com",
+    "developerName": "OpenMBEE",
+    "developerOrganization": "OpenMBEE",
+    "developerOrganizationUrl": "https://openmbee.org",
     "invokerPackage": "org.openmbee.mms",
     "modelPackage": "org.openmbee.mms.model",
-    "apiPackage": "org.openmbee.mms.api"
+    "apiPackage": "org.openmbee.mms.api",
+    "licenseName": "Apache-2.0",
+    "licenseUrl": "https://www.apache.org/licenses/LICENSE-2.0.txt"
 }

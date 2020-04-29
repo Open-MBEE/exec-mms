@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.authenticator.controllers;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationRequest;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationResponse;
 import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Auth")
 public class AuthenticationController {
 
     private AuthenticationManager authenticationManager;
