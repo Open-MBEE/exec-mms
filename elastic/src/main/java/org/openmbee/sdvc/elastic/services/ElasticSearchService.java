@@ -79,7 +79,7 @@ public class ElasticSearchService implements SearchService {
     private SearchHits doSearch(List<Node> validNodes, Map<String, String> params) throws IOException {
         SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.filter(QueryBuilders.termsQuery(ElementJson.DOCID, validNodes.stream().map(v -> v.getDocId()).toArray()));
+        query.filter(QueryBuilders.termsQuery(ElementJson.DOCID, validNodes.stream().map(Node::getDocId).toArray()));
 
         for(Map.Entry<String,String> e : params.entrySet()) {
             query.filter(QueryBuilders.termQuery(e.getKey(), e.getValue()));
