@@ -175,7 +175,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\",\n\t\t\t\"ownerId\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"a\", \n\t\t\t\"name\": \"a\",\n\t\t\t\"ownerId\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects/ss/refs/master/elements",
@@ -234,6 +234,53 @@
 							"key": "name",
 							"value": "x"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search for element tree under x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4ea3441a-8a0f-421a-ba27-67ac1351775d",
+						"exec": [
+							"pm.test(\"response has 2 elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(2);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"params\" : {\n\t\t\"ownerId\" : \"x\"\n\t},\n\t\"recurse\" : {\n\t\t\"id\" : \"ownerId\"\n\t}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/ss/refs/master/search",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"ss",
+						"refs",
+						"master",
+						"search"
 					]
 				}
 			},

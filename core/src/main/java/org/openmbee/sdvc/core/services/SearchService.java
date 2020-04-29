@@ -6,4 +6,6 @@ import java.util.Map;
 
 public interface SearchService {
     ElementsResponse basicSearch(String projectId, String refId, Map<String, String> params);
+
+    ElementsResponse recursiveSearch(String projectId, String refId, Map<String, String> params, Map<String, String> recurse);
 }

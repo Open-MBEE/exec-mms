@@ -6,6 +6,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.openmbee.sdvc.core.config.ContextHolder;
@@ -21,10 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class ElasticSearchService implements SearchService {
@@ -48,6 +46,11 @@ public class ElasticSearchService implements SearchService {
 
     @Override
     public ElementsResponse basicSearch(String projectId, String refId, Map<String, String> params) {
+        return recursiveSearch(projectId, refId, params, null);
+    }
+
+    @Override
+    public ElementsResponse recursiveSearch(String projectId, String refId, Map<String, String> params, Map<String, String> recurse) {
         try {
             ContextHolder.setContext(projectId, refId);
             List<Node> validNodes = nodeRepository.findAllByDeleted(false);
@@ -55,33 +58,59 @@ public class ElasticSearchService implements SearchService {
                 return new ElementsResponse();
             }
 
-            SearchHits hits = doSearch(validNodes, params);
-            if (hits.getTotalHits().value == 0) {
-                return new ElementsResponse();
-            }
-
-            List<ElementJson> result = parseResults(hits);
-            return prepareResponse(result);
+            Map<String, ElementJson> elementJsonMap = new HashMap<>();
+            performRecursiveSearch(validNodes, params, recurse, elementJsonMap);
+            return prepareResponse(elementJsonMap.values());
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
-    private List<ElementJson> parseResults(SearchHits hits) {
-        return Arrays.stream(hits.getHits()).map(h -> {
+    private void performRecursiveSearch(List<Node> validNodes, Map<String, String> params, Map<String, String> recurse,
+                                        Map<String, ElementJson> elementJsonMap) throws IOException {
+        SearchHits hits = doSearch(validNodes, params);
+        if (hits.getTotalHits().value == 0) {
+            return;
+        }
+        for(SearchHit hit : hits) {
             ElementJson ob = new ElementJson();
-            ob.putAll(h.getSourceAsMap());
-            return ob;
-        }).collect(Collectors.toList());
+            ob.putAll(hit.getSourceAsMap());
+            if(! elementJsonMap.containsKey(ob.getId())) {
+                elementJsonMap.put(ob.getId(), ob);
+                Map<String, String> recursiveParams = buildRecursiveParams(ob, recurse);
+                if(! recursiveParams.isEmpty()) {
+                    performRecursiveSearch(validNodes, recursiveParams, recurse, elementJsonMap);
+                }
+            }
+        }
     }
+
+    private Map<String, String> buildRecursiveParams(ElementJson ob, Map<String, String> recurse) {
+        Map<String, String> recursiveParams = new HashMap<>();
+
+        if(recurse == null || recurse.isEmpty()) {
+            return recursiveParams;
+        }
+
+        for(Map.Entry<String, String> e : recurse.entrySet()) {
+            Object o = ob.get(e.getKey());
+            if(o == null) {
+                continue;
+            }
+            recursiveParams.put(e.getValue(), o.toString());
+        }
+        return recursiveParams;
+    }
+
 
     private SearchHits doSearch(List<Node> validNodes, Map<String, String> params) throws IOException {
         SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.filter(QueryBuilders.termsQuery(ElementJson.DOCID, validNodes.stream().map(Node::getDocId).toArray()));
 
-        for(Map.Entry<String,String> e : params.entrySet()) {
+        for(Map.Entry<String, String> e : params.entrySet()) {
             query.filter(QueryBuilders.termQuery(e.getKey(), e.getValue()));
         }
 
@@ -92,9 +121,9 @@ public class ElasticSearchService implements SearchService {
         return searchResponse.getHits();
     }
 
-    private ElementsResponse prepareResponse(List<ElementJson> result) {
+    private ElementsResponse prepareResponse(Collection<ElementJson> result) {
         ElementsResponse response = new ElementsResponse();
-        response.setElements(result);
+        response.setElements(new ArrayList(result));
         return response;
     }
 }
