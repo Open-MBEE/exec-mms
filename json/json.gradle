@@ -5,6 +5,6 @@ Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
     implementation commonDependencies.'jackson-annotations'
-    compile group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.1.2'
+    implementation commonDependencies.'swagger-annotations'
     testImplementation commonDependencies.'spring-boot-starter-test'
 }
