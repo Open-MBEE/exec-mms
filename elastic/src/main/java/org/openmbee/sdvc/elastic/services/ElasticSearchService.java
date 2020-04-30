@@ -1,13 +1,15 @@
 package org.openmbee.sdvc.elastic.services;
 
+import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.dao.NodeDAO;
@@ -70,13 +72,9 @@ public class ElasticSearchService implements SearchService {
 
     private void performRecursiveSearch(List<Node> validNodes, Map<String, String> params, Map<String, String> recurse,
                                         Map<String, ElementJson> elementJsonMap) throws IOException {
-        SearchHits hits = doSearch(validNodes, params);
-        if (hits.getTotalHits().value == 0) {
-            return;
-        }
-        for(SearchHit hit : hits) {
-            ElementJson ob = new ElementJson();
-            ob.putAll(hit.getSourceAsMap());
+
+        List<ElementJson> elementJsonList = doSearch(validNodes, params);
+        for(ElementJson ob : elementJsonList) {
             if(! elementJsonMap.containsKey(ob.getId())) {
                 elementJsonMap.put(ob.getId(), ob);
                 Map<String, String> recursiveParams = buildRecursiveParams(ob, recurse);
@@ -105,7 +103,9 @@ public class ElasticSearchService implements SearchService {
     }
 
 
-    private SearchHits doSearch(List<Node> validNodes, Map<String, String> params) throws IOException {
+    private List<ElementJson> doSearch(List<Node> validNodes, Map<String, String> params) throws IOException {
+        List<ElementJson> result = new ArrayList<>();
+
         SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.filter(QueryBuilders.termsQuery(ElementJson.DOCID, validNodes.stream().map(Node::getDocId).toArray()));
@@ -117,8 +117,30 @@ public class ElasticSearchService implements SearchService {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(query);
         searchRequest.source(sourceBuilder);
+        searchRequest.scroll(TimeValue.timeValueMinutes(1L));
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-        return searchResponse.getHits();
+        String scrollId = null;
+
+        do{
+            for(SearchHit hit : searchResponse.getHits()) {
+                ElementJson ob = parseResult(hit);
+                result.add(ob);
+            }
+            scrollId = searchResponse.getScrollId();
+            if(scrollId != null) {
+                SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+                searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
+            }
+
+        } while (scrollId != null && searchResponse.getHits().getHits() != null && searchResponse.getHits().getHits().length != 0);
+
+        return result;
+    }
+
+    private ElementJson parseResult(SearchHit hit) {
+        ElementJson ob = new ElementJson();
+        ob.putAll(hit.getSourceAsMap());
+        return ob;
     }
 
     private ElementsResponse prepareResponse(Collection<ElementJson> result) {
