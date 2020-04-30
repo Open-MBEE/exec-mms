@@ -30,9 +30,8 @@ import java.util.*;
 public class ElasticSearchService implements SearchService {
     @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
-    @Value("${elasticsearch.limit.term}")
-    protected int termLimit;
-    protected static int readTimeout = 1000000000;
+    @Value("${elasticsearch.limit.scrollTimeout}")
+    protected long scrollTimeout;
     protected RestHighLevelClient client;
     protected NodeDAO nodeRepository;
 
@@ -116,8 +115,9 @@ public class ElasticSearchService implements SearchService {
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(query);
+        sourceBuilder.size(resultLimit);
         searchRequest.source(sourceBuilder);
-        searchRequest.scroll(TimeValue.timeValueMinutes(1L));
+        searchRequest.scroll(TimeValue.timeValueMillis(scrollTimeout));
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         String scrollId = null;
 
