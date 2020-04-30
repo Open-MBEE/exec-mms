@@ -1,16 +1,18 @@
-apply plugin: 'io.spring.convention.spring-module'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+
+Map<String, String> commonDependencies =  rootProject.ext.commonDependencies
 
 dependencies {
-    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.6.RELEASE'
-    compile group: 'org.springframework.data', name: 'spring-data-commons', version: '2.1.10.RELEASE'
-    compile group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+    api commonDependencies.'spring-security-core'
+    api commonDependencies.'spring-data-commons'
 
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-hibernate5', version: '2.9.7'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.7'
+    api commonDependencies.'jackson-annotations'
+    api commonDependencies.'jackson-databind'
+    api commonDependencies.'jackson-datatype-hibernate5'
+    api commonDependencies.'jackson-datatype-jsr310'
 
-    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.2.Final'
+    api commonDependencies.'hibernate-core'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
+    testImplementation commonDependencies.'spring-boot-starter-test'
 }

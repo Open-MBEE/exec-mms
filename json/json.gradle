@@ -1,7 +1,10 @@
-apply plugin: 'io.spring.convention.spring-module'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+
+Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
+    implementation commonDependencies.'jackson-annotations'
     compile group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.1.2'
+    testImplementation commonDependencies.'spring-boot-starter-test'
 }
