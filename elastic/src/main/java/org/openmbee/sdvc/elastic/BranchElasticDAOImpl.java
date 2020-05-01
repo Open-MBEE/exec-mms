@@ -57,7 +57,7 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
         try {
             UpdateRequest request = new UpdateRequest(getIndex(), refJson.getDocId());
             request.fetchSource(true);
-            request.docAsUpsert(true).doc(refJson);
+            request.docAsUpsert(true).doc(refJson).upsert(refJson);
             RefJson response = new RefJson();
 
             UpdateResponse updateResponse = client.update(request, RequestOptions.DEFAULT);
@@ -76,7 +76,7 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
 
     @Override
     protected String getIndex() {
-        return super.getIndex() + "_node";
+        return super.getIndex() + "_metadata";
     }
 }
 

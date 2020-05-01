@@ -101,19 +101,19 @@ public class DefaultBranchService implements BranchService {
     public BranchesResponse getBranch(String projectId, String id) {
         ContextHolder.setContext(projectId);
         BranchesResponse branchesResponse = new BranchesResponse();
-        Optional<Branch> branches = this.branchRepository.findByBranchId(id);
-        if (!branches.isPresent()) {
+        Optional<Branch> branchesOption = this.branchRepository.findByBranchId(id);
+        if (!branchesOption.isPresent()) {
             throw new NotFoundException(branchesResponse);
         }
-        Branch b = branches.get();
+        Branch b = branchesOption.get();
         List<RefJson> refs = new ArrayList<>();
-        Optional<RefJson> branchJson = branchIndex.findById(b.getDocId());
-        if (!branchJson.isPresent()) {
+        Optional<RefJson> refOption = branchIndex.findById(b.getDocId());
+        if (!refOption.isPresent()) {
             logger.error("DefaultBranchService: JSON Not found for {} with docId: {}",
                 b.getBranchId(), b.getDocId());
             throw new NotFoundException(branchesResponse);
         }
-        refs.add(branchJson.get());
+        refs.add(refOption.get());
         branchesResponse.setRefs(refs);
         if (b.isDeleted()) {
             throw new DeletedException(branchesResponse);
@@ -155,9 +155,9 @@ public class DefaultBranchService implements BranchService {
 
         branchIndex.update(branch);
 
-        Optional<Branch> ref = branchRepository.findByBranchId(b.getParentRefId());
-        if (ref.isPresent()) {
-            Optional<Commit> parentCommit = commitRepository.findLatestByRef(ref.get());
+        Optional<Branch> refOption = branchRepository.findByBranchId(b.getParentRefId());
+        if (refOption.isPresent()) {
+            Optional<Commit> parentCommit = commitRepository.findLatestByRef(refOption.get());
             parentCommit.ifPresent(parent -> {
                 b.setParentCommit(parent.getId());
             });
@@ -201,9 +201,9 @@ public class DefaultBranchService implements BranchService {
         b.setDeleted(true);
         branchRepository.save(b);
         List<RefJson> refs = new ArrayList<>();
-        Optional<RefJson> refOptional = branchIndex.findById(b.getDocId());
-        if(refOptional.isPresent()) {
-            RefJson refJson = refOptional.get();
+        Optional<RefJson> refOption = branchIndex.findById(b.getDocId());
+        if(refOption.isPresent()) {
+            RefJson refJson = refOption.get();
             refJson.setDeleted(true);
             branchIndex.update(refJson);
             refs.add(refJson);

@@ -8,10 +8,12 @@ import javax.transaction.Transactional;
 
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
+import org.openmbee.sdvc.core.dao.ProjectIndex;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.core.exceptions.DeletedException;
 import org.openmbee.sdvc.core.objects.Rejection;
+import org.openmbee.sdvc.data.domains.global.Metadata;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
@@ -38,10 +40,12 @@ public class ProjectsController extends BaseController {
     private static final String PROJECT_ID_VALID_PATTERN = "^[\\w-]+$";
 
     ProjectDAO projectRepository;
+    ProjectIndex projectIndex;
 
     @Autowired
-    public ProjectsController(ProjectDAO projectRepository) {
+    public ProjectsController(ProjectDAO projectRepository, ProjectIndex projectIndex) {
         this.projectRepository = projectRepository;
+        this.projectIndex = projectIndex;
     }
 
     @GetMapping
@@ -54,7 +58,12 @@ public class ProjectsController extends BaseController {
             if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
                 ProjectJson projectJson = new ProjectJson();
                 projectJson.merge(convertToMap(proj));
-                response.getProjects().add(projectJson);
+                Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
+                if (projectJsonOption.isPresent()) {
+                    response.getProjects().add(projectJsonOption.get());
+                } else {
+                    response.getProjects().add(projectJson);
+                }
             }
         }
         return response;

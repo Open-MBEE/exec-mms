@@ -3,7 +3,11 @@ package org.openmbee.sdvc.elastic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -42,11 +46,21 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
             commitIndex.mapping(getCommitMapping(), XContentType.JSON);
             CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
             nodeIndex.mapping(getNodeMapping(projectType), XContentType.JSON);
+            CreateIndexRequest metadataIndex = new CreateIndexRequest(index + "_metadata");
+            nodeIndex.mapping(getMetadataMapping(), XContentType.JSON);
             createIndex(commitIndex);
             createIndex(nodeIndex);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Optional<ProjectJson> findById(String docId) {
+        return this.findById(getIndex(), docId);
+    }
+
+    public List<ProjectJson> findAllById(Set<String> docIds) {
+        return this.findAllById(getIndex(), docIds);
     }
 
     private void createIndex(CreateIndexRequest request) throws IOException {
@@ -67,6 +81,12 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
 
     private String getCommitMapping() throws IOException {
         InputStream in = new ClassPathResource("elastic_mappings/commit.json")
+            .getInputStream();
+        return read(in);
+    }
+
+    private String getMetadataMapping() throws IOException {
+        InputStream in = new ClassPathResource("elastic_mappings/metadata.json")
             .getInputStream();
         return read(in);
     }
@@ -95,11 +115,16 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
     @Override
     public void update(ProjectJson json) {
         try {
-            UpdateRequest request = new UpdateRequest(this.getIndex() + "_node", json.getProjectId());
-            request.docAsUpsert(true).doc(json);
+            UpdateRequest request = new UpdateRequest(getIndex(), json.getDocId());
+            request.docAsUpsert(true).doc(json).upsert(json);
             client.update(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected String getIndex() {
+        return super.getIndex() + "_metadata";
     }
 }

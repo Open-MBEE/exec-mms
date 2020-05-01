@@ -25,6 +25,8 @@ public class Project extends Base {
     @JsonProperty("projectType")
     private String projectType;
 
+    private String docId;
+
     private String connectionString;
 
     @ManyToOne
@@ -83,6 +85,14 @@ public class Project extends Base {
 
     public void setProjectType(String projectType) {
         this.projectType = projectType;
+    }
+
+    public String getDocId() {
+        return docId;
+    }
+
+    public void setDocId(String docId) {
+        this.docId = docId;
     }
 
     public Organization getOrganization() {

@@ -1,6 +1,12 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.dao.OrgDAO;
@@ -9,6 +15,7 @@ import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
+import org.openmbee.sdvc.data.domains.global.Metadata;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
@@ -62,6 +69,11 @@ public class DefaultProjectService implements ProjectService {
         proj.setProjectName(project.getName());
         proj.setOrganization(org.get());
         proj.setProjectType(project.getProjectType());
+
+        String uuid = UUID.randomUUID().toString();
+        proj.setDocId(uuid);
+        project.setDocId(uuid);
+
         try {
             projectRepository.save(proj);
             projectIndex.create(proj.getProjectId(), project.getProjectType());
