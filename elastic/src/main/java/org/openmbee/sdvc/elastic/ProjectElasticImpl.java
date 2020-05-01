@@ -47,9 +47,10 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
             CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
             nodeIndex.mapping(getNodeMapping(projectType), XContentType.JSON);
             CreateIndexRequest metadataIndex = new CreateIndexRequest(index + "_metadata");
-            nodeIndex.mapping(getMetadataMapping(), XContentType.JSON);
+            metadataIndex.mapping(getMetadataMapping(), XContentType.JSON);
             createIndex(commitIndex);
             createIndex(nodeIndex);
+            createIndex(metadataIndex);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

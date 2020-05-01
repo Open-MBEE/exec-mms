@@ -29,7 +29,7 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
 
     @Override
     public void index(BaseJson json) {
-        this.index(json);
+        this.index(getIndex(), json);
     }
 
     public Optional<RefJson> findById(String docId) {

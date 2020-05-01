@@ -100,12 +100,9 @@ public class DefaultBranchService implements BranchService {
 
     public RefsResponse getBranch(String projectId, String id) {
         ContextHolder.setContext(projectId);
-        BranchesResponse branchesResponse = new BranchesResponse();
+        RefsResponse branchesResponse = new RefsResponse();
         Optional<Branch> branchesOption = this.branchRepository.findByBranchId(id);
         if (!branchesOption.isPresent()) {
-        RefsResponse branchesResponse = new RefsResponse();
-        Optional<Branch> branches = this.branchRepository.findByBranchId(id);
-        if (!branches.isPresent()) {
             throw new NotFoundException(branchesResponse);
         }
         Branch b = branchesOption.get();

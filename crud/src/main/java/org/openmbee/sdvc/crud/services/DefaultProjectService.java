@@ -1,27 +1,26 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.config.Constants;
+import org.openmbee.sdvc.core.dao.BranchDAO;
+import org.openmbee.sdvc.core.dao.BranchIndexDAO;
 import org.openmbee.sdvc.core.dao.OrgDAO;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
-import org.openmbee.sdvc.data.domains.global.Metadata;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.dao.ProjectIndex;
+import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
+import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +31,8 @@ public class DefaultProjectService implements ProjectService {
     protected ProjectDAO projectRepository;
     protected OrgDAO orgRepository;
     protected ProjectIndex projectIndex;
+    protected BranchDAO branchRepository;
+    protected BranchIndexDAO branchIndex;
     protected Optional<EventService> eventPublisher;
 
     @Autowired
@@ -47,6 +48,16 @@ public class DefaultProjectService implements ProjectService {
     @Autowired
     public void setProjectIndex(ProjectIndex projectIndex) {
         this.projectIndex = projectIndex;
+    }
+
+    @Autowired
+    public void setBranchRepository(BranchDAO branchRepository) {
+        this.branchRepository = branchRepository;
+    }
+
+    @Autowired
+    public void setBranchIndex(BranchIndexDAO branchIndex) {
+        this.branchIndex = branchIndex;
     }
 
     @Autowired
@@ -78,6 +89,25 @@ public class DefaultProjectService implements ProjectService {
             projectRepository.save(proj);
             projectIndex.create(proj.getProjectId(), project.getProjectType());
             projectIndex.update(project);
+
+            //Index master branch
+            Optional<Branch> masterBranch = branchRepository.findByBranchId(Constants.MASTER_BRANCH);
+            if (masterBranch.isPresent()) {
+                Branch master = masterBranch.get();
+                RefJson branchJson = new RefJson();
+                String docId = UUID.randomUUID().toString();
+                branchJson.setId(Constants.MASTER_BRANCH);
+                branchJson.setName(Constants.MASTER_BRANCH);
+                branchJson.setParentRefId(null);
+                branchJson.setDocId(docId);
+
+                master.setDocId(docId);
+                master.setParentCommit(0L);
+
+                branchRepository.save(master);
+                branchIndex.index(branchJson);
+            }
+
             eventPublisher.ifPresent((pub) -> pub.publish(
                 EventObject.create(project.getId(), "master", "project_created", project)));
             return project;
