@@ -1,6 +1,6 @@
 buildscript {
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
     }
 }
 
@@ -14,12 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compile(
+    implementation(
         project(':authenticator'),
         project(':localuser'),
         project(':ldap'),
@@ -37,7 +33,7 @@ dependencies {
         'org.springdoc:springdoc-openapi-security:1.3.1'
 
     )
-    testCompile(
+    testImplementation(
         'org.springframework.boot:spring-boot-starter-test'
     )
     swaggerCodegen 'org.openapitools:openapi-generator-cli:4.3.0'
@@ -67,4 +63,4 @@ swaggerSources {
     }
 }
 
-ext['elasticsearch.version'] = '7.1.1'
+ext['elasticsearch.version'] = "$elasticVersion"

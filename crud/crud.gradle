@@ -1,12 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'io.spring.convention.spring-module'
-apply plugin: 'jacoco'
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
 
-jacoco {
-    toolVersion = "0.8.5"
-}
+Map<String, String> commonDependencies = rootProject.ext.commonDependencies
+
 dependencies {
-    compile project(':core')
+    api project(':core')
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
+    testImplementation commonDependencies.'spring-boot-starter-test'
 }
