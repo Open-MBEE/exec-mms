@@ -1,0 +1,510 @@
+{
+	"info": {
+		"_postman_id": "95979133-24a0-437f-909e-59d2203ad714",
+		"name": "twc",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add new org tt",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has org tt\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('tt');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"tt\",\n\t\t\t\"name\": \"tt\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new project tt",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "561373d7-0551-4577-bffc-276c8a12b019",
+						"exec": [
+							"pm.test(\"response has project tt\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('tt');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"tt\", \n\t\t\t\"name\": \"tt\",\n\t\t\t\"orgId\": \"tt\",\n\t\t\t\"schema\": \"cameo\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create twcuser user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"twcuser\",\n\t\"password\": \"twcuser\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add twcuser to project tt with READER role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38bab316-eff8-43a8-91fc-b2dc283b306e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"twcuser\",\n                \"role\": \"READER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/tt/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"tt",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch master as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"branch has 5 perms\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/tt/refs/master/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"tt",
+						"refs",
+						"master",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "associate project tt with teamwork cloud",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "82a695c0-4512-454b-9c9b-a60ef1c35ee9",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"host\" : \"dev-twc-01.domain.com\",\n\t\"workspaceId\" : \"workspace1\",\n\t\"resourceId\" : \"resource1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/adm/maintenance/project/twcmetadata/tt",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"adm",
+						"maintenance",
+						"project",
+						"twcmetadata",
+						"tt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add twcuser to project tt with WRITER role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38bab316-eff8-43a8-91fc-b2dc283b306e",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"twcuser\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/tt/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"tt",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "associate project tt with teamwork cloud to invalid TWC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "82a695c0-4512-454b-9c9b-a60ef1c35ee9",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"host\" : \"invalid.twc.domain.com\",\n\t\"workspaceId\" : \"workspace1\",\n\t\"resourceId\" : \"resource1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/adm/maintenance/project/twcmetadata/tt",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"adm",
+						"maintenance",
+						"project",
+						"twcmetadata",
+						"tt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add twcuser to project tt with invalid mapping",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38bab316-eff8-43a8-91fc-b2dc283b306e",
+						"exec": [
+							"pm.test(\"Status code is 424\", function () {",
+							"    pm.response.to.have.status(424);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\": {\n    \t\"action\": \"MODIFY\",\n        \"permissions\": [\n            {\n                \"name\": \"twcuser\",\n                \"role\": \"WRITER\"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/tt/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"tt",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "disassociate project from teamwork cloud",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "82a695c0-4512-454b-9c9b-a60ef1c35ee9",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n}"
+				},
+				"url": {
+					"raw": "{{host}}/adm/maintenance/project/twcmetadata/tt",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"adm",
+						"maintenance",
+						"project",
+						"twcmetadata",
+						"tt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on branch master as admin Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c4dec7b1-208d-4f53-90f3-dd4f190c9739",
+						"exec": [
+							"pm.test(\"branch has 5 perms\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(3);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/tt/refs/master/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"tt",
+						"refs",
+						"master",
+						"permissions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "test",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "test",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"id": "06217212-c342-4e94-a5e8-c6450f05af75",
+			"key": "host",
+			"value": "localhost:8080",
+			"type": "string"
+		}
+	]
+}

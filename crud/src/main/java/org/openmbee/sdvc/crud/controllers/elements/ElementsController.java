@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.ElementsRequest;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
+@Tag(name = "Elements")
 public class ElementsController extends BaseController {
 
     @GetMapping
@@ -60,7 +61,7 @@ public class ElementsController extends BaseController {
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
         @RequestParam(required = false) Map<String, String> params,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
 
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
@@ -93,7 +94,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
 
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
@@ -106,7 +107,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
-        @Parameter(hidden = true) Authentication auth) {
+        Authentication auth) {
 
         return getNodeService(projectId).delete(projectId, refId, req, auth.getName());
     }

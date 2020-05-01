@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.webhooks.objects;
 
-import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.webhooks.json.WebhookJson;
 

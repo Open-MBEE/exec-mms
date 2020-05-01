@@ -25,13 +25,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
     name = "basicAuth",
     type = SecuritySchemeType.HTTP,
     scheme = "basic"
-)*/ //can't get multiple security scheme to show
+),*///can't get multiple security scheme to show
 @SecurityScheme(
     name = "bearerToken",
     type = SecuritySchemeType.HTTP,
     scheme = "bearer",
     bearerFormat = "JWT"
-)
+)//})
 public class ExampleApplication {
 
     public static void main(String[] args) {

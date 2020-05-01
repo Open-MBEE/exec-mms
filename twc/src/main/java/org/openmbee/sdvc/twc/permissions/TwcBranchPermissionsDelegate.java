@@ -1,12 +1,18 @@
 package org.openmbee.sdvc.twc.permissions;
 
+import exceptions.TwcPermissionException;
+import org.openmbee.sdvc.core.builders.PermissionUpdateResponseBuilder;
+import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
 import org.openmbee.sdvc.core.delegation.PermissionsDelegate;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
+import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
+import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
 import org.openmbee.sdvc.core.utils.RestUtils;
 import org.openmbee.sdvc.data.domains.global.Branch;
 import org.openmbee.sdvc.twc.TeamworkCloud;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import java.util.Set;
 
@@ -55,34 +61,37 @@ public class TwcBranchPermissionsDelegate implements PermissionsDelegate{
 
     @Override
     public void setPublic(boolean isPublic) {
-        //TODO should probably throw an error so users know they can't modify permissions from here
+        forbidden();
     }
 
     @Override
-    public void updateUserPermissions(PermissionUpdateRequest req) {
-        //TODO should probably throw an error so users know they can't modify permissions from here: they must use TWC
+    public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
+        forbidden();
+        return new PermissionUpdateResponseBuilder().getPermissionUpdateResponse();
     }
 
     @Override
-    public void updateGroupPermissions(PermissionUpdateRequest req) {
-        //TODO should probably throw an error so users know they can't modify permissions from here: they must use TWC
+    public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
+        forbidden();
+        return new PermissionUpdateResponseBuilder().getPermissionUpdateResponse();
     }
 
     @Override
     public PermissionResponse getUserRoles() {
-        //TODO should probably throw so users know they can't view all permissions from here (assuming this is only used for admin purposes)
+        forbidden();
         return null;
     }
 
     @Override
     public PermissionResponse getGroupRoles() {
-        //TODO should probably throw so users know they can't view all permissions from here (assuming this is only used for admin purposes)
+        forbidden();
         return null;
     }
 
     @Override
-    public void recalculateInheritedPerms() {
+    public PermissionUpdatesResponse recalculateInheritedPerms() {
         //Do nothing, permission inheritance will be handled by TWC
+        return new PermissionUpdatesResponseBuilder().getPermissionUpdatesReponse();
     }
 
     public Branch getBranch() {
@@ -99,5 +108,16 @@ public class TwcBranchPermissionsDelegate implements PermissionsDelegate{
 
     public String getResourceId() {
         return resourceId;
+    }
+
+    private void forbidden() {
+        throw new TwcPermissionException(HttpStatus.FORBIDDEN,
+            String.format("Permissions for org %s (%s), project %s (%s), branch % is controlled by Teamwork Cloud (%s)",
+                branch.getProject().getOrganization().getOrganizationName(),
+                branch.getProject().getOrganization().getOrganizationId(),
+                branch.getProject().getProjectName(),
+                branch.getProject().getProjectId(),
+                branch.getBranchId(),
+                teamworkCloud.getUrl()));
     }
 }

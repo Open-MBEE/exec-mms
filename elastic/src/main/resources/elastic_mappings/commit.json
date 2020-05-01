@@ -22,7 +22,7 @@
                     "_docId":{
                         "type":"keyword"
                     },
-                    "previousDocId":{
+                    "_previousDocId":{
                         "type":"keyword"
                     },
                     "type":{
@@ -35,7 +35,7 @@
                     "id":{
                         "type":"keyword"
                     },
-                    "previousDocId":{
+                    "_previousDocId":{
                         "type":"keyword"
                     },
                     "type":{

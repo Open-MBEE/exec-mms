@@ -21,13 +21,15 @@ yaml at http://localhost:8080/v3/api-docs.yaml - will need to fix securityScheme
           scheme: basic
           
 - change schema of ElementJson to just `type: object` (otherwise client generation ignores `additionalProperties` unless using `python-experimental` which needs other changes)
-- TODO - `addtionalProperties` in openapi spec should be just `addtionalProperties: true` where it appears
+- change `addtionalProperties` in openapi spec to be just `addtionalProperties: true` where it appears
 
 ## Run command line api test
 
 1. run example app on localhost (see top level readme)
 
-        npm install -g newman
+    1. copy localhost-env.json.example to localhost-env.json, change values accordingly
+
+            npm install -g newman
     
-        newman run sdvc.postman_collection.json -e localhost-env.json --delay-request 1000
+            newman run crud.postman_collection.json -e localhost-env.json --delay-request 300
         

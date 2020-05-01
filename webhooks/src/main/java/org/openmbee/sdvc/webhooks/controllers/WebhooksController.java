@@ -2,6 +2,7 @@ package org.openmbee.sdvc.webhooks.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.dao.WebhookDAO;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
@@ -21,6 +22,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/projects/{projectId}/webhooks")
+@Tag(name = "Webhooks")
 public class WebhooksController {
 
     private WebhookDAO webhookRepository;

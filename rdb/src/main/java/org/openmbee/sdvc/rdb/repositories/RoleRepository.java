@@ -13,6 +13,6 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     Optional<Role> findByName(String name);
 
-    List<Role> findAllByPrivileges(List<Privilege> privileges);
+    List<Role> findAllByPrivilegesIn(List<Privilege> privileges);
 
 }

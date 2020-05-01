@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,8 +21,8 @@ import org.openmbee.sdvc.core.dao.CommitDAO;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
-import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.CommitJson;
+import org.openmbee.sdvc.json.ElementVersion;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -114,10 +113,10 @@ public class NodeOperation {
         e.setCreator(cmjs.getCreator()); //Only set on creation of new element
         e.setCreated(cmjs.getCreated());
 
-        Map<String, Object> newObj = new HashMap<>();
-        newObj.put(CommitJson.TYPE, "Element");
-        newObj.put(BaseJson.DOCID, e.getDocId());
-        newObj.put(BaseJson.ID, e.getId());
+        ElementVersion newObj = new ElementVersion()
+            .setDocId(e.getDocId())
+            .setId(e.getId())
+            .setType("Element");
         cmjs.getAdded().add(newObj);
 
         n.setNodeId(e.getId());
@@ -125,18 +124,19 @@ public class NodeOperation {
     }
 
     public void processElementUpdated(ElementJson e, Node n, NodeChangeInfo info) {
+        String previousDocId = n.getDocId();
         processElementAddedOrUpdated(e, n, info);
 
-        info.getOldDocIds().add(n.getDocId());
-        Map<String, Object> newObj = new HashMap<>();
-        newObj.put(CommitJson.PREVIOUS, n.getDocId());
-        newObj.put(CommitJson.TYPE, "Element");
-        newObj.put(BaseJson.DOCID, e.getDocId());
-        newObj.put(BaseJson.ID, e.getId());
+        info.getOldDocIds().add(previousDocId);
+        ElementVersion newObj= new ElementVersion()
+            .setPreviousDocId(previousDocId)
+            .setDocId(e.getDocId())
+            .setId(e.getId())
+            .setType("Element");
         info.getCommitJson().getUpdated().add(newObj);
     }
 
-    public void processElementAddedOrUpdated(ElementJson e, Node n, NodeChangeInfo info) {
+    private void processElementAddedOrUpdated(ElementJson e, Node n, NodeChangeInfo info) {
         CommitJson cmjs = info.getCommitJson();
         e.setProjectId(cmjs.getProjectId());
         e.setRefId(cmjs.getRefId());
@@ -159,10 +159,10 @@ public class NodeOperation {
     }
 
     public void processElementDeleted(ElementJson e, Node n, NodeChangeInfo info) {
-        Map<String, Object> newObj = new HashMap<>();
-        newObj.put(CommitJson.PREVIOUS, n.getDocId());
-        newObj.put(CommitJson.TYPE, "Element");
-        newObj.put(BaseJson.ID, e.getId());
+        ElementVersion newObj = new ElementVersion()
+            .setPreviousDocId(n.getDocId())
+            .setId(e.getId())
+            .setType("Element");
         info.getCommitJson().getDeleted().add(newObj);
         info.getOldDocIds().add(n.getDocId());
         info.getToSaveNodeMap().put(n.getNodeId(), n);
