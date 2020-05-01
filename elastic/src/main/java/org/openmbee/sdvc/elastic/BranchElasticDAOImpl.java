@@ -76,7 +76,7 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
 
     @Override
     protected String getIndex() {
-        return super.getIndex() + "_commit";
+        return super.getIndex() + "_node";
     }
 }
 

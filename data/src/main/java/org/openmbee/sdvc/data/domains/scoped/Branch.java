@@ -36,12 +36,12 @@ public class Branch {
 
     }
 
-    public Branch(String description, String branchId, String branchName, String docId, String parentRef,
+    public Branch(String docId, String description, String branchId, String branchName, String parentRef,
         Long parentCommit, Instant timestamp, boolean tag, boolean deleted) {
+        setDocId(docId);
         setDescription(description);
         setBranchId(branchId);
         setBranchName(branchName);
-        setDocId(docId);
         setParentRefId(parentRef);
         setParentCommit(parentCommit);
         setTimestamp(timestamp);

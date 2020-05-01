@@ -107,7 +107,13 @@ public class DefaultBranchService implements BranchService {
         }
         Branch b = branches.get();
         List<RefJson> refs = new ArrayList<>();
-        refs.add(convertToJson(b));
+        Optional<RefJson> branchJson = branchIndex.findById(b.getDocId());
+        if (!branchJson.isPresent()) {
+            logger.error("DefaultBranchService: JSON Not found for {} with docId: {}",
+                b.getBranchId(), b.getDocId());
+            throw new NotFoundException(branchesResponse);
+        }
+        refs.add(branchJson.get());
         branchesResponse.setRefs(refs);
         if (b.isDeleted()) {
             throw new DeletedException(branchesResponse);
@@ -127,7 +133,7 @@ public class DefaultBranchService implements BranchService {
         b.setTag(branch.isTag());
         b.setTimestamp(Instant.now());
 
-        if (branch.getDocId() == null) {
+        if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
             String uuid = UUID.randomUUID().toString();
             branch.setDocId(uuid);
             b.setDocId(uuid);
@@ -195,11 +201,14 @@ public class DefaultBranchService implements BranchService {
         b.setDeleted(true);
         branchRepository.save(b);
         List<RefJson> refs = new ArrayList<>();
-
-        branchIndex.deleteById(b.getDocId());
-
-        refs.add(convertToJson(b));
-        branchesResponse.setRefs(refs);
+        Optional<RefJson> refOptional = branchIndex.findById(b.getDocId());
+        if(refOptional.isPresent()) {
+            RefJson refJson = refOptional.get();
+            refJson.setDeleted(true);
+            branchIndex.update(refJson);
+            refs.add(refJson);
+            branchesResponse.setRefs(refs);
+        }
         return branchesResponse;
     }
 
