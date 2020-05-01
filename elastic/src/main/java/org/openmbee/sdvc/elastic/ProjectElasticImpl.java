@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.dao.ProjectIndex;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +126,9 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
 
     @Override
     protected String getIndex() {
+        if (ContextHolder.getContext().getProjectId() == null) {
+            return null;
+        }
         return super.getIndex() + "_metadata";
     }
 }
