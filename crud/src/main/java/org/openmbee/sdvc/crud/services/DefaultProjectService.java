@@ -1,10 +1,13 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.config.Constants;
+import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.config.Formats;
 import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.core.dao.BranchIndexDAO;
 import org.openmbee.sdvc.core.dao.OrgDAO;
@@ -21,6 +24,7 @@ import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.json.RefJson;
+import org.openmbee.sdvc.json.RefType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,6 +88,8 @@ public class DefaultProjectService implements ProjectService {
         String uuid = UUID.randomUUID().toString();
         proj.setDocId(uuid);
         project.setDocId(uuid);
+        project.setCreated(Formats.FORMATTER.format(Instant.now()));
+        project.setType("Project");
 
         try {
             projectRepository.save(proj);
@@ -100,6 +106,11 @@ public class DefaultProjectService implements ProjectService {
                 branchJson.setName(Constants.MASTER_BRANCH);
                 branchJson.setParentRefId(null);
                 branchJson.setDocId(docId);
+                branchJson.setRefType(RefType.Branch);
+                branchJson.setCreated(project.getCreated());
+                branchJson.setProjectId(project.getId());
+                branchJson.setCreator(project.getCreator());
+                branchJson.setDeleted(false);
 
                 master.setDocId(docId);
                 master.setParentCommit(0L);
@@ -120,22 +131,24 @@ public class DefaultProjectService implements ProjectService {
 
     public ProjectJson update(ProjectJson project) {
         Optional<Project> projOption = projectRepository.findByProjectId(project.getProjectId());
-        if (projOption.isPresent() && !projOption.get().getProjectId().isEmpty()) {
+        if (projOption.isPresent()) {
+            ContextHolder.setContext(project.getProjectId());
             Project proj = projOption.get();
-            proj.setProjectId(project.getProjectId());
-            proj.setProjectName(project.getName());
-            if (!project.getOrgId().isEmpty()) {
+            if (project.getName() != null && !project.getName().isEmpty()) {
+                proj.setProjectName(project.getName());
+            }
+            if (project.getOrgId() != null && !project.getOrgId().isEmpty()) {
                 Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
                 if (org.isPresent() && !org.get().getOrganizationId().isEmpty()) {
                     proj.setOrganization(org.get());
+                    //TODO check permissions and fix inherited permissions
                 } else {
                     throw new BadRequestException("Invalid organization");
                 }
             }
+            project.setDocId(proj.getDocId());
             projectRepository.save(proj);
-            projectIndex.update(project);
-
-            return project;
+            return projectIndex.update(project);
         }
         throw new InternalErrorException("Could not update project");
     }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
-import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -114,14 +113,8 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
     }
 
     @Override
-    public void update(ProjectJson json) {
-        try {
-            UpdateRequest request = new UpdateRequest(getIndex(), json.getDocId());
-            request.docAsUpsert(true).doc(json).upsert(json);
-            client.update(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public ProjectJson update(ProjectJson json) {
+        return this.update(getIndex(), json);
     }
 
     @Override

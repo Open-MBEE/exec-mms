@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.config.Formats;
 import org.openmbee.sdvc.core.dao.BranchIndexDAO;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.objects.RefsResponse;
@@ -122,7 +123,6 @@ public class DefaultBranchService implements BranchService {
     }
 
     public RefJson createBranch(String projectId, RefJson branch) {
-        //TODO sanitize or reject branch id
         Instant now = Instant.now();
         ContextHolder.setContext(projectId);
         Branch b = new Branch();
@@ -131,14 +131,16 @@ public class DefaultBranchService implements BranchService {
         b.setBranchName(branch.getName());
         b.setDescription(branch.getDescription());
         b.setTag(branch.isTag());
-        b.setTimestamp(Instant.now());
+        b.setTimestamp(now);
+        branch.setCreated(Formats.FORMATTER.format(now));
+        branch.setDeleted(false);
+        branch.setProjectId(projectId);
 
         if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
             String uuid = UUID.randomUUID().toString();
             branch.setDocId(uuid);
             b.setDocId(uuid);
         }
-
         logger.info("Saving branch: {}", branch.getId());
 
         if (branch.getParentRefId() != null) {
@@ -153,13 +155,12 @@ public class DefaultBranchService implements BranchService {
             throw new BadRequestException("Internal Error: Invalid branch creation logic.");
         }
 
-        branchIndex.update(branch);
-
         Optional<Branch> refOption = branchRepository.findByBranchId(b.getParentRefId());
         if (refOption.isPresent()) {
             Optional<Commit> parentCommit = commitRepository.findLatestByRef(refOption.get());
             parentCommit.ifPresent(parent -> {
                 b.setParentCommit(parent.getId());
+                branch.setParentCommitId(parent.getDocId()); //commit id is same as its docId
             });
         }
 
@@ -168,19 +169,17 @@ public class DefaultBranchService implements BranchService {
             //creating more branches are not allowed until there's at least 1 commit, same as git
         }
 
-        b.setTimestamp(now);
         try {
+            branchIndex.update(branch);
             branchRepository.save(b);
             Set<String> docIds = new HashSet<>();
             for (Node n: nodeRepository.findAllByDeleted(false)) {
                 docIds.add(n.getDocId());
             }
             nodeIndex.addToRef(docIds);
-            RefJson res = convertToJson(b);
-            res.setProjectId(projectId);
             eventPublisher.ifPresent((pub) -> pub.publish(
-                EventObject.create(projectId, res.getId(), "branch_created", res)));
-            return res;
+                EventObject.create(projectId, branch.getId(), "branch_created", branch)));
+            return branch;
         } catch (Exception e) {
             logger.error("Couldn't create branch: {}", branch.getId(), e);
             throw new InternalErrorException(e);
@@ -201,32 +200,10 @@ public class DefaultBranchService implements BranchService {
         b.setDeleted(true);
         branchRepository.save(b);
         List<RefJson> refs = new ArrayList<>();
-        Optional<RefJson> refOption = branchIndex.findById(b.getDocId());
-        if(refOption.isPresent()) {
-            RefJson refJson = refOption.get();
-            refJson.setDeleted(true);
-            branchIndex.update(refJson);
-            refs.add(refJson);
-            branchesResponse.setRefs(refs);
-        }
+        RefJson refJson = new RefJson().setDocId(b.getDocId()).setDeleted(true)
+            .setProjectId(projectId).setId(id);
+        refs.add(branchIndex.update(refJson));
+        branchesResponse.setRefs(refs);
         return branchesResponse;
-    }
-
-    private RefJson convertToJson(Branch branch) {
-        RefJson refJson = new RefJson();
-        if (branch != null) {
-            refJson.setParentRefId(branch.getParentRefId());
-            if (branch.getParentCommit() != null) {
-                Optional<Commit> c = commitRepository.findById(branch.getParentCommit());
-                c.ifPresent(parent -> {
-                    refJson.setParentCommitId(parent.getDocId());
-                });
-            }
-            refJson.setId(branch.getBranchId());
-            refJson.setName(branch.getBranchName());
-            refJson.setType(branch.isTag() ? "Tag" : "Branch");
-            refJson.setDeleted(branch.isDeleted());
-        }
-        return refJson;
     }
 }

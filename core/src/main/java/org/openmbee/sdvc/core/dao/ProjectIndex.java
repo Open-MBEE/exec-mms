@@ -17,6 +17,6 @@ public interface ProjectIndex {
 
     void delete(String projectId);
 
-    void update(ProjectJson projectJson);
+    ProjectJson update(ProjectJson projectJson);
 
 }

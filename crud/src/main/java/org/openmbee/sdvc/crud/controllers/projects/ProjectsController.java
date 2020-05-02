@@ -117,11 +117,8 @@ public class ProjectsController extends BaseController {
                         continue;
                     }
 
-                    if(json.getCreator() == null || json.getCreator().isEmpty()) {
+                    if (json.getCreator() == null || json.getCreator().isEmpty()) {
                         json.setCreator(auth.getName());
-                    }
-                    if(json.getModifier() == null || json.getModifier().isEmpty()) {
-                        json.setModifier(auth.getName());
                     }
 
                     response.getProjects().add(ps.create(json));

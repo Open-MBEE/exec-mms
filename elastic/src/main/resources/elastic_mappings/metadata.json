@@ -22,6 +22,21 @@
         },
         "_projectId": {
             "type": "keyword"
+        },
+        "orgId": {
+            "type": "keyword"
+        },
+        "type": {
+            "type": "keyword"
+        },
+        "parentCommitId": {
+            "type": "keyword"
+        },
+        "parentRefId": {
+            "type": "keyword"
+        },
+        "schema": {
+            "type": "keyword"
         }
     }
 }

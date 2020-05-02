@@ -67,6 +67,7 @@ public class NodeOperation {
         cmjs.setAdded(new ArrayList<>());
         cmjs.setDeleted(new ArrayList<>());
         cmjs.setUpdated(new ArrayList<>());
+        cmjs.setType("Commit");
     }
 
     public NodeChangeInfo initInfo(List<ElementJson> elements, CommitJson cmjs) {

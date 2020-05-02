@@ -23,5 +23,5 @@ public interface BranchIndexDAO {
 
     boolean existsById(String docId);
 
-    void update(RefJson projectJson);
+    RefJson update(RefJson refJson);
 }

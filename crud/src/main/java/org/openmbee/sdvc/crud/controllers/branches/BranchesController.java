@@ -90,8 +90,8 @@ public class BranchesController extends BaseController {
                 }
 
                 RefJson res;
-
-                if(branch.getParentCommitId() == null || branch.getParentCommitId().isEmpty()) {
+                branch.setCreator(auth.getName());
+                if (branch.getParentCommitId() == null || branch.getParentCommitId().isEmpty()) {
                     res = branchService.createBranch(projectId, branch);
                 } else {
                     //TODO implement branching from historical commit
