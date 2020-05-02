@@ -1,8 +1,15 @@
 package org.openmbee.sdvc.crud.services;
 
+import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openmbee.sdvc.core.config.Constants;
+import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.config.Formats;
+import org.openmbee.sdvc.core.dao.BranchDAO;
+import org.openmbee.sdvc.core.dao.BranchIndexDAO;
 import org.openmbee.sdvc.core.dao.OrgDAO;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.objects.EventObject;
@@ -13,8 +20,11 @@ import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.dao.ProjectIndex;
+import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
+import org.openmbee.sdvc.json.RefJson;
+import org.openmbee.sdvc.json.RefType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +35,8 @@ public class DefaultProjectService implements ProjectService {
     protected ProjectDAO projectRepository;
     protected OrgDAO orgRepository;
     protected ProjectIndex projectIndex;
+    protected BranchDAO branchRepository;
+    protected BranchIndexDAO branchIndex;
     protected Optional<EventService> eventPublisher;
 
     @Autowired
@@ -40,6 +52,16 @@ public class DefaultProjectService implements ProjectService {
     @Autowired
     public void setProjectIndex(ProjectIndex projectIndex) {
         this.projectIndex = projectIndex;
+    }
+
+    @Autowired
+    public void setBranchRepository(BranchDAO branchRepository) {
+        this.branchRepository = branchRepository;
+    }
+
+    @Autowired
+    public void setBranchIndex(BranchIndexDAO branchIndex) {
+        this.branchIndex = branchIndex;
     }
 
     @Autowired
@@ -62,9 +84,41 @@ public class DefaultProjectService implements ProjectService {
         proj.setProjectName(project.getName());
         proj.setOrganization(org.get());
         proj.setProjectType(project.getProjectType());
+
+        String uuid = UUID.randomUUID().toString();
+        proj.setDocId(uuid);
+        project.setDocId(uuid);
+        project.setCreated(Formats.FORMATTER.format(Instant.now()));
+        project.setType("Project");
+
         try {
             projectRepository.save(proj);
             projectIndex.create(proj.getProjectId(), project.getProjectType());
+            projectIndex.update(project);
+
+            //Index master branch
+            Optional<Branch> masterBranch = branchRepository.findByBranchId(Constants.MASTER_BRANCH);
+            if (masterBranch.isPresent()) {
+                Branch master = masterBranch.get();
+                RefJson branchJson = new RefJson();
+                String docId = UUID.randomUUID().toString();
+                branchJson.setId(Constants.MASTER_BRANCH);
+                branchJson.setName(Constants.MASTER_BRANCH);
+                branchJson.setParentRefId(null);
+                branchJson.setDocId(docId);
+                branchJson.setRefType(RefType.Branch);
+                branchJson.setCreated(project.getCreated());
+                branchJson.setProjectId(project.getId());
+                branchJson.setCreator(project.getCreator());
+                branchJson.setDeleted(false);
+
+                master.setDocId(docId);
+                master.setParentCommit(0L);
+
+                branchRepository.save(master);
+                branchIndex.index(branchJson);
+            }
+
             eventPublisher.ifPresent((pub) -> pub.publish(
                 EventObject.create(project.getId(), "master", "project_created", project)));
             return project;
@@ -77,20 +131,24 @@ public class DefaultProjectService implements ProjectService {
 
     public ProjectJson update(ProjectJson project) {
         Optional<Project> projOption = projectRepository.findByProjectId(project.getProjectId());
-        if (projOption.isPresent() && !projOption.get().getProjectId().isEmpty()) {
+        if (projOption.isPresent()) {
+            ContextHolder.setContext(project.getProjectId());
             Project proj = projOption.get();
-            proj.setProjectId(project.getProjectId());
-            proj.setProjectName(project.getName());
-            if (!project.getOrgId().isEmpty()) {
+            if (project.getName() != null && !project.getName().isEmpty()) {
+                proj.setProjectName(project.getName());
+            }
+            if (project.getOrgId() != null && !project.getOrgId().isEmpty()) {
                 Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
                 if (org.isPresent() && !org.get().getOrganizationId().isEmpty()) {
                     proj.setOrganization(org.get());
+                    //TODO check permissions and fix inherited permissions
                 } else {
                     throw new BadRequestException("Invalid organization");
                 }
             }
+            project.setDocId(proj.getDocId());
             projectRepository.save(proj);
-            return project;
+            return projectIndex.update(project);
         }
         throw new InternalErrorException("Could not update project");
     }

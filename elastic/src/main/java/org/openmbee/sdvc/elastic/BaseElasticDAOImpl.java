@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
@@ -15,8 +16,11 @@ import org.elasticsearch.action.get.MultiGetItemResponse;
 import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.json.BaseJson;
@@ -139,5 +143,27 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public E update(String index, BaseJson json) {
+        E response = newInstance();
+        response.putAll(json);
+        try {
+            UpdateRequest request = new UpdateRequest(index, json.getDocId());
+            request.fetchSource(true);
+            request.docAsUpsert(true).doc(json).upsert(json);
+            UpdateResponse updateResponse = client.update(request, RequestOptions.DEFAULT);
+            if (updateResponse.getResult() == DocWriteResponse.Result.CREATED ||
+                updateResponse.getResult() == DocWriteResponse.Result.UPDATED) {
+                GetResult result = updateResponse.getGetResult();
+                if (result.isExists()) {
+                    response.putAll(result.sourceAsMap());
+                }
+            }
+            // TODO: Handle other getResults maybe
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return response;
     }
 }

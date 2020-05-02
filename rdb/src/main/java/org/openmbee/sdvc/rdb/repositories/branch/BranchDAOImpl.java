@@ -27,8 +27,8 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
         this.branchesOperations = branchesOperations;
     }
 
-    private final String INSERT_SQL = "INSERT INTO branches (description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    private final String UPDATE_SQL = "UPDATE branches SET description = ?, branchId = ?, branchName = ?, parentRefId = ?, parentCommit = ?, timestamp = ?, tag = ?, deleted = ? WHERE id = ?";
+    private final String INSERT_SQL = "INSERT INTO branches (docId, description, branchId, branchName, parentRefId, parentCommit, timestamp, tag, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String UPDATE_SQL = "UPDATE branches SET docId = ?, description = ?, branchId = ?, branchName = ?, parentRefId = ?, parentCommit = ?, timestamp = ?, tag = ?, deleted = ? WHERE id = ?";
 
     public Branch save(Branch branch) {
 
@@ -90,16 +90,17 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
     }
 
     private PreparedStatement prepareStatement(PreparedStatement ps, Branch branch) throws SQLException {
-        ps.setString(1, branch.getDescription());
-        ps.setString(2, branch.getBranchId());
-        ps.setString(3, branch.getBranchName());
-        ps.setString(4, branch.getParentRefId());
-        ps.setLong(5, branch.getParentCommit());
-        ps.setTimestamp(6, Timestamp.from(branch.getTimestamp()));
-        ps.setBoolean(7, branch.isTag());
-        ps.setBoolean(8, branch.isDeleted());
+        ps.setString(1, branch.getDocId());
+        ps.setString(2, branch.getDescription());
+        ps.setString(3, branch.getBranchId());
+        ps.setString(4, branch.getBranchName());
+        ps.setString(5, branch.getParentRefId());
+        ps.setLong(6, branch.getParentCommit());
+        ps.setTimestamp(7, Timestamp.from(branch.getTimestamp()));
+        ps.setBoolean(8, branch.isTag());
+        ps.setBoolean(9, branch.isDeleted());
         if (branch.getId() != null) {
-            ps.setLong(9, branch.getId());
+            ps.setLong(10, branch.getId());
         }
         return ps;
     }

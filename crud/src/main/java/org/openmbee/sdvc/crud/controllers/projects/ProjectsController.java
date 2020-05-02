@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
+import org.openmbee.sdvc.core.dao.ProjectIndex;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.core.exceptions.DeletedException;
 import org.openmbee.sdvc.core.objects.Rejection;
+import org.openmbee.sdvc.data.domains.global.Metadata;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
@@ -38,10 +41,12 @@ public class ProjectsController extends BaseController {
     private static final String PROJECT_ID_VALID_PATTERN = "^[\\w-]+$";
 
     ProjectDAO projectRepository;
+    ProjectIndex projectIndex;
 
     @Autowired
-    public ProjectsController(ProjectDAO projectRepository) {
+    public ProjectsController(ProjectDAO projectRepository, ProjectIndex projectIndex) {
         this.projectRepository = projectRepository;
+        this.projectIndex = projectIndex;
     }
 
     @GetMapping
@@ -51,9 +56,11 @@ public class ProjectsController extends BaseController {
         List<Project> allProjects = projectRepository.findAll();
         for (Project proj : allProjects) {
             if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
-                ProjectJson projectJson = new ProjectJson();
-                projectJson.merge(convertToMap(proj));
-                response.getProjects().add(projectJson);
+                ContextHolder.setContext(proj.getProjectId());
+                Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
+                projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), ()-> {
+                    logger.error("Project json not found for id: {}", proj.getProjectId());
+                });
             }
         }
         return response;
@@ -64,14 +71,16 @@ public class ProjectsController extends BaseController {
     public ProjectsResponse getProject(
         @PathVariable String projectId) {
 
+        ContextHolder.setContext(projectId);
         ProjectsResponse response = new ProjectsResponse();
         Optional<Project> projectOption = projectRepository.findByProjectId(projectId);
         if (!projectOption.isPresent()) {
             throw new NotFoundException(response.addMessage("Project not found"));
         }
-        ProjectJson projectJson = new ProjectJson();
-        projectJson.merge(convertToMap(projectOption.get()));
-        response.getProjects().add(projectJson);
+        Optional<ProjectJson> projectJsonOption = projectIndex.findById(projectOption.get().getDocId());
+        projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), ()-> {
+            throw new NotFoundException(response.addMessage("Project JSON not found"));
+        });
         if (projectOption.get().isDeleted()) {
             throw new DeletedException(response);
         }
@@ -108,11 +117,8 @@ public class ProjectsController extends BaseController {
                         continue;
                     }
 
-                    if(json.getCreator() == null || json.getCreator().isEmpty()) {
+                    if (json.getCreator() == null || json.getCreator().isEmpty()) {
                         json.setCreator(auth.getName());
-                    }
-                    if(json.getModifier() == null || json.getModifier().isEmpty()) {
-                        json.setModifier(auth.getName());
                     }
 
                     response.getProjects().add(ps.create(json));

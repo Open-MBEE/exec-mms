@@ -323,6 +323,94 @@
 			"response": []
 		},
 		{
+			"name": "update project aa metadata",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project aa\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('aa');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"aa\", \n\t\t\t\"extraField\": \"something\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get project aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project aa with extra field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].extraField).to.eql('something');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "add elements to aa",
 			"event": [
 				{
@@ -641,10 +729,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/master/commits",
 					"host": [
@@ -690,10 +774,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/master/elements/x/commits",
 					"host": [
@@ -740,10 +820,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/master/elements/y/commits",
 					"host": [
@@ -789,10 +865,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/master/elements/z/commits",
 					"host": [
@@ -831,10 +903,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/commits/{{commitId1}}",
 					"host": [
@@ -943,7 +1011,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"refa\",\n\t\t\t\"name\": \"refa\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"refa\",\n\t\t\t\"name\": \"refa\",\n\t\t\t\"type\": \"Branch\",\n\t\t\t\"extraField\": \"something\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs",
@@ -954,6 +1022,55 @@
 						"projects",
 						"aa",
 						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get branch refa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+						"exec": [
+							"pm.test(\"branch refa has extraField\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.refs[0].extraField).to.eql('something');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/refa",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"refa"
 					]
 				}
 			},
@@ -1003,6 +1120,92 @@
 			"response": []
 		},
 		{
+			"name": "create branch ref-a",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"ref-a\",\n\t\t\t\"name\": \"ref-a\",\n\t\t\t\"type\": \"Branch\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch ref-b from ref-a",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"ref-b\",\n\t\t\t\"name\": \"ref-b\",\n\t\t\t\"type\": \"Branch\",\n\t\t\t\"parentRefId\": \"ref-a\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "check inRefIds",
 			"event": [
 				{
@@ -1024,10 +1227,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/refa/elements",
 					"host": [
@@ -1218,10 +1417,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/master/commits",
 					"host": [
@@ -1269,10 +1464,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/refa/commits",
 					"host": [
@@ -1319,10 +1510,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/refa/elements/x/commits",
 					"host": [
@@ -1370,10 +1557,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/refa/elements/y/commits",
 					"host": [
@@ -1420,10 +1603,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/refa/elements/z/commits",
 					"host": [
@@ -1696,10 +1875,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs/refa/elements/x",
 					"host": [
@@ -2658,5 +2833,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
