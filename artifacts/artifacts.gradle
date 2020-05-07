@@ -5,6 +5,7 @@ Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
     api project(':core')
+    implementation project(':crud')
 
     testImplementation commonDependencies.'spring-boot-starter-test'
 }

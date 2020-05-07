@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.artifacts;
+package org.openmbee.sdvc.artifacts.storage;
 
 import org.openmbee.sdvc.json.ElementJson;
 
