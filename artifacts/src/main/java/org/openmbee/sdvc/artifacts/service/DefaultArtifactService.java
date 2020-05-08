@@ -93,7 +93,7 @@ public class DefaultArtifactService implements ArtifactService {
     private ElementJson getElement(NodeService nodeService, String projectId, String refId, String id, Map<String, String> params) {
 
         ElementsResponse elementsResponse = nodeService.read(projectId, refId, id, params);
-        if(elementsResponse.getElements() == null && elementsResponse.getElements().isEmpty()) {
+        if(elementsResponse.getElements() == null || elementsResponse.getElements().isEmpty()) {
             return null;
         } else if(elementsResponse.getElements().size() > 1) {
             throw new ConflictException("Multiple elements found with id " + id);
