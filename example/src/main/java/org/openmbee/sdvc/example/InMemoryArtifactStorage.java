@@ -23,6 +23,11 @@ public class InMemoryArtifactStorage implements ArtifactStorage {
     }
 
     private String buildLocation(ElementJson element, String mimetype) {
-        return String.format("%s//%s", element.getId(), mimetype);
+        long version = 1;
+        String location;
+        do {
+            location = String.format("%s//%s//v%d", element.getId(), mimetype, version++);
+        } while(artifacts.containsKey(location));
+        return location;
     }
 }
