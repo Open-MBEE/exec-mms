@@ -69,9 +69,9 @@
 					"script": {
 						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
 						"exec": [
-							"pm.test(\"response has org a\", function () {",
+							"pm.test(\"response has org s\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.orgs[0].id).to.eql('a');",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('s');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -131,7 +131,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"ss\", \n\t\t\t\"name\": \"ss\",\n\t\t\t\"orgId\": \"s\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"ss\", \n\t\t\t\"name\": \"ss\",\n\t\t\t\"orgId\": \"s\",\n\t\t\t\"schema\": \"cameo\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects",
@@ -155,7 +155,7 @@
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"    pm.expect(jsonData.elements.length).to.eql(4);",
 							"});",
 							"",
 							"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);"
@@ -287,14 +287,14 @@
 			"response": []
 		},
 		{
-			"name": "update x",
+			"name": "delete x",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
 						"exec": [
-							"pm.test(\"response has elements\", function () {",
+							"pm.test(\"response has 1 elements\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"});",
@@ -306,20 +306,20 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "DELETE",
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"updated1\"\n\t\t}\n\t]\n}"
+					"raw": ""
 				},
 				"url": {
-					"raw": "{{host}}/projects/ss/refs/master/elements",
+					"raw": "{{host}}/projects/ss/refs/master/elements/x",
 					"host": [
 						"{{host}}"
 					],
@@ -328,7 +328,8 @@
 						"ss",
 						"refs",
 						"master",
-						"elements"
+						"elements",
+						"x"
 					]
 				}
 			},
@@ -342,7 +343,7 @@
 					"script": {
 						"id": "4ea3441a-8a0f-421a-ba27-67ac1351775d",
 						"exec": [
-							"pm.test(\"response has 1 element\", function () {",
+							"pm.test(\"response has 0 elements\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements.length).to.eql(0);",
 							"});"
@@ -359,7 +360,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{host}}/projects/ss/refs/master/search?name=x",
+					"raw": "{{host}}/projects/ss/refs/master/search?id=x",
 					"host": [
 						"{{host}}"
 					],
@@ -372,7 +373,7 @@
 					],
 					"query": [
 						{
-							"key": "name",
+							"key": "id",
 							"value": "x"
 						}
 					]
