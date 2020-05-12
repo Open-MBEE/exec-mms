@@ -23,17 +23,11 @@ import java.util.Map;
 public class SearchController {
     private final Logger logger = LogManager.getLogger(getClass());
 
-    private MethodSecurityService mss;
     private SearchService searchService;
 
     @Autowired
     public void setSearchService(SearchService searchService) {
         this.searchService = searchService;
-    }
-
-    @Autowired
-    public void setMss(MethodSecurityService mss) {
-        this.mss = mss;
     }
 
     @GetMapping(value = "/search")
@@ -43,9 +37,7 @@ public class SearchController {
         @PathVariable String refId,
         @RequestParam(required = false) Map<String, String> params
     ) {
-         ElementsResponse res = searchService.basicSearch(projectId, refId, params);
-         handleSingleResponse(res);
-         return res;
+         return searchService.basicSearch(projectId, refId, params);
     }
 
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -55,32 +47,7 @@ public class SearchController {
         @PathVariable String refId,
         @RequestBody BasicSearchRequest request
     ) {
-        ElementsResponse res = searchService.recursiveSearch(projectId, refId, request.getParams(), request.getRecurse());
-        handleSingleResponse(res);
-        return res;
+        return searchService.recursiveSearch(projectId, refId, request.getParams(), request.getRecurse());
     }
 
-
-    private void handleSingleResponse(BaseResponse res) {
-        if (res.getRejected() != null && !res.getRejected().isEmpty()) {
-            List<Rejection> rejected = res.getRejected();
-            int code = rejected.get(0).getCode();
-            switch(code) {
-                case 304:
-                    throw new NotModifiedException(res);
-                case 400:
-                    throw new BadRequestException(res);
-                case 401:
-                    throw new UnauthorizedException(res);
-                case 403:
-                    throw new ForbiddenException(res);
-                case 404:
-                    throw new NotFoundException(res);
-                case 410:
-                    throw new DeletedException(res);
-                default:
-                    break;
-            }
-        }
-    }
 }

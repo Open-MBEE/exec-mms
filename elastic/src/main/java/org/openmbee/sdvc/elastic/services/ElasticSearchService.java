@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ElasticSearchService implements SearchService {
@@ -58,9 +59,10 @@ public class ElasticSearchService implements SearchService {
             if(validNodes == null || validNodes.isEmpty()) {
                 return new ElementsResponse();
             }
+            Set<String> validNodeDocIds = validNodes.stream().map(Node::getDocId).collect(Collectors.toCollection(HashSet::new));
 
             Map<String, ElementJson> elementJsonMap = new HashMap<>();
-            performRecursiveSearch(validNodes, params, recurse, elementJsonMap);
+            performRecursiveSearch(validNodeDocIds, refId, params, recurse, elementJsonMap);
             return prepareResponse(elementJsonMap.values());
 
         } catch (IOException e) {
@@ -69,16 +71,16 @@ public class ElasticSearchService implements SearchService {
 
     }
 
-    private void performRecursiveSearch(List<Node> validNodes, Map<String, String> params, Map<String, String> recurse,
+    private void performRecursiveSearch(Set<String> validNodeDocIds, String refId, Map<String, String> params, Map<String, String> recurse,
                                         Map<String, ElementJson> elementJsonMap) throws IOException {
 
-        List<ElementJson> elementJsonList = doSearch(validNodes, params);
+        List<ElementJson> elementJsonList = doSearch(validNodeDocIds, refId, params);
         for(ElementJson ob : elementJsonList) {
             if(! elementJsonMap.containsKey(ob.getId())) {
                 elementJsonMap.put(ob.getId(), ob);
                 Map<String, String> recursiveParams = buildRecursiveParams(ob, recurse);
                 if(! recursiveParams.isEmpty()) {
-                    performRecursiveSearch(validNodes, recursiveParams, recurse, elementJsonMap);
+                    performRecursiveSearch(validNodeDocIds, refId, recursiveParams, recurse, elementJsonMap);
                 }
             }
         }
@@ -102,12 +104,13 @@ public class ElasticSearchService implements SearchService {
     }
 
 
-    private List<ElementJson> doSearch(List<Node> validNodes, Map<String, String> params) throws IOException {
+    private List<ElementJson> doSearch(Set<String> validNodeDocIds, String refId, Map<String, String> params) throws IOException {
         List<ElementJson> result = new ArrayList<>();
 
         SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        query.filter(QueryBuilders.termsQuery(ElementJson.DOCID, validNodes.stream().map(Node::getDocId).toArray()));
+
+        query.filter(QueryBuilders.termQuery(ElementJson.INREFIDS, refId));
 
         for(Map.Entry<String, String> e : params.entrySet()) {
             query.filter(QueryBuilders.termQuery(e.getKey(), e.getValue()));
@@ -121,10 +124,12 @@ public class ElasticSearchService implements SearchService {
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         String scrollId = null;
 
-        do{
+        do {
             for(SearchHit hit : searchResponse.getHits()) {
                 ElementJson ob = parseResult(hit);
-                result.add(ob);
+                if(validNodeDocIds.contains(ob.getDocId())) {
+                    result.add(ob);
+                }
             }
             scrollId = searchResponse.getScrollId();
             if(scrollId != null) {
