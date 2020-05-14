@@ -48,6 +48,7 @@ elasticsearch.index.element=mms
 elasticsearch.limit.insert=80
 elasticsearch.limit.result=10000
 elasticsearch.limit.term=1000
+elasticsearch.limit.scrollTimeout=1000
 
 #Configuration for TWC
 #port is for REST interface

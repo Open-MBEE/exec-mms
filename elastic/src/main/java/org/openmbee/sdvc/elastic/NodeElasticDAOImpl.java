@@ -22,6 +22,7 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
+import org.openmbee.sdvc.elastic.utils.Index;
 import org.openmbee.sdvc.json.BaseJson;
 import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.stereotype.Component;
@@ -154,7 +155,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
 
     @Override
     protected String getIndex() {
-        return super.getIndex() + "_node";
+        return Index.NODE.get();
     }
 }
 
