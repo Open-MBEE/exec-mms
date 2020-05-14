@@ -213,12 +213,8 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "{{host}}/projects/ss/refs/master/search?name=x",
+					"raw": "{{host}}/projects/ss/refs/master/search?id=x",
 					"host": [
 						"{{host}}"
 					],
@@ -231,7 +227,7 @@
 					],
 					"query": [
 						{
-							"key": "name",
+							"key": "id",
 							"value": "x"
 						}
 					]
@@ -355,10 +351,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/projects/ss/refs/master/search?id=x",
 					"host": [
@@ -413,5 +405,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

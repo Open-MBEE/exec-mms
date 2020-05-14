@@ -1,0 +1,279 @@
+{
+	"info": {
+		"_postman_id": "79c6429f-0bfc-4304-8cd0-702817bc363e",
+		"name": "jupyter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login using admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "217210a9-1489-4057-b89f-bc0b44111569",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add org j",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+						"exec": [
+							"pm.test(\"response has org j\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('j');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"j\",\n\t\t\t\"name\": \"j\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add project jupyter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project jupyter\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('jupyter');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"jupyter\", \n\t\t\t\"name\": \"jupyter\",\n\t\t\t\"orgId\": \"j\",\n\t\t\t\"schema\": \"jupyter\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add notebook to jupyter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response has notebook\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.notebooks.length).to.eql(1);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"notebooks\": [\n\t\t{\n \"cells\": [\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"<!--BOOK_INFORMATION-->\\n\",\n    \"<img align=\\\"left\\\" style=\\\"padding-right:10px;\\\" src=\\\"figures/PDSH-cover-small.png\\\">\\n\",\n    \"\\n\",\n    \"*This notebook contains an excerpt from the [Python Data Science Handbook](http://shop.oreilly.com/product/0636920034919.do) by Jake VanderPlas; the content is available [on GitHub](https://github.com/jakevdp/PythonDataScienceHandbook).*\\n\",\n    \"\\n\",\n    \"*The text is released under the [CC-BY-NC-ND license](https://creativecommons.org/licenses/by-nc-nd/3.0/us/legalcode), and code is released under the [MIT license](https://opensource.org/licenses/MIT). If you find this content useful, please consider supporting the work by [buying the book](http://shop.oreilly.com/product/0636920034919.do)!*\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"<!--NAVIGATION-->\\n\",\n    \"< [Understanding Data Types in Python](02.01-Understanding-Data-Types.ipynb) | [Contents](Index.ipynb) | [Computation on NumPy Arrays: Universal Functions](02.03-Computation-on-arrays-ufuncs.ipynb) >\\n\",\n    \"\\n\",\n    \"<a href=\\\"https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/02.02-The-Basics-Of-NumPy-Arrays.ipynb\\\"><img align=\\\"left\\\" src=\\\"https://colab.research.google.com/assets/colab-badge.svg\\\" alt=\\\"Open in Colab\\\" title=\\\"Open and Execute in Google Colaboratory\\\"></a>\\n\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"# The Basics of NumPy Arrays\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Data manipulation in Python is nearly synonymous with NumPy array manipulation: even newer tools like Pandas ([Chapter 3](03.00-Introduction-to-Pandas.ipynb)) are built around the NumPy array.\\n\",\n    \"This section will present several examples of using NumPy array manipulation to access data and subarrays, and to split, reshape, and join the arrays.\\n\",\n    \"While the types of operations shown here may seem a bit dry and pedantic, they comprise the building blocks of many other examples used throughout the book.\\n\",\n    \"Get to know them well!\\n\",\n    \"\\n\",\n    \"We'll cover a few categories of basic array manipulations here:\\n\",\n    \"\\n\",\n    \"- *Attributes of arrays*: Determining the size, shape, memory consumption, and data types of arrays\\n\",\n    \"- *Indexing of arrays*: Getting and setting the value of individual array elements\\n\",\n    \"- *Slicing of arrays*: Getting and setting smaller subarrays within a larger array\\n\",\n    \"- *Reshaping of arrays*: Changing the shape of a given array\\n\",\n    \"- *Joining and splitting of arrays*: Combining multiple arrays into one, and splitting one array into many\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## NumPy Array Attributes\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"First let's discuss some useful array attributes.\\n\",\n    \"We'll start by defining three random arrays, a one-dimensional, two-dimensional, and three-dimensional array.\\n\",\n    \"We'll use NumPy's random number generator, which we will *seed* with a set value in order to ensure that the same random arrays are generated each time this code is run:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 1,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [],\n   \"source\": [\n    \"import numpy as np\\n\",\n    \"np.random.seed(0)  # seed for reproducibility\\n\",\n    \"\\n\",\n    \"x1 = np.random.randint(10, size=6)  # One-dimensional array\\n\",\n    \"x2 = np.random.randint(10, size=(3, 4))  # Two-dimensional array\\n\",\n    \"x3 = np.random.randint(10, size=(3, 4, 5))  # Three-dimensional array\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Each array has attributes ``ndim`` (the number of dimensions), ``shape`` (the size of each dimension), and ``size`` (the total size of the array):\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 2,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"x3 ndim:  3\\n\",\n      \"x3 shape: (3, 4, 5)\\n\",\n      \"x3 size:  60\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(\\\"x3 ndim: \\\", x3.ndim)\\n\",\n    \"print(\\\"x3 shape:\\\", x3.shape)\\n\",\n    \"print(\\\"x3 size: \\\", x3.size)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Another useful attribute is the ``dtype``, the data type of the array (which we discussed previously in [Understanding Data Types in Python](02.01-Understanding-Data-Types.ipynb)):\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 3,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"dtype: int64\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(\\\"dtype:\\\", x3.dtype)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Other attributes include ``itemsize``, which lists the size (in bytes) of each array element, and ``nbytes``, which lists the total size (in bytes) of the array:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 4,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"itemsize: 8 bytes\\n\",\n      \"nbytes: 480 bytes\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(\\\"itemsize:\\\", x3.itemsize, \\\"bytes\\\")\\n\",\n    \"print(\\\"nbytes:\\\", x3.nbytes, \\\"bytes\\\")\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"In general, we expect that ``nbytes`` is equal to ``itemsize`` times ``size``.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Array Indexing: Accessing Single Elements\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"If you are familiar with Python's standard list indexing, indexing in NumPy will feel quite familiar.\\n\",\n    \"In a one-dimensional array, the $i^{th}$ value (counting from zero) can be accessed by specifying the desired index in square brackets, just as with Python lists:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 5,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([5, 0, 3, 3, 7, 9])\"\n      ]\n     },\n     \"execution_count\": 5,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 6,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"5\"\n      ]\n     },\n     \"execution_count\": 6,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[0]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 7,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"7\"\n      ]\n     },\n     \"execution_count\": 7,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[4]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"To index from the end of the array, you can use negative indices:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 8,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"9\"\n      ]\n     },\n     \"execution_count\": 8,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[-1]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 9,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"7\"\n      ]\n     },\n     \"execution_count\": 9,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[-2]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"In a multi-dimensional array, items can be accessed using a comma-separated tuple of indices:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 10,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[3, 5, 2, 4],\\n\",\n       \"       [7, 6, 8, 8],\\n\",\n       \"       [1, 6, 7, 7]])\"\n      ]\n     },\n     \"execution_count\": 10,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 11,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"3\"\n      ]\n     },\n     \"execution_count\": 11,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[0, 0]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 12,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"1\"\n      ]\n     },\n     \"execution_count\": 12,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[2, 0]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 13,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"7\"\n      ]\n     },\n     \"execution_count\": 13,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[2, -1]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Values can also be modified using any of the above index notation:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 14,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  5,  2,  4],\\n\",\n       \"       [ 7,  6,  8,  8],\\n\",\n       \"       [ 1,  6,  7,  7]])\"\n      ]\n     },\n     \"execution_count\": 14,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[0, 0] = 12\\n\",\n    \"x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Keep in mind that, unlike Python lists, NumPy arrays have a fixed type.\\n\",\n    \"This means, for example, that if you attempt to insert a floating-point value to an integer array, the value will be silently truncated. Don't be caught unaware by this behavior!\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 15,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([3, 0, 3, 3, 7, 9])\"\n      ]\n     },\n     \"execution_count\": 15,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x1[0] = 3.14159  # this will be truncated!\\n\",\n    \"x1\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Array Slicing: Accessing Subarrays\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Just as we can use square brackets to access individual array elements, we can also use them to access subarrays with the *slice* notation, marked by the colon (``:``) character.\\n\",\n    \"The NumPy slicing syntax follows that of the standard Python list; to access a slice of an array ``x``, use this:\\n\",\n    \"``` python\\n\",\n    \"x[start:stop:step]\\n\",\n    \"```\\n\",\n    \"If any of these are unspecified, they default to the values ``start=0``, ``stop=``*``size of dimension``*, ``step=1``.\\n\",\n    \"We'll take a look at accessing sub-arrays in one dimension and in multiple dimensions.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### One-dimensional subarrays\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 16,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])\"\n      ]\n     },\n     \"execution_count\": 16,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.arange(10)\\n\",\n    \"x\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 17,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([0, 1, 2, 3, 4])\"\n      ]\n     },\n     \"execution_count\": 17,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[:5]  # first five elements\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 18,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([5, 6, 7, 8, 9])\"\n      ]\n     },\n     \"execution_count\": 18,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[5:]  # elements after index 5\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 19,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([4, 5, 6])\"\n      ]\n     },\n     \"execution_count\": 19,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[4:7]  # middle sub-array\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 20,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([0, 2, 4, 6, 8])\"\n      ]\n     },\n     \"execution_count\": 20,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[::2]  # every other element\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 21,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([1, 3, 5, 7, 9])\"\n      ]\n     },\n     \"execution_count\": 21,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[1::2]  # every other element, starting at index 1\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"A potentially confusing case is when the ``step`` value is negative.\\n\",\n    \"In this case, the defaults for ``start`` and ``stop`` are swapped.\\n\",\n    \"This becomes a convenient way to reverse an array:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 22,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])\"\n      ]\n     },\n     \"execution_count\": 22,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[::-1]  # all elements, reversed\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 23,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([5, 3, 1])\"\n      ]\n     },\n     \"execution_count\": 23,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x[5::-2]  # reversed every other from index 5\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Multi-dimensional subarrays\\n\",\n    \"\\n\",\n    \"Multi-dimensional slices work in the same way, with multiple slices separated by commas.\\n\",\n    \"For example:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 24,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  5,  2,  4],\\n\",\n       \"       [ 7,  6,  8,  8],\\n\",\n       \"       [ 1,  6,  7,  7]])\"\n      ]\n     },\n     \"execution_count\": 24,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 25,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  5,  2],\\n\",\n       \"       [ 7,  6,  8]])\"\n      ]\n     },\n     \"execution_count\": 25,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[:2, :3]  # two rows, three columns\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 26,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[12,  2],\\n\",\n       \"       [ 7,  8],\\n\",\n       \"       [ 1,  7]])\"\n      ]\n     },\n     \"execution_count\": 26,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[:3, ::2]  # all rows, every other column\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Finally, subarray dimensions can even be reversed together:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 27,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[ 7,  7,  6,  1],\\n\",\n       \"       [ 8,  8,  6,  7],\\n\",\n       \"       [ 4,  2,  5, 12]])\"\n      ]\n     },\n     \"execution_count\": 27,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x2[::-1, ::-1]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"#### Accessing array rows and columns\\n\",\n    \"\\n\",\n    \"One commonly needed routine is accessing of single rows or columns of an array.\\n\",\n    \"This can be done by combining indexing and slicing, using an empty slice marked by a single colon (``:``):\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 28,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[12  7  1]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2[:, 0])  # first column of x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 29,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[12  5  2  4]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2[0, :])  # first row of x2\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"In the case of row access, the empty slice can be omitted for a more compact syntax:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 30,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[12  5  2  4]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2[0])  # equivalent to x2[0, :]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Subarrays as no-copy views\\n\",\n    \"\\n\",\n    \"One important–and extremely useful–thing to know about array slices is that they return *views* rather than *copies* of the array data.\\n\",\n    \"This is one area in which NumPy array slicing differs from Python list slicing: in lists, slices will be copies.\\n\",\n    \"Consider our two-dimensional array from before:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 31,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[12  5  2  4]\\n\",\n      \" [ 7  6  8  8]\\n\",\n      \" [ 1  6  7  7]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Let's extract a $2 \\\\times 2$ subarray from this:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 32,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[12  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub = x2[:2, :2]\\n\",\n    \"print(x2_sub)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Now if we modify this subarray, we'll see that the original array is changed! Observe:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 33,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub[0, 0] = 99\\n\",\n    \"print(x2_sub)\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 34,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5  2  4]\\n\",\n      \" [ 7  6  8  8]\\n\",\n      \" [ 1  6  7  7]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"This default behavior is actually quite useful: it means that when we work with large datasets, we can access and process pieces of these datasets without the need to copy the underlying data buffer.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Creating copies of arrays\\n\",\n    \"\\n\",\n    \"Despite the nice features of array views, it is sometimes useful to instead explicitly copy the data within an array or a subarray. This can be most easily done with the ``copy()`` method:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 35,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub_copy = x2[:2, :2].copy()\\n\",\n    \"print(x2_sub_copy)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"If we now modify this subarray, the original array is not touched:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 36,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[42  5]\\n\",\n      \" [ 7  6]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x2_sub_copy[0, 0] = 42\\n\",\n    \"print(x2_sub_copy)\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 37,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[99  5  2  4]\\n\",\n      \" [ 7  6  8  8]\\n\",\n      \" [ 1  6  7  7]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"print(x2)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Reshaping of Arrays\\n\",\n    \"\\n\",\n    \"Another useful type of operation is reshaping of arrays.\\n\",\n    \"The most flexible way of doing this is with the ``reshape`` method.\\n\",\n    \"For example, if you want to put the numbers 1 through 9 in a $3 \\\\times 3$ grid, you can do the following:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 38,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[1 2 3]\\n\",\n      \" [4 5 6]\\n\",\n      \" [7 8 9]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"grid = np.arange(1, 10).reshape((3, 3))\\n\",\n    \"print(grid)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Note that for this to work, the size of the initial array must match the size of the reshaped array. \\n\",\n    \"Where possible, the ``reshape`` method will use a no-copy view of the initial array, but with non-contiguous memory buffers this is not always the case.\\n\",\n    \"\\n\",\n    \"Another common reshaping pattern is the conversion of a one-dimensional array into a two-dimensional row or column matrix.\\n\",\n    \"This can be done with the ``reshape`` method, or more easily done by making use of the ``newaxis`` keyword within a slice operation:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 39,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3]])\"\n      ]\n     },\n     \"execution_count\": 39,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.array([1, 2, 3])\\n\",\n    \"\\n\",\n    \"# row vector via reshape\\n\",\n    \"x.reshape((1, 3))\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 40,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3]])\"\n      ]\n     },\n     \"execution_count\": 40,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# row vector via newaxis\\n\",\n    \"x[np.newaxis, :]\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 41,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1],\\n\",\n       \"       [2],\\n\",\n       \"       [3]])\"\n      ]\n     },\n     \"execution_count\": 41,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# column vector via reshape\\n\",\n    \"x.reshape((3, 1))\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 42,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1],\\n\",\n       \"       [2],\\n\",\n       \"       [3]])\"\n      ]\n     },\n     \"execution_count\": 42,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# column vector via newaxis\\n\",\n    \"x[:, np.newaxis]\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"We will see this type of transformation often throughout the remainder of the book.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"## Array Concatenation and Splitting\\n\",\n    \"\\n\",\n    \"All of the preceding routines worked on single arrays. It's also possible to combine multiple arrays into one, and to conversely split a single array into multiple arrays. We'll take a look at those operations here.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Concatenation of arrays\\n\",\n    \"\\n\",\n    \"Concatenation, or joining of two arrays in NumPy, is primarily accomplished using the routines ``np.concatenate``, ``np.vstack``, and ``np.hstack``.\\n\",\n    \"``np.concatenate`` takes a tuple or list of arrays as its first argument, as we can see here:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 43,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([1, 2, 3, 3, 2, 1])\"\n      ]\n     },\n     \"execution_count\": 43,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.array([1, 2, 3])\\n\",\n    \"y = np.array([3, 2, 1])\\n\",\n    \"np.concatenate([x, y])\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"You can also concatenate more than two arrays at once:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 44,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[ 1  2  3  3  2  1 99 99 99]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"z = [99, 99, 99]\\n\",\n    \"print(np.concatenate([x, y, z]))\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"It can also be used for two-dimensional arrays:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 45,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [],\n   \"source\": [\n    \"grid = np.array([[1, 2, 3],\\n\",\n    \"                 [4, 5, 6]])\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 46,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3],\\n\",\n       \"       [4, 5, 6],\\n\",\n       \"       [1, 2, 3],\\n\",\n       \"       [4, 5, 6]])\"\n      ]\n     },\n     \"execution_count\": 46,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# concatenate along the first axis\\n\",\n    \"np.concatenate([grid, grid])\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 47,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3, 1, 2, 3],\\n\",\n       \"       [4, 5, 6, 4, 5, 6]])\"\n      ]\n     },\n     \"execution_count\": 47,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# concatenate along the second axis (zero-indexed)\\n\",\n    \"np.concatenate([grid, grid], axis=1)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"For working with arrays of mixed dimensions, it can be clearer to use the ``np.vstack`` (vertical stack) and ``np.hstack`` (horizontal stack) functions:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 48,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[1, 2, 3],\\n\",\n       \"       [9, 8, 7],\\n\",\n       \"       [6, 5, 4]])\"\n      ]\n     },\n     \"execution_count\": 48,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"x = np.array([1, 2, 3])\\n\",\n    \"grid = np.array([[9, 8, 7],\\n\",\n    \"                 [6, 5, 4]])\\n\",\n    \"\\n\",\n    \"# vertically stack the arrays\\n\",\n    \"np.vstack([x, grid])\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 49,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[ 9,  8,  7, 99],\\n\",\n       \"       [ 6,  5,  4, 99]])\"\n      ]\n     },\n     \"execution_count\": 49,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"# horizontally stack the arrays\\n\",\n    \"y = np.array([[99],\\n\",\n    \"              [99]])\\n\",\n    \"np.hstack([grid, y])\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Similary, ``np.dstack`` will stack arrays along the third axis.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"### Splitting of arrays\\n\",\n    \"\\n\",\n    \"The opposite of concatenation is splitting, which is implemented by the functions ``np.split``, ``np.hsplit``, and ``np.vsplit``.  For each of these, we can pass a list of indices giving the split points:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 50,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[1 2 3] [99 99] [3 2 1]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"x = [1, 2, 3, 99, 99, 3, 2, 1]\\n\",\n    \"x1, x2, x3 = np.split(x, [3, 5])\\n\",\n    \"print(x1, x2, x3)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Notice that *N* split-points, leads to *N + 1* subarrays.\\n\",\n    \"The related functions ``np.hsplit`` and ``np.vsplit`` are similar:\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 51,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"data\": {\n      \"text/plain\": [\n       \"array([[ 0,  1,  2,  3],\\n\",\n       \"       [ 4,  5,  6,  7],\\n\",\n       \"       [ 8,  9, 10, 11],\\n\",\n       \"       [12, 13, 14, 15]])\"\n      ]\n     },\n     \"execution_count\": 51,\n     \"metadata\": {},\n     \"output_type\": \"execute_result\"\n    }\n   ],\n   \"source\": [\n    \"grid = np.arange(16).reshape((4, 4))\\n\",\n    \"grid\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 52,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[0 1 2 3]\\n\",\n      \" [4 5 6 7]]\\n\",\n      \"[[ 8  9 10 11]\\n\",\n      \" [12 13 14 15]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"upper, lower = np.vsplit(grid, [2])\\n\",\n    \"print(upper)\\n\",\n    \"print(lower)\"\n   ]\n  },\n  {\n   \"cell_type\": \"code\",\n   \"execution_count\": 53,\n   \"metadata\": {\n    \"collapsed\": false\n   },\n   \"outputs\": [\n    {\n     \"name\": \"stdout\",\n     \"output_type\": \"stream\",\n     \"text\": [\n      \"[[ 0  1]\\n\",\n      \" [ 4  5]\\n\",\n      \" [ 8  9]\\n\",\n      \" [12 13]]\\n\",\n      \"[[ 2  3]\\n\",\n      \" [ 6  7]\\n\",\n      \" [10 11]\\n\",\n      \" [14 15]]\\n\"\n     ]\n    }\n   ],\n   \"source\": [\n    \"left, right = np.hsplit(grid, [2])\\n\",\n    \"print(left)\\n\",\n    \"print(right)\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"Similarly, ``np.dsplit`` will split arrays along the third axis.\"\n   ]\n  },\n  {\n   \"cell_type\": \"markdown\",\n   \"metadata\": {},\n   \"source\": [\n    \"<!--NAVIGATION-->\\n\",\n    \"< [Understanding Data Types in Python](02.01-Understanding-Data-Types.ipynb) | [Contents](Index.ipynb) | [Computation on NumPy Arrays: Universal Functions](02.03-Computation-on-arrays-ufuncs.ipynb) >\\n\",\n    \"\\n\",\n    \"<a href=\\\"https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/02.02-The-Basics-Of-NumPy-Arrays.ipynb\\\"><img align=\\\"left\\\" src=\\\"https://colab.research.google.com/assets/colab-badge.svg\\\" alt=\\\"Open in Colab\\\" title=\\\"Open and Execute in Google Colaboratory\\\"></a>\\n\"\n   ]\n  }\n ],\n \"metadata\": {\n  \"anaconda-cloud\": {},\n  \"kernelspec\": {\n   \"display_name\": \"Python 3\",\n   \"language\": \"python\",\n   \"name\": \"python3\"\n  },\n  \"language_info\": {\n   \"codemirror_mode\": {\n    \"name\": \"ipython\",\n    \"version\": 3\n   },\n   \"file_extension\": \".py\",\n   \"mimetype\": \"text/x-python\",\n   \"name\": \"python\",\n   \"nbconvert_exporter\": \"python\",\n   \"pygments_lexer\": \"ipython3\",\n   \"version\": \"3.5.1\"\n  }\n },\n \"nbformat\": 4,\n \"nbformat_minor\": 0\n}\n\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/jupyter/refs/master/notebooks",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"jupyter",
+						"refs",
+						"master",
+						"notebooks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get notebooks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response has notebooks\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.notebooks.length).to.eql(1);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/jupyter/refs/master/notebooks",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"jupyter",
+						"refs",
+						"master",
+						"notebooks"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "5f9000e1-e8c4-4022-b516-c32683c8d456",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "40d0a8c5-53fc-4fcb-b78e-5c37d93e7d1f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
