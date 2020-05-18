@@ -1,16 +1,20 @@
-package org.openmbee.sdvc.json;
+package org.openmbee.sdvc.artifacts.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.openmbee.sdvc.json.ElementJson;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Schema(name = "Artifact")
 @JsonIgnoreProperties({"empty"})
 public class ArtifactJson extends HashMap<String, Object> {
 
+    public static final String ARTIFACTS = "_artifacts";
     public static final String MIMETYPE = "mimetype";
     public static final String EXTENSION = "extension";
     public static final String LOCATION = "location";
@@ -70,5 +74,22 @@ public class ArtifactJson extends HashMap<String, Object> {
     public ArtifactJson setLocationType(String locationType) {
         this.put(LOCATIONTYPE, locationType);
         return  this;
+    }
+
+    public static List<ArtifactJson> getArtifacts(ElementJson elementJson){
+
+        List<Object> rawArtifacts = (List)elementJson.get(ARTIFACTS);
+        if(rawArtifacts == null) {
+            return null;
+        }
+
+        if(rawArtifacts.get(0) instanceof Map) {
+            return rawArtifacts.stream().map(v -> new ArtifactJson((Map<String, Object>) v)).collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    public static void setArtifacts(ElementJson elementJson, List<ArtifactJson> artifacts) {
+        elementJson.put(ARTIFACTS, artifacts);
     }
 }

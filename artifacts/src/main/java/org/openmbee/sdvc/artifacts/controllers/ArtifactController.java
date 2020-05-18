@@ -1,14 +1,14 @@
 package org.openmbee.sdvc.artifacts.controllers;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.openmbee.sdvc.artifacts.objects.ArtifactResponse;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
-import org.openmbee.sdvc.core.security.MethodSecurityService;
-import org.openmbee.sdvc.core.services.ArtifactService;
-import org.openmbee.sdvc.core.services.NodeService;
+import org.openmbee.sdvc.artifacts.service.ArtifactService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -43,5 +43,40 @@ public class ArtifactController extends BaseController {
             return artifactService.createOrUpdate(projectId, refId, elementId, file, auth.getName(), params);
         }
         throw new BadRequestException(response.addMessage("Empty"));
+    }
+
+    @GetMapping(value = "elements/{elementId}/{extension}")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    public ResponseEntity getArtifact(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @PathVariable String elementId,
+        @PathVariable String extension,
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
+
+        params.put("extension", extension);
+        ArtifactResponse artifact = artifactService.get(projectId, refId, elementId, params);
+
+        if(artifact == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+            .contentType(MediaType.valueOf(artifact.getMimeType()))
+            .body(artifact.getData());
+    }
+
+    @DeleteMapping(value = "elements/{elementId}/{extension}")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    public ElementsResponse deleteArtifact(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @PathVariable String elementId,
+        @PathVariable String extension,
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
+
+        params.put("extension", extension);
+        return artifactService.disassociate(projectId, refId, elementId, params);
     }
 }
