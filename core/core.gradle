@@ -13,6 +13,7 @@ dependencies {
     api commonDependencies.'log4j'
     api commonDependencies.'log4j-api'
     api commonDependencies.'swagger-annotations'
+    implementation commonDependencies.'servlet-api'
 
     testImplementation commonDependencies.'spring-boot-starter-test'
 }

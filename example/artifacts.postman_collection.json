@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "acc5d241-4c6f-4cf5-98b3-2671cca60f18",
+		"_postman_id": "5d68544f-0039-4cd6-b728-45fbf50d7191",
 		"name": "artifacts",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -300,9 +300,13 @@
 					"script": {
 						"id": "b01e263f-c028-4860-826f-c46856a078d5",
 						"exec": [
-							"pm.test(\"response has 1 element with 1 artifact\", function () {",
+							"pm.test(\"response has 1 element\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});",
+							"",
+							"pm.test(\"response element has 1 artifact\", function () {",
+							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
 							"});"
 						],
@@ -389,17 +393,65 @@
 			"response": []
 		},
 		{
-			"name": "update element x with external artifact",
+			"name": "get jpg artifact associated with element x",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
 						"exec": [
-							"pm.test(\"response element still has artifacts\", function () {",
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x/jpg",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "try to delete artifact through element modification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"element changes were rejected\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(1);",
-							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
+							"    pm.expect(jsonData.rejected.length).to.eql(1);",
+							"    pm.expect(jsonData.elements.length).to.eql(0);",
 							"});",
 							""
 						],
@@ -418,7 +470,55 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"elements\": [{\"id\": \"x\",\"_artifacts\"}]}"
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"_artifacts\" : []\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "try to add artifact through element modification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"element changes are rejected\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.rejected.length).to.eql(1);",
+							"    pm.expect(jsonData.elements.length).to.eql(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\",\n\t\t\t \"_artifacts\": [\n                {\n                    \"extension\": \"jpg\",\n                    \"locationType\": \"internal\",\n                    \"location\": \"x//image/jpeg//v1\",\n                    \"mimetype\": \"image/jpeg\"\n                }\n            ]\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects/arta/refs/master/elements",
