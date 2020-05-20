@@ -535,6 +535,50 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Disassociate artifact from element x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6539570e-0465-4e77-a0a7-24752aa01528",
+						"exec": [
+							"pm.test(\"response has 0 artifacts\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eql(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x/jpg",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"jpg"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
