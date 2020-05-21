@@ -1,10 +1,12 @@
 package org.openmbee.sdvc.artifacts.controllers;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.openmbee.sdvc.artifacts.ArtifactConstants;
 import org.openmbee.sdvc.artifacts.objects.ArtifactResponse;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.artifacts.service.ArtifactService;
+import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -14,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.print.attribute.standard.Media;
 import java.util.Map;
 
 @RestController
@@ -45,8 +48,9 @@ public class ArtifactController extends BaseController {
         throw new BadRequestException(response.addMessage("Empty"));
     }
 
+
     @GetMapping(value = "elements/{elementId}/{extension}")
-    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ_CONTENT', false)")
     public ResponseEntity getArtifact(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -55,7 +59,7 @@ public class ArtifactController extends BaseController {
         @RequestParam(required = false) Map<String, String> params,
         Authentication auth) {
 
-        params.put("extension", extension);
+        params.put(ArtifactConstants.EXTENSION_PARAM, extension);
         ArtifactResponse artifact = artifactService.get(projectId, refId, elementId, params);
 
         if(artifact == null) {

@@ -3,6 +3,7 @@ package org.openmbee.sdvc.example.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
+import org.openmbee.sdvc.core.intercept.SdvcHandlerInterceptorAdapter;
 import org.openmbee.sdvc.twc.config.TwcAuthSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +21,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpMethod.*;
@@ -42,6 +46,9 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
 
     @Autowired
     TwcAuthSecurityConfig twcAuthSecurityConfig;
+
+    @Autowired (required = false)
+    List<SdvcHandlerInterceptorAdapter> interceptors;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -95,5 +102,12 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        if(interceptors != null) {
+            interceptors.forEach(v -> v.register(registry));
+        }
     }
 }

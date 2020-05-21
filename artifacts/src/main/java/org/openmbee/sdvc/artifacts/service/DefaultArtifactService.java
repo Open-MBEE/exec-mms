@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.artifacts.service;
 
+import org.openmbee.sdvc.artifacts.ArtifactConstants;
 import org.openmbee.sdvc.artifacts.objects.ArtifactResponse;
 import org.openmbee.sdvc.artifacts.storage.ArtifactStorage;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
@@ -154,7 +155,7 @@ public class DefaultArtifactService implements ArtifactService {
     }
 
     private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, Map<String, String> params) {
-        return getExistingArtifact(artifacts, params.get("mimeType"), params.get("extension"));
+        return getExistingArtifact(artifacts, params.get(ArtifactConstants.MIMETYPE_PARAM), params.get(ArtifactConstants.EXTENSION_PARAM));
     }
 
     private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, String mimeType, String extension) {
