@@ -42,8 +42,6 @@ public class ArtifactsInterceptor extends SdvcHandlerInterceptorAdapter {
     @Override
     public boolean preHandle(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, Object handler) throws Exception {
 
-        System.out.println(handler.getClass().getName());
-
         if(handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod)handler;
             if(ElementsController.class.equals(handlerMethod.getBeanType()) && "getElement".equals(handlerMethod.getMethod().getName())) {
@@ -61,8 +59,8 @@ public class ArtifactsInterceptor extends SdvcHandlerInterceptorAdapter {
                     String elementId = matcher.group(3);
 
                     if(!mss.hasBranchPrivilege(SecurityContextHolder.getContext().getAuthentication(), projectId, refId,
-                        "BRANCH_READ_CONTENT", true)) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        "BRANCH_READ", true)) {
+                        response.setStatus(403);
                         return false;
                     }
 

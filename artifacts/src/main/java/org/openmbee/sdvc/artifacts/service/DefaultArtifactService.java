@@ -97,7 +97,7 @@ public class DefaultArtifactService implements ArtifactService {
     }
 
     @Override
-    public ElementsResponse disassociate(String projectId, String refId, String id, Map<String, String> params) {
+    public ElementsResponse disassociate(String projectId, String refId, String id, String user, Map<String, String> params) {
         ElementsResponse response = new ElementsResponse();
         NodeService nodeService = getNodeService(projectId);
         ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
@@ -114,6 +114,9 @@ public class DefaultArtifactService implements ArtifactService {
         if(artifact != null) {
             artifacts.remove(artifact);
             ArtifactJson.setArtifacts(elementJson, artifacts);
+            ElementsRequest elementsRequest = new ElementsRequest();
+            elementsRequest.setElements(Arrays.asList(elementJson));
+            nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
             response.setElements(Arrays.asList(elementJson));
         }
 

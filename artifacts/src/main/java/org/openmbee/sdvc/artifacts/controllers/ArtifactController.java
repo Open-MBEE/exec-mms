@@ -50,7 +50,7 @@ public class ArtifactController extends BaseController {
 
 
     @GetMapping(value = "elements/{elementId}/{extension}")
-    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ_CONTENT', false)")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', false)")
     public ResponseEntity getArtifact(
         @PathVariable String projectId,
         @PathVariable String refId,
@@ -80,7 +80,7 @@ public class ArtifactController extends BaseController {
         @RequestParam(required = false) Map<String, String> params,
         Authentication auth) {
 
-        params.put("extension", extension);
-        return artifactService.disassociate(projectId, refId, elementId, params);
+        params.put(ArtifactConstants.EXTENSION_PARAM, extension);
+        return artifactService.disassociate(projectId, refId, elementId, auth.getName(), params);
     }
 }

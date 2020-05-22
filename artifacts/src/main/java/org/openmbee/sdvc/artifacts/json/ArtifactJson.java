@@ -79,7 +79,7 @@ public class ArtifactJson extends HashMap<String, Object> {
     public static List<ArtifactJson> getArtifacts(ElementJson elementJson){
 
         List<Object> rawArtifacts = (List)elementJson.get(ARTIFACTS);
-        if(rawArtifacts == null) {
+        if(rawArtifacts == null || rawArtifacts.isEmpty()) {
             return null;
         }
 
