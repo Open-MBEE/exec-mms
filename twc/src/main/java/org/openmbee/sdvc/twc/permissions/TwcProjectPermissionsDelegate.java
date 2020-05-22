@@ -10,7 +10,11 @@ import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
 import org.openmbee.sdvc.core.utils.RestUtils;
 import org.openmbee.sdvc.data.domains.global.Project;
+
 import org.openmbee.sdvc.twc.TeamworkCloud;
+import org.openmbee.sdvc.twc.config.TwcConfig;
+import org.openmbee.sdvc.twc.exceptions.TwcConfigurationException;
+import org.openmbee.sdvc.twc.utilities.TwcPermissionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -18,30 +22,35 @@ import java.util.Set;
 
 public class TwcProjectPermissionsDelegate implements PermissionsDelegate {
 
-    private RestUtils restUtils;
+	private Project project;
+	private TeamworkCloud teamworkCloud;
+	private String workspaceId;
+	private String resourceId;
 
-    private Project project;
-    private TeamworkCloud teamworkCloud;
-    private String workspaceId;
-    private String resourceId;
+	@Autowired
+	private TwcPermissionUtils twcPermissionUtils;
 
-    public TwcProjectPermissionsDelegate(Project project, TeamworkCloud teamworkCloud, String workspaceId, String resourceId) {
-        this.project = project;
-        this.teamworkCloud = teamworkCloud;
-        this.workspaceId = workspaceId;
-        this.resourceId = resourceId;
-    }
+	public TwcProjectPermissionsDelegate(Project project, TeamworkCloud teamworkCloud, String workspaceId,
+			String resourceId) {
+		this.project = project;
+		this.teamworkCloud = teamworkCloud;
+		this.workspaceId = workspaceId;
+		this.resourceId = resourceId;
 
-    @Autowired
-    public void setRestUtils(RestUtils restUtils) {
-        this.restUtils = restUtils;
-    }
+	}
 
-    @Override
-    public boolean hasPermission(String user, Set<String> groups, String privilege) {
-        //TODO: implement with calls to TWC to determine permissions
-        return false;
-    }
+
+	@Override
+	public boolean hasPermission(String user, Set<String> groups, String privilege) {
+		boolean hasPermission = false;
+
+		if (teamworkCloud.hasTwcRoles(privilege)) {
+			hasPermission = twcPermissionUtils.hasPermissionToAccessProject(workspaceId, resourceId, teamworkCloud,
+					user, privilege, teamworkCloud.getTwcmmsRolesMap().get(privilege));
+		}
+
+		return hasPermission;
+	}
 
     @Override
     public void initializePermissions(String creator) {
@@ -59,40 +68,49 @@ public class TwcProjectPermissionsDelegate implements PermissionsDelegate {
         return false;
     }
 
-    @Override
-    public void setPublic(boolean isPublic) {
-        forbidden();
-    }
+	@Override
+	public void setPublic(boolean isPublic) {
+		throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+				"Cannot Modify Permissions.  Permissions for this project are controlled by Teamwork Cloud ("
+						+ teamworkCloud.getUrl() + ")");
+	}
 
-    @Override
-    public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
-        forbidden();
-        return new PermissionUpdateResponseBuilder().getPermissionUpdateResponse();
-    }
+	@Override
+	public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
 
-    @Override
-    public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
-        forbidden();
-        return new PermissionUpdateResponseBuilder().getPermissionUpdateResponse();
-    }
+		throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+				"Cannot Modify User Permissions.  Permissions for this project are controlled by Teamwork Cloud ("
+						+ teamworkCloud.getUrl() + ")");
+	}
 
-    @Override
-    public PermissionResponse getUserRoles() {
-        forbidden();
-        return null;
-    }
+	@Override
+	public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
 
-    @Override
-    public PermissionResponse getGroupRoles() {
-        forbidden();
-        return null;
-    }
+		throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+				"Cannot Modify Group Permissions.  Permissions for this project are controlled by Teamwork Cloud ("
+						+ teamworkCloud.getUrl() + ")");
+	}
 
-    @Override
-    public PermissionUpdatesResponse recalculateInheritedPerms() {
-        forbidden();
-        return new PermissionUpdatesResponseBuilder().getPermissionUpdatesReponse();
-    }
+	@Override
+	public PermissionResponse getUserRoles() {
+
+		throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+				"Cannot Query User Roles.  Permissions for this project are controlled by Teamwork Cloud ("
+						+ teamworkCloud.getUrl() + ")");
+	}
+
+	@Override
+	public PermissionResponse getGroupRoles() {
+		throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+				"Cannot Query Group Roles.  Permissions for this project are controlled by Teamwork Cloud ("
+						+ teamworkCloud.getUrl() + ")");
+	}
+
+	@Override
+	public PermissionUpdatesResponse recalculateInheritedPerms() {
+		// Do nothing, permission inheritance will be handled by TWC
+		return null;
+	}
 
     public Project getProject() {
         return project;
@@ -106,17 +124,7 @@ public class TwcProjectPermissionsDelegate implements PermissionsDelegate {
         return workspaceId;
     }
 
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    private void forbidden() {
-        throw new TwcPermissionException(HttpStatus.FORBIDDEN,
-            String.format("Permissions for org %s (%s), project %s (%s) is controlled by Teamwork Cloud (%s)",
-                project.getOrganization().getOrganizationName(),
-                project.getOrganization().getOrganizationId(),
-                project.getProjectName(),
-                project.getProjectId(),
-                teamworkCloud.getUrl()));
-    }
+	public String getResourceId() {
+		return resourceId;
+	}
 }

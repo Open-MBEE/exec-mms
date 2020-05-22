@@ -44,6 +44,7 @@ public class ProjectDAOImpl implements ProjectDAO {
                 projectOperations.createProjectDatabase(proj);
             } catch (SQLException ex) {
                 //TODO db already exists, attempt to delete db?
+                //TODO log this in a clear way
                 throw new InternalErrorException(ex);
             }
         }

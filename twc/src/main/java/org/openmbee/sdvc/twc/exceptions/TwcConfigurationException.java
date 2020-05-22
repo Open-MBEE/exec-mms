@@ -1,4 +1,4 @@
-package exceptions;
+package org.openmbee.sdvc.twc.exceptions;
 
 import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.springframework.http.HttpStatus;
