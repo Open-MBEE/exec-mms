@@ -12,7 +12,7 @@ public class PreCommitService {
 
     private List<PreCommitSubscriber> preCommitSubscribers;
 
-    @Autowired
+    @Autowired (required = false)
     public void setPreCommitSubscribers(List<PreCommitSubscriber> preCommitSubscribers) {
         this.preCommitSubscribers = preCommitSubscribers;
     }
