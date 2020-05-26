@@ -1,17 +1,12 @@
 package org.openmbee.sdvc.twc.permissions;
 
-import exceptions.TwcPermissionException;
-import org.openmbee.sdvc.core.builders.PermissionUpdateResponseBuilder;
-import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
 import org.openmbee.sdvc.core.delegation.PermissionsDelegate;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
-import org.openmbee.sdvc.core.utils.RestUtils;
 import org.openmbee.sdvc.data.domains.global.Branch;
 import org.openmbee.sdvc.twc.TeamworkCloud;
-import org.openmbee.sdvc.twc.config.TwcConfig;
 import org.openmbee.sdvc.twc.exceptions.TwcConfigurationException;
 import org.openmbee.sdvc.twc.utilities.TwcPermissionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
