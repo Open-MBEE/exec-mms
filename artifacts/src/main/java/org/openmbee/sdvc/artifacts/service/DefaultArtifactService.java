@@ -47,28 +47,23 @@ public class DefaultArtifactService implements ArtifactService {
     public ArtifactResponse get(String projectId, String refId, String id, Map<String, String> params) {
         NodeService nodeService = getNodeService(projectId);
         ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
-        if(elementJson == null){
-            return null;
-        }
 
         ArtifactJson artifact = getExistingArtifact(ArtifactJson.getArtifacts(elementJson), params);
-        if(artifact != null) {
-            byte[] data = artifactStorage.get(artifact.getLocation(), elementJson, artifact.getMimeType());
-            ArtifactResponse response = new ArtifactResponse();
-            response.setData(data);
-            response.setExtension(artifact.getExtension());
-            response.setMimeType(artifact.getMimeType());
-            return response;
-        }
-        return null;
+        byte[] data = artifactStorage.get(artifact.getLocation(), elementJson, artifact.getMimeType());
+        ArtifactResponse response = new ArtifactResponse();
+        response.setData(data);
+        response.setExtension(artifact.getExtension());
+        response.setMimeType(artifact.getMimeType());
+        return response;
     }
 
     @Override
     public ElementsResponse createOrUpdate(String projectId, String refId, String id, MultipartFile file, String user, Map<String, String> params) {
         NodeService nodeService = getNodeService(projectId);
-        ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
-
-        if(elementJson == null) {
+        ElementJson elementJson;
+        try {
+            elementJson = getElement(nodeService, projectId, refId, id, params);
+        } catch(NotFoundException ex){
             elementJson = new ElementJson();
             elementJson.setProjectId(projectId);
             elementJson.setId(id);
@@ -89,45 +84,28 @@ public class DefaultArtifactService implements ArtifactService {
         elementJson = attachOrUpdateArtifact(elementJson, artifactLocation, fileExtension, mimeType, "internal");
         ElementsRequest elementsRequest = new ElementsRequest();
         elementsRequest.setElements(Arrays.asList(elementJson));
-        nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
-
-        ElementsResponse response = new ElementsResponse();
-        response.setElements(Arrays.asList(elementJson));
-        return response;
+        return nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
     }
 
     @Override
     public ElementsResponse disassociate(String projectId, String refId, String id, String user, Map<String, String> params) {
-        ElementsResponse response = new ElementsResponse();
         NodeService nodeService = getNodeService(projectId);
         ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
-        if(elementJson == null) {
-            throw new NotFoundException("Element not found");
-        }
 
         List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
-        if(artifacts == null) {
-            throw new NotFoundException("Artifact not found");
-        }
-
         ArtifactJson artifact = getExistingArtifact(artifacts, params);
-        if(artifact != null) {
-            artifacts.remove(artifact);
-            ArtifactJson.setArtifacts(elementJson, artifacts);
-            ElementsRequest elementsRequest = new ElementsRequest();
-            elementsRequest.setElements(Arrays.asList(elementJson));
-            nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
-            response.setElements(Arrays.asList(elementJson));
-        }
-
-        return response;
+        artifacts.remove(artifact);
+        ArtifactJson.setArtifacts(elementJson, artifacts);
+        ElementsRequest elementsRequest = new ElementsRequest();
+        elementsRequest.setElements(Arrays.asList(elementJson));
+        return nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
     }
 
     private ElementJson getElement(NodeService nodeService, String projectId, String refId, String id, Map<String, String> params) {
 
         ElementsResponse elementsResponse = nodeService.read(projectId, refId, id, params);
         if(elementsResponse.getElements() == null || elementsResponse.getElements().isEmpty()) {
-            return null;
+            throw new NotFoundException("Element not found");
         } else if(elementsResponse.getElements().size() > 1) {
             throw new ConflictException("Multiple elements found with id " + id);
         } else {
@@ -138,16 +116,14 @@ public class DefaultArtifactService implements ArtifactService {
     private ElementJson attachOrUpdateArtifact(ElementJson elementJson, String artifactLocation, String fileExtension, String mimeType, String type) {
 
         List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
-        if(artifacts == null) {
-            artifacts = new ArrayList<>(1);
-        }
-
-        ArtifactJson artifact = getExistingArtifact(artifacts, mimeType, null);
-
-        if(artifact == null) {
+        ArtifactJson artifact;
+        try {
+            artifact = getExistingArtifact(artifacts, mimeType, null);
+        } catch(NotFoundException ex) {
             artifact = new ArtifactJson();
             artifacts.add(artifact);
         }
+
         artifact.setLocation(artifactLocation);
         artifact.setExtension(fileExtension);
         artifact.setMimeType(mimeType);
@@ -163,10 +139,7 @@ public class DefaultArtifactService implements ArtifactService {
 
     private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, String mimeType, String extension) {
         if(mimeType == null && extension == null) {
-            return null;
-        }
-        if(artifacts == null) {
-            return null;
+            throw new BadRequestException("Missing mimetype or extension");
         }
         //Element representation is unique by mimeType and extension
         Optional<ArtifactJson> existing = artifacts.stream().filter(v -> {
@@ -175,7 +148,7 @@ public class DefaultArtifactService implements ArtifactService {
         if(existing.isPresent()) {
             return existing.get();
         }
-        return null;
+        throw new NotFoundException("Artifact not found");
     }
 
     private String getFileExtension(MultipartFile file) {

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Schema(name = "Element")
 public class ElementJson extends BaseJson<ElementJson> {

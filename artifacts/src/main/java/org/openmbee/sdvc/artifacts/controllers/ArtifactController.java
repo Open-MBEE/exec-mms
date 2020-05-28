@@ -62,9 +62,6 @@ public class ArtifactController extends BaseController {
         params.put(ArtifactConstants.EXTENSION_PARAM, extension);
         ArtifactResponse artifact = artifactService.get(projectId, refId, elementId, params);
 
-        if(artifact == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok()
             .contentType(MediaType.valueOf(artifact.getMimeType()))
             .body(artifact.getData());

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.openmbee.sdvc.json.ElementJson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,7 @@ public class ArtifactJson extends HashMap<String, Object> {
 
         List<Object> rawArtifacts = (List)elementJson.get(ARTIFACTS);
         if(rawArtifacts == null || rawArtifacts.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
 
         if(rawArtifacts.get(0) instanceof Map) {
