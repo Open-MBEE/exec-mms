@@ -39,7 +39,7 @@ public class ElementsController extends BaseController {
         return res;
     }
 
-    @GetMapping(value = "/{elementId}")
+    @GetMapping(value = "/{elementId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ElementsResponse getElement(
         @PathVariable String projectId,

@@ -20,7 +20,7 @@ import javax.print.attribute.standard.Media;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/projects/{projectId}/refs/{refId}")
+@RequestMapping("/projects/{projectId}/refs/{refId}/elements")
 @Tag(name = "Artifacts")
 public class ArtifactController extends BaseController {
 
@@ -31,7 +31,7 @@ public class ArtifactController extends BaseController {
         this.artifactService = artifactService;
     }
 
-    @PostMapping(value = "elements/{elementId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "{elementId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ElementsResponse createOrUpdateArtifacts(
         @PathVariable String projectId,
@@ -49,9 +49,9 @@ public class ArtifactController extends BaseController {
     }
 
 
-    @GetMapping(value = "elements/{elementId}/{extension}")
+    @GetMapping(value = "{elementId}/{extension}")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', false)")
-    public ResponseEntity getArtifact(
+    public ResponseEntity getArtifactByExtension(
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
@@ -67,9 +67,27 @@ public class ArtifactController extends BaseController {
             .body(artifact.getData());
     }
 
-    @DeleteMapping(value = "elements/{elementId}/{extension}")
+    @GetMapping(value = "{elementId}")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', false)")
+    public ResponseEntity getArtifactForElement(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @PathVariable String elementId,
+        @RequestHeader(value = "Accept") String acceptHeader,
+        @RequestParam(required = false) Map<String, String> params,
+        Authentication auth) {
+
+        params.put(ArtifactConstants.MIMETYPE_PARAM, acceptHeader);
+        ArtifactResponse artifact = artifactService.get(projectId, refId, elementId, params);
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.valueOf(artifact.getMimeType()))
+            .body(artifact.getData());
+    }
+
+    @DeleteMapping(value = "{elementId}/{extension}")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
-    public ElementsResponse deleteArtifact(
+    public ElementsResponse deleteArtifactByExtension(
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,

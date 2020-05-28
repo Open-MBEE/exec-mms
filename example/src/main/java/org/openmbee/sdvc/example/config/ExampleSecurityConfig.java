@@ -3,12 +3,12 @@ package org.openmbee.sdvc.example.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
-import org.openmbee.sdvc.core.intercept.SdvcHandlerInterceptorAdapter;
 import org.openmbee.sdvc.twc.config.TwcAuthSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -46,9 +46,6 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
 
     @Autowired
     TwcAuthSecurityConfig twcAuthSecurityConfig;
-
-    @Autowired (required = false)
-    List<SdvcHandlerInterceptorAdapter> interceptors;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -105,9 +102,9 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        if(interceptors != null) {
-            interceptors.forEach(v -> v.register(registry));
-        }
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.favorParameter(false)
+            .ignoreAcceptHeader(false)
+            .defaultContentType(MediaType.APPLICATION_JSON);
     }
 }
