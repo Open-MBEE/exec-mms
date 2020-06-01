@@ -1,27 +1,14 @@
 package org.openmbee.sdvc.twc.utilities;
 
-import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.rest.RestResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.openmbee.sdvc.core.utils.JsonUtils;
 import org.openmbee.sdvc.core.utils.RestUtils;
 import org.openmbee.sdvc.twc.TeamworkCloud;
-import org.openmbee.sdvc.twc.constants.TwcConstants;
-import org.openmbee.sdvc.twc.security.TwcAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 import org.json.JSONArray;
 import org.json.JSONObject;

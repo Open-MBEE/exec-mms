@@ -11,6 +11,7 @@ dependencies {
     implementation commonDependencies.'servlet-api'
     implementation commonDependencies.'spring-boot'
     implementation commonDependencies.'spring-security-web'
+    implementation 'org.json:json:20190722'
 
     testImplementation commonDependencies.'spring-boot-starter-test'
 }
