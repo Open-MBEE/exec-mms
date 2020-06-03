@@ -14,7 +14,6 @@ import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.objects.ElementsRequest;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
-import org.openmbee.sdvc.core.validation.PreCommitService;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.CommitType;
 import org.openmbee.sdvc.data.domains.scoped.Node;
@@ -46,7 +45,6 @@ public class DefaultNodeService implements NodeService {
     protected NodeDeleteHelper nodeDeleteHelper;
 
     protected Optional<EventService> eventPublisher;
-    protected PreCommitService preCommitService;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -86,11 +84,6 @@ public class DefaultNodeService implements NodeService {
     @Autowired
     public void setEventPublisher(Optional<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
-    }
-
-    @Autowired
-    public void setPreCommitService(PreCommitService preCommitService) {
-        this.preCommitService = preCommitService;
     }
 
     @Override
@@ -137,8 +130,6 @@ public class DefaultNodeService implements NodeService {
         ContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
 
-        preCommitChanges(projectId, refId, req.getElements(), params, user);
-
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,
                 createCommit(user, refId, projectId, req), this);
@@ -149,10 +140,6 @@ public class DefaultNodeService implements NodeService {
         response.getElements().addAll(info.getUpdatedMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
         return response;
-    }
-
-    protected void preCommitChanges(String projectId, String refId, List<ElementJson> elements, Map<String, String> params, String user) {
-        preCommitService.preCommitElementChanges(projectId, refId, elements, params, user);
     }
 
     //@Transactional

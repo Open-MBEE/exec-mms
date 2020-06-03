@@ -1,6 +1,8 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.Collections;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.ElementsRequest;
@@ -8,6 +10,10 @@ import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
+import org.openmbee.sdvc.core.pubsub.EmbeddedHookService;
+import org.openmbee.sdvc.crud.hooks.ElementUpdateHook;
+import org.openmbee.sdvc.json.ElementJson;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -25,6 +31,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
 @Tag(name = "Elements")
 public class ElementsController extends BaseController {
+
+    private EmbeddedHookService embeddedHookService;
+
+    @Autowired
+    public void setEmbeddedHookService(EmbeddedHookService embeddedHookService) {
+        this.embeddedHookService = embeddedHookService;
+    }
 
     @GetMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
@@ -63,6 +76,9 @@ public class ElementsController extends BaseController {
         @RequestParam(required = false) Map<String, String> params,
         Authentication auth) {
 
+        embeddedHookService.hook(new ElementUpdateHook(ElementUpdateHook.Action.ADD_UPDATE, projectId, refId,
+            req.getElements(), params, auth));
+
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
@@ -70,8 +86,6 @@ public class ElementsController extends BaseController {
         }
         throw new BadRequestException(response.addMessage("Empty"));
     }
-
-
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
