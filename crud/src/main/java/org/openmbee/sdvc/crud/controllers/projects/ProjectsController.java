@@ -57,10 +57,12 @@ public class ProjectsController extends BaseController {
         for (Project proj : allProjects) {
             if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
                 ContextHolder.setContext(proj.getProjectId());
-                Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
-                projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), ()-> {
-                    logger.error("Project json not found for id: {}", proj.getProjectId());
-                });
+                if(proj.getDocId() != null) {
+                    Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
+                    projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), ()-> {
+                        logger.error("Project json not found for id: {}", proj.getProjectId());
+                    });
+                }
             }
         }
         return response;

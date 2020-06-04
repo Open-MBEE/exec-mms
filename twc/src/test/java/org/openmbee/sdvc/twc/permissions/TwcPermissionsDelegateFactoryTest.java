@@ -1,6 +1,5 @@
 package org.openmbee.sdvc.twc.permissions;
 
-import exceptions.TwcConfigurationException;
 import org.junit.Test;
 import org.openmbee.sdvc.core.delegation.PermissionsDelegate;
 import org.openmbee.sdvc.data.domains.global.Branch;
@@ -8,6 +7,7 @@ import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.twc.TeamworkCloud;
 import org.openmbee.sdvc.twc.config.TwcConfig;
+import org.openmbee.sdvc.twc.exceptions.TwcConfigurationException;
 import org.openmbee.sdvc.twc.metadata.TwcMetadata;
 import org.openmbee.sdvc.twc.metadata.TwcMetadataService;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
