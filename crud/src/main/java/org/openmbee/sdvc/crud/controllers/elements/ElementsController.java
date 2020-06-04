@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.controllers.elements;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.ElementsRequest;
@@ -8,6 +9,9 @@ import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
+import org.openmbee.sdvc.core.pubsub.EmbeddedHookService;
+import org.openmbee.sdvc.crud.hooks.ElementUpdateHook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -26,6 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Elements")
 public class ElementsController extends BaseController {
 
+    private EmbeddedHookService embeddedHookService;
+
+    @Autowired
+    public void setEmbeddedHookService(EmbeddedHookService embeddedHookService) {
+        this.embeddedHookService = embeddedHookService;
+    }
+
     @GetMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ElementsResponse getAllElements(
@@ -39,7 +50,7 @@ public class ElementsController extends BaseController {
         return res;
     }
 
-    @GetMapping(value = "/{elementId}")
+    @GetMapping(value = "/{elementId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ElementsResponse getElement(
         @PathVariable String projectId,
@@ -62,6 +73,9 @@ public class ElementsController extends BaseController {
         @RequestBody ElementsRequest req,
         @RequestParam(required = false) Map<String, String> params,
         Authentication auth) {
+
+        embeddedHookService.hook(new ElementUpdateHook(ElementUpdateHook.Action.ADD_UPDATE, projectId, refId,
+            req.getElements(), params, auth));
 
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {

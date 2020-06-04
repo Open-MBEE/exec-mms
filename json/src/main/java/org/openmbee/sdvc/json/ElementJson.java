@@ -21,4 +21,5 @@ public class ElementJson extends BaseJson<ElementJson> {
         this.put(INREFIDS, inRefIds);
         return this;
     }
+
 }
