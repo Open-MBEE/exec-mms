@@ -1,16 +1,10 @@
 package org.openmbee.sdvc.artifacts.pubsub;
 
-import org.openmbee.sdvc.artifacts.controllers.ArtifactController;
 import org.openmbee.sdvc.artifacts.json.ArtifactJson;
-import org.openmbee.sdvc.core.utils.RequestUtils;
 import org.openmbee.sdvc.core.pubsub.EmbeddedHookSubscriber;
 import org.openmbee.sdvc.crud.hooks.ElementUpdateHook;
-import org.openmbee.sdvc.json.ElementJson;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.method.HandlerMethod;
 
 import java.util.List;
-import java.util.Map;
 
 public class ArtifactsElementsHookSubscriber implements EmbeddedHookSubscriber {
 

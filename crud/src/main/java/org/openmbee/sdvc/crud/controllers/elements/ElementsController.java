@@ -2,7 +2,6 @@ package org.openmbee.sdvc.crud.controllers.elements;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.ElementsRequest;
@@ -12,7 +11,6 @@ import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.core.pubsub.EmbeddedHookService;
 import org.openmbee.sdvc.crud.hooks.ElementUpdateHook;
-import org.openmbee.sdvc.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
