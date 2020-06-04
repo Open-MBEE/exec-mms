@@ -5,6 +5,7 @@ Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
     implementation project(':core')
+    implementation project(':search')
 
     implementation "org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion"
 
