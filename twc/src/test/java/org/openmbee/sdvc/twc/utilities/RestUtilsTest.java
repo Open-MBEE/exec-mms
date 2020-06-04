@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.core.utils;
+package org.openmbee.sdvc.twc.utilities;
 
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;

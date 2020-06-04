@@ -2,7 +2,6 @@ package org.openmbee.sdvc.twc.utilities;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openmbee.sdvc.core.utils.RestUtils;
 import org.openmbee.sdvc.twc.TeamworkCloud;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

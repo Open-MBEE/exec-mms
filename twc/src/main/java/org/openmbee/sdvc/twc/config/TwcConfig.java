@@ -1,6 +1,6 @@
 package org.openmbee.sdvc.twc.config;
 
-import org.openmbee.sdvc.core.utils.RestUtils;
+import org.openmbee.sdvc.twc.utilities.RestUtils;
 import org.openmbee.sdvc.twc.TeamworkCloud;
 import org.openmbee.sdvc.twc.security.TwcAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;

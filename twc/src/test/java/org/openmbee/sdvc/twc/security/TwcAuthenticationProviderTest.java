@@ -4,7 +4,7 @@ import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmbee.sdvc.core.utils.RestUtils;
+import org.openmbee.sdvc.twc.utilities.RestUtils;
 import org.openmbee.sdvc.twc.TeamworkCloud;
 import org.openmbee.sdvc.twc.constants.TwcConstants;
 import org.springframework.http.HttpEntity;
