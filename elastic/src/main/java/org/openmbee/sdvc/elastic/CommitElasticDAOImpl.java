@@ -122,4 +122,9 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     protected String getIndex() {
         return Index.COMMIT.get();
     }
+
+    @Override
+    public CommitJson update(CommitJson commitJson) {
+        return this.update(getIndex(), commitJson);
+    }
 }
