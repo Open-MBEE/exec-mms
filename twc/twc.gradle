@@ -5,7 +5,9 @@ Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
 dependencies {
     implementation project(':rdb')
-
+    implementation project(':crud')
+    
+    
     //TODO: Why is elastic search a dependency?
     implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.1.1'
     implementation commonDependencies.'servlet-api'

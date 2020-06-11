@@ -19,6 +19,7 @@ public class TwcConstants {
     public final static String USERS = "users";
     
     public final static String COMMA = ",";
+    public final static String TWCREVISIONID = "twc-revisionId";
     
 
 }
