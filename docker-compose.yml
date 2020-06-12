@@ -20,17 +20,10 @@ services:
 
   mms:
     build: .
-    #command: --spring.profiles.active=test
     environment:
-        #- spring.datasource.url=jdbc:postgresql://postgres:5432
-        #- elasticsearch.host=elasticsearch
-         #- classpath:/example/build/resources/main/application.properties.test
         - "SPRING_PROFILES_ACTIVE=test"
-        #- SPRING_CONFIG_NAME=application.properties.test
-        #- SPRING_CONFIG_LOCATION=classpath:/example/build/resources/main/
     depends_on:
         - postgres
         - elasticsearch
     ports: 
         - 8080:8080
-    #command: --spring.profiles.active=test
