@@ -8,23 +8,29 @@ services:
         - POSTGRES_USER=mmsuser
         - POSTGRES_DB=mms
     ports:
-      - "5432"
+      - 5432:5432
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.1.1
     environment:
-      - spring.datasource.url=jdbc:postgresql://postgres:5432
       - "discovery.type=single-node"
     ports:
-        - "9200:9200"
-        - "9300:9300"
+        - 9200:9200
+        - 9300:9300
 
   mms:
     build: .
+    #command: --spring.profiles.active=test
     environment:
-        - spring.datasource.url=jdbc:postgresql://postgres:5432
+        #- spring.datasource.url=jdbc:postgresql://postgres:5432
+        #- elasticsearch.host=elasticsearch
+         #- classpath:/example/build/resources/main/application.properties.test
+        - "SPRING_PROFILES_ACTIVE=test"
+        #- SPRING_CONFIG_NAME=application.properties.test
+        #- SPRING_CONFIG_LOCATION=classpath:/example/build/resources/main/
     depends_on:
         - postgres
         - elasticsearch
     ports: 
-        - "8080:8080"
+        - 8080:8080
+    #command: --spring.profiles.active=test
