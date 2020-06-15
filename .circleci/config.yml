@@ -8,8 +8,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: cp application.properties.example application.properties
-      - run: docker-compose up --build
+      - run: docker-compose up --build; cp application.properties.example application.properties
       #- node/with-cache:
           #steps:
       - run: sudo npm install -g newman
