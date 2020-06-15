@@ -6,9 +6,9 @@ jobs:
     executor:
       name: node/default
     steps:
+      - checkout
       - setup_remote_docker
       - run: cd mms; docker-compose up --build
-      - checkout
       #- node/with-cache:
           #steps:
       - run: sudo npm install -g newman
