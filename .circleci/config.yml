@@ -10,7 +10,7 @@ jobs:
       #- node/with-cache:
           #steps:
       - run: sudo npm install -g newman
-      - run: cd example; newman run crud.postman_collection.json -e localhost-env.json --delay-request 300
+      - run: cd example; newman run crud.postman_collection.json -e test-env.json.example --delay-request 300
 workflows:
     build-and-test:
       jobs:
