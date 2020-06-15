@@ -2,7 +2,7 @@
 **/build/
 !gradle/wrapper/gradle-wrapper.jar
 application.properties
-localhost-env.json
+#localhost-env.json
 .vscode
 
 ### STS ###
