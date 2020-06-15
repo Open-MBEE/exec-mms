@@ -3,11 +3,12 @@ orbs:
   node: circleci/node@1.1.6
 jobs:
   build:
-    steps:  
-      - checkout   
-      - setup_remote_docker
-      - run: cp application.properties.example application.properties
-      - run: docker-compose up --build
+    docker: 
+      steps:  
+        - checkout   
+        - setup_remote_docker
+        - run: cp application.properties.example application.properties
+        - run: docker-compose up --build
   test:
     executor:
       name: node/default
