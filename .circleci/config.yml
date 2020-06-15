@@ -2,18 +2,14 @@ version: 2.1
 orbs:
   node: circleci/node@1.1.6
 jobs:
-  build:
-    docker: 
-      steps:  
-        - checkout   
-        - setup_remote_docker
-        - run: cp application.properties.example application.properties
-        - run: docker-compose up --build
-  test:
+  build-and-test:
     executor:
       name: node/default
     steps:
       - checkout
+      - setup_remote_docker
+      - run: cp application.properties.example application.properties
+      - run: docker-compose up --build
       #- node/with-cache:
           #steps:
       - run: sudo npm install -g newman
@@ -21,5 +17,4 @@ jobs:
 workflows:
     build-and-test:
       jobs:
-        - build
-        - test
+        - build-and-test
