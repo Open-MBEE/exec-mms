@@ -3,14 +3,16 @@ orbs:
   node: circleci/node@1.1.6
 jobs:
   build:
-    steps:
-      - checkout
+    steps:  
+      - checkout   
       - setup_remote_docker
       - run: cp application.properties.example application.properties
       - run: docker-compose up --build
   test:
     executor:
       name: node/default
+    steps:
+      - checkout
       #- node/with-cache:
           #steps:
       - run: sudo npm install -g newman
