@@ -4,17 +4,10 @@ orbs:
 jobs:
     build: 
         machine: true
-            image: ubuntu-1604-cuda-10.1:201909-2
         steps:
             #- setup_remote_docker
             - checkout
             #- setup_remote_docker
-            - run:
-                name: Install Docker Compose
-                command: |
-                    curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-                    chmod +x ~/docker-compose
-                    sudo mv ~/docker-compose /usr/local/bin/docker-compose
             - run: docker-compose up --build; cp application.properties.example application.properties
     test:
         executor:
@@ -30,3 +23,5 @@ workflows:
       jobs:
         - build
         - test
+            requires:
+                - build 
