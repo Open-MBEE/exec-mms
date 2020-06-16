@@ -3,7 +3,7 @@ orbs:
   node: circleci/node@1.1.6
 jobs:
     build: 
-        docker: true
+        machine: true
         steps:
             - setup_remote_docker
             - checkout
