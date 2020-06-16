@@ -4,7 +4,7 @@ orbs:
 jobs:
     build: 
         machine: true
-        working_directory: ~/mms
+        #working_directory: ~/mms
         steps:
             #- setup_remote_docker
             - checkout
@@ -23,6 +23,6 @@ workflows:
     build-and-test:
       jobs:
         - build
-        - test:
-            requires:
-                - build 
+        - test
+            #requires:
+                #- build 
