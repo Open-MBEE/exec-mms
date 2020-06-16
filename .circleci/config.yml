@@ -3,8 +3,7 @@ orbs:
   node: circleci/node@1.1.6
 jobs:
     build: 
-        docker:
-            - image: postgres:9-alpine
+        docker: true
         steps:
             - setup_remote_docker
             - checkout
