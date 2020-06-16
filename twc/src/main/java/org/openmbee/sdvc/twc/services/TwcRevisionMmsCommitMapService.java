@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.twc.services;
 
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.config.Formats;
 import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
@@ -14,11 +15,8 @@ import org.openmbee.sdvc.twc.constants.TwcConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.util.*;
 
 @Service("twcRevisionMmsCommitMapService")
 public class TwcRevisionMmsCommitMapService extends DefaultNodeService implements NodeService {
@@ -62,9 +60,11 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
      * Method to get the twc revision list with project and branch id
      * @param projectId
      * @param refId
+     * @param reverseOrder
+     * @param limit
      * @return
      */
-    public List<CommitJson> getTwcRevisionList(String projectId, String refId) {
+    public List<CommitJson> getTwcRevisionList(String projectId, String refId, Boolean reverseOrder, Integer limit) {
         List<CommitJson> commits = new ArrayList<>();
         ContextHolder.setContext(projectId);
         Optional<Branch> ref = branchRepository.findByBranchId(refId);
@@ -85,10 +85,37 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
                     }
                 });
             }
+            commits.sort(new CommitsComparator(reverseOrder));
+            if(limit != null && limit > 0) {
+                return commits.subList(0, limit);
+            }
+            return commits;
         } catch (Exception exception) {
             logger.error("Error occurred while getting Twc Revision", exception.getMessage());
             throw new InternalErrorException(exception);
         }
-        return commits;
+    }
+
+    private class CommitsComparator implements Comparator<CommitJson> {
+
+        private boolean ascending = true;
+
+        public CommitsComparator(Boolean reverseOrder) {
+            if(reverseOrder != null && reverseOrder) {
+                ascending = false;
+            }
+        }
+
+        @Override
+        public int compare(CommitJson o, CommitJson t1) {
+            try {
+                Date d1 = Formats.SDF.parse((String) o.get(CommitJson.CREATED));
+                Date d2 = Formats.SDF.parse((String) t1.get(CommitJson.CREATED));
+                return ascending ? d1.compareTo(d2) : d2.compareTo(d1);
+            } catch (ParseException e) {
+                logger.error("Error parsing commit dates", e.getMessage());
+                throw new InternalErrorException("Invalid commit created dates.");
+            }
+        }
     }
 }
