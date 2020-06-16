@@ -5,10 +5,6 @@ jobs:
     build: 
         docker:
             - image: postgres:9-alpine
-                environment:
-                    - POSTGRES_PASSWORD=test1234
-                    - POSTGRES_USER=mmsuser
-                    - POSTGRES_DB=mms
         steps:
             - checkout
             - setup_remote_docker
