@@ -8,9 +8,9 @@ jobs:
         steps:
             - checkout
             #- setup_remote_docker
-            #- run: 
-                #name: Install Docker Compose
-                #command: |
+            - run: 
+                name: Install Docker Compose
+                command: |
                     set -x
                     curl -L https://github.com/docker/compose.git `uname -s`-`uname -m` > /usr/local/bin/docker-compose
                     sudo chmod +x /usr/local/bin/docker-compose
