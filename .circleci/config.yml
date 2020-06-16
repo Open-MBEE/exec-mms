@@ -4,12 +4,12 @@ orbs:
 
 jobs:
   build:
-    docker:
-      -setup_remote_docker
+    executor:
+      name: Build
       #- image: cimg/<language>:<version TAG>
     steps:
       - checkout
-      #- setup_remote_docker
+      - setup_remote_docker
       - run: docker-compose up --build; cp application.properties.example application.properties
   test:
     executor:
