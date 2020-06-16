@@ -5,7 +5,7 @@ jobs:
     build: 
         machine: true
         steps:
-            - setup_remote_docker
+            #- setup_remote_docker
             - checkout
             - run: docker-compose up --build; cp application.properties.example application.properties
     test:
