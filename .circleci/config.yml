@@ -8,6 +8,7 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
+            - run: install docker-compose
             - run: docker-compose up --build; cp application.properties.example application.properties
     test:
         executor:
