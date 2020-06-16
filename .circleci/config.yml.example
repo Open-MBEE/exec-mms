@@ -3,7 +3,6 @@ orbs:
   node: circleci/node@1.1.6
 jobs:
   build-and-test:
-    parallelism: 2
     executor:
       name: node/default
     steps:
