@@ -11,8 +11,9 @@ jobs:
                 name: Install Docker Compose
                 command: |
                     set -x
-                    curl -L https://github.com/docker/compose/releases/tag/1.26.0`uname -s`-`uname -m` > sudo/usr/local/bin/docker-compose
-                    sudo chmod +x /usr/local/bin/docker-compose
+                    curl -L https://github.com/docker/compose/releases/tag/1.26.0`uname -s`-`uname -m` > ~/docker-compose
+                    sudo chmod +x ~/docker-compose
+                    sudo mv ~/docker-compose /usr/local/bin/docker-compose
             - run: docker-compose up --build; cp application.properties.example application.properties
     test:
         executor:
