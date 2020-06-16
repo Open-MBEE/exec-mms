@@ -5,7 +5,7 @@ jobs:
   build:
     docker:
         # specify the version you desire here
-        - image: circleci/gradle:jdk11
+        - image: circleci/openjdk:jdk11
     steps:
       - checkout
       - setup_remote_docker
