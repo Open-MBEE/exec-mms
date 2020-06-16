@@ -7,13 +7,10 @@ jobs:
         working_directory: ~/mms
         steps:
             - checkout
-            -setup_remote_docker
-            - run: 
-                name: Install Docker Compose
-                command: |
-                    set -x
-                    curl -L https://github.com/docker/compose/releases/tag/1.26.0 `uname -s`-`uname -m` > /usr/local/bin/docker-compose
-                    sudo chmod +x /usr/local/bin/docker-compose
+            - setup_remote_docker
+            #- run: 
+                #name: Install Docker Compose
+                #command: |
             - run: docker-compose up --build; cp application.properties.example application.properties
     test:
         executor:
