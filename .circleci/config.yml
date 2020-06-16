@@ -1,14 +1,19 @@
 version: 2
+orbs:
+  node: circleci/node@1.1.6
 
 jobs:
   build:
     docker:
+      -setup_remote_docker
       #- image: cimg/<language>:<version TAG>
     steps:
       - checkout
-      - setup_remote_docker
+      #- setup_remote_docker
       - run: docker-compose up --build; cp application.properties.example application.properties
   test:
+    executor:
+      name: node/default
     #docker:
       #- image: cimg/<language>:<version TAG>
     steps:
