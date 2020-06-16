@@ -5,7 +5,7 @@ orbs:
 jobs:
   build:
     executor:
-      name: Build
+      name: "Build"
       #- image: cimg/<language>:<version TAG>
     steps:
       - checkout
