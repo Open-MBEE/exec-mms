@@ -2,7 +2,7 @@ version: 2
 
 jobs:
   build:
-    #docker:
+    docker:
       #- image: cimg/<language>:<version TAG>
     steps:
       - checkout
