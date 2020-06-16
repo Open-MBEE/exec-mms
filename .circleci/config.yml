@@ -4,11 +4,15 @@ orbs:
 jobs:
     build: 
         machine: true
-        #working_directory: ~/mms
+        working_directory: ~/mms
         steps:
-            #- setup_remote_docker
             - checkout
-            #- setup_remote_docker
+            - run: 
+                name: Install Docker Compose
+                command: |
+                    set -x
+                    curl -L https://github.com/docker/compose/releases/download/1.25.3/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+                    sudo chmod +x /usr/local/bin/docker-compose
             - run: docker-compose up --build; cp application.properties.example application.properties
     test:
         executor:
@@ -17,8 +21,6 @@ jobs:
             - checkout
             - run: sudo npm install -g newman 
             - run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
-      #- run: sudo npm install -g newman
-      #- run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     build-and-test:
       jobs:
