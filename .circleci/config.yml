@@ -1,17 +1,12 @@
 version: 2.1
-orbs:
-  node: circleci/node@1.1.6
 jobs:
-  build-and-test:
-    executor:
-      name: node/default
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker-compose up --build; cp application.properties.example application.properties; bash -c 'sudo npm install -g newman'; cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300; docker-compose down
-      #- run: sudo npm install -g newman
-      #- run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
-workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+    build:
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run: docker-compose up --build; cp application.properties.example application.properties
+    test:
+        steps:
+            - checkout
+            - run: sudo npm install -g newman
+            - run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
