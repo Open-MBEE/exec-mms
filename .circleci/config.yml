@@ -1,6 +1,6 @@
 version: 2.1
-orbs:
-  node: circleci/node@1.1.6
+#orbs:
+  #node: circleci/node@1.1.6
 jobs:
     build: 
         machine: true
@@ -19,6 +19,7 @@ jobs:
             #- run: docker-compose build
             - run: docker-compose up --build 
     test:
+        machine: true
         #docker:
             #image: postman/newman:latest
         steps:
