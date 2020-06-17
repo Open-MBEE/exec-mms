@@ -16,7 +16,7 @@ jobs:
                     sudo chmod +x /usr/local/bin/docker-compose
             #- run: setup_remote_docker
             - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties 
-            - run: docker-compose up -d --build
+            - run: docker-compose up --build -d
     test:
         executor:
             name: node/default
