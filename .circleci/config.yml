@@ -8,10 +8,11 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties; docker-compose --build
+      - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties; docker-compose build
       - run: docker-compose up -d; sudo npm install -g newman
       #- run: sudo npm install -g newman
       - run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
+      - run: docker-compose down
       #- run: sudo npm install -g newman
       #- run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
