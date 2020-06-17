@@ -20,7 +20,7 @@ jobs:
             - run: docker-compose up -d
     test:
         docker:
-            image: postman/newman
+            image: postman/newman:latest
         steps:
             - checkout
             #- run: sudo npm install -g newman 
