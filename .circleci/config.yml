@@ -15,8 +15,8 @@ jobs:
                     sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
                     sudo chmod +x /usr/local/bin/docker-compose
             #- run: setup_remote_docker
-            - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties 
-            - run: docker-compose up --build
+            - run: cp /example/src/main/resources/application.properties.example /example/src/main/resources/application.properties 
+            - run: docker-compose up -d --build
     test:
         executor:
             name: node/default
