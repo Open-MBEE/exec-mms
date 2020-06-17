@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  node: circleci/node@12.17.0
+  node: circleci/node@1.1.6
 jobs:
   build-and-test:
     executor:
@@ -15,7 +15,6 @@ jobs:
       #- run: sudo npm install -g newman
       #- run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
-  version: 2
-  build-and-test:
-    jobs:
-      - build-and-test
+    build-and-test:
+      jobs:
+        - build-and-test
