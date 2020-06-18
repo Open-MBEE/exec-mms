@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  node: postman/newman@0.0.2
+  newman: postman/newman@0.0.2
 jobs:
   build-and-test:
     executor:
