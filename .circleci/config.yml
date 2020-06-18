@@ -18,6 +18,8 @@ jobs:
             #- run: setup_remote_docker
             - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties 
             - run: docker-compose up --build -d
+            - run: docker inspect mms_mms_1
+            - run: docker inspect mms_postgres_1
             - run: docker-compose ps
     test:
         executor:
