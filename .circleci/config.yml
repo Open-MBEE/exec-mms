@@ -10,6 +10,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
+      - run: pip install docker-compose
       - run: docker-compose up --build -d
       - run: docker-compose ps
       - run: sleep 2m
