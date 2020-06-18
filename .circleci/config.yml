@@ -11,7 +11,7 @@ jobs:
       - checkout
       - setup_remote_docker
       #- run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: docker-compose up --build
+      - run: docker-compose up --build -d
       - run: docker-compose ps
       - run: docker inspect mms_mms_1
       - run: docker inspect mms_mms_postgres    
