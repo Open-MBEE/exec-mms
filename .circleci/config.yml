@@ -20,7 +20,10 @@ jobs:
       - checkout
       - run: sleep 3m
       #- run: cd example
-      - newman/newman-run: cd example; crud.postman_collection.json -e test-env.json --delay-request 300
+      - newman/newman-run: 
+          collection: ./example/crud.postman_collection.json
+          environment: ./example/test-env.json
+      #test-env.json --delay-request 300
   #test:
     #executor: 
       #name: node/default
