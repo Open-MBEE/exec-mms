@@ -9,9 +9,8 @@ jobs:
     working_directory: ~/mms
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
+      - setup_remote_docker
+      #- run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: docker-compose up --build
       - run: docker-compose ps    
   test:
