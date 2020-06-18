@@ -8,7 +8,7 @@ jobs:
     working_directory: ~/mms
     steps:
       - checkout
-      - setup_remote_docker
+      #- setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: docker install docker-compose
       - run: docker-compose up --build -d
