@@ -22,14 +22,14 @@ jobs:
     test:
         executor:
             name: newman/postman-newman-docker
-          steps:
-            - checkout
-            - run: sleep 3m
-            - run: cd example
-            - newman/newman-run: 
-                collection: example/crud.postman_collection.json
-                environment: example/test-env.json
-                delay-request: '300'
+        steps:
+          - checkout
+          - run: sleep 3m
+          - run: cd example
+          - newman/newman-run: 
+              collection: example/crud.postman_collection.json
+              environment: example/test-env.json
+              delay-request: '300'
 workflows:
     version: 2
     build-and-test:
