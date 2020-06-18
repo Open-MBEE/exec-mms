@@ -1,15 +1,14 @@
 version: 2.1
-orbs:
-  node: circleci/node@1.1.6
   newman: postman/newman@0.0.2
 jobs:
   build:
-    executor:
-      name: node/default
+    docker: 
+      image: 
     working_directory: ~/mms
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: docker-compose up --build
       - run: docker-compose ps    
