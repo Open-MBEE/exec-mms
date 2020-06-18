@@ -11,7 +11,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: docker-compose up --build -d
+      - run: docker-compose up --build
       - run: docker-compose ps    
   test:
     executor:
@@ -19,10 +19,8 @@ jobs:
     steps:
       - checkout
       - run: sleep 3m
-      - run: cd example
-      - newman/newman-run:
-          collection: crud.postman_collection.json 
-          environment: test-env.json --delay-request 300
+      #- run: cd example
+      - newman/newman-run: cd example; crud.postman_collection.json -e test-env.json --delay-request 300
   #test:
     #executor: 
       #name: node/default
