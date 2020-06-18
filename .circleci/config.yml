@@ -26,7 +26,7 @@ jobs:
             name: newman/postman-newman-docker
         steps:
           - checkout
-          #- run: sleep 3m
+          - run: sleep 3m
           - run: cd example
           - newman/newman-run: 
               collection: example/crud.postman_collection.json
@@ -37,6 +37,6 @@ workflows:
     build-and-test:
       jobs:
         - build
-        - test:
-            requires:
-                - build 
+        - test
+            #requires:
+               # - build 
