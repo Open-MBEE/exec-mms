@@ -22,7 +22,7 @@ jobs:
       #- run: cd example
       - newman/newman-run: 
           collection: crud.postman_collection.json
-          environment: ./example.test-env.json
+          environment: /example.test-env.json
           delay-request: '300'
       #test-env.json --delay-request 300
   #test:
