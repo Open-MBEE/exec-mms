@@ -20,6 +20,7 @@ jobs:
             #- run: node -v
             #- run: docker-compose up --build -d
             #- run: sleep 3m
+            - run: node --version
             - run: 
                 name: "Installing NPM"
                 command: |
