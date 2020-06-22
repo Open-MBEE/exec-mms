@@ -21,13 +21,16 @@ jobs:
             #- run: docker-compose up --build -d
             #- run: sleep 3m
             - run: node --version
-            - run: 
-                name: "Installing NPM"
-                command: |
-                    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-                    sudo apt install nodejs
-                    nodejs alias default 12.18.1
-                    node --version
+            #- run: 
+                #name: "Installing NPM"
+                #command: |
+                    #curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+                    #sudo apt install nodejs
+                    #nodejs alias default 12.18.1
+                    #node --version
+            - run: wget https://nodejs.org/dist/v12.13.1/node-v12.13.1-linux-x64.tar.xz
+            - run: sudo apt-get install xz-util
+            - run: tar -C /usr/local –strip-components 1 -xJf node-v12.13.1-linux-x64.tar.xz
             #sudo npm install -g newman
             #cd example
             #newman run crud.postman_collection.json -e test-env.json --delay-request 300
