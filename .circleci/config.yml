@@ -13,8 +13,8 @@ jobs:
       - run: docker-compose build
       #- run: docker-compose ps
       - run: |
-          docker run -d --name mms mms_mms
-          docker run --network container:postgres appropriate/curl --retry 10 --retry-connrefused http://localhost:8080
+          docker run -d --name mms_mms mms_mms
+          docker run --network container:mms_postgres appropriate/curl --retry 10 --retry-connrefused http://localhost:8080
       - run: docker-compose ps
       #- run: sleep 3m
       #- run: sudo npm install -g newman
