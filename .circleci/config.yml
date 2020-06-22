@@ -19,11 +19,15 @@ jobs:
             #- run: sleep 3m
             - run: node --version
             - run: npm -v
-            - run: 
-                name: "Installing NPM"
-                command: |
-                    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-                    sudo apt install nodejs
+            - run: sudo apt-get update
+            - run: sudo apt-get install nodejs
+            - run: sudo apt-get install npm
+            - run: sudo npm install -g n
+            #- run: 
+                #name: "Installing Node"
+                #command: |
+                    #curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+                    #sudo apt install nodejs
             - run: sudo npm install -g newman
             - run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
             #- run: docker inspect mms_mms_1
