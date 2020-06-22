@@ -19,10 +19,11 @@ jobs:
             #- run: sleep 3m
             - run: node --version
             - run: npm -v
-            - run: sudo apt-get update
-            - run: sudo apt-get install nodejs
-            - run: sudo apt-get install npm
-            - run: sudo npm install -g n
+            #- run: sudo apt-get update
+            #- run: sudo apt-get install nodejs
+            #- run: sudo apt-get install npm
+            - run: curl -L https://git.io/n-install | bash
+            - run: n latest
             #- run: 
                 #name: "Installing Node"
                 #command: |
