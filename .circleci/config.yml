@@ -10,7 +10,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: docker-compose up --build -d
+      - run: docker-compose build
+      - run: docker-compose up
       - run: sleep 2m
       #- run: docker-compose up -d
       - run: docker-compose ps
