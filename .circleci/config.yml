@@ -19,26 +19,13 @@ jobs:
             #- run: sleep 3m
             - run: node --version
             - run: npm -v
-            - run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-            - run: export NVM_DIR="/opt/circleci/.nvm"
-            - run: [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            - run: [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-            #- run: 
-                #name: "Installing NPM"
-                #command: |
-                    #curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-                    #sudo apt install nodejs
-                    #nodejs alias default 12.18.1
-                    #node --version
-           #- run: sudo wget https://nodejs.org/dist/v12.18.1/node-v12.18.1-linux-x64.tar.xz
-            #- run: sudo apt-get install xz-util
-           # - run: tar -C /usr/local –strip-components 1 -xJf node-v12.13.1-linux-x64.tar.xz
+            - run: 
+                name: "Installing NPM"
+                command: |
+                    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+                    sudo apt install nodejs
             - run: sudo npm install -g newman
-            #cd example
-            #newman run crud.postman_collection.json -e test-env.json --delay-request 300
-            #- run: sudo apt-get install nodejs; node -v
-            #- run: sudo npm install -g newman
-            #- run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
+            - run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
             #- run: docker inspect mms_mms_1
             #- run: docker inspect mms_postgres_1
             #- run: docker-compose ps
