@@ -10,7 +10,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: docker-compose up --build -d
+      - run: docker-compose up --build -d --name mms mms
+      - run: docker exec mms curl --retry 10 --retry-connrefused http://localhost:8080
       - run: docker-compose ps
       - run: sleep 3m
       - run: sudo npm install -g newman
