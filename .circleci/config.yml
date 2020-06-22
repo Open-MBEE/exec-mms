@@ -22,8 +22,11 @@ jobs:
             #- run: sleep 3m
             - run: node --version
             - run: npm -v
-            - run: npm install npm@latest -g
-            - run: npm -v
+            #- run: npm install npm@latest -g
+            - run: sudo npm cache clean -f
+            - run: sudo npm install -g n
+            - run: sudo n stable
+            
             #- run: 
                 #name: "Installing NPM"
                 #command: |
