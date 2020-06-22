@@ -25,7 +25,7 @@ jobs:
                 command: |
                     curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
                     sudo apt install nodejs
-                    nvm alias default 12.18.1
+                    nodejs alias default 12.18.1
                     node --version
             #sudo npm install -g newman
             #cd example
