@@ -22,6 +22,8 @@ jobs:
             #- run: sleep 3m
             - run: node --version
             - run: npm -v
+            - run: npm install npm@latest -g
+            - run: npm -v
             #- run: 
                 #name: "Installing NPM"
                 #command: |
