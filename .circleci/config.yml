@@ -11,13 +11,11 @@ jobs:
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: docker-compose build
-      - run:
-          name: "start service and check if its running" 
-          command: | 
-            docker-compose run -d --name mms mms
-            docker exec mms curl --retry 10 --retry-connrefused http://localhost:8080
+      - run: docker-compose run -d --name mms mms
+      - run: sleep 2m
+      - run: docker exec mms curl --retry 10 --retry-connrefused http://localhost:8080
       - run: docker-compose ps
-      - run: sleep 3m
+      #- run: sleep 3m
       - run: sudo npm install -g newman
       - run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: sudo npm install -g newman
