@@ -15,10 +15,10 @@ jobs:
       #- run: docker-compose up -d
       - run: docker-compose ps
       - run:
-        name: "Start Service and Check That it’s Running"
-        command: |
-          docker run -d --name mms mms
-          docker exec mms curl --retry 10 --retry-connrefused http://localhost:8080
+          name: "Start Service and Check That it’s Running"
+          command: |
+            docker run -d --name mms mms
+            docker exec mms curl --retry 10 --retry-connrefused http://localhost:8080
       - run: docker-compose ps
       #- run: sleep 3m
       #- run: sudo npm install -g newman
