@@ -11,12 +11,9 @@ jobs:
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: docker-compose build
-      - run: 
-          name: "service"
-          command: | 
-            docker-compose run -d --name mms mms
-            sleep 2m
-            docker exec mms curl --retry 10 --retry-connrefused http://localhost:8080
+      - run: |
+          docker run -d --name mms mms
+          docker run --network container:mms appropriate/curl --retry 10 --retry-connrefused http://localhost:8080
       - run: docker-compose ps
       #- run: sleep 3m
       - run: sudo npm install -g newman
