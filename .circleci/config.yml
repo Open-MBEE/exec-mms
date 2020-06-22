@@ -18,9 +18,9 @@ jobs:
             #- run: setup_remote_docker
             - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties 
             - run: docker-compose up --build -d
-            #- run: sleep 3m
-            - run: sudo curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | sudo -E bash -; sudo nvm install node
-            #- run: sudo nvm install node
+            - run: sleep 3m
+            - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | sudo -E bash
+            - run: sudo apt-get install -y nodejs git
             - run: sudo npm install -g newman
             - run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
             #- run: docker inspect mms_mms_1
