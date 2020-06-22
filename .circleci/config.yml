@@ -19,9 +19,11 @@ jobs:
             - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties 
             #- run: docker-compose up --build -d
             #- run: sleep 3m
-            - run: sudo curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash
-            - run: sudo apt-get install nodejs; node -v
-            - run: sudo npm install -g newman
+            #- run: sudo curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash
+            #- run: sudo apt-get install nodejs; node -v
+            #- run: sudo npm install -g newman
+            - run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+            - run: nvm install v12.18.1
             - run: node -v
             #- run: cd example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
             #- run: docker inspect mms_mms_1
