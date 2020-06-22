@@ -22,8 +22,8 @@ jobs:
             #- run: sudo apt-get install npm
             - run: docker pull postman/newman
             #- run: docker run -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
-            - run: docker run -v ~/collections:/etc/postman -t postman/newman \
-                crud.postman_collection.json \
+            - run: docker run -v ~/collections:/etc/newman -t postman/newman \
+                ./example/crud.postman_collection.json \
                 --environment="test-env.json" \
                 --delay-request 300
             #- run: docker run -v ~/collections:/etc/newman -t postman/newman:alpine HTTPBinNewmanTest.json.postman_collection
