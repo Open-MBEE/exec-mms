@@ -19,8 +19,7 @@ jobs:
             #- run: sleep 3m
             - run: node --version
             - run: npm -v
-           #- run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-            - run: node latest
+            - run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
             #- run: 
                 #name: "Installing NPM"
                 #command: |
