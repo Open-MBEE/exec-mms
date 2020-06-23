@@ -17,7 +17,7 @@ jobs:
                 #working_directory: ~/mms
                 #command: | 
             - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            - run: cd ~/mms/example && ls
+            - run: cd ~/mms/example/src/main/resources && ls
             #- run: cd ~/mms && ./gradlew clean
             #- run: cd ~/mms && docker-compose down
             #- run: cd ~/mms && docker-compose up --build
