@@ -18,7 +18,7 @@ dependencies {
     implementation(
         project(':authenticator'),
         project(':localuser'),
-        //project(':ldap'),
+        project(':ldap'),
         project(':cameo'),
         project(':elastic'),
         project(':jupyter'),
