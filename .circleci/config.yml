@@ -17,13 +17,14 @@ jobs:
                 #working_directory: ~/mms
                 #command: | 
             - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            - run: cd ~/mms && ./gradlew clean
-            - run: cd ~/mms && docker-compose down
-            - run: cd ~/mms && docker-compose up --build
+            - run: cd ~/mms/example && ls
+            #- run: cd ~/mms && ./gradlew clean
+            #- run: cd ~/mms && docker-compose down
+            #- run: cd ~/mms && docker-compose up --build
             #- run: cd ~/mms && docker-compose logs mms_mms_1
             #- run: cd ~/mms && sleep 3m
-            - run: cd ~/mms && docker-compose ps
-            - run: docker pull postman/newman && cd ~/mms/example && docker run -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300 --network mms_default
+            #- run: cd ~/mms && docker-compose ps
+            #- run: docker pull postman/newman && cd ~/mms/example && docker run -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300 --network mms_default
     #test:
         #executor:
             #name: newman/postman-newman-docker
