@@ -19,7 +19,7 @@ jobs:
             #- run: sleep 3m
             - run: docker pull postman/newman
             #- run: docker run -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
-            - run: cd example; docker run -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e ./example/test-env.json --delay-request 300
+            - run: cd example; docker run -v ~/mms/example:/etc/newman -t postman/newman run --collection="crud.postman_collection.json" --enivironment="/example/test-env.json" --delay-request 300
             #- run: docker run -v ~/collections:/etc/newman -t postman/newman:alpine HTTPBinNewmanTest.json.postman_collection
     #test:
         #executor:
