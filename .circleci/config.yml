@@ -9,16 +9,16 @@ jobs:
                 name: "Install Docker Compose"
                 working_directory: ~/mms
                 command: |
-                    cd ~/mms && set -x
-                    cd ~/mms && sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-                    cd ~/mms & sudo chmod +x /usr/local/bin/docker-compose
+                    set -x
+                    sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                    sudo chmod +x /usr/local/bin/docker-compose
             #- run:
                 #name: "Build and Run Containers and Newman Tests"
                 #working_directory: ~/mms
                 #command: | 
             - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             - run: cd ~/mms && ./gradlew clean
-            - run: cd ~/mms && docker-compose up --build -d && sleep 10s && docker-compose logs mms_mms_1
+            - run: cd ~/mms && docker-compose up --build
             #- run: cd ~/mms && docker-compose logs mms_mms_1
             #- run: cd ~/mms && sleep 3m
             - run: cd ~/mms && docker-compose ps
