@@ -23,7 +23,7 @@ jobs:
         #steps
           #- checkout
           #- run: sleep 3m
-          #- run: cd example
+          #- run: cd exampl
           #- newman/newman-run: 
               #collection: example/crud.postman_collection.json
               #environment: example/test-env.json
