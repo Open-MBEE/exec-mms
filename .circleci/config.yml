@@ -22,7 +22,7 @@ jobs:
             #name newman/postman-newman-docker
         #steps
           #- checkout
-          #- run sleep 3m
+          #- run: sleep 3m
           #- run: cd exampl
           #- newman/newman-run: 
               #collection: example/crud.postman_collection.json
