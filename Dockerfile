@@ -7,4 +7,4 @@ RUN cp /mms/example/build/libs/example*.jar /app.jar
 ENTRYPOINT ["java", "--add-opens", "java.base/java.lang=ALL-UNNAMED","-jar", "/app.jar"] 
 EXPOSE 8080
 RUN apt update
-RUN apt-get install -y bcrypt
+RUN apt-get install bcrypt
