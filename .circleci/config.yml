@@ -20,7 +20,7 @@ jobs:
     #test
         #executor
             #name newman/postman-newman-docker
-        #steps:
+        #steps
           #- checkout
           #- run: sleep 3m
           #- run: cd example
