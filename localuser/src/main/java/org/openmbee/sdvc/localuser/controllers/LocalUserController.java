@@ -35,7 +35,6 @@ public class LocalUserController {
         try {
             userDetailsService.loadUserByUsername(req.getUsername());
         } catch (UsernameNotFoundException e) {
-            userDetailsService.setPasswordEncoder(passwordEncoder());
             userDetailsService.register(req.getUsername(), req.getPassword(), false);
         }
         return "";
