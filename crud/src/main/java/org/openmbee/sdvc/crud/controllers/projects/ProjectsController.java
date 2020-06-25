@@ -112,6 +112,10 @@ public class ProjectsController extends BaseController {
             }
 
             ProjectService ps = getProjectService(json);
+            if ((json.getProjectType()).equals("default")) {
+                response.addRejection(new Rejection(json, 400, "Project schema is unknown."));
+                continue;
+            }
             if (!ps.exists(json.getProjectId())) {
                 try {
                     if (!mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
