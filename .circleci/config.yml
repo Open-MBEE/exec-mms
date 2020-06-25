@@ -11,11 +11,10 @@ jobs:
       - setup_remote_docker
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: cd ~/mms && docker-compose up --build -d
-      - run: cd ~/mms && export DOCKER_HOST=127.0.0.1:8080
       - run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
       - run: cd ~/mms && sudo npm install -g newman
-      - run: cd ~/mms/example; newman run crud.postman_collection.json -e test-env.json --delay-request 300
+      - run: export DOCKER_HOST=127.0.0.1:8080 && cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     build-and-test:
       jobs:
