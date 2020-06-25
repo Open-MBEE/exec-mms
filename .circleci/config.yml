@@ -10,7 +10,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: cd ~/mms && docker-compose up --build -d
+      - run: cd ~/mms && docker-compose up --build -d DOCKER_HOST=mms_default 
       - run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
       - run: cd ~/mms && docker network ls
