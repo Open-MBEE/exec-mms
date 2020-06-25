@@ -15,8 +15,8 @@ jobs:
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && DOCKER_HOST=mms_default:host
       - run: docker stop mms_mms_1
-      - run: docker run mms_mms_1 --network=host
-      - run: cd ~/mms && docker network connect host mms_mms_1
+      - run: cd ~/mms && sudo docker run mms_mms_1 --network=host
+      #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
       - run: docker network inspect mms_default
       - run: docker network inspect host
