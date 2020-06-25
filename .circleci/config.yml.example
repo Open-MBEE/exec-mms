@@ -1,0 +1,46 @@
+version: 2.1
+jobs:
+    build-and-test:
+        machine: true
+        #machine: true
+        working_directory: ~/mms
+        steps:
+            - checkout
+            - run: 
+                name: "Install Docker Compose"
+                working_directory: ~/mms
+                command: |
+                    set -x
+                    sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                    sudo chmod +x /usr/local/bin/docker-compose
+            - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
+            - run: cd ~/mms && docker-compose up --build -d
+            - run: cd ~/mms && export DOCKER_HOST=127.0.0.1:8080
+            - run: cd ~/mms && sleep 2m
+            #- run: cd ~/mms && sleep 4m
+            - run: cd ~/mms && docker-compose ps
+            - run: docker pull postman/newman && cd ~/mms/example && docker run -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+    #test
+        #executor
+            #name newman/postman-newman-docker
+        #steps
+          #- checkout
+          #- run: sleep 3m
+          #- run: cd exampl
+          #- newman/newman-run: 
+              #collection: example/crud.postman_collection.json
+              #environment: example/test-env.json
+              #delay-request: '300'
+workflows:
+    version: 2
+    build-and-test:
+        jobs:
+            - build-and-test
+#workflows:
+    #version: 2
+    #build-and-test:
+      #jobs:
+        #- build
+        #- test
+            #requires:
+               # - build 
