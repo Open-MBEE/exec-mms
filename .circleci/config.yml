@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-    java: ci-poc/java@0.0.22
+    java-build: expi/java-build@1.0.0
 jobs:
     build-and-test:
         machine: true
