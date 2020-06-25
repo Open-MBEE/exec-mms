@@ -3,7 +3,9 @@ orbs:
     java-build: expi/java-build@1.0.0
 jobs:
     build-and-test:
-        machine: true
+        docker:
+            - image: circleci/openjdk:latest
+        #machine: true
         working_directory: ~/mms
         steps:
             - checkout
