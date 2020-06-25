@@ -15,6 +15,8 @@ jobs:
       - run: cd ~/mms && docker-compose ps
       - run: cd ~/mms && DOCKER_HOST=mms_default
       - run: cd ~/mms && docker network ls
+      - run: docker network inspect mms_default
+      - run: docker network inspect host
       - run: cd ~/mms && sudo npm install -g newman
       - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
