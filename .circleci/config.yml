@@ -14,16 +14,17 @@ jobs:
       #- run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && DOCKER_HOST=mms_default:host
-      - run: docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
-      - run: docker rm mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: docker-compose stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: docker-compose rm mms_mms_1 mms_elasticsearch_1 mms_postgres_1
       - run: cd ~/mms && docker-compose run -d mms --network=host
       - run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
       - run: cd ~/mms && docker network inspect host
+      - run: cd ~/mms && docker ps
       - run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
-      - run: cd ~/mms && sudo npm install -g newman
-      - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
+      #- run: cd ~/mms && sudo npm install -g newman
+      #- run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     build-and-test:
       jobs:
