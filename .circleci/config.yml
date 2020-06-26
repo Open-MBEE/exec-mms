@@ -10,19 +10,18 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: cd ~/mms && docker-compose build
+      - run: cd ~/mms && docker-compose up --build -d 
       #- run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && DOCKER_HOST=mms_default:host
-     # - run: docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
       #_mms_1 mms_elasticsearch_1 mms_postgres_1
-     # - run: cd ~/mms && docker rm mms_mms_1 mms_elasticsearch_1 mms_postgres_1
-      #- run: cd ~/mms && docker network rm mms_default 
-      - run: cd ~/mms && docker run -d --service-ports --name mms_mms_1 mms --network=bridge  
+      - run: cd ~/mms && docker rm mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: cd ~/mms && docker network rm mms_default 
+      - run: cd ~/mms && docker run --service-ports --name mms_mms_1 mms --network=bridge  
       - run: cd ~/mms && docker network connect bridge mms_mms_1
       - run: cd ~/mms && docker network connect bridge mms_postgres_1
       - run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
-      - run: cd ~/mms && docker attach mms_mms_1
       - run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
@@ -31,7 +30,7 @@ jobs:
       - run: cd ~/mms && docker network inspect none
       #- run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker-compose ps
-      - run: cd ~/mms && docker-compose logs -f --details mms_mms_1
+      #- run: cd ~/mms && docker-compose logs -f --details mms_mms
       #- run: cd ~/mms && docker ps
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
       - run: cd ~/mms && sudo npm install -g newman
