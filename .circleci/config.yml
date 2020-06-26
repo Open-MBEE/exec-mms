@@ -14,8 +14,9 @@ jobs:
       #- run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && DOCKER_HOST=mms_default:host
-      - run: docker-compose stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
-      - run: docker-compose rm mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: docker-compose stop mms 
+      #_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: docker-compose rm mms
       - run: cd ~/mms && docker-compose run -d mms --network=host
       - run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network connect host mms_mms_1
