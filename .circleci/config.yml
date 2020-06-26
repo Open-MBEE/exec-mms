@@ -14,10 +14,10 @@ jobs:
       #- run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && DOCKER_HOST=mms_default:host
-      - run: docker-compose mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
       #_mms_1 mms_elasticsearch_1 mms_postgres_1
       - run: docker rm mms_mms_1 mms_elasticsearch_1 mms_postgres_1
-      - run: cd ~/mms && docker-compose run -d --service-ports mms --network=host
+      - run: cd ~/mms && docker-compose run -d --service-ports -p 127.0.0.1:8080 mms --network=host
       - run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
