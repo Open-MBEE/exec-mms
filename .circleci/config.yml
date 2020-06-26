@@ -22,7 +22,7 @@ jobs:
       - run: cd ~/mms && docker network connect bridge mms_postgres_1
       - run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
      # - run: cd ~/mms && docker network rm mms_default 
-      - run: cd ~/mms && sleep 2m
+      #- run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
       - run: cd ~/mms && docker network inspect host
@@ -36,8 +36,8 @@ jobs:
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
      # - run: cd ~/mms && sudo npm install -g newman
       #- run: cd ~/mms/example && export DOCKER_HOST=172.17.0.2:127.0.0.1 && newman run crud.postman_collection.json -e test-env.json --delay-request 300
-      - run: cd ~/mms && docker pull postman/newman
-      - run: cd ~/mms/example && docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+      - run: cd ~/mms; docker pull postman/newman
+      - run: cd ~/mms/example; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     build-and-test:
       jobs:
