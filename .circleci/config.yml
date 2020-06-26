@@ -38,7 +38,7 @@ jobs:
       #- run: cd ~/mms/example && export DOCKER_HOST=172.17.0.2:127.0.0.1 && newman run crud.postman_collection.json -e test-env.json --delay-request 300
      # - run: cd ~/mms; docker pull postman/newman
       - run: export DOCKER_HOST=172.17.0.2:127.0.0.1:8080
-      - run: cd ~/mms/example && docker pull postman/newman && docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e ~/mms/example/test-env.json --delay-request 300
+      - run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     build-and-test:
       jobs:
