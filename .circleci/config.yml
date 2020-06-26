@@ -31,7 +31,7 @@ jobs:
       - run: cd ~/mms && docker network inspect mms_default
      # - run: cd ~/mms && docker network rm mms_default 
       - run: cd ~/mms && docker-compose ps
-      - run: cd ~/mms && docker-compose logs -f mms_mms_1
+      - run: cd ~/mms && docker-compose logs -f mms
       #- run: cd ~/mms && docker ps
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
      # - run: cd ~/mms && sudo npm install -g newman
