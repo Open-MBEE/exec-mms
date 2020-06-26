@@ -17,7 +17,7 @@ jobs:
       - run: docker-compose stop mms 
       #_mms_1 mms_elasticsearch_1 mms_postgres_1
       - run: docker-compose rm mms
-      - run: cd ~/mms && docker-compose run mms -d --network=host --service-ports
+      - run: cd ~/mms && docker-compose run -d mms --network=host --service-ports
       - run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
