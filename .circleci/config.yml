@@ -26,6 +26,8 @@ jobs:
       - run: cd ~/mms && docker network ls
       - run: cd ~/mms && docker network inspect host
       - run: cd ~/mms && docker network inspect bridge
+      - run: cd ~/mms && docker network inspect none
+      - run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && docker-compose logs -f --details mms_mms
       #- run: cd ~/mms && docker ps
