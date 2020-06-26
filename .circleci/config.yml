@@ -22,8 +22,9 @@ jobs:
       #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
       - run: cd ~/mms && docker network inspect host
-      - run: cd ~/mms && docker logs -f --details mms_mms
       - run: cd ~/mms && docker ps
+      - run: cd ~/mms && docker-compose logs -f --details mms_mms
+      #- run: cd ~/mms && docker ps
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
       - run: cd ~/mms && sudo npm install -g newman
       - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
