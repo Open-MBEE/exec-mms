@@ -34,6 +34,9 @@ jobs:
       #- run: cd ~/mms && docker-compose logs -f mms
       #- run: cd ~/mms && docker ps
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
+      - run: |
+          docker run -d --name mms mms_mms_1
+          docker run --network container:mms_mms_1 appropriate/curl --retry 10 --retry-connrefused http://localhost:8080
       - run: cd ~/mms && sudo npm install -g newman
       - run: export DOCKER_HOST=172.17.0.2:127.0.0.1:8080
       - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
