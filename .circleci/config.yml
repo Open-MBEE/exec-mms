@@ -13,11 +13,11 @@ jobs:
       - run: cd ~/mms && docker-compose up --build
       #- run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
-      #- run: cd ~/mms && DOCKER_HOST=mms_default:host
-      #- run: docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      - run: cd ~/mms && export DOCKER_HOST=mms_default:bridge
+      - run: cd ~/mms && docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
       #_mms_1 mms_elasticsearch_1 mms_postgres_1
-      #- run: cd ~/mms && docker rm mms_mms_1 mms_elasticsearch_1 mms_postgres_1
-      - run: cd ~/mms && docker-compose run --name mms_mms_1 mms --network="bridge"  
+      - run: cd ~/mms && docker start mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      #- run: cd ~/mms && docker-compose run --name mms_mms_1 mms --network="bridge"  
       - run: cd ~/mms && docker network connect bridge mms_mms_1
       - run: cd ~/mms && docker network connect bridge mms_postgres_1
       - run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
