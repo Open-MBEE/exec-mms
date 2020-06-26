@@ -35,7 +35,8 @@ jobs:
       #- run: cd ~/mms && docker-compose logs -f mms
       #- run: cd ~/mms && docker ps
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
-      - run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 5 --retry-connrefused http://localhost:8080
+      #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
+      - run: cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
       - run: cd ~/mms && sudo npm install -g newman
       - run: export DOCKER_HOST=172.17.0.2:127.0.0.1:8080
       - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
