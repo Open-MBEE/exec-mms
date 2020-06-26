@@ -10,13 +10,13 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: cd ~/mms && docker-compose up -d --build
+      - run: cd ~/mms && docker-compose build
       #- run: cd ~/mms && sleep 2m
       - run: cd ~/mms && docker-compose ps
       - run: cd ~/mms && export DOCKER_HOST=mms_default:bridge
-      - run: cd ~/mms && docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
+      #- run: cd ~/mms && docker stop mms_mms_1 mms_elasticsearch_1 mms_postgres_1
       #_mms_1 mms_elasticsearch_1 mms_postgres_1
-      - run: cd ~/mms && docker-compose run -d -p 8080 mms --name mms_mms_1
+      - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms --network="bridge" 
       #- run: cd ~/mms && docker-compose run --name mms_mms_1 mms --network="bridge"  
       - run: cd ~/mms && docker network connect bridge mms_mms_1
       - run: cd ~/mms && docker network connect bridge mms_postgres_1
