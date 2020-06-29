@@ -10,7 +10,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: cd ~/mms && docker-compose build
+      - run: cd ~/mms && docker-compose up --build
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
       - run: cd ~/mms && docker-compose run --name mms_mms_2 mms 
