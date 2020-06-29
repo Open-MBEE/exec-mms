@@ -10,33 +10,21 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-     # - run: cd ~/mms && docker-compose build
-      - run: cd ~/mms && docker-compose ps
-      #_mms_1 mms_elasticsearch_1 mms_postgres_1
-      #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
-     # - run: cd ~/mms && docker-compose run -d --name mms_mms_1 mms --network="bridge" 
-      - run: cd ~/mms && docker run -d -e POSTGRES_PASSWORD=test1234 -e POSTGRES_USER=mmsuser -e POSTGRES_DB=mms -p 5432:5432 postgres:9-alpine
-      - run: cd ~/mms && docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.1.1
-      - run: sleep 1m
       - run: cd ~/mms && docker-compose build
-      - run: cd ~/mms && docker run --name mms_mms_1 mms_mms:latest --network="bridge" 
-      #- run: cd ~/mms && docker network connect bridge mms_mms_1
-      #- run: cd ~/mms && docker network connect bridge mms_postgres_1
-      #- run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
-      #- run: cd ~/mms && docker stop mms_mms_1
-     # - run: cd ~/mms && docker network rm mms_default 
+      - run: cd ~/mms && docker-compose ps
+      #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
+      - run: cd ~/mms && docker-compose run --name mms_mms_1 mms --network="bridge"  
+      - run: cd ~/mms && docker network connect bridge mms_mms_1
+      - run: cd ~/mms && docker network connect bridge mms_postgres_1
+      - run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
       - run: cd ~/mms && sleep 2m
-      #- run: cd ~/mms && docker network connect host mms_mms_1
       - run: cd ~/mms && docker network ls
       - run: cd ~/mms && docker network inspect host
       - run: cd ~/mms && docker network inspect bridge
       - run: cd ~/mms && docker network inspect none
-     # - run: cd ~/mms && docker network inspect mms_default
-     # - run: cd ~/mms && docker network rm mms_default 
       - run: cd ~/mms && docker ps
       - run: cd ~/mms && export DOCKER_HOST=tcp://35.232.15.249:2376
-      #- run: cd ~/mms && docker-compose logs -f mms
-      #- run: cd ~/mms && docker ps
+      - run: docker inspect mms_mms_1 
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
       #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
      # - run: cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
