@@ -24,13 +24,13 @@ jobs:
       - run: cd ~/mms && docker network inspect none
       - run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker ps
-      - run: cd ~/mms && export NO_PROXY=tcp://127.0.0.1:8080
+      - run: cd ~/mms && export HTTP_PROXY=tcp://127.0.0.1:8080
       - run: docker inspect mms_mms_2
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
       #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
      # - run: cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
       - run: cd ~/mms && sudo npm install -g newman
-      - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300 --host=0.0.0.0
+      - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
      # - run: cd ~/mms; docker pull postman/newman
       #- run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
