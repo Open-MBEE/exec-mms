@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Privileges;
+import org.openmbee.sdvc.core.config.ProjectSchemas;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.dao.ProjectIndex;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
@@ -42,11 +43,14 @@ public class ProjectsController extends BaseController {
 
     ProjectDAO projectRepository;
     ProjectIndex projectIndex;
+    ProjectSchemas schemas;
+
 
     @Autowired
-    public ProjectsController(ProjectDAO projectRepository, ProjectIndex projectIndex) {
+    public ProjectsController(ProjectDAO projectRepository, ProjectIndex projectIndex, ProjectSchemas schemas) {
         this.projectRepository = projectRepository;
         this.projectIndex = projectIndex;
+        this.schemas = schemas;
     }
 
     @GetMapping
@@ -111,11 +115,13 @@ public class ProjectsController extends BaseController {
                 continue;
             }
 
-            ProjectService ps = getProjectService(json);
-            if ((json.getProjectType()).equals("default")) {
+            if (!((schemas.getSchemas()).containsKey(json.getProjectType()))) {
                 response.addRejection(new Rejection(json, 400, "Project schema is unknown."));
                 continue;
             }
+
+            ProjectService ps = getProjectService(json);
+
             if (!ps.exists(json.getProjectId())) {
                 try {
                     if (!mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
