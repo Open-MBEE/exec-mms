@@ -17,7 +17,9 @@ jobs:
      # - run: cd ~/mms && docker-compose run -d --name mms_mms_1 mms --network="bridge" 
       - run: cd ~/mms && docker run -d -e POSTGRES_PASSWORD=test1234 -e POSTGRES_USER=mmsuser -e POSTGRES_DB=mms -p 5432:5432 postgres:9-alpine
       - run: cd ~/mms && docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.1.1
-      - run: cd ~/mms && docker-compose build && docker run -d --name mms_mms_1 mms_mms:latest --network="bridge" 
+      - run: sleep 1m
+      - run: cd ~/mms && docker-compose build
+      - run: cd ~/mms && docker run --name mms_mms_1 mms_mms:latest --network="bridge" 
       #- run: cd ~/mms && docker network connect bridge mms_mms_1
       #- run: cd ~/mms && docker network connect bridge mms_postgres_1
       #- run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
