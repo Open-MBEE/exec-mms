@@ -24,7 +24,7 @@ jobs:
       - run: cd ~/mms && docker network inspect none
       - run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker ps
-      - run: cd ~/mms && curl http://0.0.0.0:8080/
+      - run: cd ~/mms && curl http://8080/
       - run: cd ~/mms && export NO_PROXY=tcp://127.0.0.1:8080
       - run: docker inspect mms_mms_2
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
