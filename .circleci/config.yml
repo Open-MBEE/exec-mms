@@ -24,7 +24,8 @@ jobs:
       - run: cd ~/mms && docker network inspect none
       - run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker ps
-      - run: cd ~/mms && export DOCKER_HOST=tcp://35.232.15.249:2376:8080
+      - run: cd ~/mms && curl http://localhost:8080/
+      - run: cd ~/mms && export NO_PROXY=tcp://127.0.0.1:8080
       - run: docker inspect mms_mms_2
       #- run: cd ~/mms && DOCKER_HOST=127.0.0.1:8080 
       #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
