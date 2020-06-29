@@ -55,7 +55,7 @@ public class LocalUserSecurityConfig {
         try {
             userDetailsService.loadUserByUsername(adminUsername);
         } catch (UsernameNotFoundException e) {
-            //userDetailsService.setPasswordEncoder(passwordEncoder());
+            userDetailsService.setPasswordEncoder(passwordEncoder());
             userDetailsService.register(adminUsername, adminPassword, true);
             logger.info(String.format("Creating root user: %s with specified password.",
                 adminUsername));
