@@ -1,51 +1,49 @@
 version: 2.1
+orbs:
+  node: circleci/node@1.1.6
 jobs:
-    build-and-test:
-        machine: true
-        working_directory: ~/mms
-        steps:
-            - checkout
-            - run: 
-                name: "Install Docker Compose"
-                working_directory: ~/mms
-                command: |
-                    set -x
-                    sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-                    sudo chmod +x /usr/local/bin/docker-compose
-            - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            - run: cd ~/mms && docker-compose build
-            - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
-            - run: cd ~/mms && sleep 2m
-         #- run: cd ~/mms && sleep 4m
-            - run: cd ~/mms && docker-compose ps
-            - run: docker network ls
-            - run: docker network inspect mms_default
-            - run: 
-                command: | 
-                    docker pull postman/newman
-                    cd ~/mms/example
-                    docker run -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
-    #test
-        #executor
-            #name newman/postman-newman-docker
-        #steps
-          #- checkout
-          #- run: sleep 3m
-          #- run: cd exampl
-          #- newman/newman-run: 
-              #collection: example/crud.postman_collection.json
-              #environment: example/test-env.json
-              #delay-request: '300'
+  build-and-test:
+    executor:
+      name: node/default
+    working_directory: ~/mms
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
+      - run: cd ~/mms && docker-compose build
+     # - run: cd ~/mms && docker-compose ps
+      #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
+      - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
+      - run: cd ~/mms && sleep 1m
+      - run: cd ~/mms && docker network ls
+      - run: cd ~/mms && docker network inspect mms_default
+      - run: cd ~/mms && docker network inspect bridge
+      - run: cd ~/mms && docker ps
+      - run: docker inspect mms_mms_1 
+      - run: docker inspect mms_postgres_1
+      - run: docker inspect mms_elasticsearch_1
+      #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
+     # - run cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
+     # - run: cd ~/mms && sudo npm install -g newman
+      #- run: 
+          #command: |
+           # cd ~/mms/example
+           # ssh remote-docker \
+           # newman run crud.postman_collection.json -e test-env.json --delay-request 300
+     # - run: cd ~/mms; docker pull postman/newman
+      - run: pwd 
+      - run: ls
+      - run: cd ~/mms/example; ls
+      - run: 
+          command: |
+            docker pull postman/newman
+            docker cp ~/mms/example/test-env.json ~/mms/example:/etc/newman
+            cd ~/mms/example
+            docker run --network=mms_default -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json --environment="test-env.json" --delay-request 300
+     #- run: cd ~/mms; docker pull postman/newman
+      #- run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     version: 2
     build-and-test:
-        jobs:
-            - build-and-test
-#workflows:
-    #version: 2
-    #build-and-test:
-      #jobs:
-        #- build
-        #- test
-            #requires:
-               # - build 
+      jobs:
+        - build-and-test
