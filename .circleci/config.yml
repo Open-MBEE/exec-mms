@@ -16,7 +16,7 @@ jobs:
             - run: cd ~/mms && docker-compose build
             - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
             - run: cd ~/mms && sleep 2m
-        #- run: cd ~/mms && sleep 4m
+         #- run: cd ~/mms && sleep 4m
             - run: cd ~/mms && docker-compose ps
             - run: docker network ls
             - run: docker network inspect mms_default
