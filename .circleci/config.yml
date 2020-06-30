@@ -13,8 +13,8 @@ jobs:
       - run: cd ~/mms && docker-compose build
      # - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
-      - run: cd ~/mms && docker-compose run -d --name mms_mms_2 mms
-      - run: cd ~/mms && docker network connect bridge mms_mms_2
+      - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
+      - run: cd ~/mms && docker network connect bridge mms_mms_1
       - run: cd ~/mms && docker network connect bridge mms_postgres_1
       - run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
       - run: cd ~/mms && sleep 1m
@@ -22,7 +22,7 @@ jobs:
       - run: cd ~/mms && docker network inspect host
       - run: cd ~/mms && docker network inspect bridge
       - run: cd ~/mms && docker ps
-      - run: docker inspect mms_mms_2 
+      - run: docker inspect mms_mms_1 
       - run: docker inspect mms_postgres_1
       - run: docker inspect mms_elasticsearch_1
       #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
