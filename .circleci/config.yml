@@ -13,8 +13,8 @@ jobs:
       - run: cd ~/mms && docker-compose build
       - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
-      - run: cd ~/mms && docker-compose run --name mms_mms_1 mms
-      - run: cd ~/mms && docker network connect bridge mms_mms_1
+      - run: cd ~/mms && docker-compose run -d --name mms_mms_2 mms
+      - run: cd ~/mms && docker network connect bridge mms_mms_2
       - run: cd ~/mms && docker network connect bridge mms_postgres_1
       - run: cd ~/mms && docker network connect bridge mms_elasticsearch_1
       - run: cd ~/mms && sleep 2m
@@ -23,11 +23,11 @@ jobs:
       - run: cd ~/mms && docker network inspect bridge
       - run: cd ~/mms && docker network inspect none
       - run: cd ~/mms && docker ps
-      - run: docker inspect mms_mms_1 
+      - run: docker inspect mms_mms_2 
       #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
      # - run cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
       - run: cd ~/mms && sudo npm install -g newman
-      - run: cd ~/mms/example && newman run crud.postman_collection.json -e test-env.json --delay-request 300
+      - run: cd ~/mms/example && ssh remote-docker && newman run crud.postman_collection.json -e test-env.json --delay-request 300
      #- run: cd ~/mms; docker pull postman/newman
       #- run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
