@@ -1,6 +1,6 @@
 {
     "values": [
-        {"key": "host", "value": "http://0.0.0.0:8080"},
+        {"key": "host", "value": "http://127.0.0.1:8080"},
         {"key": "adminUsername", "value": "test"},
         {"key": "adminPassword", "value": "test"},
         {"key": "ldapGroup", "value": "ldapGroup"},
