@@ -11,7 +11,6 @@ jobs:
       - setup_remote_docker
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: cd ~/mms && docker-compose build
-     # - run: cd ~/mms && docker-compose ps
       #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
       - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
       #- run: cd ~/mms && sleep 1m
@@ -26,8 +25,9 @@ jobs:
      # - run: cd ~/mms && sudo npm install -g newman
      #docker cp mms_mms_1:~/example/test-env.json /etc/newman
      #docker cp ~/mms/example/test-env.json mms_mms_1:/etc/newman
-     # create a dummy container which will hold a volume with config
      #docker cp mms_mms_1:/example/test-env.json ~/mms/example/
+     #
+     # create a dummy container which will hold a volume with config
     #docker create -v /cfg --name configs alpine:3.4 /bin/true
     # copy a config file into this volume
     #docker cp path/in/your/source/code/app_config.yml configs:/cfg
@@ -39,7 +39,7 @@ jobs:
             docker cp ./example/test-env.json test:/tst
             docker pull postman/newman
             cd ~/mms/example/
-            docker run --volumes-from test --network=mms_default -t postman/newman run crud.postman_collection.json -v ~/mms/example:/etc/newman -e test-env.json --delay-request 300
+            docker run --network=mms_default --volumes-from test -t postman/newman run crud.postman_collection.json -v ~/mms/example:/etc/newman -e test-env.json --delay-request 300
       #- run: cd ~/mms; docker pull postman/newman
       #- run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
