@@ -26,7 +26,7 @@ jobs:
           command: |
             cd ~/mms/example
             sudo npm install -g newman
-            newman run crud.postman_collection.json -e test-env.json --delay-request 300
+            newman run crud.postman_collection.json --network mms_default -e test-env.json --delay-request 300
      #docker cp mms_mms_1:~/example/test-env.json /etc/newman
      #docker cp ~/mms/example/test-env.json mms_mms_1:/etc/newman
      #docker cp mms_mms_1:/example/test-env.json ~/mms/example/
