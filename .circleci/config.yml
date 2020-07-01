@@ -33,11 +33,11 @@ jobs:
     #docker cp path/in/your/source/code/app_config.yml configs:/cfg
     # start an application container using this volume
     #docker run --volumes-from configs app-image:1.2.3
+    #docker pull postman/newman
       - run: 
           command: |
             docker create -v /tst --name test postman/newman /bin/true
             docker cp ~/mms/example/test-env.json test:/tst
-            docker pull postman/newman
             docker run --network=mms_default --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: cd ~/mms; docker pull postman/newman
       #- run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
