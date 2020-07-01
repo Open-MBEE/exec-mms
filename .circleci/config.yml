@@ -35,7 +35,7 @@ jobs:
     #docker run --volumes-from configs app-image:1.2.3
       - run: 
           command: |
-            docker create -v /tst --name test mms_mms:latest /bin/true
+            docker create -v /tst --name test postman/newman /bin/true
             docker cp ~/mms/example/test-env.json test:/tst
             docker pull postman/newman
             cd ~/mms/example/
