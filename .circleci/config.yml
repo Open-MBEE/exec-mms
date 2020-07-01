@@ -22,7 +22,7 @@ jobs:
       - run: docker inspect mms_elasticsearch_1
       #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
      # - run cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
-     - run: 
+      - run: 
           command: 
             cd ~/mms/example
             sudo npm install -g newman
