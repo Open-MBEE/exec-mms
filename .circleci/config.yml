@@ -38,8 +38,7 @@ jobs:
             docker create -v /tst --name test postman/newman /bin/true
             docker cp ~/mms/example/test-env.json test:/tst
             docker pull postman/newman
-            cd ~/mms/example/
-            docker run --network=mms_default --volumes-from test -v /tst:/etc/newman --workdir /home/circleci/mms/example -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+            docker run --network=mms_default --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: cd ~/mms; docker pull postman/newman
       #- run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
@@ -47,3 +46,8 @@ workflows:
     build-and-test:
       jobs:
         - build-and-test
+#        - run: 
+ #         command: | 
+  #            docker pull postman/newman
+  #            cd ~/mms/example
+   #           docker run -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
