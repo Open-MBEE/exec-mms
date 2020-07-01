@@ -23,7 +23,7 @@ jobs:
       - run: 
           command: |
             docker create -v /tst --name test mms_mms:latest
-            docker cp ~/mms/example/test-env.json test:/tst/
+            docker cp /example/test-env.json test:/tst/test-env.json
             docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
      # - run cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
