@@ -26,11 +26,7 @@ jobs:
       - run: 
           command: |
             docker pull postman/newman
-            pwd
-            ls
-            cd example
-            ls
-            docker cp ~/mms/example/test-env.json .
+            docker cp ~/mms/example/test-env.json circleci/node:mms/example/test-env.json
             docker run -v ~/mms/example/:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest
