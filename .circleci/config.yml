@@ -13,18 +13,18 @@ jobs:
       - run: cd ~/mms && docker-compose build
       #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
       - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
-      - run: cd ~/mms && sleep 1m
-      - run: cd ~/mms && docker network ls
-      - run: cd ~/mms && docker network inspect mms_default
+      #- run: cd ~/mms && sleep 1m
+      #- run: cd ~/mms && docker network ls
+      #- run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker ps
-      - run: docker inspect mms_mms_1 
-      - run: docker inspect mms_postgres_1
-      - run: docker inspect mms_elasticsearch_1
+      #- run: docker inspect mms_mms_1 
+      #- run: docker inspect mms_postgres_1
+      #- run: docker inspect mms_elasticsearch_1
       #scp user@host:/path/to/file /local/path
       #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
       - run: 
           command: |
-            scp -P 8080 test-env.json root@2376:/mms/example/test-env.json
+            scp -P 8080 test-env.json root@host:/mms/example/test-env.json
             docker run -v ~/mms/example/test-env.json:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest
