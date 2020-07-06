@@ -20,10 +20,12 @@ jobs:
       - run: docker inspect mms_mms_1 
       - run: docker inspect mms_postgres_1
       - run: docker inspect mms_elasticsearch_1
+      #scp user@host:/path/to/file /local/path
+      #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
       - run: 
           command: |
-            docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
-            docker run -v mms_mms_1:/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+            scp -P 8080 test-env.json root@2376:/mms/example/test-env.json
+            docker run -v ~/mms/example/test-env.json:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest
       #docker cp example/test-env.json test:/tst/test-env.json 
