@@ -13,7 +13,7 @@ jobs:
       - run: cd ~/mms && docker-compose build
       #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
       - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
-      #- run: cd ~/mms && sleep 1m
+      - run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network ls
       #- run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker ps
