@@ -24,7 +24,7 @@ jobs:
       #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
       - run: 
           command: |
-            docker-machine scp -r ~/mms/example/test-env.json DOCKER_MACHINE_NAME:/mms/example/test-env.json
+            scp -r ~/mms/example/test-env.json DOCKER_MACHINE_NAME:/mms/example/test-env.json
             docker run -v ~/mms/example/test-env.json:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest
