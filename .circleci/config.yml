@@ -26,6 +26,10 @@ jobs:
       - run: 
           command: |
             docker pull postman/newman
+            pwd
+            ls
+            cd example
+            ls
             scp -r ~/mms/example/test-env.json remote-docker:~/mms/example/test-env.json
             docker run -v ~/mms/example/:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
