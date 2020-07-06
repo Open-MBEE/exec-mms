@@ -31,7 +31,7 @@ jobs:
             ls
             cd example
             ls
-            docker run -v /home/circleci/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test1-env.json --delay-request 300
+            docker run -v /home/circleci/mms/example/test-env.json:/etc/newman -t postman/newman run crud.postman_collection.json -e test1-env.json --delay-request 300
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest
       #docker cp example/test-env.json test:/tst/test-env.json 
