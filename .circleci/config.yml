@@ -22,7 +22,7 @@ jobs:
       - run: docker inspect mms_elasticsearch_1
       - run: 
           command: |
-            docker cp ~/mms/example/test1-env.json mms_mms_1:/mms/example/test-env.json
+            docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test1-env.json
             docker run -v mms_mms_1:/etc/newman -t postman/newman run crud.postman_collection.json -e test1-env.json --delay-request 300
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest
