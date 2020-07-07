@@ -27,7 +27,7 @@ jobs:
           command: |
             docker pull postman/newman
             docker cp ~/mms/example/test-env.json ${DOCKER_MACHINE_NAME}:mms/example/test-env.json
-            docker run --network mms_default -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+            docker run --network mms_default -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: 
       #    command: | 
       #      docker pull postman/newman
