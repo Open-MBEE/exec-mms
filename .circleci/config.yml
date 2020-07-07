@@ -35,14 +35,7 @@ jobs:
             newman run crud.postman_collection.json -e test-env.json --delay-request 300
      #docker cp mms_mms_1:~/example/test-env.json /etc/newman
      #docker cp ~/mms/example/test-env.json mms_mms_1:/etc/newman
-     #docker cp mms_mms_1:/example/test-env.json ~/mms/example/
-     #
-     # create a dummy container which will hold a volume with config
-    #docker create -v /cfg --name configs alpine:3.4 /bin/true
-    # copy a config file into this volume
-    #docker cp path/in/your/source/code/app_config.yml configs:/cfg
-    # start an application container using this volume
-    #docker run --volumes-from configs app-image:1.2.3
+     #docker cp mms_mms_1:/example/test-env.json ~/mms/example
     #docker pull postman/newman
     #docker create -v /mms/tst --name test mms_mms:latest /bin/true
       #- run: cd ~/mms; docker pull postman/newman
