@@ -24,11 +24,16 @@ jobs:
     #docker run --volumes-from configs app-image:1.2.3
       - run: cd ~/mms && docker ps
       - run: 
-          command: | 
+          command: |
             docker pull postman/newman
-            docker create -v /tst --name test mms_mms:latest /bin/true
-            docker cp ~/mms/example/ test:/tst
-            docker run -v test:/etc/newman --network mms_default -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+            docker cp ~/mms/example/test-env.json ${DOCKER_MACHINE_NAME}:mms/example/test-env.json
+            docker run --network mms_default -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+      #- run: 
+      #    command: | 
+      #      docker pull postman/newman
+      #      docker create -v /tst --name test mms_mms:latest /bin/true
+      #      docker cp ~/mms/example/ test:/tst
+      #      docker run -v test:/etc/newman --network mms_default -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: docker inspect mms_mms_1 
       #- run: docker inspect mms_postgres_1
       #- run: docker inspect mms_elasticsearch_1
