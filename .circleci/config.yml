@@ -16,12 +16,19 @@ jobs:
       #- run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network ls
       #- run: cd ~/mms && docker network inspect mms_default
+      # create a dummy container which will hold a volume with config
+    #docker create -v /cfg --name configs alpine:3.4 /bin/true
+    # copy a config file into this volume
+   # docker cp path/in/your/source/code/app_config.yml configs:/cfg
+    # start an application container using this volume
+    #docker run --volumes-from configs app-image:1.2.3
       - run: cd ~/mms && docker ps
       - run: 
           command: | 
             docker pull postman/newman
-            sudo docker cp ~/mms/example/test-env.json $DOCKER_HOST:/mms/example/test1-env.json
-            sudo docker run --network mms_default -v ${DOCKER_HOST}:/etc/newman -t postman/newman run crud.postman_collection.json -e test1-env.json --delay-request 300
+            docker create -v /tst --name test mms_mms:latest /bin/true
+            docker cp ~/mms/example/ test:/tst
+            docker run --network mms_default -v test:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: docker inspect mms_mms_1 
       #- run: docker inspect mms_postgres_1
       #- run: docker inspect mms_elasticsearch_1
