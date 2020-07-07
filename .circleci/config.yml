@@ -26,18 +26,9 @@ jobs:
       - run: 
           command: |
             docker pull postman/newman
-            docker create -v /tst --name test mms_mms:latest /bin/true
-            docker cp ~/mms/example/ test:/tst
-            docker run -v test/tst/etc/newman/:/etc/newman --network mms_default -t postman/newman run etc/newman/tst/crud.postman_collection.json -e etc/newman/tst/test-env.json --delay-request 300
-      #- run: 
-      #    command: | 
-      #      docker pull postman/newman
-      #      docker create -v /tst --name test mms_mms:latest /bin/true
-      #      docker cp ~/mms/example/ test:/tst
-      #      docker run -v test:/etc/newman --network mms_default -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
-      #- run: docker inspect mms_mms_1 
-      #- run: docker inspect mms_postgres_1
-      #- run: docker inspect mms_elasticsearch_1
+            docker create --name test mms_mms:latest /bin/true
+            docker cp ~/mms/example/ test:/
+            docker run -v test:/etc/newman --network mms_default -t postman/newman run etc/newman/tst/crud.postman_collection.json -e etc/newman/tst/test-env.json --delay-request 300
       #scp user@host:/path/to/file /local/path
      # scp -r ~/mms/example/test-env.json DOCKER_MACHINE_NAME:/mms/example/test-env.json
       #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
@@ -55,9 +46,6 @@ jobs:
      #docker cp ~/mms/example/test-env.json mms_mms_1:/etc/newman
      #docker cp mms_mms_1:/example/test-env.json ~/mms/example
     #docker pull postman/newman
-    #docker create -v /mms/tst --name test mms_mms:latest /bin/true
-      #- run: cd ~/mms; docker pull postman/newman
-      #- run: cd example; docker pull postman/newman; docker run --network="bridge" -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     version: 2
     build-and-test:
