@@ -13,7 +13,7 @@ jobs:
       - run: cd ~/mms && docker-compose build
       #- run: cd ~/mms && docker run -p 8080 --name mms_mms_1 mms_mms:latest --network="bridge" 
       - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
-      - run: cd ~/mms && sleep 2m
+      #- run: cd ~/mms && sleep 2m
       #- run: cd ~/mms && docker network ls
       #- run: cd ~/mms && docker network inspect mms_default
       - run: cd ~/mms && docker ps
@@ -21,7 +21,7 @@ jobs:
           command: | 
             docker pull postman/newman
             cd ~/mms/example
-            docker cp ~/mms/example/test-env.json ${DOCKER_MACHINE_NAME}:~/mms/example/test-env.json
+            docker cp ~/mms/example/test-env.json ${DOCKER_MACHINE_NAME}:mms/example/test-env.json
             docker run --network mms_default -v ${DOCKER_HOST}:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: docker inspect mms_mms_1 
       #- run: docker inspect mms_postgres_1
