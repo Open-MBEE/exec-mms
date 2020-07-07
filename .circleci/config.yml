@@ -26,8 +26,9 @@ jobs:
       - run: 
           command: |
             docker pull postman/newman
-            docker create --name test mms_mms:latest /bin/true
-            docker cp ~/mms/example/ test:/
+            docker create -v /tst --name test mms_mms:latest /bin/true
+            docker cp ~/mms/example/ test:/tst
+            ls 
             docker run -v test:/etc/newman --network mms_default -t postman/newman run /etc/newman/crud.postman_collection.json -e /etc/newman/test-env.json --delay-request 300
       #scp user@host:/path/to/file /local/path
      # scp -r ~/mms/example/test-env.json DOCKER_MACHINE_NAME:/mms/example/test-env.json
