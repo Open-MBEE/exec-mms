@@ -20,8 +20,7 @@ jobs:
       - run: 
           command: | 
             docker pull postman/newman
-            cd ~/mms/example
-            docker cp ~/mms/example/test-env.json ${DOCKER_MACHINE_NAME}:mms/example/test-env.json
+            docker cp mms_mms_1:/mms/example/test-env.json ${DOCKER_HOST}/mms/example/test-env.json
             docker run --network mms_default -v ${DOCKER_HOST}:/etc/newman -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #- run: docker inspect mms_mms_1 
       #- run: docker inspect mms_postgres_1
