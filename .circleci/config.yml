@@ -32,12 +32,12 @@ jobs:
             ls
             cd mms
             docker pull postman/newman
-            docker create -v "$(pwd)":/tst --name test mms_mms:latest /bin/true
+            docker create -v /tst --name test mms_mms:latest /bin/true
             docker cp ~/mms/example/ test:/tst
             cd
             cd ~/tst
             ls
-            cd ~/tst/test-env.json
+            cd ~/tst/mms/example/
             docker run --network mms_default -v test:/etc/newman -t postman/newman \
               run crud.postman_collection.json -e /etc/newman/tst/test-env.json --delay-request 300
       - run: cd ~/mms && docker ps
