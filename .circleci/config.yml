@@ -15,12 +15,11 @@ jobs:
       - run: cd ~/mms && docker ps
       - run: 
           command: |
-            cd
             mkdir tst
             docker pull postman/newman
             docker create -v /tst --name test mms_mms:latest /bin/true
             docker cp ~/mms/example/ test:/tst/
-            docker run -v test:/etc/newman --network mms_default -t postman/newman run /etc/newman/tst/crud.postman_collection.json \
+            sudo docker run -v test:/etc/newman --network mms_default -t postman/newman run /etc/newman/tst/crud.postman_collection.json \
               -e /etc/newman/tst/test-env.json --delay-request 300
       #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
