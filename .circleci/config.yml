@@ -25,7 +25,7 @@ jobs:
       - run: 
           command: |
             docker create -v ~/mms/example/:/tst --name test mms_mms:latest
-            docker run --network mms_default --volumes-from test ls -la /tst -t postman/newman \
+            docker run --network mms_default --volumes-from test postman/newman -la /tst \
               run crud.postman_collection.json -e test-env.json --delay-request 300
       - run: cd ~/mms && docker ps
       - run: 
