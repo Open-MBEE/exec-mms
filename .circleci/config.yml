@@ -36,7 +36,7 @@ jobs:
             cd
             cd tst
             ls
-            docker run --network mms_default ~/tst/:etc/newman -t postman/newman \
+            docker run --network mms_default -v ~/tst/:etc/newman -t postman/newman \
               run crud.postman_collection.json -e test-env.json --delay-request 300
       - run: cd ~/mms && docker ps
       - run: 
