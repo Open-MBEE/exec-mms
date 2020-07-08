@@ -32,6 +32,7 @@ jobs:
             ls
             cd mms
             docker create -v "$(pwd)":/tst --name test mms_mms:latest
+            docker cp ~/mms/example/ test:/tst/
             cd
             cd tst
             ls
