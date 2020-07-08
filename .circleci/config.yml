@@ -24,12 +24,12 @@ jobs:
     #docker run --volumes-from configs app-image:1.2.3
       - run: 
           command: |
-            docker create -v ~/mms/example/:/tst --name test mms_mms:latest
+            docker create -v "$(pwd)":/tst --name test mms_mms:latest
             ls 
             cd example
             ls
             docker run --network mms_default --volumes-from test -w /mms/example/tst -t postman/newman \
-              run crud.postman_collection.json --environment="/mms/example/tst/test-env.json" --delay-request 300
+              run crud.postman_collection.json -e /mms/example/tst/test-env.json --delay-request 300
       - run: cd ~/mms && docker ps
       - run: 
           command: |
