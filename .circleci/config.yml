@@ -24,6 +24,11 @@ jobs:
     #docker run --volumes-from configs app-image:1.2.3
       - run: 
           command: |
+            cd 
+            ls
+            mkdir tst
+            ls
+            cd mms
             docker create -v "$(pwd)":/tst --name test mms_mms:latest
             ls 
             cd example
