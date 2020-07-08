@@ -12,22 +12,17 @@ jobs:
       - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: cd ~/mms && docker-compose build
       - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
-      #- run: cd ~/mms && sleep 2m
-      # create a dummy container which will hold a volume with config
-    #docker create -v /cfg --name configs alpine:3.4 /bin/true
-    # copy a config file into this volume
-   # docker cp path/in/your/source/code/app_config.yml configs:/cfg
-    # start an application container using this volume
-    #docker run --volumes-from configs app-image:1.2.3
       - run: cd ~/mms && docker ps
       - run: 
           command: |
+            cd
+            mkdir tst
             docker pull postman/newman
             docker create -v /tst --name test mms_mms:latest /bin/true
-            docker cp ~/mms/example/test-env.json test:/tst/test-env.json
-            docker run -v test:/etc/newman --network mms_default -t postman/newman run etc/newman/tst/crud.postman_collection.json -e etc/newman/tst/test-env.json --delay-request 300
-      #scp user@host:/path/to/file /local/path
-     # scp -r ~/mms/example/test-env.json DOCKER_MACHINE_NAME:/mms/example/test-env.json
+            docker cp ~/mms/example/ test:/tst/
+            cd ~/tst
+            docker run -v test:/etc/newman --network mms_default -t postman/newman run etc/newman/tst/crud.postman_collection.json \
+              -e etc/newman/tst/test-env.json --delay-request 300
       #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
       #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest
