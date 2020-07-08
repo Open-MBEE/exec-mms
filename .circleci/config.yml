@@ -17,7 +17,7 @@ jobs:
           command: |
             mkdir tst
             docker pull postman/newman
-            docker run --network mms_default -t postman/newman ~/mms/example/crud.postman_collection.json -e ~/mms/example/test-env.json --delay-request 300
+            docker run --network mms_default -t postman/newman run ~/mms/example/crud.postman_collection.json -e ~/mms/example/test-env.json --delay-request 300
       #docker create -v /tst --name test mms_mms:latest /bin/true
       #docker cp ~/mms/example/ test:/tst/
       #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
