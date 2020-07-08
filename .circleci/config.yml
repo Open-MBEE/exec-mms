@@ -19,22 +19,13 @@ jobs:
    # docker cp path/in/your/source/code/app_config.yml configs:/cfg
     # start an application container using this volume
     #docker run --volumes-from configs app-image:1.2.3
-      - run: 
-          command: |
-            cd 
-            mkdir tst
-            docker pull postman/newman
-            docker create --name test mms_mms:latest /bin/true
-            cp /mms/example/ /tst/
-            docker run --network mms_default -v ~/tst/:/etc/newman -t postman/newman \
-              run /etc/newman/crud.postman_collection.json -e /etc/newman/test-env.json --delay-request 300
       - run: cd ~/mms && docker ps
       - run: 
           command: |
             docker pull postman/newman
-            docker create --name test mms_mms:latest /bin/true
-            docker cp ~/mms/example/ test:/mms/example/
-            docker run --network mms_default --volumes-from test:/etc/newman -t postman/newman run mms/example/etc/newman/crud.postman_collection.json -e mms/example/etc/newman/test-env.json --delay-request 300
+            docker create -v /tst --name test mms_mms:latest /bin/true
+            docker cp ~/mms/example/ test:/tst/
+            docker run -v test:/etc/newman --network mms_default -t postman/newman run etc/newman/tst/crud.postman_collection.json -e test-env.json --delay-request 300
       #scp user@host:/path/to/file /local/path
      # scp -r ~/mms/example/test-env.json DOCKER_MACHINE_NAME:/mms/example/test-env.json
       #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
