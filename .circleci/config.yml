@@ -13,6 +13,7 @@ jobs:
       - run: cd ~/mms && docker-compose build
       - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
       - run: cd ~/mms && docker ps
+      - run: sleep 2m
       - run: 
           command: |
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
