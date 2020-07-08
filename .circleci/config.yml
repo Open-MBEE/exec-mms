@@ -29,11 +29,10 @@ jobs:
             ls
             mkdir tst
             cd mms
-            docker create -v "$(pwd)":tst --name test mms_mms:latest
+            docker create -v "$(pwd)":/tst --name test mms_mms:latest
             cd
             cd tst
             ls
-            cd mms
             docker run --network mms_default --volumes-from test --workdir ~/tst -t postman/newman \
               run crud.postman_collection.json -e test-env.json --delay-request 300
       - run: cd ~/mms && docker ps
