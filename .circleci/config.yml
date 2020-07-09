@@ -9,29 +9,16 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: cd ~/mms && cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: cd ~/mms && docker-compose build
-      - run: cd ~/mms && docker-compose run -d -p 8080 --name mms_mms_1 mms
-      - run: cd ~/mms && docker ps
+      - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
+      - run: docker-compose build
+      - run: docker-compose run -d -p 8080 --name mms_mms_1 mms
+      - run: docker ps
       - run: sleep 2m
       - run: 
           command: |
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --network mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
-      #docker create -v /tst --name test mms_mms:latest /bin/true
-      #docker cp ~/mms/example/ test:/tst/
-      #docker cp ~/mms/example/test-env.json mms_mms_1:/mms/example/test-env.json
-      #docker run --volumes-from test -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
-      #docker create -v /tst --name test mms_mms:latest
-      #docker cp example/test-env.json test:/tst/test-env.json 
-     #- run: cd ~/mms && docker run --network container:mms_mms_1 appropriate/curl --connect-timeout 30 --retry 300 --retry-delay 10 --retry-connrefused http://localhost:8080
-     # - run cd ~/mms && docker exec mms_mms_1 curl --retry 30 --retry-delay 10 --retry-connrefused http://localhost:8080
-     # - run: 
-     #     command: |
-     #       cd ~/mms/example
-     #       sudo npm install -g newman
-     #       sudo newman run crud.postman_collection.json -e test-env.json --delay-request 300
 workflows:
     version: 2
     build-and-test:
