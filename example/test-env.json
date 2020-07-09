@@ -1,6 +1,6 @@
 {
     "values": [
-        {"key": "host", "value": "http://${DOCKER_MACHINE_NAME}:8080"},
+        {"key": "host", "value": "http://172.18.0.4:8080"},
         {"key": "adminUsername", "value": "test"},
         {"key": "adminPassword", "value": "test"},
         {"key": "ldapGroup", "value": "ldapGroup"},
