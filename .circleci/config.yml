@@ -19,7 +19,7 @@ jobs:
           command: |
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
-            docker run --add-host=mms_mms_1:2376 --volumes-from mms_test_configs --network="container:mms_mms_1" -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+            docker run --add-host=mms_mms_1:127.0.0.1 --volumes-from mms_test_configs --network="container:mms_mms_1" -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
             docker network inspect mms_default
 workflows:
     version: 2
