@@ -12,7 +12,7 @@ jobs:
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: docker-compose build
       - run: docker-compose run -d -p 8080 --name mms_mms_1 mms
-      - run: sleep 15s
+      - run: sleep 30s
       - run: 
           command: |
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
