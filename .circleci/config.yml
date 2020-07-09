@@ -11,7 +11,7 @@ jobs:
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
       - run: docker-compose build
-      - run: docker-compose run -p 8080 --name mms_mms_1 mms
+      - run: docker-compose run -d -p 8080 --name mms_mms_1 mms
       - run: docker ps
       - run: sleep 2m
       - run: 
@@ -19,6 +19,7 @@ jobs:
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --network mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+            docker network inspect mms_default
 workflows:
     version: 2
     build-and-test:
