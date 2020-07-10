@@ -15,13 +15,12 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build
             docker-compose run -d -p 8080 --name mms_mms_1 mms
-    #- run: sleep 30s
+    #- run: sleep 30sm
       - run: 
           name: "Run and test Postman Collection."
           command: |
             cd ~/mms/example
-            mmsIP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' mms_mms_1)
-            cat mmsIP
+            docker inspect --format '{{ .NetworkSettings.IPAddress }}' mms_mms_1)
             sed -i 's/localhost/172.18.0.4/' test-env.json
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
