@@ -22,6 +22,10 @@ services:
     build: .
     environment:
         - "SPRING_PROFILES_ACTIVE=test"
+    networks:
+      mms_default:
+        aliases:
+          - mms1
     depends_on:
         - postgres
         - elasticsearch
