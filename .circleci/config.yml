@@ -16,7 +16,7 @@ jobs:
             docker-compose build
             docker-compose run -d -p 8080 --name mms_mms_1 mms
     #- run: sleep 30sm
-      - run: docker inspect --format '{{ .NetworkSettings.IPAddress }}' mms_mms_1
+      - run: docker inspect -f "{{ .NetworkSettings.IPAddress }}" mms_mms_1
       - run: 
           name: "Run and test Postman Collection."
           command: |
