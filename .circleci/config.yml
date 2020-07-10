@@ -23,8 +23,4 @@ workflows:
     build-and-test:
       jobs:
         - build-and-test
-#        - run 
- #         command: | 
-  #            docker pull postman/newman
-  #            cd ~/mms/example
-   #           docker run -v ~/mms/example:/etc/newman -t postman/newman run crud.postman_collection.json -e /etc/newman/test-env.json --delay-request 300
+#
