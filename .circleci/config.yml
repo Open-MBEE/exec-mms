@@ -18,7 +18,7 @@ jobs:
       - run: 
           command: |
             cd ~/mms/example
-            sed - i 's/"http://localhost:8080"/"http://172.18.0.4:8080"/' test-env.json
+            sed -i 's/"http://localhost:8080"/"http://172.18.0.4:8080"/' test-env.json
       - run: 
           command: |
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
