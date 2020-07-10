@@ -15,7 +15,7 @@ jobs:
       - run: sleep 30s
       - run: docker network inspect mms_default
       - run: docker inspect mms_mms_1
-      - run: sudo ifconfig eth1:0 172.18.0.4
+      - run: echo 172.18.0.4 mms >> /etc/hosts
       - run: 
           command: |
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
