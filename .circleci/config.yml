@@ -10,7 +10,6 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-      - run: docker network create mms_default
       - run: docker-compose build
       - run: docker-compose run -d -p 8080 --name mms_mms_1 mms
       - run: sleep 30s
