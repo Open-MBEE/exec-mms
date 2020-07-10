@@ -17,7 +17,7 @@ jobs:
             docker-compose run -d -p 8080 --name mms_mms_1 mms
     #- run: sleep 30sm
       - run: MMS_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1)
-      - run: echo $MMS_IP
+      - run: echo "$MMS_IP"
       - run: 
           name: "Run and test Postman Collection."
           command: |
