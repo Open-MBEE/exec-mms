@@ -16,16 +16,11 @@ jobs:
             docker-compose build
             docker-compose run -d -p 8080 --name mms_mms_1 mms
       - run: sleep 30s
-      - run: docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1
       - run: 
           name: "Run and test Postman Collection."
           command: |
-            cd ~/mms/example
-            BASH_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
-            echo BASH_VAR
-            echo $BASH_VAR
-            echo ${BASH_VAR}
-            sed -i "s/localhost/$BASH_VAR/" test-env.json
+            IP_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
+            sed -i "s/localhost/$IP_VAR/" test-env.json
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --network=mms_default --volumes-from mms_test_configs --link mms_mms_1 -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
