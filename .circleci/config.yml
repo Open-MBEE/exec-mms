@@ -15,7 +15,7 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build
             docker-compose run -d -p 8080 --name mms_mms_1 mms
-    #- run: sleep 30sm
+      - run: sleep 30s
       - run: docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1
       - run: 
           name: "Run and test Postman Collection."
