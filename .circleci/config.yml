@@ -19,6 +19,7 @@ jobs:
       - run: 
           name: "Run and test Postman Collection."
           command: |
+            cd ~/mms/example
             IP_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
             sed -i "s/localhost/$IP_VAR/" test-env.json
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
