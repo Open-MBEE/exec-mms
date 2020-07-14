@@ -1,6 +1,6 @@
-package org.openmbee.sdvc.core.config;
+package org.openmbee.sdvc.twc.config;
 
-import org.openmbee.sdvc.core.utils.RestUtils;
+import org.openmbee.sdvc.twc.utilities.RestUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

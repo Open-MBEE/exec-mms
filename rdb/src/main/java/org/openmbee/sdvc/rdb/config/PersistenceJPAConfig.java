@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -40,6 +41,7 @@ public class PersistenceJPAConfig {
         this.env = env;
     }
 
+    @Primary
     @Bean(name = "defaultEntityManager")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
@@ -57,6 +59,7 @@ public class PersistenceJPAConfig {
         return em;
     }
 
+    @Primary
     @Bean
     public DataSource getDatasource() {
         if (env.containsProperty("spring.datasource.jndi-name")) {
@@ -73,6 +76,7 @@ public class PersistenceJPAConfig {
         return null;
     }
 
+    @Primary
     @Bean
     public PlatformTransactionManager defaultTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
