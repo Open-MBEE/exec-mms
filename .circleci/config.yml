@@ -32,14 +32,18 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: "Get jfrog"
-          command: curl -fL https://getcli.jfrog.io | sh
-      - run:
-          name: "Set Permissions"
-          command: sudo chmod +x jfrog
-      - run:
-          name: "Configure jfrog"
-          command: ./jfrog rt c --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
+          command: |
+            sudo npm install -g jfrog-cli-go
+            jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
+    #- run:
+          #name: "Get jfrog"
+          #command: curl -fL https://getcli.jfrog.io | sh
+     # - run:
+         # name: "Set Permissions"
+         # command: sudo chmod +x jfrog
+      #- run:
+         # name: "Configure jfrog"
+         # command: ./jfrog rt c --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
 workflows:
     version: 2
     build-and-test:
