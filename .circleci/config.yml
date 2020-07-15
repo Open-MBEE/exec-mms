@@ -26,14 +26,14 @@ jobs:
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
   deploy-artifacts:
-    build: 
-      docker:
-        - image: circleci/openjdk:8
+    executor:
+      name: node/default
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-        name: "Get jfrog"
-        command: curl -fL https://getcli.jfrog.io | sh
+          name: "Get jfrog"
+          command: curl -fL https://getcli.jfrog.io | sh
       - run:
           name: "Set Permissions"
           command: sudo chmod +x jfrog
