@@ -33,7 +33,7 @@ jobs:
           command: sudo chmod +x jfrog
       - run:
           name: Configure jfrog
-          command: ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
+          command: jfrog rt c --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
 workflows:
     version: 2
     build-and-test:
