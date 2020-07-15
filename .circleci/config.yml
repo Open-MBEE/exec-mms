@@ -33,7 +33,7 @@ jobs:
       - setup_remote_docker
       - run:
           command: |
-            sudo npm install -g jfrog-cli-go
+            npm install -g jfrog-cli-go
             jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
     #- run:
           #name: "Get jfrog"
