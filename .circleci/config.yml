@@ -28,7 +28,7 @@ jobs:
       - run: 
           command: |
             ls
-            cd gradle
+            cd ~./mms/gradle/
             ls
   deploy-artifacts:
     executor:
