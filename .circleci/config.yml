@@ -25,8 +25,6 @@ jobs:
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
-            curl -fL https://getcli.jfrog.io | sh
-            ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
   deploy-artifacts:
     executor:
       name: node/default
@@ -37,7 +35,7 @@ jobs:
           command: |
             curl -fL https://getcli.jfrog.io | sh
             ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
-      - run: ./jfrog rt u '~/mms/gradle' libs-release-local/gov/nasa/jpl/mms/mms-amp/3.4.2/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
+      - run: ./jfrog rt u '~/mms/.gradle' libs-release-local/gov/nasa/jpl/mms/mms-amp/3.4.2/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
 
 workflows:
     version: 2
