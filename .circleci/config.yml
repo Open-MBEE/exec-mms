@@ -25,18 +25,26 @@ jobs:
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+  deploy-artifacts:
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - checkout
       - run:
-          name: Get jfrog
-          command: curl -fL https://getcli.jfrog.io | sh
+        name: Get jfrog
+        command: curl -fL https://getcli.jfrog.io | sh
       - run:
           name: Set Permissions
           command: sudo chmod +x jfrog
       - run:
           name: Configure jfrog
-          command: jfrog rt c --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
+          command: ./jfrog rt c --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
 workflows:
     version: 2
     build-and-test:
       jobs:
         - build-and-test
+        - deploy-artifacts:
+            requires:
+              - build-and-test
 #test6
