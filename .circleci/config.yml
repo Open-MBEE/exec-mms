@@ -10,14 +10,14 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: 
-          name: "Create and start all services from the docker-compose configuration."
+          name: "Create and start all services from the docker-compose configuration"
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build
             docker-compose run -d --name mms_mms_1 mms
       - run: sleep 30s
       - run: 
-          name: "Run and test Postman Collection."
+          name: "Run and test Postman Collection"
           command: |
             cd ~/mms/example
             IP_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
@@ -25,6 +25,8 @@ jobs:
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+            cd ..
+            ls
   deploy-artifacts:
     executor:
       name: node/default
@@ -32,18 +34,11 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          command: |
-            curl -fL https://getcli.jfrog.io | sh
-            ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
-    #- run:
-          #name: "Get jfrog"
-          #command: curl -fL https://getcli.jfrog.io | sh
-     # - run:
-         # name: "Set Permissions"
-         # command: sudo chmod +x jfrog
-      #- run:
-         # name: "Configure jfrog"
-         # command: ./jfrog rt c --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
+          name: "Get jfrog"
+          command: curl -fL https://getcli.jfrog.io | sh
+      - run:
+          name: "Configure jfrog"
+          command: ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
 workflows:
     version: 2
     build-and-test:
