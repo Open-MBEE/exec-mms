@@ -32,13 +32,13 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Get jfrog
+        name: "Get jfrog"
         command: curl -fL https://getcli.jfrog.io | sh
       - run:
-          name: Set Permissions
+          name: "Set Permissions"
           command: sudo chmod +x jfrog
       - run:
-          name: Configure jfrog
+          name: "Configure jfrog"
           command: ./jfrog rt c --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
 workflows:
     version: 2
