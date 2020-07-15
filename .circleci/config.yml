@@ -35,8 +35,8 @@ jobs:
           command: |
             curl -fL https://getcli.jfrog.io | sh
             ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
-      - run:
-          command: ./jfrog rt u '~/mms/gradle' libs-release-local/gov/nasa/jpl/mms/mms-amp/3.4.2/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
+      - run: ./jfrog rt u '~/mms/gradle' libs-release-local/gov/nasa/jpl/mms/mms-amp/3.4.2/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
+
 workflows:
     version: 2
     build-and-test:
