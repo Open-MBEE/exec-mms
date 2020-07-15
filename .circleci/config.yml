@@ -28,7 +28,7 @@ jobs:
       - run: 
           command: |
             ls
-            cd ~./mms/gradle/
+            cd ~/mms/gradle
             ls
   deploy-artifacts:
     executor:
@@ -37,9 +37,9 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          command: |
-            curl -fL https://getcli.jfrog.io | sh
-            ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive false
+        command: |
+          curl -fL https://getcli.jfrog.io | sh
+          ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
 workflows:
     version: 2
     build-and-test:
