@@ -34,7 +34,7 @@ jobs:
       - run:
           command: |
             docker run docker.bintray.io/jfrog/jfrog-cli-go:latest jfrog -v
-            jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
+            ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
     #- run:
           #name: "Get jfrog"
           #command: curl -fL https://getcli.jfrog.io | sh
