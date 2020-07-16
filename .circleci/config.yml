@@ -15,13 +15,13 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build
             docker-compose run -d --name mms_mms_1 mms
-            
+
       - run:
           name: "Prepare Store Artifacts"
           command: mkdir -p tmp/artifacts
     
       - store_artifacts:
-          path: mms/.gradle 
+          path: ~/.gradle 
      
       - run: sleep 30s
       
