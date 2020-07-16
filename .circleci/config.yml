@@ -15,7 +15,16 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build
             docker-compose run -d --name mms_mms_1 mms
+            
+      - run:
+          name: "Prepare Store Artifacts"
+          command: mkdir -p tmp/artifacts
+    
+      - store_artifacts:
+          path: mms/.gradle 
+     
       - run: sleep 30s
+      
       - run: 
           name: "Run and test Postman Collection."
           command: |
@@ -25,9 +34,10 @@ jobs:
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+    
   deploy-artifacts:
-    docker:
-      image: "gradle:jdk11"
+    executor:
+      name: node/default
     steps:
       - checkout
       - setup_remote_docker
