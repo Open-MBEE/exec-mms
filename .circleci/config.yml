@@ -26,8 +26,8 @@ jobs:
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
   deploy-artifacts:
-    executor:
-      name: node/default
+    docker:
+      image: "gradle:jdk11"
     steps:
       - checkout
       - setup_remote_docker
