@@ -41,7 +41,7 @@ jobs:
       - persist_to_workspace:
           root: mms
           paths:
-            - ~/mms/artifacts
+            - artifacts
   deploy-artifacts:
     executor:
       name: node/default
