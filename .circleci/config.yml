@@ -16,6 +16,7 @@ jobs:
             docker-compose build
             docker-compose run -d --name mms_mms_1 mms
 
+      -run: docker history gradle:jdk11
       - run:
           name: "Prepare Store Artifacts"
           command: mkdir -p tmp/artifacts
