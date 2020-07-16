@@ -25,7 +25,7 @@ jobs:
           command: mkdir -p tmp/artifacts
     
       - store_artifacts:
-          path: /home/gradle
+          path: ~/mms/artifacts
      
       - run: sleep 30s
       
