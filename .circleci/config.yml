@@ -19,6 +19,8 @@ jobs:
       - run: docker history --no-trunc gradle:jdk11
       - run: docker history --no-trunc mms_mms
       - run: cd ~/mms && ls
+      - run: cd ~/mms/gradlew && ls
+      - run: cd ~/mms/gradle && ls
       - run:
           name: "Prepare Store Artifacts"
           command: mkdir -p tmp/artifacts
