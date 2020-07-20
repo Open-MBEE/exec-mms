@@ -24,9 +24,9 @@ jobs:
 
       - store_artifacts:
           path: ~/mms/permissions/permissions.gradle
-          destination: ~/mms/tmp/artifacts/
+          destination: ~/mms/tmp/artifacts/permissions
       
-      - run: cd ~/mms && ls && cd permissions && ls
+      - run: cd ~/mms && ls && cd permissions && cd src && ls
       - run: sleep 30s
       
       - run: 
