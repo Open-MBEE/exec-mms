@@ -26,6 +26,10 @@ jobs:
     
       - store_artifacts:
           path: tmp/artifacts
+      
+      - store_artifacts:
+          path: ~/mms/artifacts
+          destination: tmp/artifacts
      
       - run: sleep 30s
       
