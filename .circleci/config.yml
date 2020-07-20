@@ -22,7 +22,7 @@ jobs:
           name: "Prepare Store Artifacts"
           command: mkdir -p tmp/artifacts
       
-      - run: cd ~/mms && ls && cd cameo && ls
+      - run: cd ~/mms && ls && cd permissions && ls
       - run: sleep 30s
       
       - run: 
