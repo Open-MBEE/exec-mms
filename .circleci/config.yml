@@ -1,10 +1,8 @@
-defaults: &defaults
 version: 2.1
 orbs:
   node: circleci/node@1.1.6
 jobs:
   build-and-test:
-    <<: *defaults
     executor:
       name: node/default
     working_directory: ~/mms
@@ -27,7 +25,9 @@ jobs:
       - store_artifacts:
           path: ~/mms/artifacts
           destination: ~/mms/tmp/artifacts
-     
+      - store_artifacts:
+        path: ~/mms/gradle/wrapper/
+        destination: ~/mms/tmp/artifacts
       - run: sleep 30s
       
       - run: 
