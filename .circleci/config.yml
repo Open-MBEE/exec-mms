@@ -23,7 +23,7 @@ jobs:
           command: mkdir -p tmp/artifacts
 
       - store_artifacts:
-        path: ~/mms/localuser
+          path: ~/mms/localuser
       
       - run: cd ~/mms && ls && cd permissions && ls
       - run: sleep 30s
