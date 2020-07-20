@@ -23,7 +23,7 @@ jobs:
           command: mkdir -p tmp/artifacts
 
       - store_artifacts:
-          path: ~/mms/permissions/
+          path: ~/mms/permissions/build/
           destination: ~/mms/tmp/artifacts/permissions
       
       - run: cd ~/mms && ls && cd permissions && ls
