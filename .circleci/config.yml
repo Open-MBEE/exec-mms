@@ -21,6 +21,9 @@ jobs:
       - run:
           name: "Prepare Store Artifacts"
           command: mkdir -p tmp/artifacts
+
+      - store_artifacts:
+        path: ~/mms/localuser
       
       - run: cd ~/mms && ls && cd permissions && ls
       - run: sleep 30s
