@@ -25,9 +25,11 @@ jobs:
       - store_artifacts:
           path: ~/mms/artifacts
           destination: ~/mms/tmp/artifacts
+
       - store_artifacts:
-        path: ~/mms/gradle/wrapper/
-        destination: ~/mms/tmp/artifacts
+          path: ~/mms/gradle/wrapper/
+          destination: ~/mms/tmp/artifacts
+      
       - run: sleep 30s
       
       - run: 
