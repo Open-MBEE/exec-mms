@@ -26,7 +26,7 @@ jobs:
       
       - store_artifacts:
           path: ~/mms/artifacts
-          destination: tmp/artifacts
+          destination: ~/mms/tmp/artifacts
 
       - run: cd ~/mms && ls
      
@@ -49,6 +49,7 @@ jobs:
       - setup_remote_docker
       - attach_workspace:
           at: mms
+      - run: cd ~/mms && ls
       - run:
           command: |
             curl -fL https://getcli.jfrog.io | sh
