@@ -22,14 +22,7 @@ jobs:
           name: "Prepare Store Artifacts"
           command: mkdir -p tmp/artifacts
       
-      - store_artifacts:
-          path: ~/mms/artifacts
-          destination: ~/mms/tmp/artifacts
-
-      - store_artifacts:
-          path: ~/mms/gradle/wrapper/
-          destination: ~/mms/tmp/artifacts
-      
+      - run: cd ~/mms && ls && cd cameo && ls
       - run: sleep 30s
       
       - run: 
