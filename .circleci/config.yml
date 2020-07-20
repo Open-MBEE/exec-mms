@@ -1,8 +1,10 @@
+defaults: &defaults
 version: 2.1
 orbs:
   node: circleci/node@1.1.6
 jobs:
   build-and-test:
+    <<: *defaults
     executor:
       name: node/default
     working_directory: ~/mms
