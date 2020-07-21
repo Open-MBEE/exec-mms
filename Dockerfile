@@ -1,6 +1,7 @@
 FROM gradle:jdk11
 COPY --chown=gradle:gradle . /mms
 WORKDIR /mms
+RUN ./gradlew build
 RUN ./gradlew bootJar
 
 RUN cp /mms/example/build/libs/example*.jar /app.jar
