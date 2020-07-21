@@ -26,7 +26,8 @@ yaml at http://localhost:8080/v3/api-docs.yaml - will need to fix securityScheme
 ## Run command line api test
 
 1. run example app on localhost (see top level readme)
-
+    
+    1. [install Node.js](https://nodejs.org/en/download/), if not already installed 
     1. copy localhost-env.json.example to localhost-env.json, change values accordingly
 
             npm install -g newman
