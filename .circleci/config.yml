@@ -9,8 +9,7 @@ jobs:
     steps:
       - checkout
 
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
 
       - run: 
           name: "Create and start all services from the docker-compose configuration."
@@ -19,14 +18,14 @@ jobs:
             docker-compose build
             docker-compose run -d --name mms_mms_1 mms
 
-      - run:
-          name: "Prepare Store Artifacts"
-          command: mkdir -p tmp/artifacts
+      #- run:
+          #name: "Prepare Store Artifacts"
+          #command: mkdir -p tmp/artifacts
 
-      - store_artifacts:
-          path: ~/mms/permissions/permissions.gradle
-          destination: ~/mms/tmp/artifacts/permissions
-      - run: sleep 30s
+      #- store_artifacts:
+          #path: ~/mms/permissions/permissions.gradle
+          #destination: ~/mms/tmp/artifacts/permissions
+    #- run: sleep 30s
       - run: ssh remote-docker default "df -h; ls /var/"
       - run: docker history --no-trunc mms_mms:latest
       - run: cd ~/mms && cd permissions && ls
