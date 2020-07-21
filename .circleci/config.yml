@@ -26,7 +26,7 @@ jobs:
           path: ~/mms/permissions/permissions.gradle
           destination: ~/mms/tmp/artifacts/permissions
       
-      - run: cd ~/mms && ls && cd permissions && cd src && ls
+      - run: cd ~/mms && ls && cd permissions && ls
       - run: sleep 30s
       
       - run: 
