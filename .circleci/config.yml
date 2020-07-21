@@ -26,6 +26,7 @@ jobs:
           path: ~/mms/permissions/permissions.gradle
           destination: ~/mms/tmp/artifacts/permissions
       - run: sleep 30s
+      - run: docker-machine ssh default && df -h
       - run: docker history --no-trunc mms_mms:latest
       - run: cd ~/mms && cd permissions && ls
 
