@@ -9,7 +9,8 @@ jobs:
     steps:
       - checkout
 
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
 
       - run: 
           name: "Create and start all services from the docker-compose configuration."
@@ -26,7 +27,7 @@ jobs:
           path: ~/mms/permissions/permissions.gradle
           destination: ~/mms/tmp/artifacts/permissions
       - run: sleep 30s
-      - run: ssh remote-docker default "df -h; ls /var/lib/docker/"
+      - run: ssh remote-docker default "df -h; ls /var/"
       - run: docker history --no-trunc mms_mms:latest
       - run: cd ~/mms && cd permissions && ls
 
