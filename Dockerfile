@@ -2,7 +2,7 @@ FROM gradle:jdk11
 COPY --chown=gradle:gradle . /mms
 WORKDIR /mms
 RUN ./gradlew build -x test
-RUN cp /mms/**/build/tmp/jar /tmp
+RUN cp /**/build/tmp/jar /tmp/**/build/tmp/jar
 #RUN ./gradlew bootJar
 
 RUN cp /mms/example/build/libs/example*.jar /app.jar
