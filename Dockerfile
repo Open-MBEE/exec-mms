@@ -4,7 +4,7 @@ WORKDIR /mms
 RUN ./gradlew build -x test
 RUN ls /mms
 RUN cp -a /mms/**/build/tmp/jar ./temp/
-RUN ls /mms/temp/
+RUN ls /mms/temp/jar
 #RUN ./gradlew bootJar
 
 RUN cp /mms/example/build/libs/example*.jar /app.jar
