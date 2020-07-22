@@ -27,7 +27,7 @@ jobs:
           #path: ~/mms/permissions/permissions.gradle
           #destination: ~/mms/tmp/artifacts/permissions
     #- run: sleep 30s
-      - run: cd ~/mms && ls
+      - run: cd ~/mms && cd temp && ls
 
       - run: 
           name: "Run and test Postman Collection."
