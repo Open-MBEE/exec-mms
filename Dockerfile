@@ -5,6 +5,7 @@ RUN ./gradlew build -x test
 RUN ls /mms
 RUN find /mms/ -name '*jar' -exec cp -a -t /mms/temp {} +
 RUN ls /mms/temp/
+RUN cp /mms/temp .
 #RUN ./gradlew bootJar
 
 RUN cp /mms/example/build/libs/example*.jar /app.jar
