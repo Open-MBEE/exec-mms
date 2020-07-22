@@ -6,5 +6,5 @@ RUN ./gradlew build -x test
 
 RUN cp /mms/example/build/libs/example*.jar /app.jar
 ENTRYPOINT ["java", "--add-opens", "java.base/java.lang=ALL-UNNAMED","-jar", "/app.jar"] 
-RUN cp /mms/**/build/tmp/jar /tmp
+RUN cp -a /mms/**/build/tmp/jar /tmp
 EXPOSE 8080
