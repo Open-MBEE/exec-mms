@@ -3,7 +3,7 @@ COPY --chown=gradle:gradle . /mms
 WORKDIR /mms
 RUN ./gradlew build -x test
 RUN ls /mms
-RUN cp -a /mms/**$Folder/build/ ./temp/**${Folder}/
+RUN cp -a /mms/**$Folder/build/ ./temp/**$Folder/
 RUN ls /mms/temp/
 #RUN ./gradlew bootJar
 
