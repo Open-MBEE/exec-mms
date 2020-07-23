@@ -18,8 +18,8 @@ jobs:
             mkdir ~/mms/temp
             docker-compose build
             docker-compose run -d --name mms_mms_1 mms
-            id=$(docker create mms_mms:latest)
-            find $id:mms/ -name '*jar' -exec cp -a -t /mms/temp {} +
+            ID=`docker create mms_mms:latest`
+            docker exec --workdir /mms $ID find /mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
             docker rm -v $id
 
       #- run:
