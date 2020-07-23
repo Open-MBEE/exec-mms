@@ -19,7 +19,7 @@ jobs:
             docker-compose run -d --name mms_mms_1 mms
             mkdir ~/mms/temp1
             docker cp -a mms_mms_1:/mms/temp ~/mms/temp1
-      - run: ls ~/mms/temp
+      - run: ls ~/mms/temp1
       #- run:
           #name: "Prepare Store Artifacts"
           #command: mkdir -p tmp/artifacts
