@@ -17,16 +17,14 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build --no-rm
             docker-compose run -d --name mms_mms_1 mms
-            mkdir ~/mms/temp1
-            docker cp -a mms_mms_1:/mms/temp ~/mms/temp1
-      - run: ls ~/mms/temp1/temp
+            docker cp -a mms_mms_1:/mms/temp ~/mms/
+      - run: ls ~/mms/temp/
       #- run:
           #name: "Prepare Store Artifacts"
           #command: mkdir -p tmp/artifacts
 
-      #- store_artifacts:
-          #path: ~/mms/
-          #destination: ~/mms/tmp/
+      - store_artifacts:
+          path: ~/mms/temp/
 
     #- run: sleep 30s
 
