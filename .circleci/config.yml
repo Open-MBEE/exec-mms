@@ -15,19 +15,19 @@ jobs:
           name: "Create and start all services from the docker-compose configuration."
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            docker-compose build --no-rm && docker ps
-            docker exec mms_mms:latest find /mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
+            docker-compose build --no-rm
             docker-compose run -d --name mms_mms_1 mms
+            docker exec mms_mms_1 find /mms/temp -name '*jar' -exec cp -a -t ~/mms/temp {} +
 
       #- run:
           #name: "Prepare Store Artifacts"
           #command: mkdir -p tmp/artifacts
 
       #- store_artifacts:
-          #path: ~/mms/permissions/permissions.gradle
-          #destination: ~/mms/tmp/artifacts/permissions
+          #path: ~/mms/
+          #destination: ~/mms/tmp/
+
     #- run: sleep 30s
-      - run: cd ~/mms && cd temp && ls
 
       - run: 
           name: "Run and test Postman Collection."
