@@ -19,9 +19,10 @@ jobs:
             docker-compose build
             docker-compose run -d --name mms_mms_1 mms
             ID=`docker create mms_mms:latest`
-            sleep 20s
+            docker run $ID 
+            sleep 10s
             docker exec $ID find /mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
-            docker rm -v $id
+            docker rm -v $ID
 
       #- run:
           #name: "Prepare Store Artifacts"
