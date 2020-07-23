@@ -18,7 +18,7 @@ jobs:
             docker-compose build --no-rm
             docker-compose run -d --name mms_mms_1 mms
             docker cp -a mms_mms_1:/mms/temp ~/mms/
-      - run: cd ~/mms && ls ~/mms/temp
+      - run: ls ~/mms && ls ~/mms/temp
 
       - store_artifacts:
           path: ~/mms/temp
