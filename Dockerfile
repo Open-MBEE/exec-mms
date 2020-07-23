@@ -2,8 +2,7 @@ FROM gradle:jdk11
 COPY --chown=gradle:gradle . /mms
 WORKDIR /mms
 RUN ./gradlew build -x test
-#RUN find /mms/ -name '*jar' -exec cp -a -t /mms/temp {} +
-#VOLUME /mms/temp/
+RUN mkdir -p /mms/temp && find /mms/ -name '*jar' -exec cp -a -t /mms/temp {} +
 #RUN ./gradlew bootJar
 
 RUN cp /mms/example/build/libs/example*.jar /app.jar

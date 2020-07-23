@@ -15,9 +15,8 @@ jobs:
           name: "Create and start all services from the docker-compose configuration."
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            mkdir ~/mms/temp
             docker-compose build --no-rm
-            find ~/mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
+            docker exec mms_mms find /mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
             docker-compose run -d --name mms_mms_1 mms
 
       #- run:
