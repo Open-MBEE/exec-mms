@@ -19,7 +19,7 @@ jobs:
             docker-compose run -d --name mms_mms_1 mms
             docker cp -a mms_mms_1:/mms/temp ~/mms/
       - run: ls ~/mms && ls ~/mms/temp
-      - run: cd ~/mms/temp && rm gradle-wrapper.jar && rm jar
+      - run: cd ~/mms/temp && rm gradle-wrapper.jar && rm -r jar
       - run: ls ~/mms/temp/
 
       - store_artifacts:
