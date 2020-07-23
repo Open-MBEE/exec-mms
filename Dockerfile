@@ -2,10 +2,7 @@ FROM gradle:jdk11
 COPY --chown=gradle:gradle . /mms
 WORKDIR /mms
 RUN ./gradlew build -x test
-RUN mkdir /temp && ls /mms
-RUN ls /mms
 RUN find /mms/ -name '*jar' -exec cp -a -t /mms/temp {} +
-RUN ls /mms/temp/
 VOLUME /mms/temp/
 #RUN ./gradlew bootJar
 
