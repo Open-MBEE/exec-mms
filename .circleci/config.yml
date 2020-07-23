@@ -17,8 +17,9 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build --no-rm
             docker-compose run -d --name mms_mms_1 mms
-            docker exec mms_mms_1 find /mms/temp -name '*jar' -exec cp -a -t ~/mms/temp {} +
-
+            mkdir ~/mms/temp1
+            docker exec mms_mms_1 find /mms/temp -name '*jar' -exec cp -a -t ~/mms/temp1 {} +
+      - run: ls ~/mms/temp
       #- run:
           #name: "Prepare Store Artifacts"
           #command: mkdir -p tmp/artifacts
