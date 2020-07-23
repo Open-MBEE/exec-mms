@@ -16,11 +16,8 @@ jobs:
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             mkdir ~/mms/temp
-            docker-compose build --target gradleBuild
-            ID=`docker run mms`
-            docker exec $ID find /mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
-            docker rm -v $ID
-            docker-compose build
+            docker-compose build --no-rm
+            find /mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
             docker-compose run -d --name mms_mms_1 mms
 
       #- run:
