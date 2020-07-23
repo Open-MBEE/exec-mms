@@ -16,11 +16,12 @@ jobs:
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             mkdir ~/mms/temp
-            docker-compose build
-            docker-compose run -d --name mms_mms_1 mms
-            docker build -q - < Dockerfile && ID=`docker create mms`
+            docker build -q - < Dockerfile
+            ID=`docker run mms`
             docker exec $ID find /mms/ -name '*jar' -exec cp -a -t ~/mms/temp {} +
             docker rm -v $ID
+            docker-compose build
+            docker-compose run -d --name mms_mms_1 mms
 
       #- run:
           #name: "Prepare Store Artifacts"
