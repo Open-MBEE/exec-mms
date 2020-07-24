@@ -23,22 +23,21 @@ jobs:
           command: |
             docker cp -a mms_mms_1:/mms/temp ~/mms/
             cd ~/mms/temp && rm gradle-wrapper.jar && rm -r jar
-            ls ~/mms/temp/
 
       - store_artifacts:
           path: ~/mms/temp
 
-      #- run: sleep 30s
+      - run: sleep 30s
 
-     # - run: 
-     #     name: "Run and test Postman Collection."
-     #     command: |
-     #       cd ~/mms/example
-     #       IP_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
-     #       sed -i "s/localhost/$IP_VAR/" test-env.json
-     #       docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
-     #       docker cp ~/mms/example/. mms_test_configs:/tst
-     #       docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+      - run: 
+          name: "Run and test Postman Collection"
+          command: |
+            cd ~/mms/example
+            IP_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
+            sed -i "s/localhost/$IP_VAR/" test-env.json
+            docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
+            docker cp ~/mms/example/. mms_test_configs:/tst
+            docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
       
       - run:
           name: "Configure jfrog"
@@ -48,7 +47,12 @@ jobs:
       
       - run: 
           name: "Send modules"
-          command: for filename in ~/mms/temp/*.jar; do ./jfrog rt u "${filename}" libs-release-local/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true; done
+          command: 
+            for FILENAME in ~/mms/temp/*.jar; do \
+              MODULE="${FILENAME%%.*}"";
+              ./jfrog rt u "$FILENAME" libs-snapshot-local/org/openmbee/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true;
+              echo "$MODULE";
+            done
 workflows:
     version: 2
     build-and-test:
