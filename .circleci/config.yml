@@ -17,10 +17,13 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build --no-rm
             docker-compose run -d --name mms_mms_1 mms
+            
+      - run: 
+          name: "Copy artifacts from mms container."
+          commmand: |
             docker cp -a mms_mms_1:/mms/temp ~/mms/
-      - run: ls ~/mms && ls ~/mms/temp
-      - run: cd ~/mms/temp && rm gradle-wrapper.jar && rm -r jar
-      - run: ls ~/mms/temp/
+            cd ~/mms/temp && rm gradle-wrapper.jar && rm -r jar
+            ls ~/mms/temp/
 
       - store_artifacts:
           path: ~/mms/temp
@@ -38,11 +41,17 @@ jobs:
             docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
       
       - run:
+          name: "Configure jfrog."
           command: |
             curl -fL https://getcli.jfrog.io | sh
             ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
-            ./jfrog rt u '~/mms/temp/artifacts-0.0.1-SNAPSHOT.jar' libs-release-local/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
-  
+      
+      - run: 
+          name: "Send modules."
+          command: |
+            for filename in ~/mms/temp/*jar; do
+              ./jfrog rt u '~/mms/temp/$filename' libs-release-local/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
+
 workflows:
     version: 2
     build-and-test:
