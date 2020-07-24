@@ -49,11 +49,11 @@ jobs:
           name: "Send modules"
           command: 
             for FILENAME in ~/mms/temp/*.jar; do
-              file=$FILENAME;
-              newfile=${file##*/};
-              base=${newfile%.*};
-              MODULE=$($base | cut -d'-' -f 1);
-              $MODULE;
+              filePath=$FILENAME;
+              fileName=${filePath##*/};
+              base=${fileName%.*};
+              MODULE=${base#-*};
+              return $MODULE;
             done
 workflows:
     version: 2
