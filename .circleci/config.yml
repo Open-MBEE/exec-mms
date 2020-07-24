@@ -49,7 +49,7 @@ jobs:
       - run: 
           name: "Send modules"
           command: 
-            for filename in ~/mms/temp/*.jar; do ./jfrog rt u '~/mms/temp/"$filename"' libs-release-local/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true; done
+            for filename in ~/mms/temp/*.jar; do ./jfrog rt u '~/mms/temp/$filename' libs-release-local/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true; done
 workflows:
     version: 2
     build-and-test:
