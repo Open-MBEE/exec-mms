@@ -20,7 +20,7 @@ jobs:
             
       - run: 
           name: "Copy artifacts from mms container."
-          commmand: |
+          command: |
             docker cp -a mms_mms_1:/mms/temp ~/mms/
             cd ~/mms/temp && rm gradle-wrapper.jar && rm -r jar
             ls ~/mms/temp/
