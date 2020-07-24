@@ -12,14 +12,14 @@ jobs:
       - setup_remote_docker
 
       - run: 
-          name: "Create and start all services from the docker-compose configuration."
+          name: "Create and start all services from the docker-compose configuration"
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose build --no-rm
             docker-compose run -d --name mms_mms_1 mms
             
       - run: 
-          name: "Copy artifacts from mms container."
+          name: "Copy artifacts from mms container"
           command: |
             docker cp -a mms_mms_1:/mms/temp ~/mms/
             cd ~/mms/temp && rm gradle-wrapper.jar && rm -r jar
@@ -28,27 +28,27 @@ jobs:
       - store_artifacts:
           path: ~/mms/temp
 
-      - run: sleep 30s
+      #- run: sleep 30s
 
-      - run: 
-          name: "Run and test Postman Collection."
-          command: |
-            cd ~/mms/example
-            IP_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
-            sed -i "s/localhost/$IP_VAR/" test-env.json
-            docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
-            docker cp ~/mms/example/. mms_test_configs:/tst
-            docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+     # - run: 
+     #     name: "Run and test Postman Collection."
+     #     command: |
+     #       cd ~/mms/example
+     #       IP_VAR=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mms_mms_1`
+     #       sed -i "s/localhost/$IP_VAR/" test-env.json
+     #       docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
+     #       docker cp ~/mms/example/. mms_test_configs:/tst
+     #       docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
       
       - run:
-          name: "Configure jfrog."
+          name: "Configure jfrog"
           command: |
             curl -fL https://getcli.jfrog.io | sh
             ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
       
       - run: 
-          name: "Send modules."
-          command: for filename in ~/mms/temp/*jar; do ./jfrog rt u '~/mms/temp/${filename}' libs-release-local/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
+          name: "Send modules"
+          command: for filename in ~/mms/temp/*.jar; do ./jfrog rt u '~/mms/temp/${filename}' libs-release-local/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true
 
 workflows:
     version: 2
