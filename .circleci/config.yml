@@ -39,11 +39,11 @@ jobs:
     #        docker cp ~/mms/example/. mms_test_configs:/tst
     #        docker run --volumes-from mms_test_configs --link mms_mms_1 --network=mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
       
-    #  - run:
-    #      name: "Configure jfrog"
-    #      command: |
-    #        curl -fL https://getcli.jfrog.io | sh
-    #        ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
+      - run:
+          name: "Configure jfrog"
+          command: |
+            curl -fL https://getcli.jfrog.io | sh
+            ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY
       
       - run: 
           name: "Send modules"
@@ -51,9 +51,11 @@ jobs:
             for FILENAME in ~/mms/temp/*.jar; do
               filePath=$FILENAME;
               fileName=${filePath##*/};
-              base=${fileName%.*};
-              MODULE=${base#-*};
-              echo "$MODULE";
+              BASE=${fileName%.*};
+              MODULE=${BASE%%-*};
+              moduleVer=${BASE%-*};
+              VERSION_NUM=${moduleVer##*-};
+              ./jfrog rt u "$FILENAME" libs-snapshot-local/org/openmbee/"$MODULE"/"$VERSION_NUM"/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true;
             done
 workflows:
     version: 2
