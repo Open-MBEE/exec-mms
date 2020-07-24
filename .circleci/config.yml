@@ -55,7 +55,7 @@ jobs:
               MODULE=${BASE%%-*};
               moduleVer=${BASE%-*};
               VERSION_NUM=${moduleVer##*-};
-              ./jfrog rt u "$FILENAME" libs-snapshot-local/org/openmbee/"$MODULE"/"$VERSION_NUM"/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true;
+              ./jfrog rt u "$FILENAME" libs-snapshot-local/org/openmbee/$MODULE/$VERSION_NUM/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true;
             done
 workflows:
     version: 2
