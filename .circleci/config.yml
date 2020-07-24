@@ -49,8 +49,7 @@ jobs:
           name: "Send modules"
           command: 
             for FILENAME in ~/mms/temp/*.jar; do \
-              MODULE="${FILENAME%%.*}";
-              echo "$MODULE";
+              echo "$FILENAME"
             done
 workflows:
     version: 2
