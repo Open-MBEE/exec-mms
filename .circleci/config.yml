@@ -53,7 +53,7 @@ jobs:
               fileName=${filePath##*/};
               base=${fileName%.*};
               MODULE=${base#-*};
-              $MODULE;
+              echo "$MODULE";
             done
 workflows:
     version: 2
