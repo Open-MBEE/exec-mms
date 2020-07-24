@@ -49,8 +49,9 @@ jobs:
           name: "Send modules"
           command: 
             for FILENAME in ~/mms/temp/*.jar; do
-              file=$({$FILENAME}##*/); 
-              base=${file%.*};
+              file=$FILENAME;
+              newfile=${file##*/};
+              base=${newfile%.*};
               MODULE=$($base | cut -d'-' -f 1);
               $MODULE;
             done
