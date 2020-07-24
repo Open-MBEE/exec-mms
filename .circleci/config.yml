@@ -47,7 +47,13 @@ jobs:
       
       - run: 
           name: "Send modules"
-          command: for FILENAME in ~/mms/temp/*.jar; do echo "$FILENAME"; done
+          command: 
+            for FILENAME in ~/mms/temp/*.jar; do \
+              echo "$FILENAME";
+              file=${"$FILENAME"##*/}; 
+              base=${file%.*};
+              echo $base;
+            done
 workflows:
     version: 2
     build-and-test:
