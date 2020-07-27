@@ -9,6 +9,7 @@ import org.openmbee.sdvc.authenticator.security.JwtTokenValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,17 +55,8 @@ public class AuthenticationController {
     @PreAuthorize("isAuthenticated()")
     public JwtTokenValidationResponse checkAuthenticationToken() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof String) {
-            final String username = (String) authentication.getPrincipal();
-            if (username != null && username != "anonymousUser") {
-                return new JwtTokenValidationResponse(username);
-            }
-        }
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            final UserDetails user = (UserDetails) authentication.getPrincipal();
-            if (user.getUsername() != null && user.getUsername() != "anonymousUser") {
-                return new JwtTokenValidationResponse(user.getUsername());
-            }
+        if (! (authentication instanceof AnonymousAuthenticationToken)) {
+            return new JwtTokenValidationResponse(authentication.getName());
         }
         return new JwtTokenValidationResponse(null);
     }
