@@ -48,9 +48,9 @@ jobs:
             for FILENAME in ~/mms/temp/*.jar; do
               filePath=$FILENAME;
               fileName=${filePath##*/};
-              BASE=${fileName%.*};
-              MODULE=${BASE%%-*};
-              moduleVer=${BASE%-*};
+              base=${fileName%.*};
+              MODULE=${base%%-*};
+              moduleVer=${base%-*};
               VERSION_NUM=${moduleVer##*-};
               ./jfrog rt u "$FILENAME" libs-snapshot-local/org/openmbee/"$MODULE"/"$VERSION_NUM"/ --build-name=mms-circleci --build-number=$CIRCLE_BUILD_NUM --flat=true;
             done
