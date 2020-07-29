@@ -1,11 +1,11 @@
 package org.openmbee.sdvc.core.services;
 
-import org.openmbee.sdvc.core.objects.ElementsResponse;
+import org.openmbee.sdvc.core.objects.ElementsSearchResponse;
 
 import java.util.Map;
 
 public interface SearchService {
-    ElementsResponse basicSearch(String projectId, String refId, Map<String, String> params);
+    ElementsSearchResponse basicSearch(String projectId, String refId, Map<String, String> params);
 
-    ElementsResponse recursiveSearch(String projectId, String refId, Map<String, String> params, Map<String, String> recurse);
+    ElementsSearchResponse recursiveSearch(String projectId, String refId, Map<String, String> params, Map<String, String> recurse, Integer from, Integer size);
 }
