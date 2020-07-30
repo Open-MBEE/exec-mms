@@ -2,6 +2,7 @@ package org.openmbee.sdvc.crud.controllers.orgs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.UUID;
 import java.util.Optional;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.dao.OrgDAO;
@@ -85,9 +86,12 @@ public class OrgsController extends BaseController {
 
         for (OrgJson org : orgPost.getOrgs()) {
             if (org.getId() == null || org.getId().isEmpty()) {
-                response.addRejection(new Rejection(org, 400, "Org id not provided"));
+                //response.addRejection(new Rejection(org, 400, "Org id not provided"));
+                String uuid = UUID.randomUUID().toString();
+                repsonse.org.setOrganizationId(uuid);
                 continue;
             }
+
             Organization o = organizationRepository.findByOrganizationId(org.getId())
                 .orElse(new Organization());
             boolean newOrg = true;
