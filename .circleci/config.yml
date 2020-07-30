@@ -15,15 +15,14 @@ jobs:
           name: "Create and start all services from the docker-compose configuration"
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            docker-compose up
-            
-      - run: 
-          name: "Copy artifacts from mms container"
-          command: |
-            docker cp -a mms_mms_1:/mms/temp ~/mms/
-            cd ~/mms/temp && rm gradle-wrapper.jar && rm -r jar
+            docker-compose up -d
 
       - run: sleep 30s
+
+      - run:
+            name: "Copy artifacts from mms container"
+            command: |
+                docker cp -a mms_mms_1:/mms/temp ~/mms/
 
       - run: 
           name: "Run and test Postman Collection"
