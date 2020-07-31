@@ -20,6 +20,8 @@ services:
 
   mms:
     build: .
+    container_name: mms
+    hostname: mms
     environment:
         - "SPRING_PROFILES_ACTIVE=test"
     depends_on:
