@@ -40,10 +40,9 @@ jobs:
 
   deploy_snapshot:
       executor: openjdk_executor
-      working_directory: /home/circleci/mms
       steps:
           - attach_workspace:
-                at: /home/circleci/mms
+                at: ~/
           - run:
                 name: Debug
                 command: ls -al
@@ -55,7 +54,7 @@ jobs:
       working_directory: /home/circleci/mms
       steps:
           - attach_workspace:
-                at: /home/circleci/mms
+                at: ~/
           - run:
                 name: Debug
                 command: ls -al
