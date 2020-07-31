@@ -40,6 +40,7 @@ jobs:
 
   deploy_snapshot:
       executor: openjdk_executor
+      working_directory: /home/circleci/mms
       steps:
           - attach_workspace:
                 at: ~/
@@ -73,3 +74,8 @@ workflows:
         - deploy_release:
               requires:
                   - build_and_test
+              filters:
+                  tags:
+                      only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
+                  branches:
+                      ignore: /.*/
