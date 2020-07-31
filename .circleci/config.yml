@@ -45,9 +45,6 @@ jobs:
           - attach_workspace:
                 at: ~/
           - run:
-                name: Debug
-                command: ls -al
-          - run:
                 name: Deploy snapshot to Artifactory
                 command: ./gradlew -PbuildAccess=opensource -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$SNAPSHOT_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
   deploy_release:
@@ -56,9 +53,6 @@ jobs:
       steps:
           - attach_workspace:
                 at: ~/
-          - run:
-                name: Debug
-                command: ls -al
           - run:
                 name: Deploy release to Artifactory
                 command: ./gradlew -PbuildAccess=opensource -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$RELEASE_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
