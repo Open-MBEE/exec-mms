@@ -29,29 +29,30 @@ jobs:
       - run: 
           name: "Run and test Postman Collection"
           command: |
-            cd ~/mms/example
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
-            docker cp ~/mms/example/. mms_test_configs:/tst
+            docker cp example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
 
       - persist_to_workspace:
             root: /home/circleci/
             paths:
-                - mms
+                - mms/*
 
   deploy_snapshot:
       executor: openjdk_executor
+      working_directory: /home/circleci/mms
       steps:
           - attach_workspace:
-                at: ~/
+                at: /home/circleci/mms
           - run:
                 name: Deploy snapshot to Artifactory
                 command: ./gradlew -PbuildAccess=opensource -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$SNAPSHOT_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
   deploy_release:
       executor: openjdk_executor
+      working_directory: /home/circleci/mms
       steps:
           - attach_workspace:
-                at: ~/
+                at: /home/circleci/mms
           - run:
                 name: Deploy release to Artifactory
                 command: ./gradlew -PbuildAccess=opensource -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$RELEASE_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
