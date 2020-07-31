@@ -16,7 +16,7 @@ jobs:
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose up -d
-            docker run --network container:mms curlimages/curl --retry 5 --retry-delay 10 --retry-max-time 50 --retry-connrefused http://mms:8080/healthcheck
+            docker run --network container:mms curlimages/curl --retry 5 --retry-delay 10 --retry-max-time 50 --retry-connrefused http://localhost:8080/healthcheck
 
       - run:
             name: "Copy artifacts from mms container"
