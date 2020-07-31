@@ -34,6 +34,11 @@ jobs:
             docker cp ~/mms/example/. mms_test_configs:/tst
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
 
+      - persist_to_workspace:
+            root: ~/
+            paths:
+                - mms
+
   deploy_snapshot:
       executor: openjdk_executor
       steps:
