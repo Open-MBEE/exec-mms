@@ -92,7 +92,7 @@ allprojects {
     //https://www.jfrog.com/confluence/display/JFROG/Gradle+Artifactory+Plugin
     //can use this or set artifactory info directly under publishing/repositories?
     artifactory {
-        contextUrl = 'http://repo.myorg.com/artifactory'
+        contextUrl = 'https://mms.jfrog.io/mms'
         publish {
             repository {
                 repoKey = project.getProperties().get('artifactoryRepository')
