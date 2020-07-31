@@ -16,7 +16,7 @@ jobs:
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose up -d
-            docker run --network container:mms curlimages/curl --retry 5 --retry-delay 10 --retry-max-time 50 --retry-connrefused http://localhost:8080/healthcheck
+            docker run --network container:mms curlimages/curl --retry 30 --retry-delay 10 --retry-max-time 240 --retry-connrefused http://localhost:8080/healthcheck
 
       - run:
             name: "Copy artifacts from mms container"
@@ -29,7 +29,7 @@ jobs:
             cd ~/mms/example
             docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
             docker cp ~/mms/example/. mms_test_configs:/tst
-            docker run --volumes-from mms_test_configs --link mms_mms_1 --network=container:mms_default -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
+            docker run --volumes-from mms_test_configs --link mms --network container:mms -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
       
       - run:
           name: "Configure jfrog"
