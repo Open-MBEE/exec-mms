@@ -13,7 +13,7 @@ jobs:
   build_and_test:
     executor:
       name: node/default
-    working_directory: ~/mms
+    working_directory: /home/circleci/mms
     steps:
       - checkout
 
@@ -35,7 +35,7 @@ jobs:
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
 
       - persist_to_workspace:
-            root: ~/
+            root: /home/circleci/
             paths:
                 - mms
 
