@@ -71,6 +71,9 @@ workflows:
         - deploy_snapshot:
               requires:
                   - build_and_test
+              filters:
+                  branches:
+                      only: /((release|hotfix|support)/[0-9.]+(-(a|b|rc)[0-9]+)?|master|develop)/
         - deploy_release:
               requires:
                   - build_and_test
