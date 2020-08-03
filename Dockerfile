@@ -1,5 +1,5 @@
 FROM openjdk:11.0.8-jdk
-COPY --chown=gradle:gradle . /mms
+COPY . /mms
 WORKDIR /mms
 RUN ./gradlew --no-daemon build -x test
 
