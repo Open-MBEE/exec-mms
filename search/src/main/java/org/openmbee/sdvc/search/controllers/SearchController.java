@@ -3,18 +3,14 @@ package org.openmbee.sdvc.search.controllers;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openmbee.sdvc.core.exceptions.*;
-import org.openmbee.sdvc.core.objects.BaseResponse;
-import org.openmbee.sdvc.core.objects.ElementsResponse;
-import org.openmbee.sdvc.core.objects.Rejection;
-import org.openmbee.sdvc.core.security.MethodSecurityService;
+import org.openmbee.sdvc.core.objects.ElementsSearchResponse;
 import org.openmbee.sdvc.core.services.SearchService;
+import org.openmbee.sdvc.search.objects.BasicSearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,7 +28,7 @@ public class SearchController {
 
     @GetMapping(value = "/search")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ElementsResponse getBasicSearch(
+    public ElementsSearchResponse getBasicSearch(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestParam(required = false) Map<String, String> params
@@ -42,12 +38,13 @@ public class SearchController {
 
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ElementsResponse postBasicSearch(
+    public ElementsSearchResponse postBasicSearch(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody BasicSearchRequest request
     ) {
-        return searchService.recursiveSearch(projectId, refId, request.getParams(), request.getRecurse());
+        return searchService.recursiveSearch(projectId, refId, request.getParams(), request.getRecurse(),
+            request.getFrom(), request.getSize());
     }
 
 }
