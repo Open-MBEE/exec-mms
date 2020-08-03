@@ -1,6 +1,7 @@
 buildscript {
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
     }
     repositories {
         maven { url 'https://repo.spring.io/plugins-release' }
@@ -8,9 +9,7 @@ buildscript {
         mavenCentral()
     }
 }
-apply plugin: 'io.spring.dependency-management'
 
-group = 'org.openmbee'
 description = 'Structured Data Version Control'
 
 ext.snapshotBuild = version.contains("SNAPSHOT")
@@ -52,5 +51,64 @@ subprojects {
     plugins.withType(JavaPlugin) {
         project.sourceCompatibility = '10'
         project.targetCompatibility = '10'
+    }
+}
+
+allprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: "com.jfrog.artifactory"
+
+    Map<String, String> commonDependencies = rootProject.ext.commonDependencies
+
+    java {
+        //withJavadocJar()
+        //withSourcesJar()
+    }
+
+    javadoc {
+        if(JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+    //https://docs.gradle.org/current/userguide/publishing_maven.html
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+
+        repositories {
+            maven {
+                def releasesRepoUrl = "$buildDir/repos/releases"
+                def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            }
+        }
+    }
+
+    //https://www.jfrog.com/confluence/display/JFROG/Gradle+Artifactory+Plugin
+    //can use this or set artifactory info directly under publishing/repositories?
+    artifactory {
+        contextUrl = 'https://mms.jfrog.io/mms'
+        publish {
+            repository {
+                repoKey = project.getProperties().get('artifactoryRepository')
+                username = project.getProperties().get('artifactoryUsername')
+                password = project.getProperties().get('artifactoryPassword')
+                maven = true
+            }
+            defaults {
+                publications('mavenJava')
+                publishArtifacts = true
+                // Properties to be attached to the published artifacts.
+                //properties = ['qa.level': 'basic', 'dev.team' : 'core']
+                // Publish generated POM files to Artifactory (true by default)
+                publishPom = true
+            }
+        }
+        clientConfig.info.setBuildNumber('' + new java.util.Random(System.currentTimeMillis()).nextInt(20000));
     }
 }
