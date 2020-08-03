@@ -33,16 +33,34 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
         }
 
         RPmap.put(Roles.ADMIN.toString(), aPriv);
-        RPmap.put(Roles.WRITER.toString(), wPriv);
         RPmap.put(Roles.READER.toString(), rPriv);
+        RPmap.put(Roles.WRITER.toString(), wPriv);
+
+        for (String role : RPmap.keySet()) {
+            Optional<Role> roleIn = roleRepo.findByName(role);
+            if (!(roleIn.isPresent())) {
+                Role missingRole = new Role();
+                missingRole.setName(role);
+                roleRepo.saveAndFlush(missingRole);
+            }
+        }
+
+        for (String privs : aPriv) {
+            Optional<Privilege> privIn = privRepo.findByName(privs);
+            if (!(privIn.isPresent())) {
+                Privilege missingPriv = new Privilege();
+                missingPriv.setName(privs);
+                privRepo.saveAndFlush(missingPriv);
+            }
+        }
 
         for (Role role : roleRepo.findAll()) {
             Set<Privilege> pSet = new HashSet<Privilege>();
             for (Privilege priv : privRepo.findAll()) {
-                if (((RPmap.get(role.getName())).contains(priv.getName())) && (!(role.getPrivileges().contains(priv)))) {
+                if (((RPmap.get(role.getName())).contains(priv.getName())) && ((role.getPrivileges() == null) || (!(role.getPrivileges().contains(priv))))) {
                     pSet.add(priv);
                     role.setPrivileges(pSet);
-                    roleRepo.save(role);
+                    roleRepo.saveAndFlush(role);
                 }
             }
         }
