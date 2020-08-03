@@ -86,10 +86,7 @@ public class OrgsController extends BaseController {
 
         for (OrgJson org : orgPost.getOrgs()) {
             if (org.getId() == null || org.getId().isEmpty()) {
-                //response.addRejection(new Rejection(org, 400, "Org id not provided"));
-                String uuid = UUID.randomUUID().toString();
-                repsonse.org.setOrganizationId(uuid);
-                continue;
+                return org.setId(UUID.randomUUID().toString());
             }
 
             Organization o = organizationRepository.findByOrganizationId(org.getId())
