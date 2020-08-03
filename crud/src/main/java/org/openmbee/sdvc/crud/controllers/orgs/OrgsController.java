@@ -86,7 +86,7 @@ public class OrgsController extends BaseController {
 
         for (OrgJson org : orgPost.getOrgs()) {
             if (org.getId() == null || org.getId().isEmpty()) {
-                return org.setId(UUID.randomUUID().toString());
+            return org.setId(UUID.randomUUID().toString());
             }
 
             Organization o = organizationRepository.findByOrganizationId(org.getId())
