@@ -1,8 +1,8 @@
 package org.openmbee.sdvc.permissions.config;
 
 import org.openmbee.sdvc.core.config.Roles;
-import org.openmbee.sdvc.data.domains.global.Privilege;
 import org.openmbee.sdvc.core.config.Privileges;
+import org.openmbee.sdvc.data.domains.global.Privilege;
 import org.openmbee.sdvc.data.domains.global.Role;
 import org.openmbee.sdvc.rdb.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,15 +54,18 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
             }
         }
 
-        for (Role role : roleRepo.findAll()) {
+        List<Role> roleList = roleRepo.findAll();
+        List<Privilege> privList = privRepo.findAll();
+
+        for (Role role : roleList) {
             Set<Privilege> pSet = new HashSet<Privilege>();
-            for (Privilege priv : privRepo.findAll()) {
+            for (Privilege priv : privList) {
                 if (((RPmap.get(role.getName())).contains(priv.getName())) && ((role.getPrivileges() == null) || (!(role.getPrivileges().contains(priv))))) {
                     pSet.add(priv);
-                    role.setPrivileges(pSet);
-                    roleRepo.saveAndFlush(role);
                 }
             }
+            role.setPrivileges(pSet);
+            roleRepo.saveAndFlush(role);
         }
     }
 }
