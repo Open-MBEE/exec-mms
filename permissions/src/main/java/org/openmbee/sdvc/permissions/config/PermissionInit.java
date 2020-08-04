@@ -2,6 +2,7 @@ package org.openmbee.sdvc.permissions.config;
 
 import org.openmbee.sdvc.core.config.Roles;
 import org.openmbee.sdvc.core.config.Privileges;
+import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.data.domains.global.Privilege;
 import org.openmbee.sdvc.data.domains.global.Role;
 import org.openmbee.sdvc.rdb.repositories.*;
@@ -19,6 +20,8 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
     private PrivilegeRepository privRepo;
     @Autowired
     private RoleRepository roleRepo;
+    @Autowired
+    private GroupRepository groupRepo;
 
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
@@ -60,12 +63,19 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
         for (Role role : roleList) {
             Set<Privilege> pSet = new HashSet<Privilege>();
             for (Privilege priv : privList) {
-                if (((RPmap.get(role.getName())).contains(priv.getName())) && ((role.getPrivileges() == null) || (!(role.getPrivileges().contains(priv))))) {
+                if ((RPmap.get(role.getName())).contains(priv.getName())) {
                     pSet.add(priv);
                 }
             }
             role.setPrivileges(pSet);
             roleRepo.saveAndFlush(role);
+        }
+
+        Optional<Group> evGroupIn = groupRepo.findByName("everyone");
+        if (!(evGroupIn.isPresent())) {
+            Group evGroup = new Group();
+            evGroup.setName("everyone");
+            groupRepo.saveAndFlush(evGroup);
         }
     }
 }
