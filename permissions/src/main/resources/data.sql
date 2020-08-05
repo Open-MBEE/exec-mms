@@ -17,12 +17,14 @@ INSERT INTO privileges (id, modified, created, name) VALUES
   (16, NOW(), NOW(), 'BRANCH_EDIT_CONTENT'),
   (17, NOW(), NOW(), 'BRANCH_DELETE'),
   (18, NOW(), NOW(), 'BRANCH_UPDATE_PERMISSIONS'),
-  (19, NOW(), NOW(), 'BRANCH_READ_PERMISSIONS');
+  (19, NOW(), NOW(), 'BRANCH_READ_PERMISSIONS')
+  ON CONFLICT DO NOTHING;
 
 INSERT INTO roles (id, modified, created, name) VALUES
   (0, NOW(), NOW(), 'ADMIN'),
   (1, NOW(), NOW(), 'READER'),
-  (2, NOW(), NOW(), 'WRITER');
+  (2, NOW(), NOW(), 'WRITER')
+  ON CONFLICT DO NOTHING;
 
 INSERT INTO roles_privileges (role_id, privilege_id) VALUES
   (0, 1),
@@ -63,7 +65,9 @@ INSERT INTO roles_privileges (role_id, privilege_id) VALUES
   (1, 9),
   (1, 13),
   (1, 15),
-  (1, 19);
+  (1, 19)
+  ON CONFLICT DO NOTHING;
 
 INSERT INTO groups (id, created, modified, name) VALUES
-  (0, NOW(), NOW(), 'everyone');
+  (0, NOW(), NOW(), 'everyone')
+  ON CONFLICT DO NOTHING;
