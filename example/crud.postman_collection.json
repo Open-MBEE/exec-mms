@@ -2699,7 +2699,7 @@
 			"response": []
 		},
 		{
-			"name": "add org c",
+			"name": "add org c without id",
 			"event": [
 				{
 					"listen": "test",
@@ -2722,8 +2722,8 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
