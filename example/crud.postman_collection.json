@@ -2708,10 +2708,10 @@
 						"exec": [
 							"pm.test(\"response has org c\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.orgs[0].name == 'c');",
+							"    pm.expect(jsonData.orgs[0].name).to.eql('c');",
 							"});",
 							"",
-							"pm.environment.set(\"orgIdC\", pm.response.json().orgs[1].id);"
+							"pm.environment.set(\"orgIdC\", pm.response.json().orgs[0].id);"
 						],
 						"type": "text/javascript"
 					}
@@ -2728,7 +2728,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\":,\n\t\t\t\"name\": \"c\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"name\": \"c\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/orgs",
