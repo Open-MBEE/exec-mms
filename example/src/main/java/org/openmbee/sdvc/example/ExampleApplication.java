@@ -44,4 +44,5 @@ public class ExampleApplication {
     public ArtifactStorage getArtifactStorage() {
         return new InMemoryArtifactStorage();
     }
+    
 }
