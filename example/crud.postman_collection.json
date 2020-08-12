@@ -2676,7 +2676,13 @@
 			],
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n  \"projects\": [\r\n    {\r\n      \"orgId\": \"a\",\r\n      \"name\": \"string\",\r\n      \"id\": \"string\",\r\n      \"schema\":\"invalid\"\r\n    }\r\n  ]\r\n}",
@@ -2748,25 +2754,17 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8e150fd0-a9f5-4b88-894b-814a886690d7",
+						"id": "8d61501e-4a5b-4a71-9f1d-ad00c75893bd",
 						"exec": [
-							"pm.test(\"response has at least 2 orgs\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.orgs.length).to.be.at.least(2);",
-							"});",
-							"",
 							"pm.test(\"org id number is right\", function() {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.orgs[1].id).to.eql(pm.environment.get(\"orgIdC\"))",
+							"    pm.expect(jsonData.orgs[0].id).to.eql(pm.environment.get(\"orgIdC\"))",
 							"})"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"method": "GET",
 				"header": [
@@ -2776,17 +2774,14 @@
 						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "{{host}}/orgs",
+					"raw": "{{host}}/orgs/{{orgIdC}}",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						"orgs"
+						"orgs",
+						"{{orgIdC}}"
 					]
 				}
 			},
