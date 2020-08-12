@@ -1,8 +1,3 @@
-apply plugin: 'java-library'
-apply plugin: 'io.spring.dependency-management'
-
-Map<String, String> commonDependencies = rootProject.ext.commonDependencies
-
 dependencies {
     implementation project(':core')
     implementation project(':search')
