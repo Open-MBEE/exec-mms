@@ -7,10 +7,18 @@ import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.openmbee.sdvc.artifacts.storage.ArtifactStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
+import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @SpringBootApplication(scanBasePackages = "org.openmbee")
 @OpenAPIDefinition(
@@ -39,6 +47,7 @@ public class ExampleApplication {
     public static void main(String[] args) {
         SpringApplication.run(ExampleApplication.class, args);
     }
+
     @Bean
     public CommonsRequestLoggingFilter logFilter() {
         CommonsRequestLoggingFilter filter
@@ -50,6 +59,29 @@ public class ExampleApplication {
         filter.setAfterMessagePrefix("REQUEST DATA : ");
         return filter;
     }
+
+    @Component
+    @WebFilter("/*")
+    public class ResponseFilter implements Filter {
+        private final Logger LOGGER = LoggerFactory.getLogger(ResponseFilter.class);
+        @Override
+        public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+            long time = System.currentTimeMillis();
+            HttpServletResponseCopier responseCopier = new HttpServletResponseCopier((HttpServletResponse) resp);
+
+            try {
+                chain.doFilter(req, responseCopier);
+                responseCopier.flushBuffer();
+
+            } finally {
+                byte[] copy = responseCopier.getCopy();
+                time = System.currentTimeMillis() - time;
+                LOGGER.info("{}: {} ms ", ((HttpServletRequest) req).getRequestURI(),  time);
+                LOGGER.info(new String(copy, resp.getCharacterEncoding()));
+            }
+        }
+    }
+
     //TODO: remove. This is just for testing until the real open source implementation is done.
     @Bean
     public ArtifactStorage getArtifactStorage() {
