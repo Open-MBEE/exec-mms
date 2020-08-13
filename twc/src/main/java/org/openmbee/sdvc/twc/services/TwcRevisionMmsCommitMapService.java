@@ -50,7 +50,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
                 throw new NotFoundException(commitsResponse);
             }
         } catch (Exception exception) {
-            logger.error("Error occurred while associating commit ID and Twc Revision", exception.getMessage());
+            logger.error("Error occurred while associating commit ID and Twc Revision: " + exception.getMessage());
             throw new InternalErrorException(exception);
         }
         return commitsResponse;
@@ -91,7 +91,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
             }
             return commits;
         } catch (Exception exception) {
-            logger.error("Error occurred while getting Twc Revision", exception.getMessage());
+            logger.error("Error occurred while getting Twc Revision: " + exception.getMessage());
             throw new InternalErrorException(exception);
         }
     }
@@ -113,7 +113,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
                 Date d2 = Formats.SDF.parse((String) t1.get(CommitJson.CREATED));
                 return ascending ? d1.compareTo(d2) : d2.compareTo(d1);
             } catch (ParseException e) {
-                logger.error("Error parsing commit dates", e.getMessage());
+                logger.error("Error parsing commit dates: " + e.getMessage());
                 throw new InternalErrorException("Invalid commit created dates.");
             }
         }
