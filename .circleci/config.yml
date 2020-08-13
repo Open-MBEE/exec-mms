@@ -36,7 +36,6 @@ jobs:
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/jupyter.postman_collection.json -e /tst/test-env.json --delay-request 300
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/authentication.postman_collection.json -e /tst/test-env.json --delay-request 300
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/permissions.postman_collection.json -e /tst/test-env.json --delay-request 300
-            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/artifacts.postman_collection.json -e /tst/test-env.json --delay-request 300
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/search.postman_collection.json -e /tst/test-env.json --delay-request 300
 
 
