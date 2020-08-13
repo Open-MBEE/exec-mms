@@ -38,6 +38,7 @@ public class VeController extends BaseController {
     public MountsResponse getMounts(
         @PathVariable String projectId,
         @PathVariable String refId,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         MountJson json = cameoViewService
@@ -52,6 +53,7 @@ public class VeController extends BaseController {
     public DocumentsResponse getDocuments(
         @PathVariable String projectId,
         @PathVariable String refId,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse docs = cameoViewService.getDocuments(projectId, refId, params);
@@ -64,6 +66,7 @@ public class VeController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String viewId,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse res = cameoViewService.getView(projectId, refId, viewId, params);
@@ -77,6 +80,7 @@ public class VeController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         return cameoViewService.getViews(projectId, refId, req, params);
@@ -88,6 +92,7 @@ public class VeController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
+        @RequestParam(required = false) String overwrite,
         @RequestParam(required = false) Map<String, String> params,
         @Parameter(hidden = true) Authentication auth) {
 

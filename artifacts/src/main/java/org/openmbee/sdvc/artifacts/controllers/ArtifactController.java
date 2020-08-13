@@ -6,7 +6,6 @@ import org.openmbee.sdvc.artifacts.objects.ArtifactResponse;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.artifacts.service.ArtifactService;
-import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.print.attribute.standard.Media;
 import java.util.Map;
 
 @RestController

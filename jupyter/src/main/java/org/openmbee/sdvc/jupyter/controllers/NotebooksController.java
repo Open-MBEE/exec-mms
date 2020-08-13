@@ -80,6 +80,7 @@ public class NotebooksController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody NotebooksRequest req,
+        @RequestParam(required = false) String overwrite,
         @RequestParam(required = false) Map<String, String> params,
         @Parameter(hidden = true) Authentication auth) {
 
