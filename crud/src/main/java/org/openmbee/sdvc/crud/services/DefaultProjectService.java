@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class DefaultProjectService implements ProjectService {
     protected ProjectIndex projectIndex;
     protected BranchDAO branchRepository;
     protected BranchIndexDAO branchIndex;
-    protected Optional<EventService> eventPublisher;
+    protected Collection<EventService> eventPublisher;
 
     @Autowired
     public void setProjectRepository(ProjectDAO projectRepository) {
@@ -66,7 +67,7 @@ public class DefaultProjectService implements ProjectService {
     }
 
     @Autowired
-    public void setEventPublisher(Optional<EventService> eventPublisher) {
+    public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -120,7 +121,7 @@ public class DefaultProjectService implements ProjectService {
                 branchIndex.index(branchJson);
             }
 
-            eventPublisher.ifPresent((pub) -> pub.publish(
+            eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(project.getId(), "master", "project_created", project)));
             return project;
         } catch (Exception e) {

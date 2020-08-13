@@ -1,4 +1,4 @@
-package org.openmbee.sdvc.webhooks.services;
+package org.openmbee.sdvc.core.pubsub;
 
 import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.EventService;
@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
-public class WebhookEventService implements EventService {
+public class DefaultEventService implements EventService {
 
     private ApplicationEventPublisher applicationEventPublisher;
 

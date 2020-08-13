@@ -44,7 +44,7 @@ public class DefaultNodeService implements NodeService {
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
 
-    protected Optional<EventService> eventPublisher;
+    protected Collection<EventService> eventPublisher;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -82,7 +82,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
-    public void setEventPublisher(Optional<EventService> eventPublisher) {
+    public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -180,7 +180,7 @@ public class DefaultNodeService implements NodeService {
             this.commitIndex.index(cmjs);
             this.commitRepository.save(commit);
 
-            eventPublisher.ifPresent((pub) -> pub.publish(
+            eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));
         }
     }

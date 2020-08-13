@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -50,7 +51,7 @@ public class DefaultBranchService implements BranchService {
 
     private NodeIndexDAO nodeIndex;
 
-    protected Optional<EventService> eventPublisher;
+    protected Collection<EventService> eventPublisher;
 
     @Autowired
     public void setBranchRepository(BranchDAO branchRepository) {
@@ -83,7 +84,7 @@ public class DefaultBranchService implements BranchService {
     }
 
     @Autowired
-    public void setEventPublisher(Optional<EventService> eventPublisher) {
+    public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -178,7 +179,7 @@ public class DefaultBranchService implements BranchService {
                 docIds.add(n.getDocId());
             }
             nodeIndex.addToRef(docIds);
-            eventPublisher.ifPresent((pub) -> pub.publish(
+            eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(projectId, branch.getId(), "branch_created", branch)));
             return branch;
         } catch (Exception e) {
