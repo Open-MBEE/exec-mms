@@ -56,6 +56,7 @@ public class ArtifactController extends BaseController {
         @PathVariable String refId,
         @PathVariable String elementId,
         @PathVariable String extension,
+        @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         params.put(ArtifactConstants.EXTENSION_PARAM, extension);
@@ -72,6 +73,7 @@ public class ArtifactController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
+        @RequestParam(required = false) String commitId,
         @RequestHeader(value = "Accept") String acceptHeader,
         @RequestParam(required = false) Map<String, String> params) {
 
