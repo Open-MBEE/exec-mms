@@ -11,7 +11,6 @@ import org.springframework.context.annotation.PropertySource;
 import java.util.List;
 
 @Configuration
-@PropertySource("classpath:application.properties")
 @ConfigurationProperties("twc")
 public class TwcConfig {
 

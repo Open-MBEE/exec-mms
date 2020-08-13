@@ -1,10 +1,10 @@
 package org.openmbee.sdvc.webhooks.components;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.dao.WebhookDAO;
 import org.openmbee.sdvc.data.domains.global.Webhook;
 import org.openmbee.sdvc.core.objects.EventObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @Component
 public class EventListener implements ApplicationListener<EventObject> {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${webhook.default.all:#{null}}")
     private Optional<String> allEvents;

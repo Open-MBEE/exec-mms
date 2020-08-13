@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -23,8 +22,9 @@ import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.data.domains.scoped.NodeType;
 import org.openmbee.sdvc.rdb.datasources.CrudDataSources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -39,7 +39,7 @@ public class DatabaseDefinitionService {
 
     private static final String INITIAL_REF = "INSERT INTO branches (id, branchid, branchname, tag, deleted, timestamp) VALUES (0, 'master', 'master', false, false, NOW());";
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private CrudDataSources crudDataSources;
     private Environment env;
 
