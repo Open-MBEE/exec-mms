@@ -23,6 +23,7 @@ ext {
         'servlet-api'                   : 'javax.servlet:javax.servlet-api:4.0.1',
         'log4j'                         : "org.apache.logging.log4j:log4j-core:$log4jVersion",
         'log4j-api'                     : "org.apache.logging.log4j:log4j-api:$log4jVersion",
+        'slf4j-api'                     : 'org.slf4j:slf4j-api:1.7.30',
         'spring-boot'                   : "org.springframework.boot:spring-boot:$springBootVersion",
         'spring-security-core'          : "org.springframework.security:spring-security-core:$springSecurityVersion",
         'spring-security-config'        : "org.springframework.security:spring-security-config:$springSecurityVersion",

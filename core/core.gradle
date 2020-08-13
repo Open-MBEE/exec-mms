@@ -5,8 +5,7 @@ dependencies {
     api commonDependencies.'spring-security-config'
     api commonDependencies.'spring-webmvc'
     api commonDependencies.'spring-tx'
-    api commonDependencies.'log4j'
-    api commonDependencies.'log4j-api'
+    api commonDependencies.'slf4j-api'
     api commonDependencies.'swagger-annotations'
     implementation commonDependencies.'servlet-api'
 

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import javax.crypto.SecretKey;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,7 +30,7 @@ public class JwtTokenGenerator implements Serializable {
     private static final String CLAIM_KEY_CREATED = "created";
     private static final String CLAIM_KEY_ENABLED = "enabled";
     private static final String CLAIM_KEY_AUTHORITIES = "authorities";
-    static Logger logger = LogManager.getLogger(JwtTokenGenerator.class);
+    static Logger logger = LoggerFactory.getLogger(JwtTokenGenerator.class);
     @Value("${jwt.secret}")
     private String secret;
 

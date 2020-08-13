@@ -3,9 +3,9 @@ package org.openmbee.sdvc.permissions;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
+import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.security.MethodSecurityService;
-import org.openmbee.sdvc.permissions.exceptions.PermissionException;
 import org.openmbee.sdvc.permissions.objects.PermissionLookup;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupRequest;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupResponse;
@@ -58,7 +58,7 @@ public class PermissionsLookupController {
                 if (!result) {
                     res.setAllPassed(false);
                 }
-            } catch (PermissionException e) {
+            } catch (SdvcException e) {
                 res.addRejection(new Rejection(lookup, e.getCode().value(), e.getMessage()));
                 res.setAllPassed(false);
             }

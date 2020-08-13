@@ -1,13 +1,14 @@
 package org.openmbee.sdvc.ldap;
 
 import java.util.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.data.domains.global.Group;
 import org.openmbee.sdvc.rdb.repositories.GroupRepository;
 import org.openmbee.sdvc.rdb.repositories.UserRepository;
 import org.openmbee.sdvc.data.domains.global.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,11 +28,10 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@PropertySource("classpath:application.properties")
 @EnableTransactionManagement
 public class LdapSecurityConfig {
 
-    private static Logger logger = LogManager.getLogger(LdapSecurityConfig.class);
+    private static Logger logger = LoggerFactory.getLogger(LdapSecurityConfig.class);
 
     @Value("${ldap.provider.url}")
     private String providerUrl;

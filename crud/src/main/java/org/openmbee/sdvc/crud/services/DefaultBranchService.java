@@ -1,11 +1,11 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Formats;
@@ -26,6 +26,8 @@ import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.RefJson;
 import org.openmbee.sdvc.core.dao.CommitDAO;
 import org.openmbee.sdvc.core.dao.NodeDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +37,7 @@ import java.util.Optional;
 
 @Service
 public class DefaultBranchService implements BranchService {
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private BranchDAO branchRepository;
 
@@ -49,7 +51,7 @@ public class DefaultBranchService implements BranchService {
 
     private NodeIndexDAO nodeIndex;
 
-    protected Optional<EventService> eventPublisher;
+    protected Collection<EventService> eventPublisher;
 
     @Autowired
     public void setBranchRepository(BranchDAO branchRepository) {
@@ -82,7 +84,7 @@ public class DefaultBranchService implements BranchService {
     }
 
     @Autowired
-    public void setEventPublisher(Optional<EventService> eventPublisher) {
+    public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -177,7 +179,7 @@ public class DefaultBranchService implements BranchService {
                 docIds.add(n.getDocId());
             }
             nodeIndex.addToRef(docIds);
-            eventPublisher.ifPresent((pub) -> pub.publish(
+            eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(projectId, branch.getId(), "branch_created", branch)));
             return branch;
         } catch (Exception e) {
