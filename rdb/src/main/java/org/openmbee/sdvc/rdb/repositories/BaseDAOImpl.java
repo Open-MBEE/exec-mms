@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.rdb.repositories;
 
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.config.ContextObject;
 import org.openmbee.sdvc.rdb.datasources.CrudDataSources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +33,7 @@ public abstract class BaseDAOImpl {
     }
 
     public String getSuffix() {
-        return ContextHolder.getContext().getDbTableSuffix();
+        String refId = ContextHolder.getContext().getBranchId();
+        return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
     }
 }

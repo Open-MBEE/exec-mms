@@ -6,6 +6,7 @@ import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.config.ContextObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,8 @@ public class SuffixedPhysicalNamingStrategy implements PhysicalNamingStrategy {
 
     @Override
     public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
-        String refId = ContextHolder.getContext().getDbTableSuffix();
+        String refId = ContextHolder.getContext().getBranchId();
+        refId = refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
         return new Identifier(compoundKey(name.getText(), refId), name.isQuoted());
     }
 
