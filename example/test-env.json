@@ -1,0 +1,10 @@
+{
+    "values": [
+        {"key": "host", "value": "http://mms:8080"},
+        {"key": "adminUsername", "value": "test"},
+        {"key": "adminPassword", "value": "test"},
+        {"key": "ldapGroup", "value": "ldapGroup"},
+        {"key": "ldapUser", "value": "ldapUser"},
+        {"key": "ldapPass", "value": "ldapPass"}
+    ]
+}

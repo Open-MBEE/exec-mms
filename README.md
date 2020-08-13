@@ -3,10 +3,22 @@
 
 The MMS SDVC is a collection of modules built on top of the Spring Framework and is a part of Open-MBEE. For more information about Open-MBEE, visit the [Open-MBEE Website](https://openmbee.org/)
 
+## Quick Start
+### Docker
+Installation instructions are found here: [Docker documentation](https://docs.docker.com/)
+
+1. Copy the example properties file in `example/src/main/resources/` as `application.properties`
+1. In the command line, run `docker-compose up --build` to create and start all the services from the configuration. 
+1. Swagger ui at [http://localhost:8080/v3/swagger-ui.html](http://localhost:8080/v3/swagger-ui.html)
+1. Use the command `docker-compose down` to stop any containers from running and to remove the containers, networks, and images created by the `docker-compose up` command. This command should always be done before any new attempts to restart the services from the configuration. 
+
 ## Developer Setup for example project
 ### Docker 
 We suggest using Docker to set up PostgreSQL and Elasticsearch.  Installation 
 instructions are found here: [Docker documentation](https://docs.docker.com/)
+
+### Java SE Development Kit 11
+Installation instructions: [JDK-11 download](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 
 ### Postgresql
 Install postgres (PostgreSQL) 9.6, instructions for Docker: [PostgreSQL with Docker](https://hub.docker.com/_/postgres)
@@ -22,6 +34,7 @@ Install postgres (PostgreSQL) 9.6, instructions for Docker: [PostgreSQL with Doc
 Install Elasticsearch 7.1.  If you use Docker instructions are available here: [Setting up Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
 
     docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.1.1
+    
     
 ### IntelliJ IDEA
 
@@ -49,7 +62,7 @@ See README in /example
 
 ## Contributing
 
-To learn how you can get involved in a variety of ways, please see [Contibuting to OpenMBEE](https://www.openmbee.org/contribute).
+To learn how you can get involved in a variety of ways, please see [Contributing to OpenMBEE](https://www.openmbee.org/contribute).
 
 ## Versioning
 
