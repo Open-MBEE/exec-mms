@@ -19,11 +19,11 @@ public class BranchGDAOImpl implements BranchGDAO {
     @Override
     public Optional<Branch> findByProject_ProjectIdAndBranchId(
         String projectId, String branchId) {
-        return Optional.empty();
+        return branchRepository.findByProject_ProjectIdAndBranchId(projectId, branchId);
     }
 
     @Override
     public Branch save(Branch branch) {
-        return null;
+        return branchRepository.save(branch);
     }
 }
