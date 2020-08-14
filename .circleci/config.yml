@@ -68,12 +68,15 @@ workflows:
     build-test-deploy:
       jobs:
         - build_and_test
+              filters:
+                  tags:
+                      only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
         - deploy_snapshot:
               requires:
                   - build_and_test
               filters:
                   branches:
-                      only: /((release|hotfix|support)/[0-9.]+(-(a|b|rc)[0-9]+)?|master|develop)/
+                      only: /((release|hotfix|support)/[0-9.]+(-(a|b|rc)[0-9]+)?|develop)/
         - deploy_release:
               requires:
                   - build_and_test
