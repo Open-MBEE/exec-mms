@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "fdddbcd1-78bb-475b-967a-eb4f148bfd7f",
+		"_postman_id": "8e02bf5a-3000-415b-ab0c-a335f8c3ce4f",
 		"name": "crud",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f8549a6d-6c1b-44c9-925e-5111a2074509",
+						"id": "dbfb2f53-bbfa-47d5-babc-9a90ca4777a7",
 						"exec": [
 							"",
 							"pm.test(\"Status code is 200\", function () {",
@@ -67,7 +67,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5a80c156-c5df-4ba9-9afd-65ab7e6c0d10",
+						"id": "f073480c-1c23-4aaa-aeee-098e496b532f",
 						"exec": [
 							"pm.test(\"response has org a\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -109,7 +109,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ece8a0c4-3c55-42db-b0c8-68752373e71d",
+						"id": "d9e35dd4-e07f-4615-8c9e-51aee30f3520",
 						"exec": [
 							"pm.test(\"response has at least 1 org\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -154,7 +154,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "329e65e4-272b-4213-85d0-eac3f93a24f6",
+						"id": "65fe78d4-bc2d-452c-a398-5034ee07171b",
 						"exec": [
 							"pm.test(\"response has project aa\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -196,7 +196,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "923b8fb6-4183-4187-8fc8-b22d54eddb37",
+						"id": "1c6e1ab4-9293-4046-974f-b408e4fac79f",
 						"exec": [
 							"pm.test(\"Status code is 400\", function () {",
 							"    pm.response.to.have.status(400);",
@@ -237,7 +237,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "02e550aa-5cfa-4f63-9a52-f4cf85ee0269",
+						"id": "d38a254c-8415-460b-b98b-9c6f8de91c84",
 						"exec": [
 							"pm.test(\"response has at least 1 project\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -282,7 +282,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f63b245a-3dfc-4888-b4fa-c3a71f46706f",
+						"id": "83464769-8f32-4e9d-9849-4cc30a73f3a1",
 						"exec": [
 							"pm.test(\"response has project aa\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -324,7 +324,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4bc305da-da10-4f86-b5de-799c679861c7",
+						"id": "c85f0a65-1bb2-4d9b-b24a-96cc1f72d3cd",
 						"exec": [
 							"pm.test(\"response has project aa with extra field\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -370,7 +370,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8406a1d0-a871-4653-b8bc-7ce3abf72792",
+						"id": "8ed5b157-3676-4a07-ba30-3e96d1328cd8",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -418,7 +418,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "23800f47-0ef1-49b9-aed2-a4e21aa6923e",
+						"id": "f038705f-9fa3-4f84-9952-044fc0fc42fb",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -466,7 +466,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "bef898ac-41f0-4cca-94c1-b160271314b2",
+						"id": "b48194cb-ed8e-43e4-81cf-918587d2bd4a",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -514,7 +514,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e7d1e32b-c0cd-4f03-8442-b69c9f7482b4",
+						"id": "aaea2c03-c5b9-47c0-bfa4-3d33bdb3257f",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -562,7 +562,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b45d2c56-fbc1-4af4-9b49-19d154aa7ea0",
+						"id": "b1e71fd7-e309-4be4-a050-a26636e36009",
 						"exec": [
 							"pm.test(\"response has 4 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -608,7 +608,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e1e31f0c-0b67-4b10-87b0-a2d9ef2b6e1e",
+						"id": "92241556-c482-4ee7-8ea2-bdbb8125f9d5",
 						"exec": [
 							"pm.test(\"response has 3 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -655,7 +655,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4e29138c-54c1-4c2b-a9b4-d591e73b0687",
+						"id": "ad6e9548-d53e-4d6f-a5d7-4b308bcc129f",
 						"exec": [
 							"pm.test(\"response has 2 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -701,7 +701,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d059475b-01b7-447a-841f-71ef4762465a",
+						"id": "fb4ae3f4-b1a5-4781-82ae-9393c3a8de2e",
 						"exec": [
 							"pm.test(\"response has 2 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -746,7 +746,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c539cd73-d474-4afc-970c-2e2bdc3a8c84",
+						"id": "990ae0d1-e50d-4f42-af50-04031812cbfa",
 						"exec": [
 							"pm.test(\"first commit has 3 added\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -781,7 +781,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "12d4fccf-a254-44d7-8ccb-15578ac0b130",
+						"id": "2bae385e-0899-4964-8bb8-8b87ee9028b8",
 						"exec": [
 							"pm.test(\"elements have expected names\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -844,7 +844,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ef77e81f-062f-46d0-b37c-1c35332da1d3",
+						"id": "398710ed-d623-4bc4-90d0-43cb1cbf3b7f",
 						"exec": [
 							"pm.test(\"branch created with right parentRef and commit id\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -890,7 +890,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "62236b2c-c8f5-446b-8bc4-2e133be2cb2f",
+						"id": "14fae161-cef8-4d2a-a84d-9ddbd336f028",
 						"exec": [
 							"pm.test(\"branch refa has extraField\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -939,7 +939,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "fb90e37b-619e-4ee6-99aa-4ccfac1fd431",
+						"id": "8d061063-cdf8-4047-825d-13de7cfa3305",
 						"exec": [
 							"pm.test(\"Status code is 400\", function () {",
 							"    pm.response.to.have.status(400);",
@@ -982,7 +982,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "55278a54-dae2-457f-8bd3-3a86fb6a7b70",
+						"id": "e01f95cd-158b-4dac-960f-9281fba667dc",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1025,7 +1025,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f530d376-8d79-4a4e-a927-7cee16d560a1",
+						"id": "74de6b67-421d-4019-93c4-878329978ff4",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1068,7 +1068,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "80e4d103-9c3c-431f-b5bb-2b48d774cd83",
+						"id": "04cd8667-aa37-47a8-92a2-49f66e7d9a8a",
 						"exec": [
 							"pm.test(\"elements in new ref have right _inRefIds\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1106,7 +1106,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "38d5c674-ce11-4721-8927-21a8a336d103",
+						"id": "2028325c-3441-4420-b725-86af2cbdc79b",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1154,7 +1154,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e62d3d43-eacd-409f-82e8-bf9e87c7c10b",
+						"id": "3d3133fe-66e4-4b9b-9741-ddedbe4e1003",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1202,7 +1202,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "1c0729c5-daa2-411b-9582-0f953f0cca96",
+						"id": "6ac4b958-5f84-40b0-929a-2b3179f95ee8",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1250,7 +1250,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a8d96814-0c96-4691-ab15-ff2b413541a0",
+						"id": "cb0c483b-c528-4933-926d-0bc2e930be57",
 						"exec": [
 							"pm.test(\"response has 5 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1296,7 +1296,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "82290c8e-b39d-4f66-8642-037054c9d954",
+						"id": "9a67f4a3-298d-44f1-89c9-f1b29fa1c55c",
 						"exec": [
 							"pm.test(\"response has 6 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1343,7 +1343,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "fa4c5c81-836d-4fb7-accb-6fff960104f1",
+						"id": "d1e3946a-9058-4caf-888a-543ce9ff2c88",
 						"exec": [
 							"pm.test(\"response has 3 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1391,7 +1391,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "40cea579-3c72-49ec-810d-c97748f7c602",
+						"id": "29d6e0c3-d8a4-4ff3-a096-73de2d94c2a3",
 						"exec": [
 							"pm.test(\"response has 3 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1438,7 +1438,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9e392aae-f5e2-466c-aff8-140324e140d3",
+						"id": "48a6aabe-0b4f-436f-b8fd-334597e7110a",
 						"exec": [
 							"pm.test(\"response has 3 commits\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1484,7 +1484,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "372fcc3e-8151-444d-b925-c298043f7a65",
+						"id": "69c1a087-5273-469c-bd19-d038817f95eb",
 						"exec": [
 							"pm.test(\"has 4 results\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1530,7 +1530,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a10acd56-ba0e-49cc-a154-7c3a9a794e7e",
+						"id": "dae17393-f0da-48b5-bc49-b6dde9151c8f",
 						"exec": [
 							"pm.test(\"has 4 results\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1579,7 +1579,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "118b1894-cc6a-41c9-937f-e8750a032937",
+						"id": "5c73171a-a892-4291-981d-7f39c95c46cc",
 						"exec": [
 							"pm.test(\"has 3 results and 1 rejected\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1626,7 +1626,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f3969545-c3b4-4bd3-9aaa-f27da008b4cd",
+						"id": "3ef20d32-b272-4ae8-a676-70031989aeb1",
 						"exec": [
 							"pm.test(\"has 3 results and 2 rejected\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1679,7 +1679,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3b8b0879-4c80-4307-a366-f8d51ebc40e6",
+						"id": "f668d836-927a-4d6f-8b5d-68f11993cda8",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1719,7 +1719,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "21a90484-af51-4524-9268-7f65c9054e0e",
+						"id": "7d719d00-20a4-4995-96ba-e9ee80b7ef8e",
 						"exec": [
 							"pm.test(\"Status code is 410\", function () {",
 							"    pm.response.to.have.status(410);",
@@ -1755,7 +1755,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "582b1ca5-9339-4f2b-b5d0-43f2deb72b3c",
+						"id": "c986e214-b56c-4c3b-a722-2b1455d79cad",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1805,7 +1805,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "75b9215a-f2ad-4630-932c-0c5e03d86d1a",
+						"id": "3b63c7ed-aae2-4b5c-b91e-f303e0f6c0a6",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1859,7 +1859,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "abae1493-65ea-48c1-9f45-e02b81225b4d",
+						"id": "3d593715-5bb2-4899-94e4-5fa40188752f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1904,7 +1904,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f1aacca5-9e2f-486a-9853-81ebb369c7cb",
+						"id": "e53eec76-449c-42e5-a3ed-fdaf67de66ee",
 						"exec": [
 							"pm.test(\"response has org a\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1946,7 +1946,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7e36355c-73ef-4fa3-834e-f9db764f83d7",
+						"id": "12411399-f102-48e9-bb43-e5cd63015042",
 						"exec": [
 							"pm.test(\"response has project cc\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1988,7 +1988,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ed49207a-9ae4-4007-bc70-b67ad935d8d3",
+						"id": "4692feff-c75a-413b-8033-f5487311e95d",
 						"exec": [
 							"",
 							"pm.test(\"Status code is 400, cannot make branch in empty project\", function () {",
@@ -2032,7 +2032,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d36d99cd-fbe6-4c92-87b6-e1f0eb56bbce",
+						"id": "a78e7d6d-4580-4399-9d1b-85eb303eca9d",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2077,7 +2077,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0325ce9e-c30e-477f-aab9-d8758634e65b",
+						"id": "f8273c73-8fa3-4585-8551-f2c964273b3d",
 						"exec": [
 							"pm.test(\"branch created\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2121,7 +2121,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7b6de5b0-b034-409b-80ea-df66f0b19d1d",
+						"id": "c50d7b7f-86ed-4b5b-b3b5-a41948a6fe79",
 						"exec": [
 							"pm.test(\"branch deleted\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2160,7 +2160,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "77399dc3-4050-45a3-8294-f8260a1ae75d",
+						"id": "a1e52fdb-14d9-41d8-83ed-c9a5070de30e",
 						"exec": [
 							"  ",
 							"pm.test(\"Status code is 410\", function () {",
@@ -2203,7 +2203,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7a86176a-3184-4006-a0a3-569b2bb17846",
+						"id": "bac1fdf5-508c-41e0-a2f3-b795e2d2d6bd",
 						"exec": [
 							"",
 							"pm.test(\"Status code is 400\", function () {",
@@ -2243,7 +2243,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "abb3c9ed-1253-4995-ae55-4ee7c844e306",
+						"id": "81bb85c3-a7e3-4daa-ad34-1ce5aec8cbba",
 						"exec": [
 							"pm.test(\"project soft deleted\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2280,7 +2280,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "04fa8662-a1f1-432a-b72b-d4dd88b5b1aa",
+						"id": "9c1f9bc9-7c38-4873-8e56-9a6fc1681b18",
 						"exec": [
 							"pm.test(\"Status code is 410\", function () {",
 							"    pm.response.to.have.status(410);",
@@ -2319,7 +2319,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2e6f3ffe-79bb-4590-8641-7b89e5862647",
+						"id": "5cf493af-d755-4f9a-bb8b-bcf20f91e798",
 						"exec": [
 							"pm.test(\"Status code is 400, org not empty\", function () {",
 							"    pm.response.to.have.status(400);",
@@ -2355,7 +2355,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "71465b31-1ae9-4ef8-a169-e840cf121fed",
+						"id": "51d5bbf9-a7a6-45f1-ac66-93559a5535fe",
 						"exec": [
 							"pm.test(\"project hard deleted\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2398,7 +2398,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b1bc086e-0f1e-4b6f-9800-9310faa52d70",
+						"id": "ed3a7b66-e2f3-4735-b9e5-385e4ead5465",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2434,7 +2434,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2ae4761f-aed4-46d5-80f7-47549b65bbab",
+						"id": "66d102a3-2cc6-48f4-a6ee-42fc89678bc9",
 						"exec": [
 							"pm.test(\"Status code is 404\", function () {",
 							"    pm.response.to.have.status(404);",
@@ -2473,7 +2473,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "856ecf73-3d3a-4255-a5df-f388a1e41af8",
+						"id": "dc488e17-b18e-40a3-8279-5901275c4921",
 						"exec": [
 							"pm.test(\"webhook created with returned id\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2519,7 +2519,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "15105a63-b92e-411c-a281-0314518a2d1d",
+						"id": "23f4cdb6-304e-4694-8e53-6d308d1dc18e",
 						"exec": [
 							"pm.test(\"project aa has one webhook\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2569,7 +2569,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "012f9790-38f0-477d-ac49-a4e68a2695bf",
+						"id": "d456cf25-a811-407d-a49a-a2f70627a627",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2615,7 +2615,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b430f618-c108-483a-ac70-aeaac672a376",
+						"id": "6028196d-12f0-4516-8d7d-23c6e6d69b14",
 						"exec": [
 							"pm.test(\"project aa has no webhooks\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2664,7 +2664,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6f21622a-a837-44c9-8823-a82279030fd2",
+						"id": "60d8f8d3-c1b8-4d72-8cdd-3c804cbf3745",
 						"exec": [
 							"pm.test(\"Status code is 400\", function () {\r",
 							"    pm.response.to.have.status(400);\r",
@@ -2676,7 +2676,13 @@
 			],
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n  \"projects\": [\r\n    {\r\n      \"orgId\": \"a\",\r\n      \"name\": \"string\",\r\n      \"id\": \"string\",\r\n      \"schema\":\"invalid\"\r\n    }\r\n  ]\r\n}",
@@ -2697,6 +2703,89 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "add org c without id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "10fccefe-0118-4aee-8753-b09e3605b255",
+						"exec": [
+							"pm.test(\"response has org c\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].name).to.eql('c');",
+							"});",
+							"",
+							"pm.environment.set(\"orgIdC\", pm.response.json().orgs[0].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"name\": \"c\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get org c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8d61501e-4a5b-4a71-9f1d-ad00c75893bd",
+						"exec": [
+							"pm.test(\"org id number is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql(pm.environment.get(\"orgIdC\"))",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/orgs/{{orgIdC}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs",
+						"{{orgIdC}}"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -2713,7 +2802,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "0bdda746-83ff-4d2e-9c48-87f493ad63c6",
+				"id": "3a55851b-68ec-459b-a55e-d8c0c6470d05",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -2723,7 +2812,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "25cd1aee-336b-4efb-9265-54cdd8f6138f",
+				"id": "7997e11d-0bd7-4e0e-a3ac-486d9ff9b5fe",
 				"type": "text/javascript",
 				"exec": [
 					""

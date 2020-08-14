@@ -1,13 +1,10 @@
 package org.openmbee.sdvc.example.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.authenticator.config.AuthSecurityConfig;
 import org.openmbee.sdvc.twc.config.TwcAuthSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,15 +26,12 @@ import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpMethod.*;
 
 @Configuration
-@PropertySource("classpath:application.properties")
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
 @EnableAsync
 public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implements
     WebMvcConfigurer {
-
-    private static Logger logger = LogManager.getLogger(ExampleSecurityConfig.class);
 
     @Autowired
     AuthSecurityConfig authSecurityConfig;

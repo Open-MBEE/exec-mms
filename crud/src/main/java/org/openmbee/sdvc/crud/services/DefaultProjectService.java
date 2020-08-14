@@ -1,10 +1,10 @@
 package org.openmbee.sdvc.crud.services;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Formats;
@@ -25,19 +25,21 @@ import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.json.RefJson;
 import org.openmbee.sdvc.json.RefType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("defaultProjectService")
 public class DefaultProjectService implements ProjectService {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected ProjectDAO projectRepository;
     protected OrgDAO orgRepository;
     protected ProjectIndex projectIndex;
     protected BranchDAO branchRepository;
     protected BranchIndexDAO branchIndex;
-    protected Optional<EventService> eventPublisher;
+    protected Collection<EventService> eventPublisher;
 
     @Autowired
     public void setProjectRepository(ProjectDAO projectRepository) {
@@ -65,7 +67,7 @@ public class DefaultProjectService implements ProjectService {
     }
 
     @Autowired
-    public void setEventPublisher(Optional<EventService> eventPublisher) {
+    public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -119,12 +121,11 @@ public class DefaultProjectService implements ProjectService {
                 branchIndex.index(branchJson);
             }
 
-            eventPublisher.ifPresent((pub) -> pub.publish(
+            eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(project.getId(), "master", "project_created", project)));
             return project;
         } catch (Exception e) {
-            logger.error("Couldn't create project: {}", project.getProjectId());
-            logger.error(e);
+            logger.error("Couldn't create project: {}", project.getProjectId(), e);
         }
         throw new InternalErrorException("Could not create project");
     }

@@ -1,37 +1,37 @@
-package org.openmbee.sdvc.permissions;
+package org.openmbee.sdvc.core.services;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.openmbee.sdvc.core.builders.PermissionUpdateResponseBuilder;
 import org.openmbee.sdvc.core.builders.PermissionUpdatesResponseBuilder;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
 import org.openmbee.sdvc.core.config.Constants;
+import org.openmbee.sdvc.core.dao.BranchGDAO;
+import org.openmbee.sdvc.core.dao.OrgDAO;
+import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.delegation.PermissionsDelegateFactory;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.objects.PermissionResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdateRequest;
 import org.openmbee.sdvc.core.objects.PermissionUpdateResponse;
 import org.openmbee.sdvc.core.objects.PermissionUpdatesResponse;
-import org.openmbee.sdvc.core.services.PermissionService;
 import org.openmbee.sdvc.data.domains.global.Branch;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.core.delegation.PermissionsDelegate;
-import org.openmbee.sdvc.permissions.exceptions.PermissionException;
-import org.openmbee.sdvc.rdb.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("defaultPermissionService")
 public class DefaultPermissionService implements PermissionService {
 
-    private BranchRepository branchRepo;
-    private ProjectRepository projectRepo;
-    private OrganizationRepository orgRepo;
+    private BranchGDAO branchRepo;
+    private ProjectDAO projectRepo;
+    private OrgDAO orgRepo;
     private List<PermissionsDelegateFactory> permissionsDelegateFactories;
 
     @Autowired
@@ -40,17 +40,17 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Autowired
-    public void setBranchRepo(BranchRepository branchRepo) {
+    public void setBranchRepo(BranchGDAO branchRepo) {
         this.branchRepo = branchRepo;
     }
 
     @Autowired
-    public void setProjectRepo(ProjectRepository projectRepo) {
+    public void setProjectRepo(ProjectDAO projectRepo) {
         this.projectRepo = projectRepo;
     }
 
     @Autowired
-    public void setOrgRepo(OrganizationRepository orgRepo) {
+    public void setOrgRepo(OrgDAO orgRepo) {
         this.orgRepo = orgRepo;
     }
 
@@ -238,7 +238,7 @@ public class DefaultPermissionService implements PermissionService {
     public boolean isProjectInherit(String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
         if (!project.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "project " + projectId + " not found");
+            throw new NotFoundException("project " + projectId + " not found");
         }
         return project.get().isInherit();
     }
@@ -255,7 +255,7 @@ public class DefaultPermissionService implements PermissionService {
     public boolean isOrgPublic(String orgId) {
         Optional<Organization> organization = orgRepo.findByOrganizationId(orgId);
         if (!organization.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "org " + orgId + " not found");
+            throw new NotFoundException("org " + orgId + " not found");
         }
         return organization.get().isPublic();
     }
@@ -265,7 +265,7 @@ public class DefaultPermissionService implements PermissionService {
     public boolean isProjectPublic(String projectId) {
         Optional<Project> project = projectRepo.findByProjectId(projectId);
         if (!project.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "project " + projectId + " not found");
+            throw new NotFoundException("project " + projectId + " not found");
         }
         return project.get().isPublic();
     }
@@ -351,7 +351,7 @@ public class DefaultPermissionService implements PermissionService {
         Optional<Organization> org = orgRepo.findByOrganizationId(orgId);
 
         if (!org.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Organization not found");
+            throw new NotFoundException("Organization not found");
         }
 
         return org.get();
@@ -361,7 +361,7 @@ public class DefaultPermissionService implements PermissionService {
         Optional<Project> proj = projectRepo.findByProjectId(projectId);
 
         if (!proj.isPresent()) {
-            throw new PermissionException(HttpStatus.NOT_FOUND, "Project not found");
+            throw new NotFoundException("Project not found");
         }
         return proj.get();
     }
@@ -373,7 +373,7 @@ public class DefaultPermissionService implements PermissionService {
         if(!branch.isPresent()) {
             switch(mode){
                 case THROW:
-                    throw new PermissionException(HttpStatus.NOT_FOUND, "Branch not found");
+                    throw new NotFoundException("Branch not found");
                 case CREATE:
                     Branch b = new Branch(getProject(projectId), branchId, false);
                     branchRepo.save(b);
@@ -395,7 +395,7 @@ public class DefaultPermissionService implements PermissionService {
             return permissionsDelegate.get();
         }
 
-        throw new PermissionException(HttpStatus.INTERNAL_SERVER_ERROR,
+        throw new InternalErrorException(
             "No valid permissions scheme found for organization " + organization.getOrganizationId()
                 + " (" + organization.getOrganizationName() + ")");
     }
@@ -408,7 +408,7 @@ public class DefaultPermissionService implements PermissionService {
             return permissionsDelegate.get();
         }
 
-        throw new PermissionException(HttpStatus.INTERNAL_SERVER_ERROR,
+        throw new InternalErrorException(
             "No valid permissions scheme found for project " + project.getProjectId()
                 + " (" + project.getProjectName() + ")");
     }
@@ -421,7 +421,7 @@ public class DefaultPermissionService implements PermissionService {
             return permissionsDelegate.get();
         }
 
-        throw new PermissionException(HttpStatus.INTERNAL_SERVER_ERROR,
+        throw new InternalErrorException(
             "No valid permissions scheme found for branch " + branch.getBranchId()
                 + " of project " + branch.getProject().getProjectId()
                 + " (" + branch.getProject().getProjectName() + ")");

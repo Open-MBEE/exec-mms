@@ -1,8 +1,8 @@
 package org.openmbee.sdvc.localuser.config;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+;
 import org.openmbee.sdvc.localuser.security.UserDetailsServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,11 +16,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@PropertySource("classpath:application.properties")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class LocalUserSecurityConfig {
 
-    private static Logger logger = LogManager.getLogger(LocalUserSecurityConfig.class);
+    private static Logger logger = LoggerFactory.getLogger(LocalUserSecurityConfig.class);
     @Autowired
     public UserDetailsServiceImpl userDetailsService;
     @Value("${sdvc.admin.username}")

@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.objects.Rejection;
@@ -21,11 +20,13 @@ import org.openmbee.sdvc.core.exceptions.NotModifiedException;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.openmbee.sdvc.data.domains.global.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseController {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected ObjectMapper om;
 

@@ -71,6 +71,7 @@ public class ElementsController extends BaseController {
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
+        @RequestParam(required = false) String overwrite,
         @RequestParam(required = false) Map<String, String> params,
         Authentication auth) {
 

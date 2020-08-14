@@ -1,9 +1,10 @@
 package org.openmbee.sdvc.authenticator.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationEntryPoint;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationTokenFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,7 +20,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class AuthSecurityConfig {
 
-    private static Logger logger = LogManager.getLogger(AuthSecurityConfig.class);
+    private static Logger logger = LoggerFactory.getLogger(AuthSecurityConfig.class);
 
     public AuthSecurityConfig() {
     }

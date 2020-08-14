@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource("classpath:application.properties")
 public abstract class JcrConfig {
     //String uri = "mongodb://" + host + ":" + port;
     //Node ns = new DocumentMK.Builder().setMongoDB(uri, "oak_demo", 16).getNodeStore();

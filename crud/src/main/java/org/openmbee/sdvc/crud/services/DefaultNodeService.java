@@ -3,8 +3,6 @@ package org.openmbee.sdvc.crud.services;
 import java.time.Instant;
 import java.util.*;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openmbee.sdvc.core.objects.EventObject;
 import org.openmbee.sdvc.core.services.EventService;
 import org.openmbee.sdvc.core.services.NodeChangeInfo;
@@ -23,6 +21,8 @@ import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.openmbee.sdvc.core.dao.NodeIndexDAO;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
@@ -33,7 +33,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 @Service("defaultNodeService")
 public class DefaultNodeService implements NodeService {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected NodeDAO nodeRepository;
     protected CommitDAO commitRepository;
@@ -44,7 +44,7 @@ public class DefaultNodeService implements NodeService {
     protected NodePostHelper nodePostHelper;
     protected NodeDeleteHelper nodeDeleteHelper;
 
-    protected Optional<EventService> eventPublisher;
+    protected Collection<EventService> eventPublisher;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -82,7 +82,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
-    public void setEventPublisher(Optional<EventService> eventPublisher) {
+    public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -180,7 +180,7 @@ public class DefaultNodeService implements NodeService {
             this.commitIndex.index(cmjs);
             this.commitRepository.save(commit);
 
-            eventPublisher.ifPresent((pub) -> pub.publish(
+            eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));
         }
     }
