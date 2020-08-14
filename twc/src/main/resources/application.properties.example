@@ -1,0 +1,26 @@
+#Configuration for TWC
+#port is for REST interface
+#aliases are for clustered usages
+twc.instances[0].url=dev-twc-03.domain.com
+twc.instances[0].protocol=https
+twc.instances[0].port=8111
+twc.instances[0].aliases[0]=dev-twc-02.domain.com
+twc.instances[0].aliases[1]=dev-twc-01.domain.com
+
+#Admin Credentials for TWC
+twc.instances[0].adminUsername=admin
+twc.instances[0].adminPwd=password
+
+#TWC MMS Roles mapping for projects
+twc.instances[0].roles.project_read=Resource Reviewer,Resource Contributor,Resource Manager
+twc.instances[0].roles.project_read_commits=Resource Reviewer,Resource Contributor,Resource Manager
+twc.instances[0].roles.project_read_permissions=Resource Reviewer,Resource Contributor,Resource Manager
+twc.instances[0].roles.project_edit=Resource Contributor,Resource Manager
+twc.instances[0].roles.project_create_branch=Resource Manager
+twc.instances[0].roles.project_update_permissions=Resource Manager
+
+#TWC MMS Roles mapping for branches
+twc.instances[0].roles.branch_read=Resource Reviewer,Resource Contributor,Resource Manager
+twc.instances[0].roles.branch_read_permissions=Resource Reviewer,Resource Contributor,Resource Manager
+twc.instances[0].roles.branch_edit_content=Resource Contributor,Resource Manager
+twc.instances[0].roles.branch_update_permissions=Resource Manager

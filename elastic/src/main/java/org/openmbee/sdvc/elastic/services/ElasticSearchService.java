@@ -1,0 +1,269 @@
+package org.openmbee.sdvc.elastic.services;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.fieldcaps.FieldCapabilities;
+import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
+import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchScrollRequest;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.dao.NodeDAO;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
+import org.openmbee.sdvc.core.objects.ElementsResponse;
+import org.openmbee.sdvc.core.objects.ElementsSearchResponse;
+import org.openmbee.sdvc.core.objects.Rejection;
+import org.openmbee.sdvc.core.services.SearchService;
+import org.openmbee.sdvc.data.domains.scoped.Node;
+import org.openmbee.sdvc.elastic.utils.Index;
+import org.openmbee.sdvc.json.ElementJson;
+import org.openmbee.sdvc.search.SearchConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Service
+public class ElasticSearchService implements SearchService {
+    private final Logger logger = LogManager.getLogger(getClass());
+
+    @Value("${elasticsearch.limit.result}")
+    protected int resultLimit;
+    @Value("${elasticsearch.limit.scrollTimeout}")
+    protected long scrollTimeout;
+    protected RestHighLevelClient client;
+    protected NodeDAO nodeRepository;
+
+    @Autowired
+    public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
+        this.client = client;
+    }
+
+    @Autowired
+    public void setNodeRepository(NodeDAO nodeRepository) {
+        this.nodeRepository = nodeRepository;
+    }
+
+    @Override
+    public ElementsSearchResponse basicSearch(String projectId, String refId, Map<String, String> params) {
+        if(params == null || params.isEmpty()) {
+            return new ElementsSearchResponse();
+        }
+
+        return recursiveSearch(projectId, refId, params, null, null, null);
+    }
+
+    @Override
+    public ElementsSearchResponse recursiveSearch(String projectId, String refId, Map<String, String> params, Map<String, String> recurse, Integer from, Integer size) {
+        if(params == null || params.isEmpty()) {
+            return new ElementsSearchResponse();
+        }
+
+        try {
+            ContextHolder.setContext(projectId, refId);
+            List<Node> allNodes = nodeRepository.findAll();
+            if(allNodes == null || allNodes.isEmpty()) {
+                return new ElementsSearchResponse();
+            }
+
+            Set<String> allNodeDocIds = allNodes.stream().map(Node::getDocId).collect(Collectors.toCollection(HashSet::new));
+            Map<String, OrderedResult<ElementJson>> elementJsonMap = new HashMap<>();
+            Collection<OrderedResult<Rejection>> deletedElements = new HashSet<>();
+
+            boolean showDeletedAsRejected = false;
+            String showDeleted = params.remove(SearchConstants.SHOW_DELETED_FIELD);
+            if(showDeleted != null && showDeleted.equals("true")) {
+                showDeletedAsRejected = true;
+            }
+
+            performRecursiveSearch(allNodeDocIds, params, recurse, elementJsonMap,0);
+            Collection<OrderedResult<ElementJson>> filteredElementJson = filterIndexedElementsUsingDatabaseNodes(allNodes, elementJsonMap, deletedElements, showDeletedAsRejected);
+            return prepareResponse(filteredElementJson, deletedElements, from, size);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void performRecursiveSearch(Set<String> allNodeDocIds, Map<String, String> params, Map<String, String> recurse,
+                                        Map<String, OrderedResult<ElementJson>> elementJsonMap, Integer count) throws IOException {
+        Set<String> fields = new HashSet<>(params.keySet());
+        if(recurse != null) {
+            fields.addAll(recurse.keySet());
+        }
+        SearchConfiguration searchConfiguration = getSearchConfiguration(fields);
+        List<ElementJson> elementJsonList = doSearch(searchConfiguration, allNodeDocIds, params);
+        for(ElementJson ob : elementJsonList) {
+            if(!elementJsonMap.containsKey(ob.getId())) {
+                elementJsonMap.put(ob.getId(), new OrderedResult<>(ob, count++));
+                Map<String, String> recursiveParams = buildRecursiveParams(ob, recurse);
+                if(!recursiveParams.isEmpty()) {
+                    performRecursiveSearch(allNodeDocIds, recursiveParams, recurse, elementJsonMap, count);
+                }
+            }
+        }
+    }
+
+    private SearchConfiguration getSearchConfiguration(Set<String> fields) {
+        SearchConfiguration searchConfiguration = new SearchConfiguration();
+        FieldCapabilitiesRequest fieldsRequest = new FieldCapabilitiesRequest();
+        fieldsRequest.indices(Index.NODE.get());
+        fieldsRequest.fields(fields.toArray(new String[]{}));
+        try {
+            FieldCapabilitiesResponse fieldCaps = client.fieldCaps(fieldsRequest, RequestOptions.DEFAULT);
+            for(String field : fields) {
+                Map<String, FieldCapabilities> fieldMap = fieldCaps.getField(field);
+                if(fieldMap == null) {
+                    continue;
+                }
+                for(FieldCapabilities cap : fieldMap.values()) {
+                    if(field.equals(cap.getName())) {
+                        searchConfiguration.addField(field, cap.getType(), cap.isSearchable());
+                        break;
+                    }
+                }
+            }
+            return searchConfiguration;
+        } catch (IOException e) {
+            logger.error("Could retrieve field mappings for search configuration", e);
+            throw new InternalErrorException("Could not configure search");
+        }
+    }
+
+    private Map<String, String> buildRecursiveParams(ElementJson ob, Map<String, String> recurse) {
+        Map<String, String> recursiveParams = new HashMap<>();
+
+        if(recurse == null || recurse.isEmpty()) {
+            return recursiveParams;
+        }
+
+        for(Map.Entry<String, String> e : recurse.entrySet()) {
+            Object o = ob.get(e.getKey());
+            if(o == null) {
+                continue;
+            }
+            recursiveParams.put(e.getValue(), o.toString());
+        }
+        return recursiveParams;
+    }
+
+
+    private List<ElementJson> doSearch(SearchConfiguration searchConfiguration, Set<String> allNodeDocIds, Map<String, String> params) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+
+        for(Map.Entry<String, String> e : params.entrySet()) {
+           searchConfiguration.addQueryForField(query, e.getKey(), e.getValue());
+        }
+
+        return performElasticQuery(allNodeDocIds, searchRequest, query);
+    }
+
+    private List<ElementJson> performElasticQuery(Set<String> allNodeDocIds, SearchRequest searchRequest, BoolQueryBuilder query) throws IOException {
+        List<ElementJson> result = new ArrayList<>();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(query);
+        sourceBuilder.size(resultLimit);
+        searchRequest.source(sourceBuilder);
+        searchRequest.scroll(TimeValue.timeValueMillis(scrollTimeout));
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        String scrollId = null;
+
+        do {
+            for(SearchHit hit : searchResponse.getHits()) {
+                ElementJson ob = parseResult(hit);
+                if(allNodeDocIds.contains(ob.getDocId())) {
+                    result.add(ob);
+                }
+            }
+            scrollId = searchResponse.getScrollId();
+            if (scrollId != null) {
+                SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+                searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
+            }
+
+        } while (scrollId != null && searchResponse.getHits().getHits() != null && searchResponse.getHits().getHits().length != 0);
+
+        return result;
+    }
+
+    private ElementJson parseResult(SearchHit hit) {
+        ElementJson ob = new ElementJson();
+        ob.putAll(hit.getSourceAsMap());
+        return ob;
+    }
+
+    private Collection<OrderedResult<ElementJson>> filterIndexedElementsUsingDatabaseNodes(List<Node> allNodes, Map<String, OrderedResult<ElementJson>> elementJsonMap, Collection<OrderedResult<Rejection>> deletedElements, boolean showDeletedAsRejected) {
+        Collection<OrderedResult<ElementJson>> filteredIndexedElements = new HashSet<>();
+
+        OrderedResult<ElementJson> currentJson;
+        for(Node n : allNodes) {
+            currentJson = elementJsonMap.remove(n.getNodeId());
+            if(currentJson != null) {
+                if(!n.isDeleted()) {
+                    filteredIndexedElements.add(currentJson);
+                } else if(showDeletedAsRejected) {
+                    deletedElements.add(new OrderedResult<>(new Rejection(currentJson.getWrapped(), 410, SearchConstants.ELEMENT_DELETED_INFO), currentJson.getOrder()));
+                }
+            } else { // node found in DB not found in the index
+                logger.warn(SearchConstants.POSSIBLE_ELASTIC_DISCREPANCY, n.getNodeId());
+            }
+        }
+
+        return filteredIndexedElements;
+    }
+
+    private ElementsSearchResponse prepareResponse(Collection<OrderedResult<ElementJson>> result, Collection<OrderedResult<Rejection>> rejected, Integer from, Integer size) {
+        ElementsSearchResponse response = new ElementsSearchResponse();
+        response.setTotal(result.size());
+        response.setRejectedTotal(rejected.size());
+        response.setElements(sortAndTrim(result, from, size));
+        response.setRejected(sortAndTrim(rejected, from, size));
+        return response;
+    }
+
+    private <T> List<T> sortAndTrim(Collection<OrderedResult<T>> collection, Integer from, Integer size) {
+        Stream<T> stream = collection.stream()
+            .sorted(Comparator.comparingInt(OrderedResult::getOrder))
+            .map(OrderedResult::getWrapped);
+
+        if(from != null) {
+            stream = stream.skip(from);
+        }
+        if(size != null) {
+            stream = stream.limit(size);
+        }
+        return stream.collect(Collectors.toList());
+    }
+
+    private static class OrderedResult<T> {
+        private final T wrapped;
+        private final int order;
+
+        public OrderedResult(T wrapped, int order) {
+            this.wrapped = wrapped;
+            this.order = order;
+        }
+
+        public T getWrapped() {
+            return wrapped;
+        }
+
+        public int getOrder() {
+            return order;
+        }
+    }
+}

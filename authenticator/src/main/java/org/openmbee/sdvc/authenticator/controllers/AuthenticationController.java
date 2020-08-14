@@ -1,43 +1,42 @@
 package org.openmbee.sdvc.authenticator.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationRequest;
 import org.openmbee.sdvc.authenticator.security.JwtAuthenticationResponse;
 import org.openmbee.sdvc.authenticator.security.JwtTokenGenerator;
-import org.openmbee.sdvc.authenticator.security.UserDetailsImpl;
-import org.openmbee.sdvc.authenticator.services.UserDetailsServiceImpl;
+import org.openmbee.sdvc.authenticator.security.JwtTokenValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/authentication")
+@Tag(name = "Auth")
 public class AuthenticationController {
 
-    @Value("${jwt.header}")
-    private String tokenHeader;
-
     private AuthenticationManager authenticationManager;
-    private UserDetailsServiceImpl userDetailsService;
     private JwtTokenGenerator jwtTokenUtil;
 
     @Autowired
     public AuthenticationController(AuthenticationManager authenticationManager,
-        UserDetailsServiceImpl userDetailsService, JwtTokenGenerator jwtTokenUtil) {
+        JwtTokenGenerator jwtTokenUtil) {
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-    @PostMapping
-    public ResponseEntity<JwtAuthenticationResponse> createAuthenticationToken(
+    @PostMapping(value = "/authentication", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @SecurityRequirements(value = {})
+    public JwtAuthenticationResponse createAuthenticationToken(
         @RequestBody
             JwtAuthenticationRequest authenticationRequest) {
 
@@ -46,10 +45,20 @@ public class AuthenticationController {
                 authenticationRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        final UserDetailsImpl userDetails = userDetailsService
-            .loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+        return new JwtAuthenticationResponse(token);
 
     }
+
+    @GetMapping(value = "/checkAuth")
+    @PreAuthorize("isAuthenticated()")
+    public JwtTokenValidationResponse checkAuthenticationToken() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (! (authentication instanceof AnonymousAuthenticationToken)) {
+            return new JwtTokenValidationResponse(authentication.getName());
+        }
+        return new JwtTokenValidationResponse(null);
+    }
+
 }

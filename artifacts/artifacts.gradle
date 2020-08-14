@@ -1,0 +1,7 @@
+dependencies {
+    api project(':core')
+    implementation project(':crud')
+    implementation commonDependencies.'servlet-api'
+
+    testImplementation commonDependencies.'spring-boot-starter-test'
+}

@@ -1,0 +1,7 @@
+{
+    "values": [
+        {"key": "host", "value": "http://localhost:8080"},
+        {"key": "adminUsername", "value": "admin"},
+        {"key": "adminPassword", "value": "admin"}
+    ]
+}

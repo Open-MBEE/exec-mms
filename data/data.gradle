@@ -1,0 +1,13 @@
+dependencies {
+    api commonDependencies.'spring-security-core'
+    api commonDependencies.'spring-data-commons'
+
+    api commonDependencies.'jackson-annotations'
+    api commonDependencies.'jackson-databind'
+    api commonDependencies.'jackson-datatype-hibernate5'
+    api commonDependencies.'jackson-datatype-jsr310'
+
+    api commonDependencies.'hibernate-core'
+
+    testImplementation commonDependencies.'spring-boot-starter-test'
+}

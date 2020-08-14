@@ -1,30 +1,74 @@
 buildscript {
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
     }
 }
 
-plugins { id "io.spring.dependency-management" }
+plugins {
+    id "io.spring.dependency-management"
+    id 'org.hidetake.swagger.generator' version '2.18.2'
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compile(
+    implementation(
+        project(':authenticator'),
+        project(':localuser'),
         project(':ldap'),
-        project(':crud'),
+        project(':cameo'),
+        project(':elastic'),
+        project(':jupyter'),
+        project(':permissions'),
+        project(':webhooks'),
+        project(':twc'),
+        project(':search'),
+        project(':artifacts'),
         'org.springframework.boot:spring-boot-starter-web',
         'org.postgresql:postgresql:42.2.5',
-        'io.springfox:springfox-swagger2:2.7.0',
-        'io.springfox:springfox-swagger-ui:2.7.0'
+        //'mysql:mysql-connector-java:8.0.17',
+        'org.springdoc:springdoc-openapi-ui:1.3.1',
+        'org.springdoc:springdoc-openapi-security:1.3.1'
+
     )
-    testCompile(
+    testImplementation(
         'org.springframework.boot:spring-boot-starter-test'
     )
+    swaggerCodegen 'org.openapitools:openapi-generator-cli:4.3.0'
 }
+
+swaggerSources {
+    python {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'python'
+            configFile = file('openapi/python-config.json')
+        }
+    }
+    java {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'java'
+            configFile = file('openapi/java-config.json')
+        }
+    }
+    doc {
+        inputFile = file('openapi/api-docs.yaml')
+        code {
+            language = 'html2'
+            configFile = file('openapi/doc-config.json')
+        }
+    }
+}
+
+//https://stackoverflow.com/questions/61197984/bootjar-mavenjar-artifact-wasnt-produced-by-this-build
+configurations {
+    [apiElements, runtimeElements].each {
+        it.outgoing.artifacts.removeIf { it.buildDependencies.getDependencies(null).contains(jar) }
+        it.outgoing.artifact(bootJar)
+    }
+}
+ext['elasticsearch.version'] = "$elasticVersion"

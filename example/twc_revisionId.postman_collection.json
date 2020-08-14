@@ -1,0 +1,838 @@
+{
+	"info": {
+		"_postman_id": "c5799aa8-33bc-4de4-9d2d-e36e89f4d7f4",
+		"name": "twc_revisionID",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login using admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "217210a9-1489-4057-b89f-bc0b44111569",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add org org01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+						"exec": [
+							"pm.test(\"response has org 01\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('org01');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"org01\",\n\t\t\t\"name\": \"org01\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add project project01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project project01\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('project01');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"project01\", \n\t\t\t\"name\": \"project01\",\n\t\t\t\"orgId\": \"org01\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add elements to project01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);",
+							"pm.environment.set(\"revisionId1\", 'revA');",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x1\",\n\t\t\t\"name\": \"x1\"\n\t\t}, {\n\t\t\t\"id\": \"y1\", \n\t\t\t\"name\": \"y1\"\n\t\t}, {\n\t\t\t\"id\": \"z1\",\n\t\t\t\"name\": \"z1\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update CommitId with valid Twc RevisionId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(1);",
+							"});",
+							"",
+							"pm.test(\"commit having revision details\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    if('twc-revisionId' in jsonData.commits) {",
+							"    pm.expect(jsonData.commits[0].twc-revisionId).to.eql(pm.environment.get(\"revisionId1\"))",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/commits/{{commitId1}}/twc-revision/{{revisionId1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"commits",
+						"{{commitId1}}",
+						"twc-revision",
+						"{{revisionId1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add elements to project01 again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId2\", pm.response.json().elements[0]._commitId);",
+							"pm.environment.set(\"revisionId2\", 'revB');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x2\",\n\t\t\t\"name\": \"x2\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update CommitId with next valid Twc RevisionId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(1);",
+							"});",
+							"",
+							"pm.test(\"commit having revision details\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    if('twc-revisionId' in jsonData.commits) {",
+							"    pm.expect(jsonData.commits[0].twc-revisionId).to.eql(pm.environment.get(\"revisionId2\"))",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/commits/{{commitId2}}/twc-revision/{{revisionId2}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"commits",
+						"{{commitId2}}",
+						"twc-revision",
+						"{{revisionId2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch ref_project01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ff54f17-72ad-466a-a967-75ac15d5c2e4",
+						"exec": [
+							"pm.test(\"branch created with project01\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.refs[0].id).to.eql('ref_project01');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"id\": \"ref_project01\",\n\t\t\t\"name\": \"ref_project01\",\n\t\t\t\"type\": \"Branch\",\n\t\t\t\"extraField\": \"something\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create element on ref_project01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ca83fd4-0bcb-481d-a1d7-4feab4d6ae3d",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId_ref_project01\", pm.response.json().elements[0]._commitId);",
+							"pm.environment.set(\"refID\", pm.response.json().elements[0]._refId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x3\",\n\t\t\t\"name\": \"x3\"\n\t\t}, {\n\t\t\t\"id\": \"y2\", \n\t\t\t\"name\": \"y2\"\n\t\t}, {\n\t\t\t\"id\": \"z2\",\n\t\t\t\"name\": \"z3\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs/ref_project01/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs",
+						"ref_project01",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Associate branch commitId with Twc RevisionId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(1);",
+							"});",
+							"",
+							"pm.test(\"commit having revision details\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    if('twc-revisionId' in jsonData.commits) {",
+							"    pm.expect(jsonData.commits[0].twc-revisionId).to.eql(pm.environment.get(\"ref_revisionId1\"))",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9133f278-6368-4999-9ad0-0349fa3dc445",
+						"exec": [
+							"pm.environment.set(\"ref_revisionId1\", 'ref_revA');"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/commits/{{commitId_ref_project01}}/twc-revision/{{ref_revisionId1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"commits",
+						"{{commitId_ref_project01}}",
+						"twc-revision",
+						"{{ref_revisionId1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Twc RevisionId list for branch",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(3);",
+							"});",
+							"",
+							"pm.test(\"branch commit having revision and ref details\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"twc-revisionId\"]).to.eql(\"revA\")",
+							"    pm.expect(jsonData[1][\"twc-revisionId\"]).to.eql(\"revB\")",
+							"    pm.expect(jsonData[2][\"twc-revisionId\"]).to.eql(\"ref_revA\")",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs/{{refID}}/twc-revisions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs",
+						"{{refID}}",
+						"twc-revisions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Twc RevisionId list for branch reverse order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(3);",
+							"});",
+							"",
+							"pm.test(\"branch commit having revision and ref details\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[2][\"twc-revisionId\"]).to.eql(\"revA\")",
+							"    pm.expect(jsonData[1][\"twc-revisionId\"]).to.eql(\"revB\")",
+							"    pm.expect(jsonData[0][\"twc-revisionId\"]).to.eql(\"ref_revA\")",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs/{{refID}}/twc-revisions?reverseOrder=true",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs",
+						"{{refID}}",
+						"twc-revisions"
+					],
+					"query": [
+						{
+							"key": "reverseOrder",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Twc RevisionId list for branch just the latest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"});",
+							"",
+							"pm.test(\"branch commit having revision and ref details\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"twc-revisionId\"]).to.eql(\"ref_revA\")",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs/{{refID}}/twc-revisions?reverseOrder=true&limit=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs",
+						"{{refID}}",
+						"twc-revisions"
+					],
+					"query": [
+						{
+							"key": "reverseOrder",
+							"value": "true"
+						},
+						{
+							"key": "limit",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Twc RevisionId list master",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"response has commits\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"branch commit having revision and ref details\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"twc-revisionId\"]).to.eql(\"revA\")",
+							"    pm.expect(jsonData[1][\"twc-revisionId\"]).to.eql(\"revB\")",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/refs/master/twc-revisions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"refs",
+						"master",
+						"twc-revisions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update CommitID with invalid Twc Revision ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bb2a4fd5-47b9-4d7f-be43-b33701766fc4",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a8fcad70-1a0b-43ac-a431-3c57d9f08e51",
+						"exec": [
+							"pm.environment.set(\"revisionId3\", null);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/project01/commits/{{commitId1}}/twc-revision/{{revisionId3}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"project01",
+						"commits",
+						"{{commitId1}}",
+						"twc-revision",
+						"{{revisionId3}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "a38d93e6-1de5-4875-8f80-a5a6cec3dcd4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "0866a69c-ea90-48f6-bedf-269b559b40d8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

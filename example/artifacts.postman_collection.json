@@ -1,0 +1,1100 @@
+{
+	"info": {
+		"_postman_id": "5d68544f-0039-4cd6-b728-45fbf50d7191",
+		"name": "artifacts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login using admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "217210a9-1489-4057-b89f-bc0b44111569",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add org art",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+						"exec": [
+							"pm.test(\"response has org art\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('art');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"art\",\n\t\t\t\"name\": \"art\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add project arta",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+						"exec": [
+							"pm.test(\"response has project arta\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('arta');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"arta\", \n\t\t\t\"name\": \"arta\",\n\t\t\t\"orgId\": \"art\",\n\t\t\t\"projectType\": \"default\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add elements to arta",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response has elements\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(3);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "associate artifact with element x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6539570e-0465-4e77-a0a7-24752aa01528",
+						"exec": [
+							"pm.test(\"response has 1 artifact\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
+							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('x//image/jpeg//v1');",
+							"    pm.environment.set(\"x-commit-1\", jsonData.elements[0][\"_commitId\"]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "test_artifacts/x.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "associate artifact with element x again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "619a483c-5116-4fd9-b7e6-59534061c43b",
+						"exec": [
+							"pm.test(\"response has 1 artifact with a new version\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
+							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('x//image/jpeg//v2')",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "test_artifacts/x.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "associate artifact with an undefined element aa",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b01e263f-c028-4860-826f-c46856a078d5",
+						"exec": [
+							"pm.test(\"response has 1 element\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});",
+							"",
+							"pm.test(\"response element has 1 artifact\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "test_artifacts/aa.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/aa",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"aa"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update element x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response element still has artifacts\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"new-xs\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get jpg artifact associated with element x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.header(\"Content-Type\", \"image/jpeg\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x/jpg",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get json for element x with empty accept header",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.header(\"Content-Type\", \"application/json\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get json for element x with json accept header",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.header(\"Content-Type\", \"application/json\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get jpg artifact associated with element x via accept header",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.header(\"Content-Type\", \"image/jpeg\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "image/jpeg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "try to delete artifact through element modification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"element changes were rejected\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.rejected.length).to.eql(1);",
+							"    pm.expect(jsonData.elements.length).to.eql(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"_artifacts\" : []\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "try to add artifact through element modification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"element changes are rejected\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.rejected.length).to.eql(1);",
+							"    pm.expect(jsonData.elements.length).to.eql(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\",\n\t\t\t \"_artifacts\": [\n                {\n                    \"extension\": \"jpg\",\n                    \"locationType\": \"internal\",\n                    \"location\": \"x//image/jpeg//v1\",\n                    \"mimetype\": \"image/jpeg\"\n                }\n            ]\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create other user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"other\",\n\t\"password\": \"other\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get jpg artifact associated with element x as other user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "other",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "other",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x/jpg",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get json for element x with empty accept header as other user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "other",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "other",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get json for element x with json accept header as other user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "other",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "other",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get jpg artifact associated with element x via accept header as other user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.header(\"Content-Type\", \"image/jpeg\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "image/jpeg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Disassociate artifact from element x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6539570e-0465-4e77-a0a7-24752aa01528",
+						"exec": [
+							"pm.test(\"response has 0 artifacts\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eql(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x/jpg",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get jpg artifact associated with element x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x/jpg",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get jpg artifact associated with element x at original commit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+						"exec": [
+							"pm.test(\"response is jpg\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.header(\"Content-Type\", \"image/jpeg\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "image/jpeg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements/x?commitId={{x-commit-1}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					],
+					"query": [
+						{
+							"key": "commitId",
+							"value": "{{x-commit-1}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "accc84a8-a5da-4920-91a9-eb1ad1f7a175",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "844fd480-aaee-4e99-af99-55f3f12fbb73",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

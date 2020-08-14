@@ -1,8 +1,5 @@
-apply plugin: 'io.spring.convention.spring-module'
-
 dependencies {
-    compile project(':authenticator')
+    implementation project(':rdb')
 
-    compile group: 'org.springframework.security', name: 'spring-security-ldap', version: '5.0.8.RELEASE'
-
+    implementation commonDependencies.'spring-security-ldap'
 }

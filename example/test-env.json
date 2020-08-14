@@ -1,0 +1,7 @@
+{
+    "values": [
+        {"key": "host", "value": "http://mms:8080"},
+        {"key": "adminUsername", "value": "test"},
+        {"key": "adminPassword", "value": "test"}
+    ]
+}

@@ -1,0 +1,7 @@
+apply plugin: 'java-library'
+apply plugin: 'io.spring.dependency-management'
+dependencies {
+    implementation project(':rdb')
+    implementation 'org.apache.commons:commons-lang3:3.10'
+    implementation 'org.springframework.boot:spring-boot:2.2.6.RELEASE'
+}

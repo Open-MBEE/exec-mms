@@ -1,0 +1,5 @@
+dependencies {
+    implementation commonDependencies.'jackson-annotations'
+    implementation commonDependencies.'swagger-annotations'
+    testImplementation commonDependencies.'spring-boot-starter-test'
+}

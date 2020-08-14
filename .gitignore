@@ -2,6 +2,8 @@
 **/build/
 !gradle/wrapper/gradle-wrapper.jar
 application.properties
+localhost-env.json
+.vscode
 
 ### STS ###
 .apt_generated
@@ -25,3 +27,6 @@ application.properties
 /dist/
 /nbdist/
 /.nb-gradle/
+
+
+**/bin

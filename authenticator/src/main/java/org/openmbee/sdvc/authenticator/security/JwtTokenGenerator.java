@@ -3,14 +3,22 @@ package org.openmbee.sdvc.authenticator.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.crypto.SecretKey;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +29,8 @@ public class JwtTokenGenerator implements Serializable {
     private static final String CLAIM_KEY_USERID = "id";
     private static final String CLAIM_KEY_CREATED = "created";
     private static final String CLAIM_KEY_ENABLED = "enabled";
-    static Logger logger = LogManager.getLogger(JwtTokenGenerator.class);
+    private static final String CLAIM_KEY_AUTHORITIES = "authorities";
+    static Logger logger = LoggerFactory.getLogger(JwtTokenGenerator.class);
     @Value("${jwt.secret}")
     private String secret;
 
@@ -29,18 +38,18 @@ public class JwtTokenGenerator implements Serializable {
     private Long expiration;
 
     public String getUsernameFromToken(String token) {
-        String email = null;
+        String username = null;
         try {
             final Claims claims = getClaimsFromToken(token);
             if (claims != null) {
-                email = claims.getSubject();
+                username = claims.getSubject();
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Error getting username from token", e);
             }
         }
-        return email;
+        return username;
     }
 
     public Date getCreatedDateFromToken(String token) {
@@ -89,17 +98,22 @@ public class JwtTokenGenerator implements Serializable {
         return new Date(System.currentTimeMillis() + expiration * 1000);
     }
 
-    private Boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         final Date expirationDate = getExpirationDateFromToken(token);
         return expirationDate.before(new Date());
     }
 
-    public String generateToken(UserDetailsImpl userDetails) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        List<String> authorities = new ArrayList<>();
+        for (GrantedAuthority ga : userDetails.getAuthorities()) {
+            authorities.add(ga.getAuthority());
+        }
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-        claims.put(CLAIM_KEY_USERID, userDetails.getUser().getId());
+        claims.put(CLAIM_KEY_USERID, userDetails.getUsername());
         claims.put(CLAIM_KEY_ENABLED, userDetails.isEnabled());
         claims.put(CLAIM_KEY_CREATED, new Date());
+        claims.put(CLAIM_KEY_AUTHORITIES, authorities);
         return generateToken(claims);
     }
 
@@ -129,9 +143,27 @@ public class JwtTokenGenerator implements Serializable {
         return refreshedToken;
     }
 
-    public Boolean validateToken(String token, UserDetailsImpl userDetails) {
-        final String email = getUsernameFromToken(token);
-        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean validateToken(String token) {
+        return !isTokenExpired(token);
+    }
+
+    public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        try {
+            final Claims claims = getClaimsFromToken(token);
+            if (claims != null) {
+                @SuppressWarnings("unchecked")
+                ArrayList<String> tokenAuthorities = (ArrayList<String>) claims.get(CLAIM_KEY_AUTHORITIES);
+                for (String auth : tokenAuthorities) {
+                    authorities.add(new SimpleGrantedAuthority(auth));
+                }
+            }
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Error getting authorities from token", e);
+            }
+        }
+        return authorities;
     }
 
 }

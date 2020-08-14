@@ -1,0 +1,2032 @@
+{
+	"info": {
+		"_postman_id": "c17f315c-0bfe-4adc-8787-1125d8a9576b",
+		"name": "cameo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "mounts",
+			"item": [
+				{
+					"name": "login using admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "217210a9-1489-4057-b89f-bc0b44111569",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    ",
+									"});",
+									"",
+									"pm.test(\"response has token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/authentication",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"authentication"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add org cameo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
+								"exec": [
+									"pm.test(\"response has org cameo\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.orgs[0].id).to.eql('cameo');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"cameo\",\n\t\t\t\"name\": \"cameo\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/orgs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"orgs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add project cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has project cameo_parent\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('cameo_parent');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cameo_parent\", \n\t\t\t\"name\": \"Cameo Parent\",\n\t\t\t\"orgId\": \"cameo\",\n\t\t\t\"schema\": \"cameo\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get default project elements",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "262962ce-3848-4189-b81e-0df185b8d1a3",
+								"exec": [
+									"pm.test(\"has 2 results\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add project cameoChild",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has project cameo_child\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('cameo_child');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cameo_child\", \n\t\t\t\"name\": \"Cameo Child\",\n\t\t\t\"orgId\": \"cameo\",\n\t\t\t\"schema\": \"cameo\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add project cameoChild2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has project cameo_child\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('cameo_child2');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cameo_child2\", \n\t\t\t\"name\": \"Cameo Child2\",\n\t\t\t\"orgId\": \"cameo\",\n\t\t\t\"schema\": \"cameo\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add project cameoChild3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
+								"exec": [
+									"pm.test(\"response has project cameo_child\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projects[0].id).to.eql('cameo_child3');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cameo_child3\", \n\t\t\t\"name\": \"Cameo Child3\",\n\t\t\t\"orgId\": \"cameo\",\n\t\t\t\"schema\": \"cameo\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add elements to cameoChild",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(3);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add elements to cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(3);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"a\",\n\t\t\t\"name\": \"a\"\n\t\t}, {\n\t\t\t\"id\": \"b\", \n\t\t\t\"name\": \"b\"\n\t\t}, {\n\t\t\t\"id\": \"c\",\n\t\t\t\"name\": \"c\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add elements to cameoChild2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(3);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"d\",\n\t\t\t\"name\": \"d\"\n\t\t}, {\n\t\t\t\"id\": \"e\", \n\t\t\t\"name\": \"e\"\n\t\t}, {\n\t\t\t\"id\": \"f\",\n\t\t\t\"name\": \"f\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child2/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child2",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add elements to cameoChild3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(3);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"g\",\n\t\t\t\"name\": \"g\"\n\t\t}, {\n\t\t\t\"id\": \"h\", \n\t\t\t\"name\": \"h\"\n\t\t}, {\n\t\t\t\"id\": \"i\",\n\t\t\t\"name\": \"i\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child3/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child3",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add usage from cameoParent to cameoChild",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t   \"type\": \"Mount\",\n\t\t   \"id\": \"usage1\",\n\t\t   \"mountedElementProjectId\": \"cameo_child\",\n\t\t   \"mountedRefId\": \"master\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add usage from cameoParent to cameoChild2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t   \"type\": \"Mount\",\n\t\t   \"id\": \"usage2\",\n\t\t   \"mountedElementProjectId\": \"cameo_child2\",\n\t\t   \"mountedRefId\": \"master\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add usage from cameoChild2 to cameoChild3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t   \"type\": \"Mount\",\n\t\t   \"id\": \"usage3\",\n\t\t   \"mountedElementProjectId\": \"cameo_child3\",\n\t\t   \"mountedRefId\": \"master\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child2/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child2",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add usage from cameoChild3 to cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t   \"type\": \"Mount\",\n\t\t   \"id\": \"usage3\",\n\t\t   \"mountedElementProjectId\": \"cameo_parent\",\n\t\t   \"mountedRefId\": \"master\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child3/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child3",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all elements from cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"response has 12 elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(12);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{   \"id\": \"a\" },\n\t\t{   \"id\": \"b\" },\n\t\t{   \"id\": \"c\" },\n\t\t{   \"id\": \"d\" },\n\t\t{   \"id\": \"e\" },\n\t\t{   \"id\": \"f\" },\n\t\t{   \"id\": \"g\" },\n\t\t{   \"id\": \"h\" },\n\t\t{   \"id\": \"i\" },\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements/a",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements",
+								"a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoChild",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child/refs/master/elements/x",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child",
+								"refs",
+								"master",
+								"elements",
+								"x"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoChild2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child2/refs/master/elements/d",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child2",
+								"refs",
+								"master",
+								"elements",
+								"d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete an element from cameoChild3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child3/refs/master/elements/g",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child3",
+								"refs",
+								"master",
+								"elements",
+								"g"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get missing and deleted elements from cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 8 elements\", function () {",
+									"    pm.expect(jsonData.elements.length).to.eql(8);",
+									"});",
+									"pm.test(\"rejected has 5 elements, a, d, x, g, should be 410 and missing is 404\",",
+									"   function() {",
+									"       pm.expect(jsonData.rejected.length).to.eql(5);",
+									"       for (let r of jsonData.rejected) {",
+									"           if (r.object == 'missing') {",
+									"               pm.expect(r.code).to.eql(404);",
+									"           } else {",
+									"               pm.expect(r.code).to.eql(410);",
+									"           }",
+									"       }",
+									"   });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{   \"id\": \"a\" },\n\t\t{   \"id\": \"b\" },\n\t\t{   \"id\": \"c\" },\n\t\t{   \"id\": \"d\" },\n\t\t{   \"id\": \"e\" },\n\t\t{   \"id\": \"f\" },\n\t\t{   \"id\": \"g\" },\n\t\t{   \"id\": \"h\" },\n\t\t{   \"id\": \"i\" },\n\t\t{\n\t\t\t\"id\": \"x\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\"\n\t\t}, {\n\t\t\t\"id\": \"missing\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get mounts json",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 1 project\", function () {",
+									"    pm.expect(jsonData.projects.length).to.eql(1);",
+									"});",
+									"pm.test(\"project has 2 mounts\",",
+									"   function() {",
+									"       pm.expect(jsonData.projects[0]['_mounts'].length).to.eql(2);",
+									"   });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/mounts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"mounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add usage from cameoChild to nonexistent project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t   \"type\": \"Mount\",\n\t\t   \"id\": \"usage_bad\",\n\t\t   \"mountedElementProjectId\": \"cameo_bad\",\n\t\t   \"mountedRefId\": \"master\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get nonexistent element from cameoChild",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f900c37-5fc2-40fd-8b15-60459f4db501",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child/refs/master/elements/no",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child",
+								"refs",
+								"master",
+								"elements",
+								"no"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "getViews",
+			"item": [
+				{
+					"name": "add leaf view to cameoChlid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview1\",\n\t\t\t\"name\": \"leafview1\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add leaf view to cameoChlid2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview2\",\n\t\t\t\"name\": \"leafview2\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_child2/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_child2",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add views to cameoParent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(6);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview3\",\n\t\t\t\"name\": \"leafview3\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t},\n\t\t{\n\t\t\t\"id\": \"docPackage\",\n\t\t\t\"name\": \"docPackage\",\n\t\t\t\"type\": \"Package\",\n\t\t\t\"_isGroup\": true\n\t\t},\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"name\": \"parentdoc\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_2_3_87b0275_1371477871400_792964_43374\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": [\"prop1\", \"prop2\", \"prop3\"],\n\t\t\t\"ownerId\": \"docPackage\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop1\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview1\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop2\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview2\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"prop3\",\n\t\t\t\"ownerId\": \"parentdoc\",\n\t\t\t\"type\": \"Property\",\n\t\t\t\"aggregation\": \"composite\",\n\t\t\t\"typeId\": \"leafview3\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get documents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has parentdoc with _childViews\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.documents.length).to.eql(1);",
+									"    pm.expect(jsonData.documents[0]['_childViews']).to.eql([",
+									"        {",
+									"        \"id\": \"leafview1\",",
+									"        \"aggregation\": \"composite\",",
+									"        \"propertyId\": \"prop1\"",
+									"        },",
+									"        {",
+									"        \"id\": \"leafview2\",",
+									"        \"aggregation\": \"composite\",",
+									"        \"propertyId\": \"prop2\"",
+									"        },",
+									"        {",
+									"        \"id\": \"leafview3\",",
+									"        \"aggregation\": \"composite\",",
+									"        \"propertyId\": \"prop3\"",
+									"        }",
+									"        ])",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/documents",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"documents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get views",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has views with _childViews\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(4);",
+									"    for (let v of jsonData.elements) {",
+									"        if (v.id == \"parentdoc\") {",
+									"            pm.expect(v._childViews.length).to.eql(3);",
+									"        } else {",
+									"            pm.expect(v._childViews.length).to.eql(0);",
+									"        }",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\"id\": \"leafview1\"},\n\t\t{\"id\": \"leafview2\"},\n\t\t{\"id\": \"leafview3\"},\n\t\t{\"id\": \"parentdoc\"}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/views",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"views"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "childViews post",
+			"item": [
+				{
+					"name": "add new view to parent view and remove a child",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 5 elements\", function () {",
+									"    pm.expect(jsonData.elements.length).to.eql(5);",
+									"});",
+									"var propertyId = '';",
+									"var assocId = '';",
+									"var assocPropertyId = '';",
+									"var commitId = '';",
+									"var propertyCount = 0;",
+									"var associationCount = 0;",
+									"pm.test(\"2 properties and association are created\", function() {",
+									"    var propertyCount = 0;",
+									"    var associationCount = 0;",
+									"    for (let e of jsonData.elements) {",
+									"        if (e.type == \"Property\") {",
+									"            if (e.aggregation == 'composite') {",
+									"                propertyId = e.id;",
+									"            } else {",
+									"                assocPropertyId = e.id;",
+									"            }",
+									"            propertyCount++;",
+									"        } else if (e.type == \"Association\") {",
+									"            associationCount++;",
+									"            pm.expect(e.ownerId).to.eql('docPackage');",
+									"            assocId = e.id;",
+									"            commitId = e._commitId;",
+									"        }",
+									"    }",
+									"    pm.expect(propertyCount).to.eql(2);",
+									"    pm.expect(associationCount).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"parentdoc view has updated _childViews returned\", function() {",
+									"     for (let e of jsonData.elements) {",
+									"        if (e.id == \"parentdoc\") {",
+									"            pm.expect(e['_childViews']).to.eql([",
+									"                {",
+									"                    \"id\": \"leafview1\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop1\"",
+									"                },",
+									"                {",
+									"                    \"id\": \"leafview2\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop2\"",
+									"                },",
+									"                {",
+									"                    \"id\": \"leafview4\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": propertyId",
+									"                }",
+									"            ]);",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.environment.set(\"propertyId\", propertyId);",
+									"pm.environment.set(\"assocId\", assocId);",
+									"pm.environment.set(\"assocPropertyId\", assocPropertyId);",
+									"pm.environment.set(\"childViewsPostCommitId\", commitId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview4\",\n\t\t\t\"name\": \"leafview4\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t},\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"_childViews\": [\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview1\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview2\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview4\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/views",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"views"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check commit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05736c0e-c3e9-46b7-aea8-d1b407b8c73a",
+								"exec": [
+									"var jsonData = pm.response.json().commits[0];",
+									"pm.test(\"commit has 1 update for parentdoc\", function () {",
+									"    pm.expect(jsonData.updated.length).to.eql(1);",
+									"    pm.expect(jsonData.updated[0].id).to.eql('parentdoc');",
+									"});",
+									"pm.test(\"commit has 4 added\", function() {",
+									"    pm.expect(jsonData.added.length).to.eql(4);",
+									"});",
+									"pm.test(\"commit has 1 deleted for prop3\", function() {",
+									"    pm.expect(jsonData.deleted.length).to.eql(1);",
+									"    pm.expect(jsonData.deleted[0].id).to.eql('prop3');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/commits/{{childViewsPostCommitId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"commits",
+								"{{childViewsPostCommitId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add new view to parent view and remove a child 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 5 elements\", function () {",
+									"    pm.expect(jsonData.elements.length).to.eql(5);",
+									"});",
+									"var propertyId = '';",
+									"var assocId = '';",
+									"var assocPropertyId = '';",
+									"var commitId = '';",
+									"var propertyCount = 0;",
+									"var associationCount = 0;",
+									"pm.test(\"2 properties and association are created\", function() {",
+									"    var propertyCount = 0;",
+									"    var associationCount = 0;",
+									"    for (let e of jsonData.elements) {",
+									"        if (e.type == \"Property\") {",
+									"            if (e.aggregation == 'composite') {",
+									"                propertyId = e.id;",
+									"            } else {",
+									"                assocPropertyId = e.id;",
+									"            }",
+									"            propertyCount++;",
+									"        } else if (e.type == \"Association\") {",
+									"            associationCount++;",
+									"            pm.expect(e.ownerId).to.eql('docPackage');",
+									"            assocId = e.id;",
+									"            commitId = e._commitId;",
+									"        }",
+									"    }",
+									"    pm.expect(propertyCount).to.eql(2);",
+									"    pm.expect(associationCount).to.eql(1);",
+									"});",
+									"",
+									"pm.test(\"parentdoc view has updated _childViews returned\", function() {",
+									"     for (let e of jsonData.elements) {",
+									"        if (e.id == \"parentdoc\") {",
+									"            pm.expect(e['_childViews']).to.eql([",
+									"                {",
+									"                    \"id\": \"leafview1\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop1\"",
+									"                },",
+									"                {",
+									"                    \"id\": \"leafview2\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop2\"",
+									"                },",
+									"                {",
+									"                    \"id\": \"leafview5\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": propertyId",
+									"                }",
+									"            ]);",
+									"        }",
+									"    }",
+									"});",
+									"",
+									"pm.environment.set(\"propertyId2\", propertyId);",
+									"pm.environment.set(\"assocId2\", assocId);",
+									"pm.environment.set(\"assocPropertyId2\", assocPropertyId);",
+									"pm.environment.set(\"childViewsPostCommitId2\", commitId);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"leafview5\",\n\t\t\t\"name\": \"leafview5\",\n\t\t\t\"_appliedStereotypeIds\": [\"_17_0_1_232f03dc_1325612611695_581988_21583\"],\n\t\t\t\"type\": \"Class\",\n\t\t\t\"ownedAttributeIds\": []\n\t\t},\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"_childViews\": [\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview1\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview2\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview5\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/views",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"views"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check commit 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "05736c0e-c3e9-46b7-aea8-d1b407b8c73a",
+								"exec": [
+									"var jsonData = pm.response.json().commits[0];",
+									"pm.test(\"commit has 1 update for parentdoc\", function () {",
+									"    pm.expect(jsonData.updated.length).to.eql(1);",
+									"    pm.expect(jsonData.updated[0].id).to.eql('parentdoc');",
+									"});",
+									"pm.test(\"commit has 4 added\", function() {",
+									"    pm.expect(jsonData.added.length).to.eql(4);",
+									"});",
+									"pm.test(\"commit has 3 deleted\", function() {",
+									"    pm.expect(jsonData.deleted.length).to.eql(3);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/commits/{{childViewsPostCommitId2}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"commits",
+								"{{childViewsPostCommitId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get deleted props and assocs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has 3 deleted\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.rejected.length).to.eql(3);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\"id\": \"{{propertyId}}\"},\n\t\t{\"id\": \"{{assocId}}\"},\n\t\t{\"id\": \"{{assocPropertyId}}\"}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reorder childviews without delete or adds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 1 element\", function () {",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									"pm.test(\"parentdoc view has updated _childViews returned\", function() {",
+									"        pm.expect(jsonData.elements[0]['_childViews']).to.eql([",
+									"                {",
+									"                    \"id\": \"leafview5\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": pm.environment.get(\"propertyId2\")",
+									"                },",
+									"                 {",
+									"                    \"id\": \"leafview1\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop1\"",
+									"                },",
+									"                 {",
+									"                    \"id\": \"leafview2\",",
+									"                    \"aggregation\": \"composite\",",
+									"                    \"propertyId\": \"prop2\"",
+									"                }",
+									"            ]);",
+									"        pm.expect(jsonData.elements[0].ownedAttributeIds).to.eql([pm.environment.get('propertyId2'), 'prop1', 'prop2']);",
+									"        ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"parentdoc\",\n\t\t\t\"_childViews\": [\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview5\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview1\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\t\"id\": \"leafview2\",\n\t\t\t\t\t\"aggregation\": \"composite\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/views",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"views"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8f035a70-58f7-4b94-8a5a-6104e5d003e7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "88d18b33-2f23-47bb-ab2f-855d4b9023e6",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "groups",
+			"item": [
+				{
+					"name": "add group under docPackage group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"pm.test(\"response has elements\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.elements.length).to.eql(1);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"group1\",\n\t\t\t\"name\": \"group1\",\n\t\t\t\"type\": \"Package\",\n\t\t\t\"_isGroup\": true,\n\t\t\t\"ownerId\": \"docPackage\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/elements",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 2 groups\", function () {",
+									"    pm.expect(jsonData.groups.length).to.eql(2);",
+									"    for (var g of jsonData.groups) {",
+									"        if (g.id == 'group1') {",
+									"            pm.expect(g._parentId).to.eql('docPackage');",
+									"        }",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/groups",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get document with group key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"response has 1 document with group key\", function () {",
+									"    pm.expect(jsonData.documents.length).to.eql(1);",
+									"    pm.expect(jsonData.documents[0]._groupId).to.eql('docPackage');",
+									"    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/projects/cameo_parent/refs/master/documents",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"projects",
+								"cameo_parent",
+								"refs",
+								"master",
+								"documents"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "eb327499-ad5c-44a1-937c-83682c480b64",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "60fb49a9-3cbb-4141-853b-c27da462ba61",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

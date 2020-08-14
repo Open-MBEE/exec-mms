@@ -1,0 +1,18 @@
+package org.openmbee.sdvc.core.dao;
+
+import java.util.List;
+import java.util.Optional;
+import org.openmbee.sdvc.data.domains.global.Project;
+
+public interface ProjectDAO {
+
+    Optional<Project> findByProjectId(String id);
+
+    Optional<Project> findByProjectName(String name);
+
+    Project save(Project p);
+
+    void delete(Project p);
+
+    List<Project> findAll();
+}

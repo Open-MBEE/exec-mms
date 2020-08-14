@@ -1,0 +1,1835 @@
+openapi: 3.0.1
+info:
+  title: MMS Example API
+  description: Documentation for MMS API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  version: 0.0.1
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+security:
+- basicAuth: []
+- bearerToken: []
+paths:
+  /healthcheck:
+    get:
+      tags:
+      - Monitor
+      operationId: healthcheck
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: string
+  /authentication:
+    post:
+      tags:
+      - Auth
+      operationId: createAuthenticationToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JwtAuthenticationRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationResponse'
+      security: []
+  /user:
+    post:
+      tags:
+      - Auth
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: object
+  /password:
+    post:
+      tags:
+      - Auth
+      operationId: updatePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: object
+  /projects/{projectId}/refs/{refId}/views:
+    put:
+      tags:
+      - Views
+      operationId: getViews
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    post:
+      tags:
+      - Views
+      operationId: createOrUpdateViews
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+  /projects/{projectId}/refs/{refId}/views/{viewId}:
+    get:
+      tags:
+      - Views
+      operationId: getView
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: viewId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+  /projects/{projectId}/refs/{refId}/mounts:
+    get:
+      tags:
+      - Views
+      operationId: getMounts
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MountsResponse'
+  /projects/{projectId}/refs/{refId}/documents:
+    get:
+      tags:
+      - Views
+      operationId: getDocuments
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentsResponse'
+  /projects/{projectId}/refs/{refId}/groups:
+    get:
+      tags:
+      - Views
+      operationId: getGroups
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupsResponse'
+  /projects/{projectId}/refs/{refId}/notebooks:
+    get:
+      tags:
+      - Notebooks
+      operationId: getAllNotebooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+    put:
+      tags:
+      - Notebooks
+      operationId: getNotebooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotebooksRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+    post:
+      tags:
+      - Notebooks
+      operationId: createOrUpdateNotebooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotebooksRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+  /projects/{projectId}/refs/{refId}/notebooks/{notebookId}:
+    get:
+      tags:
+      - Notebooks
+      operationId: getNotebook
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: notebookId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotebooksResponse'
+  /orgs/{orgId}/permissions:
+    get:
+      tags:
+      - Auth
+      operationId: getOrgPermissions
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+    post:
+      tags:
+      - Auth
+      operationId: updateOrgPermissions
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionUpdatesResponse'
+  /projects/{projectId}/permissions:
+    get:
+      tags:
+      - Auth
+      operationId: getProjectPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+    post:
+      tags:
+      - Auth
+      operationId: updateProjectPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionUpdatesResponse'
+  /projects/{projectId}/refs/{refId}/permissions:
+    get:
+      tags:
+      - Auth
+      operationId: getBranchPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+    post:
+      tags:
+      - Auth
+      operationId: updateBranchPermissions
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionUpdatesResponse'
+  /permissions:
+    put:
+      tags:
+      - Auth
+      operationId: lookupPermissions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionLookupRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionLookupResponse'
+  /projects/{projectId}/webhooks:
+    get:
+      tags:
+      - Webhooks
+      operationId: getAllWebhooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+    post:
+      tags:
+      - Webhooks
+      operationId: createOrUpdateWebhooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+    delete:
+      tags:
+      - Webhooks
+      operationId: deleteWebhooks
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+  /projects/{projectId}/refs:
+    get:
+      tags:
+      - Refs
+      operationId: getAllRefs
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefsResponse'
+    post:
+      tags:
+      - Refs
+      operationId: createRefs
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefsResponse'
+  /projects/{projectId}/refs/{refId}:
+    get:
+      tags:
+      - Refs
+      operationId: getRef
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefsResponse'
+    delete:
+      tags:
+      - Refs
+      operationId: deleteRef
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefsResponse'
+  /projects/{projectId}/commits:
+    put:
+      tags:
+      - Commits
+      operationId: getCommits
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}/refs/{refId}/commits:
+    get:
+      tags:
+      - Commits
+      operationId: getRefCommits
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: maxTimestamp
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}/commits/{commitId}:
+    get:
+      tags:
+      - Commits
+      operationId: getCommit
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}/refs/{refId}/elements/{elementId}/commits:
+    get:
+      tags:
+      - Commits
+      operationId: getElementCommits
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitsResponse'
+  /projects/{projectId}/refs/{refId}/elements:
+    get:
+      tags:
+      - Elements
+      operationId: getAllElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    put:
+      tags:
+      - Elements
+      operationId: getElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    post:
+      tags:
+      - Elements
+      operationId: createOrUpdateElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    delete:
+      tags:
+      - Elements
+      operationId: deleteElements
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElementsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+  /projects/{projectId}/refs/{refId}/elements/{elementId}:
+    get:
+      tags:
+      - Elements
+      operationId: getElement
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: commitId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+    delete:
+      tags:
+      - Elements
+      operationId: deleteElement
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: refId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: elementId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementsResponse'
+  /orgs:
+    get:
+      tags:
+      - Orgs
+      operationId: getAllOrgs
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+    post:
+      tags:
+      - Orgs
+      operationId: createOrUpdateOrgs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+  /orgs/{orgId}:
+    get:
+      tags:
+      - Orgs
+      operationId: getOrg
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+    delete:
+      tags:
+      - Orgs
+      operationId: deleteOrg
+      parameters:
+      - name: orgId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+  /schemas:
+    get:
+      tags:
+      - Projects
+      operationId: getProjectSchemaOptions
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemasResponse'
+      security: []
+  /projects/{projectId}:
+    get:
+      tags:
+      - Projects
+      operationId: getProject
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+    delete:
+      tags:
+      - Projects
+      operationId: deleteProject
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: hard
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+  /projects:
+    get:
+      tags:
+      - Projects
+      operationId: getAllProjects
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+    post:
+      tags:
+      - Projects
+      operationId: createOrUpdateProjects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectsRequest'
+        required: true
+      responses:
+        200:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectsResponse'
+components:
+  schemas:
+    JwtAuthenticationRequest:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    JwtAuthenticationResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    UserCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Element:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        _inRefIds:
+          type: array
+          readOnly: true
+          items:
+            type: string
+            readOnly: true
+        _projectId:
+          type: string
+          readOnly: true
+        _refId:
+          type: string
+          readOnly: true
+        _creator:
+          type: string
+          readOnly: true
+        _docId:
+          type: string
+          readOnly: true
+        _modifier:
+          type: string
+          readOnly: true
+        _created:
+          type: string
+          readOnly: true
+        _commitId:
+          type: string
+          readOnly: true
+        _modified:
+          type: string
+          readOnly: true
+      additionalProperties: true
+    ElementsRequest:
+      required:
+      - elements
+      type: object
+      properties:
+        source:
+          type: string
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Element'
+    ElementsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/Element'
+    Rejection:
+      type: object
+      properties:
+        object:
+          type: object
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+      nullable: true
+    Mount:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        _projectId:
+          type: string
+          readOnly: true
+        _refId:
+          type: string
+          readOnly: true
+        _creator:
+          type: string
+          readOnly: true
+        _docId:
+          type: string
+          readOnly: true
+        _modifier:
+          type: string
+          readOnly: true
+        _created:
+          type: string
+          readOnly: true
+        _commitId:
+          type: string
+          readOnly: true
+        _modified:
+          type: string
+          readOnly: true
+      additionalProperties: true
+    MountsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Mount'
+    DocumentsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Element'
+    GroupsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/Element'
+    NotebooksResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        notebooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Element'
+    NotebooksRequest:
+      required:
+      - notebooks
+      type: object
+      properties:
+        source:
+          type: string
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        notebooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Element'
+    Permission:
+      type: object
+      properties:
+        name:
+          type: string
+        role:
+          type: string
+    PermissionUpdateRequest:
+      required:
+      - action
+      - permissions
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - MODIFY
+          - REPLACE
+          - REMOVE
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    PermissionsRequest:
+      type: object
+      properties:
+        users:
+          $ref: '#/components/schemas/PermissionUpdateRequest'
+        groups:
+          $ref: '#/components/schemas/PermissionUpdateRequest'
+        inherit:
+          type: boolean
+        public:
+          type: boolean
+    PermissionUpdate:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - ADD
+          - REMOVE
+        name:
+          type: string
+        role:
+          type: string
+        orgId:
+          type: string
+        orgName:
+          type: string
+        projectId:
+          type: string
+        projectName:
+          type: string
+        branchId:
+          type: string
+        inherited:
+          type: boolean
+    PermissionUpdateResponse:
+      type: object
+      properties:
+        permissionUpdates:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionUpdate'
+    PermissionUpdatesResponse:
+      type: object
+      properties:
+        inherit:
+          type: boolean
+        users:
+          $ref: '#/components/schemas/PermissionUpdateResponse'
+        groups:
+          $ref: '#/components/schemas/PermissionUpdateResponse'
+        public:
+          type: boolean
+    PermissionResponse:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    PermissionsResponse:
+      type: object
+      properties:
+        inherit:
+          type: boolean
+        users:
+          $ref: '#/components/schemas/PermissionResponse'
+        groups:
+          $ref: '#/components/schemas/PermissionResponse'
+        public:
+          type: boolean
+    PermissionLookup:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - ORG
+          - PROJECT
+          - BRANCH
+        orgId:
+          type: string
+        projectId:
+          type: string
+        refId:
+          type: string
+        privilege:
+          type: string
+          enum:
+          - ORG_READ
+          - ORG_EDIT
+          - ORG_UPDATE_PERMISSIONS
+          - ORG_READ_PERMISSIONS
+          - ORG_CREATE_PROJECT
+          - ORG_DELETE
+          - PROJECT_READ
+          - PROJECT_EDIT
+          - PROJECT_READ_COMMITS
+          - PROJECT_CREATE_BRANCH
+          - PROJECT_DELETE
+          - PROJECT_UPDATE_PERMISSIONS
+          - PROJECT_READ_PERMISSIONS
+          - PROJECT_CREATE_WEBHOOKS
+          - BRANCH_READ
+          - BRANCH_EDIT_CONTENT
+          - BRANCH_DELETE
+          - BRANCH_UPDATE_PERMISSIONS
+          - BRANCH_READ_PERMISSIONS
+        allowAnonIfPublic:
+          type: boolean
+        hasPrivilege:
+          type: boolean
+    PermissionLookupRequest:
+      type: object
+      properties:
+        lookups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionLookup'
+    PermissionLookupResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        lookups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionLookup'
+        allPassed:
+          type: boolean
+    Webhook:
+      required:
+      - url
+      type: object
+      properties:
+        url:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+        _projectId:
+          type: string
+          readOnly: true
+        _creator:
+          type: string
+          readOnly: true
+        _created:
+          type: string
+          readOnly: true
+      additionalProperties: true
+    WebhookResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        webhooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Webhook'
+    WebhookRequest:
+      required:
+      - webhooks
+      type: object
+      properties:
+        webhooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Webhook'
+    Ref:
+      required:
+      - name
+      - type
+      type: object
+      properties:
+        status:
+          type: string
+          readOnly: true
+        parentRefId:
+          type: string
+          default: master
+        deleted:
+          type: boolean
+          readOnly: true
+        parentCommitId:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+          - Branch
+          - Tag
+        name:
+          type: string
+        _projectId:
+          type: string
+          readOnly: true
+        _refId:
+          type: string
+          readOnly: true
+        _creator:
+          type: string
+          readOnly: true
+        _docId:
+          type: string
+          readOnly: true
+        _modifier:
+          type: string
+          readOnly: true
+        _created:
+          type: string
+          readOnly: true
+        _modified:
+          type: string
+          readOnly: true
+      additionalProperties: true
+    RefsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        refs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ref'
+    RefsRequest:
+      required:
+      - refs
+      type: object
+      properties:
+        refs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ref'
+    Commit:
+      required:
+      - id
+      type: object
+      properties:
+        deleted:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ElementVersion'
+        added:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ElementVersion'
+        updated:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ElementVersion'
+        comment:
+          type: string
+          readOnly: true
+        source:
+          type: string
+          readOnly: true
+        id:
+          type: string
+        _projectId:
+          type: string
+          readOnly: true
+        _refId:
+          type: string
+          readOnly: true
+        _creator:
+          type: string
+          readOnly: true
+        _docId:
+          type: string
+          readOnly: true
+        _created:
+          type: string
+          readOnly: true
+        _commitId:
+          type: string
+          readOnly: true
+      additionalProperties: true
+    CommitsRequest:
+      required:
+      - commits
+      type: object
+      properties:
+        commits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Commit'
+    ElementVersion:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        _previousDocId:
+          type: string
+          readOnly: true
+        _docId:
+          type: string
+          readOnly: true
+      readOnly: true
+    CommitsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        commits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Commit'
+    Org:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        _creator:
+          type: string
+          readOnly: true
+        _docId:
+          type: string
+          readOnly: true
+        _modifier:
+          type: string
+          readOnly: true
+        _created:
+          type: string
+          readOnly: true
+        _modified:
+          type: string
+          readOnly: true
+      additionalProperties: true
+    OrganizationsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        orgs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Org'
+    OrganizationsRequest:
+      required:
+      - orgs
+      type: object
+      properties:
+        orgs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Org'
+    Schema:
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+      additionalProperties: true
+    SchemasResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Schema'
+    Project:
+      required:
+      - name
+      - orgId
+      type: object
+      properties:
+        orgId:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        schema:
+          type: string
+          description: Acceptable values depends on the specific build and implementation
+            (ex. default, cameo, jupyter), if a value isn't supported, will fall back
+            to default. This can influence the project's underlying schema used and
+            additional validation or processing when getting or updating elements.
+          default: default
+        _projectId:
+          type: string
+          readOnly: true
+        _creator:
+          type: string
+          readOnly: true
+        _docId:
+          type: string
+          readOnly: true
+        _modifier:
+          type: string
+          readOnly: true
+        _created:
+          type: string
+          readOnly: true
+        _modified:
+          type: string
+          readOnly: true
+      additionalProperties: true
+    ProjectsResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        rejected:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Rejection'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+    ProjectsRequest:
+      required:
+      - projects
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    basicAuth:
+      type: http
+      scheme: basic
