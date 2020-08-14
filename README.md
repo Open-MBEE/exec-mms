@@ -1,5 +1,5 @@
 # MMS Structured Data Version Control
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/Open-MBEE/mms.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Open-MBEE/mms/context:java)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/Open-MBEE/mms.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Open-MBEE/mms/context:java) [![CircleCI](https://circleci.com/gh/Open-MBEE/mms.svg?style=svg)](https://circleci.com/gh/Open-MBEE/mms)
 
 The MMS SDVC is a collection of modules built on top of the Spring Framework and is a part of Open-MBEE. For more information about Open-MBEE, visit the [Open-MBEE Website](https://openmbee.org/)
 
