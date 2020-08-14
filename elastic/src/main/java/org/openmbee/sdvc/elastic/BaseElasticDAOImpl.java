@@ -18,6 +18,7 @@ import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.get.GetResult;
@@ -36,6 +37,13 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     protected int termLimit;
     protected static int readTimeout = 1000000000;
     protected RestHighLevelClient client;
+    private static final RequestOptions REQUEST_OPTIONS;
+    static {
+        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+        // TODO: Should be configureable
+        builder.setHttpAsyncResponseConsumerFactory(new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024));
+        REQUEST_OPTIONS = builder.build();
+    }
 
     @Autowired
     public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
@@ -50,7 +58,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void deleteById(String index, String docId) {
         try {
-            client.delete(new DeleteRequest(index, docId), RequestOptions.DEFAULT);
+            client.delete(new DeleteRequest(index, docId), REQUEST_OPTIONS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +70,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             for (BaseJson json : jsons) {
                 bulkIndex.add(new DeleteRequest(index, json.getDocId()));
             }
-            client.bulk(bulkIndex, RequestOptions.DEFAULT);
+            client.bulk(bulkIndex, REQUEST_OPTIONS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -73,7 +81,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             GetRequest getRequest = new GetRequest(index, docId);
             getRequest.fetchSourceContext(new FetchSourceContext(false));
             getRequest.storedFields("_none_");
-            return client.exists(getRequest, RequestOptions.DEFAULT);
+            return client.exists(getRequest, REQUEST_OPTIONS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +90,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     public Optional<E> findById(String index, String docId) {
         try {
             GetResponse res = client
-                .get(new GetRequest(index, docId), RequestOptions.DEFAULT);
+                .get(new GetRequest(index, docId), REQUEST_OPTIONS);
             if (res.isExists()) {
                 E ob = newInstance();
                 ob.putAll(res.getSourceAsMap());
@@ -106,7 +114,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             for (String eid : docIds) {
                 request.add(index, eid);
             }
-            MultiGetResponse response = client.mget(request, RequestOptions.DEFAULT);
+            MultiGetResponse response = client.mget(request, REQUEST_OPTIONS);
 
             for (MultiGetItemResponse res : response.getResponses()) {
                 GetResponse item = res.getResponse();
@@ -130,7 +138,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             for (BaseJson json : jsons) {
                 bulkIndex.add(new IndexRequest(index).id(json.getDocId()).source(json));
             }
-            client.bulk(bulkIndex, RequestOptions.DEFAULT);
+            client.bulk(bulkIndex, REQUEST_OPTIONS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -139,7 +147,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     public void index(String index, BaseJson json) {
         try {
             client.index(new IndexRequest(index).id(json.getDocId()).source(json),
-                RequestOptions.DEFAULT);
+                REQUEST_OPTIONS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -152,7 +160,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             UpdateRequest request = new UpdateRequest(index, json.getDocId());
             request.fetchSource(true);
             request.docAsUpsert(true).doc(json).upsert(json);
-            UpdateResponse updateResponse = client.update(request, RequestOptions.DEFAULT);
+            UpdateResponse updateResponse = client.update(request, REQUEST_OPTIONS);
             if (updateResponse.getResult() == DocWriteResponse.Result.CREATED ||
                 updateResponse.getResult() == DocWriteResponse.Result.UPDATED) {
                 GetResult result = updateResponse.getGetResult();

@@ -1,6 +1,7 @@
 package org.openmbee.sdvc.elastic.config;
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +20,8 @@ public class ElasticsearchConfig {
 
     @Bean(name = "clientElastic", destroyMethod = "close")
     public RestHighLevelClient restClient() {
-        RestHighLevelClient client = new RestHighLevelClient(
-            RestClient.builder(new HttpHost(elasticsearchHost, elasticsearchPort, elasticsearchHttp)));
+        RestClientBuilder builder = RestClient.builder(new HttpHost(elasticsearchHost, elasticsearchPort, elasticsearchHttp));
+        RestHighLevelClient client = new RestHighLevelClient(builder);
         // :TODO can pass other params to config here
         return client;
     }
