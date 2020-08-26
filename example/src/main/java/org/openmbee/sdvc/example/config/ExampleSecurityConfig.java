@@ -24,6 +24,8 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository;
+import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpMethod.*;
@@ -104,5 +106,13 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
         configurer.favorParameter(false)
             .ignoreAcceptHeader(false)
             .defaultContentType(MediaType.APPLICATION_JSON);
+    }
+    @Bean
+    public InMemoryAuditEventRepository repository(){
+        return new InMemoryAuditEventRepository();
+    }
+    @Bean
+    public InMemoryHttpTraceRepository httpTraceRepository() {
+        return new InMemoryHttpTraceRepository();
     }
 }
