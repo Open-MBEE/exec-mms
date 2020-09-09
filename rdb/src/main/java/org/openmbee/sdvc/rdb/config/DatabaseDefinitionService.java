@@ -56,12 +56,11 @@ public class DatabaseDefinitionService {
     public boolean createProjectDatabase(Project project) throws SQLException {
         ContextHolder.setContext(null);
         //TODO sanitize projectId? or reject if not valid id
-        String queryString = String.format("CREATE DATABASE \"_%s\"", project.getProjectId());
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
             crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
         try {
-            jdbcTemplate.execute(queryString);
+            jdbcTemplate.execute("CREATE DATABASE " + databaseProjectString(project));
             created.add("Created Database");
 
             generateProjectSchemaFromModels(project);
@@ -77,6 +76,15 @@ public class DatabaseDefinitionService {
             }
         }
         return !created.isEmpty();
+    }
+
+    public void deleteProjectDatabase(Project project) throws SQLException {
+        Connection connection = crudDataSources.getDataSource("DEFAULT").getConnection();
+        connection.createStatement().executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
+    }
+
+    private String databaseProjectString(Project project) {
+        return String.format("\"_%s\"", project.getProjectId());
     }
 
     public void createBranch() {

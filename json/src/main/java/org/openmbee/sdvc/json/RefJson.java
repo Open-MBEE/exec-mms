@@ -12,8 +12,8 @@ public class RefJson extends BaseJson<RefJson> {
     public static final String PARENT_REF_ID = "parentRefId";
     public static final String PARENT_COMMIT_ID = "parentCommitId";
     public static final String STATUS = "status";
-    public static final String TYPE = "type";
     public static final String DESCRIPTION = "description";
+    public static final String TAG = "Tag";
     public static final String DELETED = "deleted";
 
     @Schema(defaultValue = "master")
@@ -57,7 +57,7 @@ public class RefJson extends BaseJson<RefJson> {
     }
 
     public boolean isTag() {
-        return "Tag".equals(getType());
+        return TAG.equals(getType());
     }
 
     public String getDescription() {

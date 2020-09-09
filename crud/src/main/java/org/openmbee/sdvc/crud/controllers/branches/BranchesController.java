@@ -44,6 +44,8 @@ public class BranchesController extends BaseController {
         @PathVariable String projectId,
         Authentication auth) {
 
+        getProjectType(projectId);
+
         RefsResponse res = branchService.getBranches(projectId);
         if (!permissionService.isProjectPublic(projectId)) {
             List<RefJson> filtered = new ArrayList<>();

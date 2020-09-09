@@ -1,17 +1,22 @@
 package org.openmbee.sdvc.rdb.repositories;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.rdb.config.DatabaseDefinitionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public class ProjectDAOImpl implements ProjectDAO {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ProjectRepository projectRepository;
 
@@ -53,8 +58,14 @@ public class ProjectDAOImpl implements ProjectDAO {
 
     @Override
     public void delete(Project p) {
-        //TODO delete db
         projectRepository.delete(p);
+
+        try {
+            projectOperations.deleteProjectDatabase(p);
+        } catch(SQLException ex) {
+            logger.error("DELETE PROJECT DATABASE EXCEPTION\nPotential connection issue, query statement mishap, or unexpected RDB behavior.");
+            throw new InternalErrorException(ex);
+        }
     }
 
     @Override

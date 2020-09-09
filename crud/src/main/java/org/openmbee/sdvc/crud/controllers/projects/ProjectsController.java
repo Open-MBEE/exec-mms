@@ -61,7 +61,7 @@ public class ProjectsController extends BaseController {
         for (Project proj : allProjects) {
             if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
                 ContextHolder.setContext(proj.getProjectId());
-                if(proj.getDocId() != null) {
+                if(proj.getDocId() != null  && !proj.isDeleted()) {
                     Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
                     projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), ()-> {
                         logger.error("Project json not found for id: {}", proj.getProjectId());
@@ -174,8 +174,10 @@ public class ProjectsController extends BaseController {
         res.add(projectJson);
         if (hard) {
             projectRepository.delete(project);
+            projectIndex.delete(projectId);
         } else {
             projectRepository.save(project);
+            // TODO soft delete for index?
         }
         return response.setProjects(res);
     }

@@ -7,6 +7,7 @@ import org.openmbee.sdvc.crud.services.DefaultProjectService;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.openmbee.sdvc.json.ElementJson;
 import org.openmbee.sdvc.json.ProjectJson;
+import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,10 @@ public class CameoProjectService extends DefaultProjectService implements Projec
     public ProjectJson create(ProjectJson project) {
         ProjectJson projectJson = super.create(project);
 
-        ElementJson projectHoldingBin = createNode(CameoConstants.HOLDING_BIN_PREFIX + project.getProjectId(),
+        ElementJson projectHoldingBin = createNode(CameoConstants.HOLDING_BIN_PREFIX + projectJson.getProjectId(),
             "Holding Bin", projectJson);
 
-        ElementJson viewInstanceBin = createNode(CameoConstants.VIEW_INSTANCES_BIN_PREFIX + project.getProjectId(),
+        ElementJson viewInstanceBin = createNode(CameoConstants.VIEW_INSTANCES_BIN_PREFIX + projectJson.getProjectId(),
             "View Instances Bin", projectJson);
 
         ElementsRequest elementsRequest = new ElementsRequest();
@@ -43,6 +44,14 @@ public class CameoProjectService extends DefaultProjectService implements Projec
             Collections.EMPTY_MAP, projectJson.getCreator());
 
         return projectJson;
+    }
+
+    @Override
+    public RefJson createRefJson(ProjectJson project, String docId){
+        RefJson branchJson = super.createRefJson(project, docId);
+        branchJson.put("twcId",Constants.MASTER_BRANCH);
+        return branchJson;
+
     }
 
     private static ElementJson createNode(String id, String name, ProjectJson projectJson) {

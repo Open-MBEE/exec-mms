@@ -95,32 +95,20 @@ public class DefaultProjectService implements ProjectService {
 
         try {
             projectRepository.save(proj);
-            projectIndex.create(proj.getProjectId(), project.getProjectType());
-            projectIndex.update(project);
+            projectIndex.create(project);
 
-            //Index master branch
             Optional<Branch> masterBranch = branchRepository.findByBranchId(Constants.MASTER_BRANCH);
             if (masterBranch.isPresent()) {
-                Branch master = masterBranch.get();
-                RefJson branchJson = new RefJson();
                 String docId = UUID.randomUUID().toString();
-                branchJson.setId(Constants.MASTER_BRANCH);
-                branchJson.setName(Constants.MASTER_BRANCH);
-                branchJson.setParentRefId(null);
-                branchJson.setDocId(docId);
-                branchJson.setRefType(RefType.Branch);
-                branchJson.setCreated(project.getCreated());
-                branchJson.setProjectId(project.getId());
-                branchJson.setCreator(project.getCreator());
-                branchJson.setDeleted(false);
-
+                Branch master = masterBranch.get();
                 master.setDocId(docId);
                 master.setParentCommit(0L);
 
                 branchRepository.save(master);
+
+                RefJson branchJson = createRefJson(project, docId);
                 branchIndex.index(branchJson);
             }
-
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(project.getId(), "master", "project_created", project)));
             return project;
@@ -128,6 +116,20 @@ public class DefaultProjectService implements ProjectService {
             logger.error("Couldn't create project: {}", project.getProjectId(), e);
         }
         throw new InternalErrorException("Could not create project");
+    }
+
+    public RefJson createRefJson(ProjectJson project, String docId){
+        RefJson branchJson = new RefJson();
+        branchJson.setId(Constants.MASTER_BRANCH);
+        branchJson.setName(Constants.MASTER_BRANCH);
+        branchJson.setParentRefId(null);
+        branchJson.setDocId(docId);
+        branchJson.setRefType(RefType.Branch);
+        branchJson.setCreated(project.getCreated());
+        branchJson.setProjectId(project.getId());
+        branchJson.setCreator(project.getCreator());
+        branchJson.setDeleted(false);
+        return branchJson;
     }
 
     public ProjectJson update(ProjectJson project) {

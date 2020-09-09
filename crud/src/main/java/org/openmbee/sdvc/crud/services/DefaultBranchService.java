@@ -137,11 +137,11 @@ public class DefaultBranchService implements BranchService {
         branch.setCreated(Formats.FORMATTER.format(now));
         branch.setDeleted(false);
         branch.setProjectId(projectId);
+        branch.setStatus("created");
 
         if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
-            String uuid = UUID.randomUUID().toString();
-            branch.setDocId(uuid);
-            b.setDocId(uuid);
+            branch.setDocId(branch.getId());
+            b.setDocId(branch.getId());
         }
         logger.info("Saving branch: {}", branch.getId());
 
