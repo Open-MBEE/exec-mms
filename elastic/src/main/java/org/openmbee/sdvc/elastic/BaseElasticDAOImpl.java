@@ -146,6 +146,9 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void indexAll(String index, Collection<? extends BaseJson> jsons) {
         BulkProcessor bulkProcessor = getBulkProcessor(client);
+        for (BaseJson json : jsons) {
+            bulkProcessor.add(new IndexRequest(index).id(json.getDocId()).source(json));
+        }
         try {
             if(!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
                 logger.error("Timed out in bulk processing");
