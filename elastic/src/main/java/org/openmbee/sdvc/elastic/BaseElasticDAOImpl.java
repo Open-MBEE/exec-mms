@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -32,16 +30,17 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.elastic.utils.Index;
 import org.openmbee.sdvc.json.BaseJson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
-    private final Logger logger = LogManager.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
@@ -154,7 +153,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                 logger.error("Timed out in bulk processing");
             }
         } catch (InterruptedException e) {
-            logger.error(e);
+            logger.error("Index all interrupted: ", e);
         }
 
     }
@@ -197,6 +196,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     private static BulkProcessor getBulkProcessor(RestHighLevelClient client,  BulkProcessor.Listener listener) {
         if (listener == null) {
             listener = new BulkProcessor.Listener() {
+                private final Logger logger = LoggerFactory.getLogger(getClass());
                 @Override
                 public void beforeBulk(long executionId, BulkRequest request) {
                 }
@@ -207,6 +207,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
                 @Override
                 public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                    logger.error("Error in bulk processing: ", failure);
                 }
             };
         }
