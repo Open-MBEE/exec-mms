@@ -2,6 +2,7 @@ buildscript {
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
     repositories {
         maven { url 'https://repo.spring.io/plugins-release' }
@@ -11,10 +12,6 @@ buildscript {
 }
 
 description = 'Structured Data Version Control'
-
-ext.snapshotBuild = version.contains("SNAPSHOT")
-ext.releaseBuild = !version.contains("SNAPSHOT")
-ext.milestoneBuild = !(snapshotBuild || releaseBuild)
 
 ext {
     commonDependencies = [
@@ -42,6 +39,17 @@ ext {
     ]
 }
 
+String buildTag = project.getProperties().get('buildTag')
+if (buildTag != null && !buildTag.isEmpty() && buildTag != version) {
+    throw new GradleException('Version mismatch: '+buildTag+' vs '+version)
+}
+if (buildTag == null || buildTag.isEmpty() || project.getProperties().getOrDefault('artifactoryRepository', '').toLowerCase().contains('snapshot')) {
+    version += '-SNAPSHOT'
+}
+ext.snapshotBuild = version.contains("SNAPSHOT")
+ext.releaseBuild = !version.contains("SNAPSHOT")
+ext.milestoneBuild = !(snapshotBuild || releaseBuild)
+
 subprojects {
     repositories {
         maven { url 'https://repo.spring.io/plugins-release' }
@@ -53,13 +61,13 @@ subprojects {
         project.sourceCompatibility = '10'
         project.targetCompatibility = '10'
     }
-}
+    version = rootProject.version
 
-allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: "com.jfrog.artifactory"
+    apply plugin: 'com.jfrog.bintray'
 
     Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
@@ -109,6 +117,21 @@ allprojects {
                 // Publish generated POM files to Artifactory (true by default)
                 publishPom = true
             }
+        }
+    }
+
+    bintray {
+        user = project.getProperties().get('bintrayUser')
+        key = project.getProperties().get('bintrayKey')
+        publications = ['mavenJava']
+        publish = true
+        dryRun = true
+        pkg {
+            repo = 'maven'
+            name = project.name
+            userOrg = 'openmbee'
+            licenses = ['Apache-2.0']
+            vcsUrl = 'https://github.com/Open-MBEE/mms.git'
         }
     }
 }
