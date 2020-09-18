@@ -55,8 +55,8 @@ public class DatabaseDefinitionService {
 
     public boolean createProjectDatabase(Project project) throws SQLException {
         ContextHolder.setContext(null);
-        //TODO sanitize projectId? or reject if not valid id
-        String queryString = String.format("CREATE DATABASE \"_%s\"", project.getProjectId());
+        String prefix = env.getProperty("rdb.project.prefix", "");
+        String queryString = String.format("CREATE DATABASE \"%s_%s\"", prefix, project.getProjectId());
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
             crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
