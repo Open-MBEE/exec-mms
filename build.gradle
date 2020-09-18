@@ -128,7 +128,7 @@ subprojects {
         dryRun = true
         pkg {
             repo = 'maven'
-            name = project.name
+            name = 'mms-' + project.name
             userOrg = 'openmbee'
             licenses = ['Apache-2.0']
             vcsUrl = 'https://github.com/Open-MBEE/mms.git'
