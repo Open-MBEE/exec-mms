@@ -125,7 +125,6 @@ subprojects {
         key = project.getProperties().get('bintrayKey')
         publications = ['mavenJava']
         publish = true
-        dryRun = true
         pkg {
             repo = 'maven'
             name = 'mms-' + project.name
