@@ -14,15 +14,9 @@ public class LocalUserSecurityConfig {
 
     private static Logger logger = LoggerFactory.getLogger(LocalUserSecurityConfig.class);
 
-    private DaoAuthenticationProvider daoAuthenticationProvider;
-
     @Autowired
-    public void setDaoAuthenticationProvider(DaoAuthenticationProvider daoAuthenticationProvider) {
-        this.daoAuthenticationProvider = daoAuthenticationProvider;
-    }
-
-    @Autowired
-    public void configureDaoAuth(AuthenticationManagerBuilder auth) {
+    public void configureDaoAuth(AuthenticationManagerBuilder auth,
+            DaoAuthenticationProvider daoAuthenticationProvider) {
         auth.authenticationProvider(daoAuthenticationProvider);
     }
 }
