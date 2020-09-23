@@ -52,7 +52,7 @@ jobs:
                 at: ~/
           - run:
                 name: Deploy snapshot to Artifactory
-                command: ./gradlew -PbuildAccess=opensource -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$SNAPSHOT_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
+                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$SNAPSHOT_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
   deploy_release:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
@@ -61,7 +61,10 @@ jobs:
                 at: ~/
           - run:
                 name: Deploy release to Artifactory
-                command: ./gradlew -PbuildAccess=opensource -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$RELEASE_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
+                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$RELEASE_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
+          - run:
+                name: Deploy release to Bintray
+                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY --info --stacktrace bintrayUpload
 
 workflows:
     version: 2
