@@ -36,7 +36,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
      */
     public CommitsResponse updateTwcRevisionID(String projectId, String commitId, String revisionId) {
         CommitsResponse commitsResponse = new CommitsResponse();
-        if (revisionId.isEmpty() || revisionId.isBlank()) {
+        if (revisionId == null || revisionId.isEmpty()) {
             return commitsResponse.addMessage("Revision id can not be empty");
         }
         ContextHolder.setContext(projectId);

@@ -18,13 +18,11 @@ dependencies {
     implementation(
         project(':authenticator'),
         project(':localuser'),
-        project(':ldap'),
         project(':cameo'),
         project(':elastic'),
         project(':jupyter'),
         project(':permissions'),
         project(':webhooks'),
-        project(':twc'),
         project(':search'),
         project(':artifacts'),
         'org.springframework.boot:spring-boot-starter-web',

@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.bulk.BackoffPolicy;
+import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -21,15 +25,22 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.openmbee.sdvc.elastic.utils.Index;
 import org.openmbee.sdvc.json.BaseJson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
@@ -39,10 +50,10 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     protected RestHighLevelClient client;
     private static final RequestOptions REQUEST_OPTIONS;
     static {
-        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+        RequestOptions.Builder requestBuilder = RequestOptions.DEFAULT.toBuilder();
         // TODO: Should be configureable
-        builder.setHttpAsyncResponseConsumerFactory(new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024));
-        REQUEST_OPTIONS = builder.build();
+        requestBuilder.setHttpAsyncResponseConsumerFactory(new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024));
+        REQUEST_OPTIONS = requestBuilder.build();
     }
 
     @Autowired
@@ -133,18 +144,21 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     }
 
     public void indexAll(String index, Collection<? extends BaseJson> jsons) {
-        try {
-            BulkRequest bulkIndex = new BulkRequest();
-            for (BaseJson json : jsons) {
-                bulkIndex.add(new IndexRequest(index).id(json.getDocId()).source(json));
-            }
-            client.bulk(bulkIndex, REQUEST_OPTIONS);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        BulkProcessor bulkProcessor = getBulkProcessor(client);
+        for (BaseJson json : jsons) {
+            bulkProcessor.add(new IndexRequest(index).id(json.getDocId()).source(json));
         }
+        try {
+            if(!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
+                logger.error("Timed out in bulk processing");
+            }
+        } catch (InterruptedException e) {
+            logger.error("Index all interrupted: ", e);
+        }
+
     }
 
-    public void index(String index, BaseJson json) {
+    public void index(String index, BaseJson<?> json) {
         try {
             client.index(new IndexRequest(index).id(json.getDocId()).source(json),
                 REQUEST_OPTIONS);
@@ -173,5 +187,38 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             throw new RuntimeException(e);
         }
         return response;
+    }
+
+    private static BulkProcessor getBulkProcessor(RestHighLevelClient client) {
+        return getBulkProcessor(client, null);
+    }
+
+    private static BulkProcessor getBulkProcessor(RestHighLevelClient client,  BulkProcessor.Listener listener) {
+        if (listener == null) {
+            listener = new BulkProcessor.Listener() {
+                private final Logger logger = LoggerFactory.getLogger(getClass());
+                @Override
+                public void beforeBulk(long executionId, BulkRequest request) {
+                }
+
+                @Override
+                public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+                }
+
+                @Override
+                public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                    logger.error("Error in bulk processing: ", failure);
+                }
+            };
+        }
+        BulkProcessor.Builder bpBuilder = BulkProcessor.builder((request, bulkListener) -> client
+            .bulkAsync(request, RequestOptions.DEFAULT, bulkListener), listener);
+        bpBuilder.setBulkActions(5000);
+        bpBuilder.setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB));
+        bpBuilder.setConcurrentRequests(1);
+        bpBuilder.setFlushInterval(TimeValue.timeValueSeconds(5));
+        bpBuilder.setBackoffPolicy(BackoffPolicy.constantBackoff(TimeValue.timeValueMillis(100), 3));
+
+        return bpBuilder.build();
     }
 }

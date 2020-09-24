@@ -72,8 +72,9 @@ public class CrudDataSources implements InitializingBean {
 
     public DataSource addDataSource(Project project) {
         String url = project.getConnectionString();
+        String prefix = env.getProperty("rdb.project.prefix", "");
         if (url == null || url.isEmpty()) {
-            url = env.getProperty("spring.datasource.url") + "/_" + project.getProjectId();
+            url = env.getProperty("spring.datasource.url") + "/" + prefix + "_" + project.getProjectId();
         }
         DataSource dataSource = buildDataSource(url);
         targetDataSources.put(project.getProjectId(), dataSource);
