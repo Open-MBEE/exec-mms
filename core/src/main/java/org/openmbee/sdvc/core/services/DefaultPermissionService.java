@@ -334,11 +334,11 @@ public class DefaultPermissionService implements PermissionService {
         PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
         responseBuilder.insert(permissionsDelegate.recalculateInheritedPerms());
 
-        if (project.getBranches() !=  null) { //TODO this shouldn't be returning null..
-        for (Branch branch : project.getBranches()) {
+        if (project.getBranches() !=  null) {
+            for (Branch branch : project.getBranches()) {
                 responseBuilder.insert(recalculateInheritedPerms(branch));
+            }
         }
-    }
         return responseBuilder.getPermissionUpdatesReponse();
     }
 
@@ -351,7 +351,7 @@ public class DefaultPermissionService implements PermissionService {
         Optional<Organization> org = orgRepo.findByOrganizationId(orgId);
 
         if (!org.isPresent()) {
-            throw new NotFoundException("Organization not found");
+            throw new NotFoundException("Organization " + orgId + " not found");
         }
 
         return org.get();
@@ -361,7 +361,7 @@ public class DefaultPermissionService implements PermissionService {
         Optional<Project> proj = projectRepo.findByProjectId(projectId);
 
         if (!proj.isPresent()) {
-            throw new NotFoundException("Project not found");
+            throw new NotFoundException("Project " + projectId + " not found");
         }
         return proj.get();
     }
@@ -373,7 +373,7 @@ public class DefaultPermissionService implements PermissionService {
         if(!branch.isPresent()) {
             switch(mode){
                 case THROW:
-                    throw new NotFoundException("Branch not found");
+                    throw new NotFoundException("Branch " +  projectId + " " + branchId + " not found");
                 case CREATE:
                     Branch b = new Branch(getProject(projectId), branchId, false);
                     branchRepo.save(b);
@@ -381,7 +381,6 @@ public class DefaultPermissionService implements PermissionService {
                 default:
                     //do nothing
                     break;
-
             }
         }
         return branch.orElse(null);
@@ -391,7 +390,7 @@ public class DefaultPermissionService implements PermissionService {
         Optional<PermissionsDelegate> permissionsDelegate = permissionsDelegateFactories.stream()
             .map(v -> v.getPermissionsDelegate(organization)).filter(Objects::nonNull).findFirst();
 
-        if(permissionsDelegate.isPresent()) {
+        if (permissionsDelegate.isPresent()) {
             return permissionsDelegate.get();
         }
 

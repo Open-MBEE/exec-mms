@@ -3,6 +3,7 @@ package org.openmbee.sdvc.crud.controllers.branches;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.core.objects.RefsRequest;
@@ -81,10 +82,9 @@ public class BranchesController extends BaseController {
         for (RefJson branch : projectsPost.getRefs()) {
             try {
                 if (branch.getId() == null || branch.getId().isEmpty()) {
-                    response.addRejection(new Rejection(branch, 400, "Branch id missing"));
-                    continue;
+                    branch.setId(UUID.randomUUID().toString());
                 }
-                if(! isBranchIdValid(branch.getId())) {
+                if(!isBranchIdValid(branch.getId())) {
                     response.addRejection(new Rejection(branch, 400, "Branch id is invalid."));
                     continue;
                 }

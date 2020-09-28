@@ -96,7 +96,6 @@ public class DefaultBranchService implements BranchService {
         branches.forEach(branch -> {
             docIds.add(branch.getDocId());
         });
-        //TODO: Paginate?
         branchesResponse.setRefs(branchIndex.findAllById(docIds));
         return branchesResponse;
     }

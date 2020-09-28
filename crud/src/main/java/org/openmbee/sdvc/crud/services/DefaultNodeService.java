@@ -158,28 +158,24 @@ public class DefaultNodeService implements NodeService {
                 if (json != null && !json.isEmpty()) {
                     this.nodeIndex.indexAll(json.values());
                 }
-                //TODO reevaluate transaction handling to include commit data
-                //transactional vs the right transaction manager?
+                this.nodeIndex.removeFromRef(info.getOldDocIds());
+
+                Commit commit = new Commit();
+                commit.setBranchId(cmjs.getRefId());
+                commit.setCommitType(CommitType.COMMIT);
+                commit.setCreator(cmjs.getCreator());
+                commit.setDocId(cmjs.getId());
+                commit.setTimestamp(now);
+                commit.setComment(cmjs.getComment());
+
+                this.commitIndex.index(cmjs);
+                this.commitRepository.save(commit);
                 this.nodeRepository.getTransactionManager().commit(status);
             } catch (Exception e) {
                 logger.error("commitChanges error: ", e);
                 this.nodeRepository.getTransactionManager().rollback(status);
                 throw new InternalErrorException("Error committing transaction");
             }
-
-            this.nodeIndex.removeFromRef(info.getOldDocIds());
-
-            Commit commit = new Commit();
-            commit.setBranchId(cmjs.getRefId());
-            commit.setCommitType(CommitType.COMMIT);
-            commit.setCreator(cmjs.getCreator());
-            commit.setDocId(cmjs.getId());
-            commit.setTimestamp(now);
-            commit.setComment(cmjs.getComment());
-
-            this.commitIndex.index(cmjs);
-            this.commitRepository.save(commit);
-
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));
         }

@@ -118,7 +118,7 @@ public class NodeGetHelper extends NodeOperation {
             return processGetAll();
         }
         //TODO (basically get model at commit)
-        return processGetAll();
+        throw new BadRequestException("Getting model at commit not yet supported");
     }
 
     public List<ElementJson> processGetAll(Instant time) {

@@ -109,8 +109,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
 
     @Override
     public void setPublic(boolean isPublic) {
-        //Not currently supported
-        //TODO should this be supported?
+        //Not supported
     }
 
     @Override

@@ -19,7 +19,6 @@ import org.openmbee.sdvc.core.objects.ElementsResponse;
 import org.openmbee.sdvc.crud.services.DefaultNodeService;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.data.domains.scoped.Node;
-import org.openmbee.sdvc.cameo.CameoEdgeType;
 import org.openmbee.sdvc.json.MountJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -85,15 +84,6 @@ public class CameoNodeService extends DefaultNodeService implements NodeService 
         node.setNodeType(cameoHelper.getNodeType(element).getValue());
         //remove _childViews if posted
         element.remove(CameoConstants.CHILDVIEWS);
-        //TODO move graph processing somewhere else/another interface
-        Map<Integer, List<Pair<String, String>>> res = info.getEdgesToSave();
-        String owner = (String) element.get("ownerId");
-        if (owner != null && !owner.isEmpty()) {
-            if (!res.containsKey(CameoEdgeType.CONTAINMENT.getValue())) {
-                res.put(CameoEdgeType.CONTAINMENT.getValue(), new ArrayList<>());
-            }
-            res.get(CameoEdgeType.CONTAINMENT.getValue()).add(Pair.of(owner, element.getId()));
-        }
     }
 
     @Override

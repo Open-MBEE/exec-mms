@@ -4,16 +4,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Privileges;
 import org.openmbee.sdvc.core.config.ProjectSchemas;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
 import org.openmbee.sdvc.core.dao.ProjectIndex;
+import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.core.objects.ProjectsRequest;
 import org.openmbee.sdvc.core.objects.ProjectsResponse;
 import org.openmbee.sdvc.core.exceptions.DeletedException;
 import org.openmbee.sdvc.core.objects.Rejection;
-import org.openmbee.sdvc.data.domains.global.Metadata;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.crud.controllers.BaseController;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
@@ -106,45 +107,43 @@ public class ProjectsController extends BaseController {
 
         ProjectsResponse response = new ProjectsResponse();
         for (ProjectJson json: projectsPost.getProjects()) {
-            if (json.getProjectId().isEmpty()) {
-                response.addRejection(new Rejection(json, 400, "Project id missing"));
-                continue;
-            }
-            if(! isProjectIdValid(json.getProjectId())) {
-                response.addRejection(new Rejection(json, 400, "Project id is invalid."));
-                continue;
-            }
-
-            if ((json.getProjectType() != null) && (!((schemas.getSchemas()).containsKey(json.getProjectType())))) {
-                response.addRejection(new Rejection(json, 400, "Project schema is unknown."));
-                continue;
-            }
-
-            ProjectService ps = getProjectService(json);
-            if (!ps.exists(json.getProjectId())) {
-                try {
-                    if (!mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
+            try {
+                if (json.getProjectId() == null || json.getProjectId().isEmpty()) {
+                    json.setId(UUID.randomUUID().toString());
+                }
+                if (!isProjectIdValid(json.getProjectId())) {
+                    response.addRejection(new Rejection(json, 400, "Project id is invalid."));
+                    continue;
+                }
+                if ((json.getProjectType() != null) && (!((schemas.getSchemas())
+                    .containsKey(json.getProjectType())))) {
+                    response.addRejection(new Rejection(json, 400, "Project schema is unknown."));
+                    continue;
+                }
+                ProjectService ps = getProjectService(json);
+                if (!ps.exists(json.getProjectId())) {
+                    if (!mss.hasOrgPrivilege(auth, json.getOrgId(),
+                        Privileges.ORG_CREATE_PROJECT.name(), false)) {
                         response.addRejection(new Rejection(json, 403, "No permission to create project under org"));
                         continue;
                     }
-
                     if (json.getCreator() == null || json.getCreator().isEmpty()) {
                         json.setCreator(auth.getName());
                     }
-
                     response.getProjects().add(ps.create(json));
                     permissionService.initProjectPerms(json.getProjectId(), true, auth.getName());
-                } catch (BadRequestException ex) {
-                    response.addRejection(new Rejection(json, 400, "Org to put project under is not found"));
-                    continue;
+                } else {
+                    if (!mss.hasProjectPrivilege(auth, json.getProjectId(),
+                        Privileges.PROJECT_EDIT.name(), false)) {
+                        response.addRejection(new Rejection(json, 403, "No permission to change project"));
+                        continue;
+                    }
+                    //TODO need to check delete perm on proj and create perm in new org if moving org, and reset project perms if org changed
+                    response.getProjects().add(ps.update(json));
                 }
-            } else {
-                if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_EDIT.name(), false)) {
-                    response.addRejection(new Rejection(json, 403, "No permission to change project"));
-                    continue;
-                }
-                //TODO need to check delete perm on proj and create perm in new org if moving org, and reset project perms if org changed
-                response.getProjects().add(ps.update(json));
+            } catch (SdvcException ex) {
+                response.addRejection(new Rejection(json, ex.getCode().value(), ex.getMessageObject().toString()));
+                continue;
             }
         }
         if (projectsPost.getProjects().size() == 1) {
