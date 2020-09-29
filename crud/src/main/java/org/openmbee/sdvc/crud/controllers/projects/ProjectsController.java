@@ -138,8 +138,27 @@ public class ProjectsController extends BaseController {
                         response.addRejection(new Rejection(json, 403, "No permission to change project"));
                         continue;
                     }
-                    //TODO need to check delete perm on proj and create perm in new org if moving org, and reset project perms if org changed
+                    boolean updateInheritedPerms = false;
+                    if (json.getOrgId() != null && !json.getOrgId().isEmpty()) {
+                        Project proj = projectRepository.findByProjectId(json.getProjectId()).get();
+                        String existingOrg = proj.getOrgId();
+                        if (!json.getOrgId().equals(existingOrg)) {
+                            if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_DELETE.name(), false) ||
+                                !mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
+                                response.addRejection(
+                                    new Rejection(json, 403, "No permission to move project org"));
+                                continue;
+                            }
+                            if (proj.isInherit()) {
+                                updateInheritedPerms = true;
+                            }
+                        }
+                    }
                     response.getProjects().add(ps.update(json));
+                    if (updateInheritedPerms) {
+                        permissionService.setProjectInherit(false, json.getProjectId());
+                        permissionService.setProjectInherit(true, json.getProjectId());
+                    }
                 }
             } catch (SdvcException ex) {
                 response.addRejection(new Rejection(json, ex.getCode().value(), ex.getMessageObject().toString()));

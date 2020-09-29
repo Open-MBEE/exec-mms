@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "47ebb4f5-8f6e-42ac-b215-b6cdfd433ea9",
+		"_postman_id": "9a20c31e-a562-4461-8508-1738cb1ee8ee",
 		"name": "permissions",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1801,6 +1801,175 @@
 					],
 					"path": [
 						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "move project to new org as writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ffc0657-fddf-4972-a14a-20add95057d0",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{writerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"orgId\": \"permissions-a\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "move project to nonexistent org",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0071452e-abd8-42d9-9775-1659a80bc2a6",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"orgId\": \"missing\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "move project to new org as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "915f8f0c-c5cc-48aa-a694-6d89a6efbacf",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"writer\",\n\t\t\t\"orgId\": \"permissions-a\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check perms on project writer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f5fdb53a-12cf-469c-a3c1-4963f4882c59",
+						"exec": [
+							"pm.test(\"writer project as 2 permissions - 1 inherited and 1 not\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.inherit).to.eql(true);",
+							"    pm.expect(jsonData.users.permissions.length).to.eql(2);",
+							"    pm.expect(jsonData.public).to.eql(false);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/projects/writer/permissions",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"writer",
+						"permissions"
 					]
 				}
 			},
