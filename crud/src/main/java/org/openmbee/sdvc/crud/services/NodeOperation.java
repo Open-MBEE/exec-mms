@@ -102,8 +102,6 @@ public class NodeOperation {
         info.setRejected(new HashMap<>());
         info.setNow(now);
         info.setOldDocIds(new HashSet<>());
-        info.setEdgesToDelete(new HashMap<>());
-        info.setEdgesToSave(new HashMap<>());
         info.setActiveElementMap(new HashMap<>());
         return info;
     }

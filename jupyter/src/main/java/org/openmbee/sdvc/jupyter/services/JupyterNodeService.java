@@ -37,16 +37,6 @@ public class JupyterNodeService extends DefaultNodeService implements NodeServic
     @Override
     public void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info) {
         node.setNodeType(JupyterHelper.getNodeType(element).getValue());
-        Map<Integer, List<Pair<String, String>>> res = info.getEdgesToSave();
-        List<String> cells = (List<String>) element.get(JupyterConstants.CELLS); //check list of cell ids
-        if (cells != null && !cells.isEmpty()) {
-            if (!res.containsKey(JupyterEdgeType.CONTAINMENT.getValue())) {
-                res.put(JupyterEdgeType.CONTAINMENT.getValue(), new ArrayList<>());
-            }
-            for (String cellId: cells) {
-                res.get(JupyterEdgeType.CONTAINMENT.getValue()).add(Pair.of(element.getId(), cellId));
-            }
-        }
     }
 
     public ElementsResponse readNotebooks(String projectId, String refId, String elementId, Map<String, String> params) {

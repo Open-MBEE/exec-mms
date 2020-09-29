@@ -1,13 +1,11 @@
 package org.openmbee.sdvc.core.services;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.openmbee.sdvc.data.domains.scoped.Node;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.json.ElementJson;
-import org.springframework.data.util.Pair;
 
 public class NodeChangeInfo extends NodeGetInfo {
 
@@ -22,30 +20,6 @@ public class NodeChangeInfo extends NodeGetInfo {
     CommitJson commitJson;
 
     Instant now;
-
-    Map<Integer, List<Pair<String, String>>> edgesToDelete;
-
-    Map<Integer, List<Pair<String, String>>> edgesToSave;
-
-    public Map<Integer, List<Pair<String, String>>> getEdgesToDelete() {
-        return edgesToDelete;
-    }
-
-    public NodeChangeInfo setEdgesToDelete(
-        Map<Integer, List<Pair<String, String>>> edgesToDelete) {
-        this.edgesToDelete = edgesToDelete;
-        return this;
-    }
-
-    public Map<Integer, List<Pair<String, String>>> getEdgesToSave() {
-        return edgesToSave;
-    }
-
-    public NodeChangeInfo setEdgesToSave(
-        Map<Integer, List<Pair<String, String>>> edgesToSave) {
-        this.edgesToSave = edgesToSave;
-        return this;
-    }
 
     public Instant getNow() {
         return now;
@@ -99,5 +73,4 @@ public class NodeChangeInfo extends NodeGetInfo {
         this.commitJson = commitJson;
         return this;
     }
-
 }

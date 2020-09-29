@@ -2967,6 +2967,219 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "add project to nonexistent org",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "90859114-65cc-41c2-8b34-015f1464201a",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"name\": \"bad\",\n\t\t\t\"orgId\": \"missing\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add project without org",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c410396b-451f-4120-bbd6-69fa66effe42",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"name\": \"bad\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch from commit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bfbfce50-298d-4d87-b403-951ab3e2f574",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"name\": \"bad\",\n\t\t\t\"parentCommitId\": \"bad\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create branch from nonexistent ref",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c140808f-619f-4b5e-ab06-ae1124039678",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"name\": \"bad\",\n\t\t\t\"parentRefId\": \"missing\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post elements to nonexistent project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "563236de-9fa5-4902-aa08-b271cdee278e",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"name\": \"bad\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aaa/refs/missing/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aaa",
+						"refs",
+						"missing",
+						"elements"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
