@@ -1,0 +1,4 @@
+minio.access_key=test
+minio.secret_key=test
+minio.region=optional
+minio.bucket=optional

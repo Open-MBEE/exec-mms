@@ -205,7 +205,7 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
-							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('x//image/jpeg//v1');",
+							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('arta//x//jpg//v1');",
 							"    pm.environment.set(\"x-commit-1\", jsonData.elements[0][\"_commitId\"]);",
 							"});",
 							""
@@ -256,7 +256,7 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
-							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('x//image/jpeg//v2')",
+							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('arta//x//jpg//v2')",
 							"});"
 						],
 						"type": "text/javascript"

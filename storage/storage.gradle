@@ -1,0 +1,9 @@
+dependencies {
+    api project(':artifacts')
+
+    implementation 'io.minio:minio:7.1.0'
+    implementation 'org.apache.tika:tika-parsers:1.24.1'
+    implementation commonDependencies.'servlet-api'
+
+    testImplementation commonDependencies.'spring-boot-starter-test'
+}
