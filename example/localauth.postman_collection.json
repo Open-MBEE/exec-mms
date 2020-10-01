@@ -109,7 +109,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4b10362d-8346-470b-88e4-5d9a2acf0ea4",
+						"id": "3a3fbe4c-f6fb-413c-add6-f721a9663eb3",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -154,7 +154,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f8f6e163-ed51-4807-aa29-e8630fb160e4",
+						"id": "3355b2c7-bf99-4ad6-aa13-2239c1eaba0f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -196,7 +196,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "25f57df3-c53e-4062-9037-6cf50420099d",
+						"id": "1047c0e4-9661-46c3-b65b-ef5391763400",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -241,7 +241,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "dd89ebf4-0cb9-42c6-8191-b515b39d6f9e",
+						"id": "c5b04c96-3f04-44fa-97e8-1166ca8691c4",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -298,7 +298,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8a550e7a-054f-4ae7-a7cd-2f3812642b5f",
+						"id": "25164386-38d1-43ca-921f-d22312316bf6",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -340,7 +340,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "586e46da-5ff7-49bf-9f6d-049ad5414477",
+						"id": "7491159e-f458-4979-8c1f-6c3eed0aa58f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -385,7 +385,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "834b33fc-7f6b-447f-b7d8-8a952b740ecd",
+						"id": "b6216691-00f9-4bfe-b9df-4311a7484b05",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -442,7 +442,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "20ff1b1e-811d-43ee-a26c-15cfa77dcf99",
+						"id": "44930a15-4bf1-4016-8c45-66b9400970ee",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -487,7 +487,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e45c1551-a955-4d3a-8ff2-217f66a81db8",
+						"id": "4eece62a-abe7-4f3b-b71e-e3d62eea4efe",
 						"exec": [
 							"pm.test(\"Status code is 404\", function () {",
 							"    pm.response.to.have.status(404);",
@@ -529,7 +529,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "dd728e87-bf11-4991-a09e-0f5dd0bf0783",
+						"id": "d6d3cee1-7b9b-4d0b-b4df-191947594ff4",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401);",
@@ -579,23 +579,167 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Create new admin user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "71b58b4b-a829-4fb4-b91d-d66e61a5fe44",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"admin2\",\n\t\"password\" : \"adminpassword\",\n\t\"admin\": true\n}"
+				},
+				"url": {
+					"raw": "{{host}}/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Attempt to change user1's password as new admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2226ed2-0c91-478b-b312-eeff739b2d6e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "adminpassword",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin2",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"password4\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/password",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authenticate as user1 with new password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "279509b8-74dd-4f3d-a2df-1c2ba514eab8",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"user1\",\n\t\"password\" : \"password4\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
 		}
 	],
-    "auth": {
-        "type": "bearer",
-        "bearer": [
-            {
-                "key": "token",
-                "value": "{{token}}",
-                "type": "string"
-            }
-        ]
-    },
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "9719183c-3fdb-46e0-ba4f-28c75b9220ec",
+				"id": "ee94b4b0-2006-4c46-90e7-aea11a988df3",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -605,12 +749,13 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "5eced19e-077a-4208-ac4a-98549e1b024a",
+				"id": "38741dbc-722d-4110-9f55-f673ccf34b8b",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

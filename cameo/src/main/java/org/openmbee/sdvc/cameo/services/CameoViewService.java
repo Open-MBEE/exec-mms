@@ -227,6 +227,5 @@ public class CameoViewService extends CameoNodeService {
             Node assocPropNode = assocPropInfo.getExistingNodeMap().get(assocPropJson.getId());
             nodePostHelper.processElementDeleted(assocPropJson, assocPropNode, info);
         }
-        //TODO may help if we have graph query for this instead of getting them by layers
     }
 }

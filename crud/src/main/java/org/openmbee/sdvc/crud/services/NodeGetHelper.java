@@ -3,6 +3,7 @@ package org.openmbee.sdvc.crud.services;
 import java.time.Instant;
 import java.util.*;
 
+import java.util.stream.Collectors;
 import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.NodeGetInfo;
 import org.openmbee.sdvc.core.config.ContextHolder;
@@ -45,8 +46,7 @@ public class NodeGetHelper extends NodeOperation {
         }
 
         Optional<Commit> commit = commitRepository.findByCommitId(commitId);
-        Optional<Branch> currentBranch = branchRepository.findByBranchId(ContextHolder.getContext().getBranchId());
-        if (!commit.isPresent() ) { //TODO also if commitId is not part of current branch history?
+        if (!commit.isPresent() ) {
             throw new BadRequestException("commitId is invalid");
         }
         Instant time = commit.get().getTimestamp(); //time of commit
@@ -113,21 +113,25 @@ public class NodeGetHelper extends NodeOperation {
         return nodeIndex.findAllById(indexIds);
     }
 
-    public List<ElementJson> processGetAll(String commitId) {
+    public List<ElementJson> processGetAll(String commitId, NodeService service) {
         if (commitId == null || commitId.isEmpty()) {
             return processGetAll();
+        } else {
+            List<Node> nodes = nodeRepository.findAll();
+            List<ElementJson> el = nodes.stream().map(
+                node -> new ElementJson().setId(node.getNodeId())).collect(Collectors.toList());
+            NodeGetInfo info = processGetJson(el, commitId, service);
+            return new ArrayList<>(info.getActiveElementMap().values());
         }
-        //TODO (basically get model at commit)
-        throw new BadRequestException("Getting model at commit not yet supported");
     }
 
-    public List<ElementJson> processGetAll(Instant time) {
+    public List<ElementJson> processGetAll(Instant time, NodeService service) {
         List<ElementJson> result = new ArrayList<>();
         Optional<Branch> ref = branchRepository.findByBranchId(getContext().getBranchId());
         if (ref.isPresent()) {
             Optional<Commit> c = commitRepository.findByRefAndTimestamp(ref.get(), time);
             if (c.isPresent()) {
-                result.addAll(processGetAll(c.get().getDocId()));
+                result.addAll(processGetAll(c.get().getDocId(), service));
             } else {
                 throw new BadRequestException("invalid time");
             }

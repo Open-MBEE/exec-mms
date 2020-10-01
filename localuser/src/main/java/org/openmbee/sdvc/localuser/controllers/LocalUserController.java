@@ -2,6 +2,7 @@ package org.openmbee.sdvc.localuser.controllers;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.openmbee.sdvc.core.config.AuthorizationConstants;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.exceptions.UnauthorizedException;
 import org.openmbee.sdvc.core.utils.AuthenticationUtils;
@@ -29,15 +30,14 @@ public class LocalUserController {
 
     @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
-    public Object createUser(@RequestBody UserCreateRequest req) {
-        //TODO allow create admin accounts
-        //TODO should allow admin authority string to be set via properties
+    public UserCreateRequest createUser(@RequestBody UserCreateRequest req) {
         try {
             userDetailsService.loadUserByUsername(req.getUsername());
         } catch (UsernameNotFoundException e) {
-            userDetailsService.register(req.getUsername(), req.getPassword(), false);
+            userDetailsService.register(req.getUsername(), req.getPassword(), req.isAdmin());
+            return req;
         }
-        return "";
+        throw new BadRequestException("User already exists");
     }
 
     @PostMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)

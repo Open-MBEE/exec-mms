@@ -103,7 +103,7 @@ public class DefaultNodeService implements NodeService {
 
             ElementsResponse response = new ElementsResponse();
             String commitId = params.getOrDefault("commitId", null);
-            response.getElements().addAll(nodeGetHelper.processGetAll(commitId));
+            response.getElements().addAll(nodeGetHelper.processGetAll(commitId, this));
             return response;
         }
     }
