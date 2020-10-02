@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.core.dao.CommitDAO;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.rdb.repositories.BaseDAOImpl;
@@ -51,7 +52,8 @@ public class CommitDAOImpl extends BaseDAOImpl implements CommitDAO {
         }, keyHolder);
 
         if (keyHolder.getKeyList().isEmpty()) {
-            return null;//TODO error
+            logger.error("commit db save failed");
+            throw new InternalErrorException("Commit db save failed");
         }
         commit.setId(keyHolder.getKey().longValue());
         return commit;

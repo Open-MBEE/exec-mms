@@ -102,8 +102,6 @@ public class NodeOperation {
         info.setRejected(new HashMap<>());
         info.setNow(now);
         info.setOldDocIds(new HashSet<>());
-        info.setEdgesToDelete(new HashMap<>());
-        info.setEdgesToSave(new HashMap<>());
         info.setActiveElementMap(new HashMap<>());
         return info;
     }
@@ -223,7 +221,6 @@ public class NodeOperation {
 
     //find first element of type in types following e's relkey (assuming relkey's value is an element id)
     public Optional<ElementJson> getFirstRelationshipOfType(ElementJson e, List<Integer> types, String relkey) {
-        //TODO to use some graph interface sometime
         //only for latest graph
         String nextId = (String)e.get(relkey);
         if (nextId == null || nextId.isEmpty()) {

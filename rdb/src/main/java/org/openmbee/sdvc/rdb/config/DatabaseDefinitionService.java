@@ -110,16 +110,6 @@ public class DatabaseDefinitionService {
                 metadata.getMetadataBuilder().build());
 
         try (Connection conn = crudDataSources.getDataSource(project).getConnection()) {
-           /* TODO rethink if project itself should be a node
-            try (PreparedStatement ps = conn.prepareStatement(INITIAL_PROJECT)) {
-                ps.setString(1, project.getProjectId());
-                ps.setString(2, "test");
-                ps.setString(3, "test");
-                ps.setString(4, "test");
-                ps.setInt(5, 1);
-                ps.execute();
-            }*/
-
             try (PreparedStatement ps = conn.prepareStatement(INITIAL_REF)) {
                 ps.execute();
             }

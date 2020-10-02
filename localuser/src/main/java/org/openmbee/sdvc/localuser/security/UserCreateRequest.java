@@ -8,15 +8,7 @@ public class UserCreateRequest implements Serializable {
 
     private String username;
     private String password;
-
-    public UserCreateRequest() {
-        super();
-    }
-
-    public UserCreateRequest(String username, String password) {
-        this.setUsername(username);
-        this.setPassword(password);
-    }
+    private boolean admin;
 
     public String getUsername() {
         return this.username;
@@ -32,6 +24,14 @@ public class UserCreateRequest implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
 }

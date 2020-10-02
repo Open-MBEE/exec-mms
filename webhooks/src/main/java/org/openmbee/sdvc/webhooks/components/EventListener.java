@@ -60,12 +60,11 @@ public class EventListener implements ApplicationListener<EventObject> {
             }
         } catch (URISyntaxException se) {
             // Do nothing; Nowhere to post;
-            logger.error("Error in web hook: ", se);
+            logger.error("Error in web hook: " + webhook, se);
             return;
         } catch (Exception e) {
-            logger.error("Some error happened", e);
+            logger.error("Some webhook error happened for " + webhook, e);
             return;
         }
-        logger.info("Sent event to " + webhook + " with payload: " + payload);
     }
 }

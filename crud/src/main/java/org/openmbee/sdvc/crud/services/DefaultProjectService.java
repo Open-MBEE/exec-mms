@@ -73,12 +73,12 @@ public class DefaultProjectService implements ProjectService {
 
     public ProjectJson create(ProjectJson project) {
         if (project.getOrgId() == null || project.getOrgId().isEmpty()) {
-            throw new BadRequestException(new ProjectsResponse().addMessage("Organization ID not provided"));
+            throw new BadRequestException("Organization ID not provided");
         }
 
         Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
         if (!org.isPresent() || org.get().getOrganizationId().isEmpty()) {
-            throw new BadRequestException(new ProjectsResponse().addMessage("Organization not found"));
+            throw new BadRequestException("Organization not found");
         }
 
         Project proj = new Project();
@@ -142,7 +142,6 @@ public class DefaultProjectService implements ProjectService {
                 Optional<Organization> org = orgRepository.findByOrganizationId(project.getOrgId());
                 if (org.isPresent() && !org.get().getOrganizationId().isEmpty()) {
                     proj.setOrganization(org.get());
-                    //TODO check permissions and fix inherited permissions
                 } else {
                     throw new BadRequestException("Invalid organization");
                 }

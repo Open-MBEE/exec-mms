@@ -96,8 +96,6 @@ public class WebhooksController {
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_WEBHOOKS', false)")
     public WebhookResponse deleteWebhooks(@PathVariable String projectId, @RequestBody WebhookRequest webhookRequest) {
 
-        // TODO: Determine which webhook to delete somehow. Maybe require webhook id.
-
         Set<String> uris = new HashSet<>();
         for (WebhookJson webhookJson : webhookRequest.getWebhooks()) {
             uris.add(webhookJson.getUrl());

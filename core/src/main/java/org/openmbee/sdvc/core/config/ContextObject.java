@@ -1,6 +1,11 @@
 package org.openmbee.sdvc.core.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ContextObject {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String DEFAULT_PROJECT = "DEFAULT";
     public static final String MASTER_BRANCH = "master";
@@ -9,6 +14,8 @@ public class ContextObject {
     private String branchId = MASTER_BRANCH;
 
     public ContextObject() {
+        logger.debug("Context project set to " + projectId);
+        logger.debug("Context branch set to " + branchId);
     }
 
     public ContextObject(String projectId) {
@@ -31,6 +38,7 @@ public class ContextObject {
     public void setProjectId(String projectId) {
         if (projectId != null) {
             this.projectId = projectId;
+            logger.debug("Context project set to " + projectId);
         }
     }
 
@@ -41,6 +49,7 @@ public class ContextObject {
     public void setBranchId(String branchId) {
         if (branchId != null) {
             this.branchId = branchId;
+            logger.debug("Context branch set to " + branchId);
         }
     }
 }

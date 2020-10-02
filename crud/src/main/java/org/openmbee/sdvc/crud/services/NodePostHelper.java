@@ -64,25 +64,25 @@ public class NodePostHelper extends NodeOperation {
             boolean added = false;
             boolean updated = false;
             if (element.getId() == null || element.getId().isEmpty()) {
-                info.addRejection(UUID.randomUUID().toString(), new Rejection(element, 400, "Missing ID"));
-            } else {
-                Map<String, Object> elasticElement = info.getExistingElementMap()
-                    .get(element.getId());
-                Node n = info.getExistingNodeMap().get(element.getId());
-                if (n == null) {
-                    added = true;
-                } else if (elasticElement == null) {
-                    continue; //TODO this should be an error - the db has entry but elastic doesn't, reject 500?
-                }
+                element.setId(UUID.randomUUID().toString());
+            }
+            ElementJson elasticElement = info.getExistingElementMap().get(element.getId());
+            Node n = info.getExistingNodeMap().get(element.getId());
+            if (n == null) {
+                added = true;
+            } else if (elasticElement == null) {
+                logger.warn("node db and elastic mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
+                info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
+                continue;
+            }
 
-                if (!added) {
-                    if (!overwriteJson) {
-                        if (n.isDeleted() || isUpdated(element, elasticElement, info)) {
-                            updated = diffUpdateJson(element, elasticElement, info);
-                        }
-                    } else {
-                        updated = true;
+            if (!added) {
+                if (!overwriteJson) {
+                    if (n.isDeleted() || isUpdated(element, elasticElement, info)) {
+                        updated = diffUpdateJson(element, elasticElement, info);
                     }
+                } else {
+                    updated = true;
                 }
             }
 
