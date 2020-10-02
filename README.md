@@ -3,6 +3,8 @@
 
 The MMS SDVC is a collection of modules built on top of the Spring Framework and is a part of Open-MBEE. For more information about Open-MBEE, visit the [Open-MBEE Website](https://openmbee.org/)
 
+For a reference on how to create an application, see [MMSRI](https://github.com/Open-MBEE/mmsri) or the "example" package. Also see README inside each module.
+
 ## Quick Start
 ### Docker
 Installation instructions are found here: [Docker documentation](https://docs.docker.com/)
@@ -66,7 +68,7 @@ To learn how you can get involved in a variety of ways, please see [Contributing
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/Open-MBEE/mms-sdvc.git). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/Open-MBEE/mms.git). 
 
 
 ## License
