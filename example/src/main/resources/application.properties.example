@@ -67,8 +67,8 @@ springdoc.swagger-ui.tagsSorter=alpha
 springdoc.default-produces-media-type=application/json
 springdoc.swagger-ui.displayOperationId=true
 
-minio.endpoint=http://localhost:9000
-minio.access_key=test
-minio.secret_key=test
-minio.region=optional
-minio.bucket=optional
+s3.endpoint=http://localhost:9000
+s3.access_key=test
+s3.secret_key=test
+s3.region=optional
+s3.bucket=optional

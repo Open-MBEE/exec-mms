@@ -445,7 +445,7 @@
 					"script": {
 						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
 						"exec": [
-							"pm.test(\"response is jpg\", function () {",
+							"pm.test(\"response is json\", function () {",
 							"    pm.response.to.have.status(200);",
 							"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
 							"});"
@@ -486,7 +486,7 @@
 					"script": {
 						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
 						"exec": [
-							"pm.test(\"response is jpg\", function () {",
+							"pm.test(\"response is json\", function () {",
 							"    pm.response.to.have.status(200);",
 							"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
 							"});"

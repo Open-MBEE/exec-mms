@@ -9,24 +9,25 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ListObjectsV2Request;
-import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 import org.apache.tika.mime.MimeTypes;
 import org.openmbee.sdvc.artifacts.storage.ArtifactStorage;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.json.ElementJson;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class S3Storage implements ArtifactStorage {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -69,7 +70,7 @@ public class S3Storage implements ArtifactStorage {
                 try {
                     s3Client.createBucket(getBucket());
                 } catch (AmazonS3Exception e) {
-                    logger.error("Error creating bucket: ", e);
+                    throw new InternalErrorException(e);
                 }
             }
         }
@@ -78,14 +79,13 @@ public class S3Storage implements ArtifactStorage {
     }
 
     @Override
-    public byte[] get(String location, ElementJson element, String mimetype) {
+    public byte[] get(String location, ElementJson element, String mimetype) throws SdvcException {
         GetObjectRequest rangeObjectRequest = new GetObjectRequest(getBucket(), location);
         try {
             return getClient().getObject(rangeObjectRequest).getObjectContent().readAllBytes();
-        } catch (Exception e) {
-            logger.error("Error getting object: ", e);
+        } catch (IOException ioe) {
+            throw new NotFoundException(ioe);
         }
-        return null;
     }
 
     @Override
@@ -99,8 +99,8 @@ public class S3Storage implements ArtifactStorage {
 
         try {
             getClient().putObject(por);
-        } catch (Exception e) {
-            logger.error("Error putting object: ", e);
+        } catch (RuntimeException e) {
+            throw new InternalErrorException(e);
         }
         return location;
     }
