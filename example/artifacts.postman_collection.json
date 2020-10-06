@@ -205,8 +205,9 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
-							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('arta/x/jpg/v1');",
-							"    pm.environment.set(\"x-commit-1\", jsonData.elements[0][\"_commitId\"]);",
+                            "    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.include('arta/x/jpg/')",
+                            "    pm.environment.set(\"commit-1-loc\", pm.response.json().elements[0][\"_artifacts\"][0].location);",
+                            "    pm.environment.set(\"x-commit-1\", jsonData.elements[0][\"_commitId\"]);",
 							"});",
 							""
 						],
@@ -256,7 +257,8 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
-							"    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.eq('arta/x/jpg/v2')",
+                            "    pm.environment.set(\"commit-2-loc\", pm.response.json().elements[0][\"_artifacts\"][0].location);",
+                            "    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.include('arta/x/jpg/')",
 							"});"
 						],
 						"type": "text/javascript"

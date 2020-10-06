@@ -15,6 +15,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import java.io.ByteArrayInputStream;
+import java.util.Date;
 import java.util.Optional;
 import org.apache.tika.mime.MimeTypes;
 import org.openmbee.sdvc.artifacts.storage.ArtifactStorage;
@@ -105,27 +106,8 @@ public class S3Storage implements ArtifactStorage {
     }
 
     private String buildLocation(ElementJson element, String mimetype) {
-        int it = 1;
-        ListObjectsV2Request req = new ListObjectsV2Request().withBucketName(getBucket()).withMaxKeys(20);
-        ListObjectsV2Result result;
-        try {
-            do {
-                result = getClient().listObjectsV2(req);
-
-                //Debugging
-                for (S3ObjectSummary objectSummary : result.getObjectSummaries()) {
-                    System.out.printf(" - %s (size: %d)\n", objectSummary.getKey(), objectSummary.getSize());
-                }
-                it = it + result.getKeyCount();
-                String token = result.getNextContinuationToken();
-                System.out.println("Next Continuation Token: " + token);
-                req.setContinuationToken(token);
-            } while (result.isTruncated());
-
-        } catch (Exception e) {
-            logger.error("Error building location: ", e);
-        }
-        return String.format("%s/%s/%s/v%d", element.getProjectId(), element.getId(), getExtension(mimetype), it);
+        Date today = new Date();
+        return String.format("%s/%s/%s/%d", element.getProjectId(), element.getId(), getExtension(mimetype), today.getTime());
     }
 
     private String getExtension(String mime) {
