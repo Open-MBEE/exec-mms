@@ -1,0 +1,9 @@
+dependencies {
+    api project(':artifacts')
+
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.874'
+    implementation 'org.apache.tika:tika-parsers:1.24.1'
+    implementation commonDependencies.'servlet-api'
+
+    testImplementation commonDependencies.'spring-boot-starter-test'
+}

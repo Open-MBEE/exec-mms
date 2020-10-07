@@ -1,0 +1,4 @@
+s3.access_key=test
+s3.secret_key=test
+s3.region=somewhere
+s3.bucket=optional
