@@ -29,15 +29,15 @@ jobs:
       - run: 
           name: "Run and test Postman Collection"
           command: |
-            docker create -v /tst --name mms_test_configs alpine:3.4 /bin/true
-            docker cp example/. mms_test_configs:/tst
-            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/crud.postman_collection.json -e /tst/test-env.json --delay-request 300
-            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/cameo.postman_collection.json -e /tst/test-env.json --delay-request 300
-            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/jupyter.postman_collection.json -e /tst/test-env.json --delay-request 300
-            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/localauth.postman_collection.json -e /tst/test-env.json --delay-request 300
-            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/permissions.postman_collection.json -e /tst/test-env.json --delay-request 300
-            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run /tst/search.postman_collection.json -e /tst/test-env.json --delay-request 300
-
+            docker create -v /etc/newman --name mms_test_configs alpine:3.4 /bin/true
+            docker cp example/. mms_test_configs:/etc/newman
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 300
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run cameo.postman_collection.json -e test-env.json --delay-request 300
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run jupyter.postman_collection.json -e test-env.json --delay-request 300
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run localauth.postman_collection.json -e test-env.json --delay-request 300
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run permissions.postman_collection.json -e test-env.json --delay-request 300
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run search.postman_collection.json -e test-env.json --delay-request 300
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run artifacts.postman_collection.json -e test-env.json --delay-request 300
 
       - persist_to_workspace:
             root: /home/circleci/

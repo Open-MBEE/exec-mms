@@ -36,5 +36,6 @@ services:
     depends_on:
         - postgres
         - elasticsearch
+        - minio
     ports: 
         - 8080:8080

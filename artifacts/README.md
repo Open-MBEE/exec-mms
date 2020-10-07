@@ -27,4 +27,4 @@ Adds ArtifactStorage interface - this allows different implementations to be use
             String store(byte[] data, ElementJson element, String mimetype);
         }
         
-see `tbd` for an example reference implementation using s3
+see `storage` for an example reference implementation using s3
