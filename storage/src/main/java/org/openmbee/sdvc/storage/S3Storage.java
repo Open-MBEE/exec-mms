@@ -79,7 +79,7 @@ public class S3Storage implements ArtifactStorage {
     }
 
     @Override
-    public byte[] get(String location, ElementJson element, String mimetype) throws SdvcException {
+    public byte[] get(String location, ElementJson element, String mimetype) {
         GetObjectRequest rangeObjectRequest = new GetObjectRequest(getBucket(), location);
         try {
             return getClient().getObject(rangeObjectRequest).getObjectContent().readAllBytes();
