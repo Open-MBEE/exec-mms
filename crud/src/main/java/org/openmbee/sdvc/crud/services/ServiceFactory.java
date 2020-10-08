@@ -1,5 +1,6 @@
 package org.openmbee.sdvc.crud.services;
 
+import org.openmbee.sdvc.core.services.CommitService;
 import org.openmbee.sdvc.core.services.NodeService;
 import org.openmbee.sdvc.core.services.ProjectService;
 import org.springframework.beans.BeansException;
@@ -38,4 +39,14 @@ public class ServiceFactory implements ApplicationContextAware {
         return context.getBean("defaultProjectService", ProjectService.class);
     }
 
+    public CommitService getCommitService(String type) {
+        try {
+            CommitService cs = context.getBean(type + "CommitService", CommitService.class);
+            if (cs != null) {
+                return cs;
+            }
+        } catch (BeansException e) {
+        }
+        return context.getBean("defaultCommitService", CommitService.class);
+    }
 }

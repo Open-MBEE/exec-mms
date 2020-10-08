@@ -54,14 +54,12 @@ public class DatabaseDefinitionService {
     }
 
     public boolean createProjectDatabase(Project project) throws SQLException {
-        ContextHolder.setContext(null);
-        String prefix = env.getProperty("rdb.project.prefix", "");
-        String queryString = String.format("CREATE DATABASE \"%s_%s\"", prefix, project.getProjectId());
+        ContextHolder.setContext(null);        
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
             crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
         try {
-            jdbcTemplate.execute(queryString);
+            jdbcTemplate.execute("CREATE DATABASE " + databaseProjectString(project));
             created.add("Created Database");
 
             generateProjectSchemaFromModels(project);
@@ -77,6 +75,16 @@ public class DatabaseDefinitionService {
             }
         }
         return !created.isEmpty();
+    }
+
+    public void deleteProjectDatabase(Project project) throws SQLException {
+        Connection connection = crudDataSources.getDataSource("DEFAULT").getConnection();
+        connection.createStatement().executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
+    }
+
+    private String databaseProjectString(Project project) {
+		String prefix = env.getProperty("rdb.project.prefix", "");
+        return String.format("\"%s_%s\"", prefix, project.getProjectId());
     }
 
     public void createBranch() {

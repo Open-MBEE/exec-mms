@@ -5,9 +5,8 @@ import java.util.Map;
 
 import org.openmbee.sdvc.core.objects.CommitsRequest;
 import org.openmbee.sdvc.core.objects.CommitsResponse;
+import org.openmbee.sdvc.core.services.CommitService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.crud.services.CommitService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/projects/{projectId}")
 @Tag(name = "Commits")
 public class CommitsController extends BaseController {
-
-    private CommitService commitService;
-
-    @Autowired
-    public CommitsController(CommitService commitService) {
-        this.commitService = commitService;
-    }
-
     @GetMapping(value = "/refs/{refId}/commits")
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ_COMMITS', true)")
     public CommitsResponse getRefCommits(
@@ -38,7 +29,7 @@ public class CommitsController extends BaseController {
         @RequestParam(required = false) String limit,
         @RequestParam(required = false) String maxTimestamp,
         @RequestParam(required = false) Map<String, String> params) {
-
+        CommitService commitService = serviceFactory.getCommitService(getProjectType(projectId));
         return commitService.getRefCommits(projectId, refId, params);
     }
 
@@ -47,7 +38,7 @@ public class CommitsController extends BaseController {
     public CommitsResponse getCommit(
         @PathVariable String projectId,
         @PathVariable String commitId) {
-
+        CommitService commitService = serviceFactory.getCommitService(getProjectType(projectId));
         return commitService.getCommit(projectId, commitId);
     }
 
@@ -58,7 +49,7 @@ public class CommitsController extends BaseController {
         @PathVariable String refId,
         @PathVariable String elementId,
         @RequestParam(required = false) Map<String, String> params) {
-
+        CommitService commitService = serviceFactory.getCommitService(getProjectType(projectId));
         return commitService.getElementCommits(projectId, refId, elementId, params);
     }
 
@@ -67,7 +58,7 @@ public class CommitsController extends BaseController {
     public CommitsResponse getCommits(
         @PathVariable String projectId,
         @RequestBody CommitsRequest req) {
-
+        CommitService commitService = serviceFactory.getCommitService(getProjectType(projectId));
         return commitService.getCommits(projectId, req);
     }
 }

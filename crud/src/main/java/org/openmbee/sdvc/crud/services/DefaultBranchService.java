@@ -1,39 +1,31 @@
 package org.openmbee.sdvc.crud.services;
 
-import java.time.Instant;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 import org.openmbee.sdvc.core.config.Constants;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.Formats;
-import org.openmbee.sdvc.core.dao.BranchIndexDAO;
-import org.openmbee.sdvc.core.exceptions.InternalErrorException;
-import org.openmbee.sdvc.core.objects.RefsResponse;
-import org.openmbee.sdvc.core.objects.EventObject;
-import org.openmbee.sdvc.core.services.BranchService;
-import org.openmbee.sdvc.core.dao.NodeIndexDAO;
+import org.openmbee.sdvc.core.dao.*;
 import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.DeletedException;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.sdvc.core.objects.EventObject;
+import org.openmbee.sdvc.core.objects.RefsResponse;
+import org.openmbee.sdvc.core.services.BranchService;
+import org.openmbee.sdvc.core.services.CommitService;
 import org.openmbee.sdvc.core.services.EventService;
+import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.data.domains.scoped.Commit;
 import org.openmbee.sdvc.data.domains.scoped.Node;
-import org.openmbee.sdvc.core.dao.BranchDAO;
-import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.RefJson;
-import org.openmbee.sdvc.core.dao.CommitDAO;
-import org.openmbee.sdvc.core.dao.NodeDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
 
 @Service
 public class DefaultBranchService implements BranchService {
@@ -44,8 +36,6 @@ public class DefaultBranchService implements BranchService {
     private BranchIndexDAO branchIndex;
 
     private CommitDAO commitRepository;
-
-    private CommitService commitService;
 
     private NodeDAO nodeRepository;
 
@@ -61,11 +51,6 @@ public class DefaultBranchService implements BranchService {
     @Autowired
     public void setCommitRepository(CommitDAO commitRepository) {
         this.commitRepository = commitRepository;
-    }
-
-    @Autowired
-    public void setCommitService(CommitService commitService) {
-        this.commitService = commitService;
     }
 
     @Autowired
@@ -136,11 +121,11 @@ public class DefaultBranchService implements BranchService {
         branch.setCreated(Formats.FORMATTER.format(now));
         branch.setDeleted(false);
         branch.setProjectId(projectId);
+        branch.setStatus("created");
 
         if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
-            String uuid = UUID.randomUUID().toString();
-            branch.setDocId(uuid);
-            b.setDocId(uuid);
+            branch.setDocId(branch.getId());
+            b.setDocId(branch.getId());
         }
         logger.info("Saving branch: {}", branch.getId());
 
