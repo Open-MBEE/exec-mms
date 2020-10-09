@@ -36,11 +36,10 @@ public class BranchesController extends BaseController {
     }
 
     @GetMapping
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public RefsResponse getAllRefs(
         @PathVariable String projectId,
         Authentication auth) {
-
-        getProjectType(projectId);
 
         RefsResponse res = branchService.getBranches(projectId);
         if (!permissionService.isProjectPublic(projectId)) {

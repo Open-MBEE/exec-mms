@@ -46,7 +46,6 @@ public class ElementsController extends BaseController {
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        findBranch(projectId, refId);
         return nodeService.read(projectId, refId, "", params);
     }
 
@@ -61,7 +60,6 @@ public class ElementsController extends BaseController {
 
 
         NodeService nodeService = getNodeService(projectId);
-        findBranch(projectId, refId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
         handleSingleResponse(res);
         return res;
@@ -83,7 +81,6 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            findBranch(projectId, refId);
             return nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
         }
         throw new BadRequestException(response.addMessage("Empty"));
@@ -101,7 +98,6 @@ public class ElementsController extends BaseController {
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
             NodeService nodeService = getNodeService(projectId);
-            findBranch(projectId, refId);
             return nodeService.read(projectId, refId, req, params);
         }
         throw new BadRequestException(response.addMessage("Empty"));
@@ -115,7 +111,6 @@ public class ElementsController extends BaseController {
         @PathVariable String elementId,
         Authentication auth) {
 
-        findBranch(projectId, refId);
         ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
         return res;
@@ -129,7 +124,6 @@ public class ElementsController extends BaseController {
         @RequestBody ElementsRequest req,
         Authentication auth) {
 
-        findBranch(projectId, refId);
         return getNodeService(projectId).delete(projectId, refId, req, auth.getName());
     }
 }

@@ -32,8 +32,6 @@ public abstract class BaseController {
 
     protected ProjectDAO projectRepository;
 
-    protected BranchDAO branchRepository;
-
     protected PermissionService permissionService;
 
     protected MethodSecurityService mss;
@@ -46,11 +44,6 @@ public abstract class BaseController {
     @Autowired
     public void setProjectRepository(ProjectDAO projectRepository) {
         this.projectRepository = projectRepository;
-    }
-
-    @Autowired
-    public void setBranchRepository(BranchDAO branchRepository) {
-        this.branchRepository = branchRepository;
     }
 
     @Autowired
@@ -70,14 +63,6 @@ public abstract class BaseController {
 
     public Map<String, Object> convertToMap(Object obj) {
         return om.convertValue(obj, new TypeReference<Map<String, Object>>() {});
-    }
-
-    protected void findBranch(String projectId, String id){
-        getProjectType(projectId);
-        Optional<Branch> branchesOption = branchRepository.findByBranchId(id);
-        if (!branchesOption.isPresent()) {
-            throw new NotFoundException("branch not found");
-        }
     }
 
     protected String getProjectType(String projectId) {

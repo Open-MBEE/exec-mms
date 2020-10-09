@@ -15,6 +15,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
+import org.openmbee.sdvc.core.config.ContextObject;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
@@ -78,8 +79,9 @@ public class DatabaseDefinitionService {
     }
 
     public void deleteProjectDatabase(Project project) throws SQLException {
-        Connection connection = crudDataSources.getDataSource("DEFAULT").getConnection();
-        connection.createStatement().executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
+        try(Connection connection = crudDataSources.getDataSource(ContextObject.DEFAULT_PROJECT).getConnection()) {
+            connection.createStatement().executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
+        }
     }
 
     private String databaseProjectString(Project project) {

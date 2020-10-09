@@ -124,8 +124,9 @@ public class DefaultBranchService implements BranchService {
         branch.setStatus("created");
 
         if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
-            branch.setDocId(branch.getId());
-            b.setDocId(branch.getId());
+            String docId = branchIndex.createDocId(branch);
+            branch.setDocId(docId);
+            b.setDocId(docId);
         }
         logger.info("Saving branch: {}", branch.getId());
 

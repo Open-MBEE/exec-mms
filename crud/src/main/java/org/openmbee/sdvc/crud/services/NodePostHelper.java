@@ -71,7 +71,7 @@ public class NodePostHelper extends NodeOperation {
             if (n == null) {
                 added = true;
             } else if (indexElement == null) {
-                logger.warn("node db and elastic mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
+                logger.warn("node db and index mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
                 info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
                 continue;
             }

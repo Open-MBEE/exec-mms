@@ -56,5 +56,10 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
     protected String getIndex() {
         return super.getIndex() + "_metadata";
     }
+
+    @Override
+    public String createDocId(RefJson branch) {
+        return UUID.randomUUID().toString();
+    }
 }
 
