@@ -2,6 +2,7 @@ package org.openmbee.sdvc.core.security;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.dao.BranchDAO;
@@ -63,14 +64,7 @@ public class MethodSecurityService {
         });
 
         CompletableFuture<Boolean> existsFuture = CompletableFuture.supplyAsync(() -> orgExists(orgId));
-
-        if(!permissionsFuture.join()) {
-            return false;
-        }
-        if(!existsFuture.join()) {
-            throw new NotFoundException("Org not found");
-        }
-        return true;
+        return completeFutures(permissionsFuture, existsFuture, "Org");
     }
 
     public boolean hasProjectPrivilege(Authentication authentication, String projectId, String privilege, boolean allowAnonIfPublic) {
@@ -89,14 +83,7 @@ public class MethodSecurityService {
         });
 
         CompletableFuture<Boolean> existsFuture = CompletableFuture.supplyAsync(() -> projectExists(projectId));
-
-        if(!permissionsFuture.join()) {
-            return false;
-        }
-        if(!existsFuture.join()) {
-            throw new NotFoundException("Project not found");
-        }
-        return true;
+        return completeFutures(permissionsFuture, existsFuture, "Project");
     }
 
     public boolean hasBranchPrivilege(Authentication authentication, String projectId, String branchId, String privilege, boolean allowAnonIfPublic) {
@@ -115,14 +102,7 @@ public class MethodSecurityService {
         });
 
         CompletableFuture<Boolean> existsFuture = CompletableFuture.supplyAsync(() -> branchExists(projectId, branchId));
-
-        if(!permissionsFuture.join()) {
-            return false;
-        }
-        if(!existsFuture.join()) {
-            throw new NotFoundException("Org not found");
-        }
-        return true;
+        return completeFutures(permissionsFuture, existsFuture, "Branch");
     }
 
     private boolean orgExists(String orgId) {
@@ -142,5 +122,22 @@ public class MethodSecurityService {
         }
         Optional<Branch> branchesOption = branchRepository.findByBranchId(branchId);
         return branchesOption.isPresent();
+    }
+
+    private boolean completeFutures(CompletableFuture<Boolean> permissionsFuture, CompletableFuture<Boolean> existsFuture, String context) {
+        try {
+            if (!permissionsFuture.join()) {
+                return false;
+            }
+            if (!existsFuture.join()) {
+                throw new NotFoundException(context + " not found");
+            }
+            return true;
+        } catch(CompletionException ex) {
+            if(ex.getCause() instanceof RuntimeException){
+                throw (RuntimeException) ex.getCause();
+            }
+            return false;
+        }
     }
 }

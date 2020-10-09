@@ -2976,8 +2976,8 @@
 					"script": {
 						"id": "90859114-65cc-41c2-8b34-015f1464201a",
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {",
-							"    pm.response.to.have.status(400);",
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3017,8 +3017,8 @@
 					"script": {
 						"id": "c410396b-451f-4120-bbd6-69fa66effe42",
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {",
-							"    pm.response.to.have.status(400);",
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
 							"});"
 						],
 						"type": "text/javascript"

@@ -10,6 +10,7 @@ import org.openmbee.sdvc.permissions.objects.PermissionLookup;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupRequest;
 import org.openmbee.sdvc.permissions.objects.PermissionLookupResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -60,6 +61,9 @@ public class PermissionsLookupController {
                 }
             } catch (SdvcException e) {
                 res.addRejection(new Rejection(lookup, e.getCode().value(), e.getMessage()));
+                res.setAllPassed(false);
+            } catch (Exception e) {
+                res.addRejection(new Rejection(lookup, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
                 res.setAllPassed(false);
             }
         }
