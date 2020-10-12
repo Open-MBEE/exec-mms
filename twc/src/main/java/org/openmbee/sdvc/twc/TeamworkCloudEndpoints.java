@@ -26,8 +26,8 @@ public enum TeamworkCloudEndpoints {
     	if(params == null) {
     		return url;
     	}
-    	
-        return String.format(url, params);
+
+        return String.format(url, (Object[]) params);
     }
 
 }

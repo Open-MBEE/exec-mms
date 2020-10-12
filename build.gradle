@@ -18,8 +18,6 @@ ext {
         'swagger-annotations'           : 'io.swagger.core.v3:swagger-annotations:2.1.2',
         'hibernate-core'                : 'org.hibernate:hibernate-core:5.4.14.Final',
         'servlet-api'                   : 'javax.servlet:javax.servlet-api:4.0.1',
-        'log4j'                         : "org.apache.logging.log4j:log4j-core:$log4jVersion",
-        'log4j-api'                     : "org.apache.logging.log4j:log4j-api:$log4jVersion",
         'slf4j-api'                     : 'org.slf4j:slf4j-api:1.7.30',
         'spring-boot'                   : "org.springframework.boot:spring-boot:$springBootVersion",
         'spring-security-core'          : "org.springframework.security:spring-security-core:$springSecurityVersion",

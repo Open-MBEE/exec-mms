@@ -1,83 +1,72 @@
 package org.openmbee.sdvc.twc.metadata;
 
+import org.openmbee.sdvc.core.config.ContextHolder;
+import org.openmbee.sdvc.core.dao.ProjectIndex;
+import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.data.domains.global.Metadata;
 import org.openmbee.sdvc.data.domains.global.Project;
-import org.openmbee.sdvc.rdb.repositories.MetadataRepository;
+import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.twc.constants.TwcConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class TwcMetadataService {
 
-
-    private MetadataRepository metadataRepository;
+    private static final Logger logger = LoggerFactory.getLogger(TwcMetadataService.class);
+    private ProjectIndex projectIndex;
 
     @Autowired
-    public void setMetadataRepository(MetadataRepository metadataRepository) {
-        this.metadataRepository = metadataRepository;
+    public void setProjectIndex(ProjectIndex projectIndex) {
+        this.projectIndex = projectIndex;
     }
 
     public void updateTwcMetadata(Project project, TwcMetadata metadata) {
-        updateTwcMetadata(project, TwcConstants.HOST_KEY, metadata.getHost());
-        updateTwcMetadata(project, TwcConstants.WORKSPACE_ID_KEY, metadata.getWorkspaceId());
-        updateTwcMetadata(project, TwcConstants.RESOURCE_ID_KEY, metadata.getResourceId());
-    }
-
-    private void updateTwcMetadata(Project project, String fieldKey, String value) {
-
-        Metadata metadata = null;
-        List<Metadata> metadataList = project.getMetadata().stream()
-            .filter(v -> fieldKey.equals(v.getKey())).collect(Collectors.toList());
-
-        if(metadataList.size() > 0) {
-            metadata = metadataList.get(0);
-        }
-        //All of the TWC metadata fields should be unique. If more than one exists, remove the extras.
-        if(metadataList.size() > 1) {
-            metadataRepository.deleteAll(metadataList.subList(1, metadataList.size()));
-        }
-
-        //If null and exists, delete
-        if(value == null) {
-            if(metadata != null) {
-                metadataRepository.delete(metadata);
-            }
-        }
-        else {
-            //If not null and exists, update
-            if(metadata != null) {
-                metadata.setValue(value);
-                metadataRepository.save(metadata);
-            }
-            //If not null and does not exist, create
-            else {
-                metadata = new Metadata();
-                metadata.setProject(project);
-                metadata.setKey(fieldKey);
-                metadata.setValue(value);
-                metadataRepository.save(metadata);
-            }
-        }
+        ContextHolder.setContext(project.getProjectId());
+        ProjectJson projectJson = getProjectJson(project);
+        Map<String, String> metadataMap = metadata.toMap();
+        metadataMap.put(TwcConstants.ENABLED_KEY, "true");
+        projectJson.put(TwcConstants.FOREIGN_PROJECT, metadataMap);
+        projectIndex.update(projectJson);
     }
 
     public TwcMetadata getTwcMetadata(Project project) {
+        ContextHolder.setContext(project.getProjectId());
+        ProjectJson projectJson = getProjectJson(project);
+        Map<String, Object> metadata = (Map)projectJson.get(TwcConstants.FOREIGN_PROJECT);
+        if(metadata == null) {
+            return null;
+        }
+
         TwcMetadata twcMetadata = new TwcMetadata();
-        twcMetadata.setHost(getMetadataField(project, TwcConstants.HOST_KEY));
-        twcMetadata.setWorkspaceId(getMetadataField(project, TwcConstants.WORKSPACE_ID_KEY));
-        twcMetadata.setResourceId(getMetadataField(project, TwcConstants.RESOURCE_ID_KEY));
+        twcMetadata.setHost(String.valueOf(metadata.get(TwcConstants.HOST_KEY)));
+        twcMetadata.setWorkspaceId(String.valueOf(metadata.get(TwcConstants.WORKSPACE_ID_KEY)));
+        twcMetadata.setResourceId(String.valueOf(metadata.get(TwcConstants.RESOURCE_ID_KEY)));
         return twcMetadata;
     }
 
-    private String getMetadataField(Project project, String key) {
-        if(project.getMetadata() == null)
-            return null;
+    public void deleteTwcMetadata(Project project) {
+        ContextHolder.setContext(project.getProjectId());
+        ProjectJson projectJson = getProjectJson(project);
+        Map<String, Object> metadata = (Map)projectJson.get(TwcConstants.FOREIGN_PROJECT);
+        if(metadata == null) {
+            return;
+        }
+        metadata.put(TwcConstants.ENABLED_KEY, "false");
+        projectJson.put(TwcConstants.FOREIGN_PROJECT, metadata);
+        projectIndex.update(projectJson);
+    }
 
-        Optional<String> value = project.getMetadata().stream()
-            .filter(v -> key.equals(v.getKey())).map(Metadata::getValue).findFirst();
-        return value.orElse(null);
+    private ProjectJson getProjectJson(Project project) {
+        ProjectJson projectJson = projectIndex.findById(project.getDocId()).orElse(null);
+        if(projectJson == null) {
+            logger.error("Could not locate project in project index: " + project.getDocId());
+            throw new InternalErrorException("Could not locate project in project index");
+        }
+        return projectJson;
     }
 }

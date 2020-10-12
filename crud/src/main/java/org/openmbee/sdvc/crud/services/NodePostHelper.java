@@ -66,20 +66,20 @@ public class NodePostHelper extends NodeOperation {
             if (element.getId() == null || element.getId().isEmpty()) {
                 element.setId(UUID.randomUUID().toString());
             }
-            ElementJson elasticElement = info.getExistingElementMap().get(element.getId());
+            ElementJson indexElement = info.getExistingElementMap().get(element.getId());
             Node n = info.getExistingNodeMap().get(element.getId());
             if (n == null) {
                 added = true;
-            } else if (elasticElement == null) {
-                logger.warn("node db and elastic mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
+            } else if (indexElement == null) {
+                logger.warn("node db and index mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
                 info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
                 continue;
             }
 
             if (!added) {
                 if (!overwriteJson) {
-                    if (n.isDeleted() || isUpdated(element, elasticElement, info)) {
-                        updated = diffUpdateJson(element, elasticElement, info);
+                    if (n.isDeleted() || isUpdated(element, indexElement, info)) {
+                        updated = diffUpdateJson(element, indexElement, info);
                     }
                 } else {
                     updated = true;

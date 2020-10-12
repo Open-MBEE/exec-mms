@@ -1,5 +1,10 @@
 package org.openmbee.sdvc.twc.metadata;
 
+import org.openmbee.sdvc.twc.constants.TwcConstants;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class TwcMetadata {
     private String host;
     private String workspaceId;
@@ -34,5 +39,13 @@ public class TwcMetadata {
         return host != null && !host.isEmpty()
             && workspaceId != null && !workspaceId.isEmpty()
             && resourceId != null && !resourceId.isEmpty();
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> result = new HashMap<>();
+        result.put(TwcConstants.HOST_KEY, getHost());
+        result.put(TwcConstants.WORKSPACE_ID_KEY, getWorkspaceId());
+        result.put(TwcConstants.RESOURCE_ID_KEY, getResourceId());
+        return result;
     }
 }

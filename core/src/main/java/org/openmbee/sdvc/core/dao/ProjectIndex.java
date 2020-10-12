@@ -9,7 +9,7 @@ public interface ProjectIndex {
 
     void create(String projectId);
 
-    void create(String projectId, String projectType);
+    void create(ProjectJson project);
 
     Optional<ProjectJson> findById(String docId);
 

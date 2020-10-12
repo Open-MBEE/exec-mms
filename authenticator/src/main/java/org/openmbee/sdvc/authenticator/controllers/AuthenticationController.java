@@ -51,6 +51,19 @@ public class AuthenticationController {
 
     }
 
+    @GetMapping(value = "/authentication")
+    @PreAuthorize("isAuthenticated()")
+    public JwtAuthenticationResponse createAuthenticationToken() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            final String token = jwtTokenUtil.generateToken(userDetails);
+            return new JwtAuthenticationResponse(token);
+        }
+        return new JwtAuthenticationResponse(null);
+    }
+
+
     @GetMapping(value = "/checkAuth")
     @PreAuthorize("isAuthenticated()")
     public JwtTokenValidationResponse checkAuthenticationToken() {

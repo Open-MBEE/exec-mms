@@ -46,8 +46,7 @@ public class ElementsController extends BaseController {
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        ElementsResponse res = nodeService.read(projectId, refId, "", params);
-        return res;
+        return nodeService.read(projectId, refId, "", params);
     }
 
     @GetMapping(value = "/{elementId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,6 +57,7 @@ public class ElementsController extends BaseController {
         @PathVariable String elementId,
         @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
+
 
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);

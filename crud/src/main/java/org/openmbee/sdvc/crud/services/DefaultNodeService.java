@@ -129,6 +129,7 @@ public class DefaultNodeService implements NodeService {
 
         ContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
+        nodePostHelper.setPreserveTimestamps(Boolean.parseBoolean(params.get("preserveTimestamps")));
 
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,

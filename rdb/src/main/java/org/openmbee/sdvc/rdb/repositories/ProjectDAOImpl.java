@@ -56,8 +56,14 @@ public class ProjectDAOImpl implements ProjectDAO {
 
     @Override
     public void delete(Project p) {
-        //TODO delete db
         projectRepository.delete(p);
+
+        try {
+            projectOperations.deleteProjectDatabase(p);
+        } catch(SQLException ex) {
+            logger.error("DELETE PROJECT DATABASE EXCEPTION\nPotential connection issue, query statement mishap, or unexpected RDB behavior.");
+            throw new InternalErrorException(ex);
+        }
     }
 
     @Override
