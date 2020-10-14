@@ -3166,7 +3166,7 @@
 					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"name\": \"bad\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
-					"raw": "{{host}}/projects/aaa/refs/missing/elements",
+					"raw": "{{host}}/projects/aaa/refs/master/elements",
 					"host": [
 						"{{host}}"
 					],
@@ -3174,8 +3174,173 @@
 						"projects",
 						"aaa",
 						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post elements to nonexistent ref",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f8b1c3b-629e-4080-bd96-c7ea7a29faf0",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"name\": \"bad\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/missing/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
 						"missing",
 						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get nonexistent project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f9e479b7-97e5-41f2-b801-7c1f7f4553ec",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/projects/zz",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"zz"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get nonexistent ref",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "58d3d7d2-416b-4ac3-8933-7b54c2691fd4",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/missing",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"missing"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get element in nonexistent ref",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5eacc2a2-caea-4256-aa97-bf6e50bd3b68",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/missing/elements/asdf",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"missing",
+						"elements",
+						"asdf"
 					]
 				}
 			},

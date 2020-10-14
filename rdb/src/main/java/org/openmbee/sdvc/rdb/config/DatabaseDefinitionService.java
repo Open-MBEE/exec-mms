@@ -3,6 +3,7 @@ package org.openmbee.sdvc.rdb.config;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class DatabaseDefinitionService {
             crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
         try {
-            jdbcTemplate.execute("CREATE DATABASE " + databaseProjectString(project));
+            jdbcTemplate.execute("CREATE DATABASE " + databaseProjectString(project)); //lgtm[java/sql-injection]
             created.add("Created Database");
 
             generateProjectSchemaFromModels(project);
@@ -79,8 +80,9 @@ public class DatabaseDefinitionService {
     }
 
     public void deleteProjectDatabase(Project project) throws SQLException {
-        try(Connection connection = crudDataSources.getDataSource(ContextObject.DEFAULT_PROJECT).getConnection()) {
-            connection.createStatement().executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
+        try (Connection connection = crudDataSources.getDataSource(ContextObject.DEFAULT_PROJECT).getConnection();
+                Statement statement = connection.createStatement()) {
+            statement.executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
         }
     }
 
@@ -160,11 +162,11 @@ public class DatabaseDefinitionService {
 
         jdbcTemplate.execute("BEGIN");
 
-        jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
+        jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable)); //lgtm[java/sql-injection]
 
         //reset db auto increment sequence for postgresql only
         if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
-            jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
+            jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable)); //lgtm[java/sql-injection]
         }
 
         jdbcTemplate.execute("COMMIT");
