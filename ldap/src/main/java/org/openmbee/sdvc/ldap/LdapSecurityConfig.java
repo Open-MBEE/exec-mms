@@ -80,7 +80,7 @@ public class LdapSecurityConfig {
     public void configureLdapAuth(AuthenticationManagerBuilder auth,
         LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
         throws Exception {
-        logger.error("LDAP IS HAPPENING!!!");
+        logger.debug("LDAP IS HAPPENING!!!");
         /*
             see this article : https://spring.io/guides/gs/authenticating-ldap/
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
