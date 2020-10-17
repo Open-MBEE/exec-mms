@@ -3,6 +3,7 @@ package org.openmbee.sdvc.rdb.config;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
+import org.openmbee.sdvc.core.config.ContextObject;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
@@ -54,14 +56,12 @@ public class DatabaseDefinitionService {
     }
 
     public boolean createProjectDatabase(Project project) throws SQLException {
-        ContextHolder.setContext(null);
-        String prefix = env.getProperty("rdb.project.prefix", "");
-        String queryString = String.format("CREATE DATABASE \"%s_%s\"", prefix, project.getProjectId());
+        ContextHolder.setContext(null);        
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
             crudDataSources.getDataSource(ContextHolder.getContext().getKey()));
         List<Object> created = new ArrayList<>();
         try {
-            jdbcTemplate.execute(queryString);
+            jdbcTemplate.execute("CREATE DATABASE " + databaseProjectString(project)); //lgtm[java/sql-injection]
             created.add("Created Database");
 
             generateProjectSchemaFromModels(project);
@@ -77,6 +77,18 @@ public class DatabaseDefinitionService {
             }
         }
         return !created.isEmpty();
+    }
+
+    public void deleteProjectDatabase(Project project) throws SQLException {
+        try (Connection connection = crudDataSources.getDataSource(ContextObject.DEFAULT_PROJECT).getConnection();
+                Statement statement = connection.createStatement()) {
+            statement.executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
+        }
+    }
+
+    private String databaseProjectString(Project project) {
+		String prefix = env.getProperty("rdb.project.prefix", "");
+        return String.format("\"%s_%s\"", prefix, project.getProjectId());
     }
 
     public void createBranch() {
@@ -110,16 +122,6 @@ public class DatabaseDefinitionService {
                 metadata.getMetadataBuilder().build());
 
         try (Connection conn = crudDataSources.getDataSource(project).getConnection()) {
-           /* TODO rethink if project itself should be a node
-            try (PreparedStatement ps = conn.prepareStatement(INITIAL_PROJECT)) {
-                ps.setString(1, project.getProjectId());
-                ps.setString(2, "test");
-                ps.setString(3, "test");
-                ps.setString(4, "test");
-                ps.setInt(5, 1);
-                ps.execute();
-            }*/
-
             try (PreparedStatement ps = conn.prepareStatement(INITIAL_REF)) {
                 ps.execute();
             }
@@ -160,11 +162,11 @@ public class DatabaseDefinitionService {
 
         jdbcTemplate.execute("BEGIN");
 
-        jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable));
+        jdbcTemplate.execute(String.format(COPY_SQL, targetNodeTable, parentNodeTable)); //lgtm[java/sql-injection]
 
         //reset db auto increment sequence for postgresql only
         if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
-            jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable));
+            jdbcTemplate.execute(String.format(COPY_IDX, targetNodeTable, parentNodeTable)); //lgtm[java/sql-injection]
         }
 
         jdbcTemplate.execute("COMMIT");

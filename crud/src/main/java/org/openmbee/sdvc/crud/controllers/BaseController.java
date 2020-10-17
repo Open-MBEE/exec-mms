@@ -2,27 +2,25 @@ package org.openmbee.sdvc.crud.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
+import org.openmbee.sdvc.core.dao.BranchDAO;
 import org.openmbee.sdvc.core.dao.ProjectDAO;
+import org.openmbee.sdvc.core.exceptions.*;
 import org.openmbee.sdvc.core.objects.BaseResponse;
 import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.security.MethodSecurityService;
-import org.openmbee.sdvc.core.services.PermissionService;
-import org.openmbee.sdvc.core.exceptions.ForbiddenException;
-import org.openmbee.sdvc.core.exceptions.UnauthorizedException;
-import org.openmbee.sdvc.core.exceptions.BadRequestException;
-import org.openmbee.sdvc.core.exceptions.DeletedException;
-import org.openmbee.sdvc.core.exceptions.NotFoundException;
-import org.openmbee.sdvc.core.exceptions.NotModifiedException;
 import org.openmbee.sdvc.core.services.NodeService;
+import org.openmbee.sdvc.core.services.PermissionService;
 import org.openmbee.sdvc.crud.services.ServiceFactory;
 import org.openmbee.sdvc.data.domains.global.Project;
+import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public abstract class BaseController {
 

@@ -41,6 +41,9 @@ public class NodeOperation {
         .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZone(
             ZoneId.systemDefault());
 
+    private boolean preserveTimestamps = false;
+
+
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
         this.nodeRepository = nodeRepository;
@@ -102,8 +105,6 @@ public class NodeOperation {
         info.setRejected(new HashMap<>());
         info.setNow(now);
         info.setOldDocIds(new HashSet<>());
-        info.setEdgesToDelete(new HashMap<>());
-        info.setEdgesToSave(new HashMap<>());
         info.setActiveElementMap(new HashMap<>());
         return info;
     }
@@ -145,11 +146,14 @@ public class NodeOperation {
         List<String> inRefIds = new ArrayList<>();
         inRefIds.add(cmjs.getRefId());
         e.setInRefIds(inRefIds);
-        String elasticId = UUID.randomUUID().toString();
-        e.setDocId(elasticId);
+        String docId = UUID.randomUUID().toString();
+        e.setDocId(docId);
         e.setCommitId(cmjs.getId());
-        e.setModified(cmjs.getCreated());
-        e.setModifier(cmjs.getCreator());
+
+        if(!preserveTimestamps) {
+            e.setModified(cmjs.getCreated());
+            e.setModifier(cmjs.getCreator());
+        }
 
         n.setDocId(e.getDocId());
         n.setLastCommit(cmjs.getId());
@@ -183,8 +187,7 @@ public class NodeOperation {
         info.addRejection(nodeId, new Rejection(nodeId, 404, "Not Found"));
     }
 
-    public static Map<String, ElementJson> convertJsonToMap(
-        List<ElementJson> elements) {
+    public static Map<String, ElementJson> convertJsonToMap(List<ElementJson> elements) {
         Map<String, ElementJson> result = new HashMap<>();
         for (ElementJson elem : elements) {
             if (elem == null) {
@@ -223,7 +226,6 @@ public class NodeOperation {
 
     //find first element of type in types following e's relkey (assuming relkey's value is an element id)
     public Optional<ElementJson> getFirstRelationshipOfType(ElementJson e, List<Integer> types, String relkey) {
-        //TODO to use some graph interface sometime
         //only for latest graph
         String nextId = (String)e.get(relkey);
         if (nextId == null || nextId.isEmpty()) {
@@ -245,5 +247,13 @@ public class NodeOperation {
             nextNode = nodeRepository.findByNodeId(nextId);
         }
         return Optional.empty();
+    }
+
+    public boolean isPreserveTimestamps() {
+        return preserveTimestamps;
+    }
+
+    public void setPreserveTimestamps(boolean preserveTimestamps) {
+        this.preserveTimestamps = preserveTimestamps;
     }
 }

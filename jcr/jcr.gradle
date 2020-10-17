@@ -1,8 +1,0 @@
-dependencies {
-    implementation project(':core')
-
-    implementation group: 'org.apache.jackrabbit', name: 'oak-core', version: '1.9.9'
-    implementation group: 'org.apache.jackrabbit', name: 'oak-store-spi', version: '1.9.9'
-    implementation group: 'org.apache.jackrabbit', name: 'oak-api', version: '1.9.9'
-
-}

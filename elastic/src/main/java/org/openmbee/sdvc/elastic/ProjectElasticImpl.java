@@ -34,12 +34,17 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
 
     @Override
     public void create(String projectId) {
-        create(projectId, "default");
+        ProjectJson projectJson = newInstance();
+        projectJson.setProjectId(projectId);
+        projectJson.setType("default");
+        create(projectJson);
     }
 
     @Override
-    public void create(String projectId, String projectType) {
+    public void create(ProjectJson project) {
         try {
+            String projectId = project.getProjectId();
+            String projectType = project.getProjectType();
             String index = projectId.toLowerCase();
             CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
             commitIndex.mapping(getCommitMapping(), XContentType.JSON);
@@ -50,6 +55,7 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
             createIndex(commitIndex);
             createIndex(nodeIndex);
             createIndex(metadataIndex);
+            update(project);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

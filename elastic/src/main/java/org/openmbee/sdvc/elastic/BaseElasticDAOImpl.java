@@ -149,7 +149,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             bulkProcessor.add(new IndexRequest(index).id(json.getDocId()).source(json));
         }
         try {
-            if(!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
+            if (!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
                 logger.error("Timed out in bulk processing");
             }
         } catch (InterruptedException e) {
@@ -182,7 +182,6 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                     response.putAll(result.sourceAsMap());
                 }
             }
-            // TODO: Handle other getResults maybe
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

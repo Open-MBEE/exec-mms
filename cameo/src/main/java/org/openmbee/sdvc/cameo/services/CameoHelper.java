@@ -84,7 +84,6 @@ public class CameoHelper {
         res.put(CameoConstants.AGGREGATION, aggregation);
         res.put(CameoConstants.ASSOCIATIONID, assocId);
         List<String> asIds = new ArrayList<>();
-        //TODO not needed?? asIds.add(CameoConstants.PROPERTYSIDS.get(aggregation));
         res.put(CameoConstants.APPLIEDSTEREOTYPEIDS, asIds);
         res.put(CameoConstants.DOCUMENTATION, "");
         res.put(CameoConstants.MDEXTENSIONSIDS, new ArrayList());

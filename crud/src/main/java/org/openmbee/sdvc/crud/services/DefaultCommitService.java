@@ -15,6 +15,7 @@ import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.InternalErrorException;
 import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.core.dao.BranchDAO;
+import org.openmbee.sdvc.core.services.CommitService;
 import org.openmbee.sdvc.data.domains.scoped.Branch;
 import org.openmbee.sdvc.json.CommitJson;
 import org.openmbee.sdvc.core.objects.CommitsRequest;
@@ -25,10 +26,9 @@ import org.openmbee.sdvc.core.dao.CommitIndexDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class CommitService {
-
-    private CommitDAO commitRepository;
+@Service("defaultCommitService")
+public class DefaultCommitService implements CommitService {
+    protected CommitDAO commitRepository;
     private CommitIndexDAO commitIndex;
     private BranchDAO branchRepository;
 
@@ -47,8 +47,8 @@ public class CommitService {
         this.commitIndex = commitElasticRepository;
     }
 
-    public CommitsResponse getRefCommits(String projectId, String refId,
-        Map<String, String> params) {
+    @Override
+    public CommitsResponse getRefCommits(String projectId, String refId, Map<String, String> params) {
         ContextHolder.setContext(projectId, refId);
         int limit = 0;
         Instant timestamp = null;
@@ -89,6 +89,7 @@ public class CommitService {
         return res;
     }
 
+    @Override
     public CommitsResponse getCommit(String projectId, String commitId) {
         ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
@@ -106,8 +107,8 @@ public class CommitService {
         return res;
     }
 
-    public CommitsResponse getElementCommits(String projectId, String refId, String elementId,
-        Map<String, String> params) {
+    @Override
+    public CommitsResponse getElementCommits(String projectId, String refId, String elementId, Map<String, String> params) {
         ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
         try {
@@ -128,6 +129,7 @@ public class CommitService {
         return res;
     }
 
+    @Override
     public CommitsResponse getCommits(String projectId, CommitsRequest req) {
         ContextHolder.setContext(projectId);
         Set<String> ids = new HashSet<>();
@@ -142,5 +144,12 @@ public class CommitService {
             throw new InternalErrorException(e);
         }
         return res;
+    }
+
+    @Override
+    public boolean isProjectNew(String projectId) {
+        ContextHolder.setContext(projectId);
+        List<Commit> commits = commitRepository.findAll();
+        return commits == null || commits.isEmpty();
     }
 }

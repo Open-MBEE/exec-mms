@@ -3,6 +3,8 @@ package org.openmbee.sdvc.rdb.repositories;
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.config.ContextObject;
 import org.openmbee.sdvc.rdb.datasources.CrudDataSources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,6 +14,7 @@ public abstract class BaseDAOImpl {
 
     private CrudDataSources crudDataSources;
     public PlatformTransactionManager transactionManager;
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     public void setCrudDataSources(CrudDataSources crudDataSources) {

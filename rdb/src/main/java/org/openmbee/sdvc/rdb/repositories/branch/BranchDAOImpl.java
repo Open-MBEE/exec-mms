@@ -36,7 +36,6 @@ public class BranchDAOImpl extends BaseDAOImpl implements BranchDAO {
             ContextHolder.setContext(ContextHolder.getContext().getProjectId(), branch.getBranchId());
             branchesOperations.createBranch();
             branchesOperations.copyTablesFromParent(branch.getBranchId(), branch.getParentRefId(), null);
-            //TODO it only supports branch from latest here
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
 

@@ -1,29 +1,25 @@
 package org.openmbee.sdvc.crud.controllers.branches;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 import org.openmbee.sdvc.core.config.Privileges;
+import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.core.exceptions.SdvcException;
 import org.openmbee.sdvc.core.objects.RefsRequest;
 import org.openmbee.sdvc.core.objects.RefsResponse;
 import org.openmbee.sdvc.core.objects.Rejection;
 import org.openmbee.sdvc.core.services.BranchService;
 import org.openmbee.sdvc.crud.controllers.BaseController;
-import org.openmbee.sdvc.core.exceptions.BadRequestException;
 import org.openmbee.sdvc.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs")
@@ -40,6 +36,7 @@ public class BranchesController extends BaseController {
     }
 
     @GetMapping
+    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public RefsResponse getAllRefs(
         @PathVariable String projectId,
         Authentication auth) {
@@ -81,10 +78,9 @@ public class BranchesController extends BaseController {
         for (RefJson branch : projectsPost.getRefs()) {
             try {
                 if (branch.getId() == null || branch.getId().isEmpty()) {
-                    response.addRejection(new Rejection(branch, 400, "Branch id missing"));
-                    continue;
+                    branch.setId(UUID.randomUUID().toString());
                 }
-                if(! isBranchIdValid(branch.getId())) {
+                if(!isBranchIdValid(branch.getId())) {
                     response.addRejection(new Rejection(branch, 400, "Branch id is invalid."));
                     continue;
                 }

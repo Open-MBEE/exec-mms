@@ -92,6 +92,7 @@ public class NodeDAOImpl extends BaseDAOImpl implements NodeDAO {
 
             return nodes;
         } catch (SQLException ex) {
+            logger.error("node insert all", ex);
             throw new InternalErrorException(ex);
         }
     }

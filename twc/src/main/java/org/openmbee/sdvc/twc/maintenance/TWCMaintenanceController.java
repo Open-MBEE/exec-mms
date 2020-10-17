@@ -58,6 +58,15 @@ public class TWCMaintenanceController {
         }
     }
 
+    @Transactional
+    @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
+    @DeleteMapping(value = "/project/twcmetadata/{id}")
+    @ResponseBody
+    public void deleteProjectMetadata(@PathVariable String id){
+        Project project = getProject(id);
+        twcMetadataService.deleteTwcMetadata(project);
+    }
+
     private Project getProject(String projectId) {
 
         Optional<Project> proj = projectRepo.findByProjectId(projectId);
