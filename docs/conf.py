@@ -22,6 +22,8 @@ project = 'Model Management System'
 copyright = '2020, OpenMBEE'
 author = 'OpenMBEE'
 
+master_doc = 'index'
+
 # The full version, including alpha/beta/rc tags
 release = '4.0.0'
 
