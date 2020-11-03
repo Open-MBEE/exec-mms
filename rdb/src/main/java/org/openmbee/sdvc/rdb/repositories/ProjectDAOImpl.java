@@ -47,7 +47,7 @@ public class ProjectDAOImpl implements ProjectDAO {
             try {
                 projectOperations.createProjectDatabase(proj);
             } catch (SQLException ex) {
-                logger.error("error creating project database", ex);
+                logger.error("Error creating project database. Database may already exist.", ex);
                 throw new InternalErrorException(ex);
             }
         }
