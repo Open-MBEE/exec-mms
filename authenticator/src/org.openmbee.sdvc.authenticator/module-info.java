@@ -1,1 +1,0 @@
-org.openmbee.sdvc.authenticator
