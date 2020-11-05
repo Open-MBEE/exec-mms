@@ -3,7 +3,7 @@ package org.openmbee.mms.twc.permissions;
 import org.openmbee.mms.core.delegation.PermissionsDelegate;
 import org.openmbee.mms.core.delegation.PermissionsDelegateFactory;
 import org.openmbee.mms.twc.TeamworkCloud;
-import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.data.domains.global.Branch;
 import org.openmbee.mms.data.domains.global.Organization;
 import org.openmbee.mms.data.domains.global.Project;

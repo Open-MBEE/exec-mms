@@ -3,7 +3,7 @@ package org.openmbee.mms.twc.metadata;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.dao.ProjectIndex;
 import org.openmbee.mms.twc.constants.TwcConstants;
-import org.openmbee.sdvc.core.exceptions.NotFoundException;
+import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.data.domains.global.Project;
 import org.openmbee.mms.json.ProjectJson;
 import org.slf4j.Logger;
