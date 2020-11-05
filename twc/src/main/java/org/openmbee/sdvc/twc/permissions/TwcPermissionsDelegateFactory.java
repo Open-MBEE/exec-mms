@@ -2,6 +2,7 @@ package org.openmbee.sdvc.twc.permissions;
 
 import org.openmbee.sdvc.core.delegation.PermissionsDelegate;
 import org.openmbee.sdvc.core.delegation.PermissionsDelegateFactory;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.data.domains.global.Branch;
 import org.openmbee.sdvc.data.domains.global.Organization;
 import org.openmbee.sdvc.data.domains.global.Project;
@@ -103,7 +104,11 @@ public class TwcPermissionsDelegateFactory implements PermissionsDelegateFactory
     }
 
     private TwcProjectDetails getTwcDetails(Project project) {
-        TwcMetadata twcMetadata = twcMetadataService.getTwcMetadata(project);
+        TwcMetadata twcMetadata = null;
+        try {
+            twcMetadata = twcMetadataService.getTwcMetadata(project);
+        }
+        catch (NotFoundException e){ }
 
         if(twcMetadata == null || ! twcMetadata.isComplete()) {
             return null;

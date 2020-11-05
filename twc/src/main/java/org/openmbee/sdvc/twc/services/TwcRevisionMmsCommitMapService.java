@@ -87,7 +87,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
             }
             commits.sort(new CommitsComparator(reverseOrder));
             if(limit != null && limit > 0) {
-                return commits.subList(0, limit);
+                return commits.subList(0, Math.min(limit, commits.size()));
             }
             return commits;
         } catch (Exception exception) {

@@ -2,8 +2,7 @@ package org.openmbee.sdvc.twc.metadata;
 
 import org.openmbee.sdvc.core.config.ContextHolder;
 import org.openmbee.sdvc.core.dao.ProjectIndex;
-import org.openmbee.sdvc.core.exceptions.InternalErrorException;
-import org.openmbee.sdvc.data.domains.global.Metadata;
+import org.openmbee.sdvc.core.exceptions.NotFoundException;
 import org.openmbee.sdvc.data.domains.global.Project;
 import org.openmbee.sdvc.json.ProjectJson;
 import org.openmbee.sdvc.twc.constants.TwcConstants;
@@ -12,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Map;
 
 @Service
 public class TwcMetadataService {
@@ -65,7 +64,7 @@ public class TwcMetadataService {
         ProjectJson projectJson = projectIndex.findById(project.getDocId()).orElse(null);
         if(projectJson == null) {
             logger.error("Could not locate project in project index: " + project.getDocId());
-            throw new InternalErrorException("Could not locate project in project index");
+            throw new NotFoundException("Could not locate project in project index");
         }
         return projectJson;
     }
