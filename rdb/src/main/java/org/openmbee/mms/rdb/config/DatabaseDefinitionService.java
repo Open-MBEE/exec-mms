@@ -191,7 +191,7 @@ public class DatabaseDefinitionService {
         properties.put("hibernate.tenant_identifier_resolver", identifierResolver);
 
         properties.put("hibernate.physical_naming_strategy",
-            "org.openmbee.sdvc.rdb.config.SuffixedPhysicalNamingStrategy");
+            "org.openmbee.mms.rdb.config.SuffixedPhysicalNamingStrategy");
 
         return properties;
     }
