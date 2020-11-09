@@ -177,7 +177,7 @@ public class DatabaseDefinitionService {
         properties.put("hibernate.hbm2ddl.auto", "none");
         properties
             .put("hibernate.dialect", env.getProperty("spring.jpa.properties.hibernate.dialect",
-                "org.hibernate.dialect.PostgreSQL94Dialect"));
+                "org.hibernate.dialect.PostgreSQL10Dialect"));
 
         properties.put("hibernate.jdbc.lob.non_contextual_creation", true);
         properties.put("hibernate.current_session_context_class", "thread");
