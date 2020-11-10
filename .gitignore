@@ -28,5 +28,8 @@ localhost-env.json
 /nbdist/
 /.nb-gradle/
 
+### Sphinx ###
+_build
+
 
 **/bin

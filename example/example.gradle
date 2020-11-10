@@ -6,7 +6,6 @@ buildscript {
 
 plugins {
     id "io.spring.dependency-management"
-    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 apply plugin: 'java'
@@ -35,31 +34,6 @@ dependencies {
     testImplementation(
         'org.springframework.boot:spring-boot-starter-test'
     )
-    swaggerCodegen 'org.openapitools:openapi-generator-cli:4.3.0'
-}
-
-swaggerSources {
-    python {
-        inputFile = file('openapi/api-docs.yaml')
-        code {
-            language = 'python'
-            configFile = file('openapi/python-config.json')
-        }
-    }
-    java {
-        inputFile = file('openapi/api-docs.yaml')
-        code {
-            language = 'java'
-            configFile = file('openapi/java-config.json')
-        }
-    }
-    doc {
-        inputFile = file('openapi/api-docs.yaml')
-        code {
-            language = 'html2'
-            configFile = file('openapi/doc-config.json')
-        }
-    }
 }
 
 //https://stackoverflow.com/questions/61197984/bootjar-mavenjar-artifact-wasnt-produced-by-this-build
