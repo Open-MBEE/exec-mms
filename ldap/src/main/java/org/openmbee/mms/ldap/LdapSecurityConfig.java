@@ -124,13 +124,13 @@ public class LdapSecurityConfig {
 
                 User user = userOptional.get();
                 user.setPassword(null);
-                String userDn = "uid=" + user.getUsername() + "," + providerBase;
+                String userDn = userAttributesUsername + "=" + user.getUsername() + "," + providerBase;
 
                 List<Group> definedGroups = groupRepository.findAll();
                 OrFilter orFilter = new OrFilter();
 
                 for (int i = 0; i < definedGroups.size(); i++) {
-                    orFilter.or(new EqualsFilter("cn", definedGroups.get(i).getName()));
+                    orFilter.or(new EqualsFilter(groupRoleAttribute, definedGroups.get(i).getName()));
                 }
 
                 AndFilter andFilter = new AndFilter();

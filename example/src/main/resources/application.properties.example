@@ -29,7 +29,7 @@ spring.datasource.driver-class-name=org.postgresql.Driver
 spring.datasource.initialization-mode=always
 
 # The SQL dialect makes Hibernate generate better SQL for the chosen database
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL94Dialect
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL10Dialect
 #spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL57Dialect
 #spring.jpa.properties.hibernate.dialect.storage_engine=innodb
 
@@ -68,7 +68,7 @@ springdoc.default-produces-media-type=application/json
 springdoc.swagger-ui.displayOperationId=true
 
 s3.endpoint=http://localhost:9000
-s3.access_key=test
-s3.secret_key=test
+s3.access_key=admintest
+s3.secret_key=admintest
 s3.region=optional
 s3.bucket=optional
