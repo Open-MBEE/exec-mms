@@ -3,18 +3,9 @@
 
 The MMS SDVC is a collection of modules built on top of the Spring Framework and is a part of Open-MBEE. For more information about Open-MBEE, visit the [Open-MBEE Website](https://openmbee.org/)
 
-For a reference on how to create an application, see [MMSRI](https://github.com/Open-MBEE/mmsri) or the "example" package. Also see README inside each module.
+#### If you are interested in deploying MMS, please see the [MMSRI](https://github.com/Open-MBEE/mmsri) quickstart.
 
-## Quick Start
-### Docker
-Installation instructions are found here: [Docker documentation](https://docs.docker.com/)
-
-1. Copy the example properties file in `example/src/main/resources/` as `application.properties`
-1. In the command line, run `docker-compose up --build` to create and start all the services from the configuration. 
-1. Swagger ui at [http://localhost:8080/v3/swagger-ui.html](http://localhost:8080/v3/swagger-ui.html)
-1. Use the command `docker-compose down` to stop any containers from running and to remove the containers, networks, and images created by the `docker-compose up` command. This command should always be done before any new attempts to restart the services from the configuration. 
-
-## Developer Setup for example project
+## Developer Setup
 ### Docker 
 We suggest using Docker to set up PostgreSQL and Elasticsearch.  Installation 
 instructions are found here: [Docker documentation](https://docs.docker.com/)
