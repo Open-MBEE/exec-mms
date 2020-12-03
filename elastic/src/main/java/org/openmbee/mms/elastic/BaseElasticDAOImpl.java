@@ -46,6 +46,8 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     protected int resultLimit;
     @Value("${elasticsearch.limit.term}")
     protected int termLimit;
+    @Value("${elasticsearch.limit.get}")
+    protected int getLimit;
     protected static int readTimeout = 1000000000;
     protected RestHighLevelClient client;
     private static final RequestOptions REQUEST_OPTIONS;
@@ -121,25 +123,38 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             if (docIds.isEmpty()) {
                 return listOfResponses;
             }
+            int cur = 0;
             MultiGetRequest request = new MultiGetRequest();
             for (String eid : docIds) {
                 request.add(index, eid);
-            }
-            MultiGetResponse response = client.mget(request, REQUEST_OPTIONS);
-
-            for (MultiGetItemResponse res : response.getResponses()) {
-                GetResponse item = res.getResponse();
-                if (item != null && item.isExists()) {
-                    E ob = newInstance();
-                    ob.putAll(item.getSourceAsMap());
-                    listOfResponses.add(ob);
-                } else {
-                    continue;
+                cur++;
+                if (cur == getLimit) {
+                    getResponses(request, listOfResponses);
+                    cur = 0;
+                    request = new MultiGetRequest();
                 }
+            }
+            if (cur > 0) {
+                getResponses(request, listOfResponses);
             }
             return listOfResponses;
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void getResponses(MultiGetRequest request, List<E> listOfResponses) throws IOException {
+        MultiGetResponse response = client.mget(request, REQUEST_OPTIONS);
+
+        for (MultiGetItemResponse res : response.getResponses()) {
+            GetResponse item = res.getResponse();
+            if (item != null && item.isExists()) {
+                E ob = newInstance();
+                ob.putAll(item.getSourceAsMap());
+                listOfResponses.add(ob);
+            } else {
+                continue;
+            }
         }
     }
 

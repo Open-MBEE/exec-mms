@@ -168,9 +168,9 @@ public class DefaultNodeService implements NodeService {
                 commit.setDocId(cmjs.getId());
                 commit.setTimestamp(now);
                 commit.setComment(cmjs.getComment());
-
-                this.commitIndex.index(cmjs);
+                
                 this.commitRepository.save(commit);
+                this.commitIndex.index(cmjs);
                 this.nodeRepository.getTransactionManager().commit(status);
             } catch (Exception e) {
                 logger.error("commitChanges error: ", e);

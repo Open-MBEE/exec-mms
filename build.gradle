@@ -50,9 +50,9 @@ ext.milestoneBuild = !(snapshotBuild || releaseBuild)
 
 subprojects {
     repositories {
-        maven { url 'https://repo.spring.io/plugins-release' }
-        gradlePluginPortal()
         mavenCentral()
+        gradlePluginPortal()
+        maven { url 'https://repo.spring.io/plugins-release' }
     }
 
     plugins.withType(JavaPlugin) {
