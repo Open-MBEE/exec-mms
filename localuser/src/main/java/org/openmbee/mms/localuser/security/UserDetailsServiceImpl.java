@@ -1,5 +1,6 @@
 package org.openmbee.mms.localuser.security;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.openmbee.mms.core.exceptions.ForbiddenException;
@@ -37,6 +38,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 String.format("No user found with username '%s'.", username));
         }
         return new UserDetailsImpl(user.get());
+    }
+
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 
     @Transactional

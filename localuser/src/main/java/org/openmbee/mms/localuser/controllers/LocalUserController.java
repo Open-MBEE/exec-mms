@@ -8,11 +8,13 @@ import org.openmbee.mms.core.exceptions.UnauthorizedException;
 import org.openmbee.mms.core.utils.AuthenticationUtils;
 import org.openmbee.mms.localuser.security.UserCreateRequest;
 import org.openmbee.mms.localuser.security.UserDetailsServiceImpl;
+import org.openmbee.mms.localuser.security.UsersResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +40,14 @@ public class LocalUserController {
             return req;
         }
         throw new BadRequestException("User already exists");
+    }
+
+    @GetMapping(value = "/users")
+    @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
+    public UsersResponse getUsers() {
+        UsersResponse res = new UsersResponse();
+        res.setUsers(userDetailsService.getUsers());
+        return res;
     }
 
     @PostMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)

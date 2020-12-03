@@ -15,7 +15,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 @MappedSuperclass
-@JsonIgnoreProperties(value = {"created", "modified"}, allowGetters = true)
+@JsonIgnoreProperties(value = {"created", "modified", "id"})
 public abstract class Base implements Serializable {
 
     private static final long serialVersionUID = 8389104517465359723L;
