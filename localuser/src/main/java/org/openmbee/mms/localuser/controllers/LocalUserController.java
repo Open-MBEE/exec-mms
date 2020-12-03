@@ -36,7 +36,7 @@ public class LocalUserController {
         try {
             userDetailsService.loadUserByUsername(req.getUsername());
         } catch (UsernameNotFoundException e) {
-            userDetailsService.register(req.getUsername(), req.getPassword(), req.isAdmin());
+            userDetailsService.register(req);
             return req;
         }
         throw new BadRequestException("User already exists");
