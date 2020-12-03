@@ -1,5 +1,6 @@
 package org.openmbee.mms.localuser.config;
 
+import org.openmbee.mms.localuser.security.UserCreateRequest;
 import org.openmbee.mms.localuser.security.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,11 @@ public class AuthProviderConfig {
         try {
             userDetailsService.loadUserByUsername(adminUsername);
         } catch (UsernameNotFoundException e) {
-            userDetailsService.register(adminUsername, adminPassword, true);
+            UserCreateRequest req = new UserCreateRequest();
+            req.setAdmin(true);
+            req.setPassword(adminPassword);
+            req.setUsername(adminUsername);
+            userDetailsService.register(req);
             logger.info(String.format("Creating root user: %s with specified password.",
                 adminUsername));
         }
