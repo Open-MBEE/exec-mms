@@ -1,5 +1,6 @@
 package org.openmbee.mms.localuser.security;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.openmbee.mms.core.exceptions.ForbiddenException;
@@ -39,13 +40,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new UserDetailsImpl(user.get());
     }
 
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
     @Transactional
-    public User register(String username, String password, boolean isAdmin) {
+    public User register(UserCreateRequest req) {
         User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(req.getEmail());
+        user.setFirstName(req.getFirstname());
+        user.setLastName(req.getLastname());
+        user.setUsername(req.getUsername());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setEnabled(true);
-        user.setAdmin(isAdmin);
+        user.setAdmin(req.isAdmin());
         return userRepository.save(user);
     }
 
