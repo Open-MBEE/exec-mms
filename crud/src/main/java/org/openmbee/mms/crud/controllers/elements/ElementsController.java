@@ -1,5 +1,8 @@
 package org.openmbee.mms.crud.controllers.elements;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.Map;
@@ -12,7 +15,9 @@ import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.core.pubsub.EmbeddedHookService;
 import org.openmbee.mms.crud.hooks.ElementUpdateHook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequestMapping("/projects/{projectId}/refs/{refId}/elements")
@@ -37,16 +43,21 @@ public class ElementsController extends BaseController {
         this.embeddedHookService = embeddedHookService;
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ElementsResponse getAllElements(
+    @ApiResponse(responseCode="200", content={@Content(schema=@Schema(implementation=ElementsResponse.class))})
+    public ResponseEntity<StreamingResponseBody> getAllElements(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        return nodeService.read(projectId, refId, "", params);
+        if (!nodeService.isCommitIdValid(projectId, commitId)) {
+            throw new BadRequestException("commitId not valid");
+        }
+        StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(stream);
     }
 
     @GetMapping(value = "/{elementId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,7 +68,6 @@ public class ElementsController extends BaseController {
         @PathVariable String elementId,
         @RequestParam(required = false) String commitId,
         @RequestParam(required = false) Map<String, String> params) {
-
 
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);

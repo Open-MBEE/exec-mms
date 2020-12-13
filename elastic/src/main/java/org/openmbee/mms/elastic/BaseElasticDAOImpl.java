@@ -44,10 +44,16 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
+
     @Value("${elasticsearch.limit.term}")
     protected int termLimit;
-    @Value("${elasticsearch.limit.get}")
+
+    @Value("${elasticsearch.limit.get:100000}")
     protected int getLimit;
+
+    @Value("${elasticsearch.limit.index:5000}")
+    protected int bulkLimit;
+
     protected static int readTimeout = 1000000000;
     protected RestHighLevelClient client;
     private static final RequestOptions REQUEST_OPTIONS;
@@ -203,11 +209,11 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         return response;
     }
 
-    private static BulkProcessor getBulkProcessor(RestHighLevelClient client) {
+    private BulkProcessor getBulkProcessor(RestHighLevelClient client) {
         return getBulkProcessor(client, null);
     }
 
-    private static BulkProcessor getBulkProcessor(RestHighLevelClient client,  BulkProcessor.Listener listener) {
+    private BulkProcessor getBulkProcessor(RestHighLevelClient client,  BulkProcessor.Listener listener) {
         if (listener == null) {
             listener = new BulkProcessor.Listener() {
                 private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -217,6 +223,13 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
                 @Override
                 public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+                    if (response.hasFailures()) {
+                        response.iterator().forEachRemaining(action -> {
+                            if (action.isFailed()) {
+                                logger.error("Error in bulk processing: ", action.getFailureMessage());;
+                            }
+                        });
+                    }
                 }
 
                 @Override
@@ -227,7 +240,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         }
         BulkProcessor.Builder bpBuilder = BulkProcessor.builder((request, bulkListener) -> client
             .bulkAsync(request, RequestOptions.DEFAULT, bulkListener), listener);
-        bpBuilder.setBulkActions(5000);
+        bpBuilder.setBulkActions(bulkLimit);
         bpBuilder.setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB));
         bpBuilder.setConcurrentRequests(1);
         bpBuilder.setFlushInterval(TimeValue.timeValueSeconds(5));

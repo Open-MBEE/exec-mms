@@ -74,15 +74,14 @@ public class NodeOperation {
         cmjs.setType("Commit");
     }
 
-    public NodeChangeInfo initInfo(List<ElementJson> elements, CommitJson cmjs) {
-
+    public NodeChangeInfo initInfoFromNodes(List<Node> existingNodes, CommitJson cmjs) {
         Set<String> indexIds = new HashSet<>();
-        Map<String, ElementJson> reqElementMap = convertJsonToMap(elements);
-        List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
         Map<String, Node> existingNodeMap = new HashMap<>();
+        Map<String, ElementJson> reqElementMap = new HashMap<>();
         for (Node node : existingNodes) {
             indexIds.add(node.getDocId());
             existingNodeMap.put(node.getNodeId(), node);
+            reqElementMap.put(node.getNodeId(), new ElementJson().setId(node.getNodeId()));
         }
         // bulk read existing elements in elastic
         List<ElementJson> existingElements = nodeIndex.findAllById(indexIds);
@@ -106,6 +105,14 @@ public class NodeOperation {
         info.setNow(now);
         info.setOldDocIds(new HashSet<>());
         info.setActiveElementMap(new HashMap<>());
+        return info;
+    }
+
+    public NodeChangeInfo initInfo(List<ElementJson> elements, CommitJson cmjs) {
+        Map<String, ElementJson> reqElementMap = convertJsonToMap(elements);
+        List<Node> existingNodes = nodeRepository.findAllByNodeIds(reqElementMap.keySet());
+        NodeChangeInfo info = initInfoFromNodes(existingNodes, cmjs);
+        info.setReqElementMap(reqElementMap);
         return info;
     }
 

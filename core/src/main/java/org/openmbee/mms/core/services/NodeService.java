@@ -1,5 +1,7 @@
 package org.openmbee.mms.core.services;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Map;
 
 import org.openmbee.mms.core.objects.ElementsRequest;
@@ -8,6 +10,8 @@ import org.openmbee.mms.data.domains.scoped.Node;
 import org.openmbee.mms.json.ElementJson;
 
 public interface NodeService {
+
+    void readAsStream(String projectId, String refId, Map<String, String> params, OutputStream output) throws IOException;
 
     ElementsResponse read(String projectId, String refId, String id, Map<String, String> params);
 
@@ -25,4 +29,6 @@ public interface NodeService {
     ElementsResponse delete(String projectId, String refId, String id, String user);
 
     ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user);
+
+    boolean isCommitIdValid(String projectId, String commitId);
 }
