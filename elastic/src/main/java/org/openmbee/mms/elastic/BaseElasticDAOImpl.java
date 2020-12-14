@@ -226,7 +226,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                     if (response.hasFailures()) {
                         response.iterator().forEachRemaining(action -> {
                             if (action.isFailed()) {
-                                logger.error("Error in bulk processing: ", action.getFailureMessage());;
+                                logger.error("Error in bulk processing: {}", action.getFailureMessage());
                             }
                         });
                     }
