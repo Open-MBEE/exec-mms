@@ -1,5 +1,6 @@
 package org.openmbee.mms.crud.controllers.elements;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,37 +54,27 @@ public class ElementsController extends BaseController {
         this.commitService = commitService;
     }
 
-    @GetMapping(produces = "application/x-ndjson")
+    @GetMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    public ResponseEntity<StreamingResponseBody> getAllElementsStream(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @RequestParam(required = false) String commitId,
-        @RequestParam(required = false) Map<String, String> params) {
-
-        NodeService nodeService = getNodeService(projectId);
-        if (commitId != null && !commitId.isEmpty()) {
-            commitService.getCommit(projectId, commitId); //check commit exists
-        }
-        StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream, "application/x-ndjson");
-        return ResponseEntity.ok().header("Content-Type", "application/x-ndjson").body(stream);
-    }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = ElementsResponse.class))})
+    @ApiResponse(responseCode = "200", content = {
+        @Content(mediaType = "application/json", schema = @Schema(implementation = ElementsResponse.class)),
+        @Content(mediaType = "application/x-ndjson")
+    })
     public ResponseEntity<StreamingResponseBody> getAllElements(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestParam(required = false) String commitId,
-        @RequestParam(required = false) Map<String, String> params) {
+        @RequestParam(required = false) Map<String, String> params,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept", defaultValue = "application/json") String accept) {
 
         NodeService nodeService = getNodeService(projectId);
         if (commitId != null && !commitId.isEmpty()) {
             commitService.getCommit(projectId, commitId); //check commit exists
         }
-        StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream, MediaType.APPLICATION_JSON_VALUE);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(stream);
+        StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream, accept);
+        return ResponseEntity.ok()
+            .header("Content-Type", accept.equals("application/x-ndjson") ? accept : "application/json")
+            .body(stream);
     }
 
     @GetMapping(value = "/{elementId}", produces = MediaType.APPLICATION_JSON_VALUE)
