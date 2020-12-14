@@ -11,7 +11,7 @@ import org.openmbee.mms.json.ElementJson;
 
 public interface NodeService {
 
-    void readAsStream(String projectId, String refId, Map<String, String> params, OutputStream output) throws IOException;
+    void readAsStream(String projectId, String refId, Map<String, String> params, OutputStream output, String accept) throws IOException;
 
     ElementsResponse read(String projectId, String refId, String id, Map<String, String> params);
 

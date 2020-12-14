@@ -52,6 +52,22 @@ public class ElementsController extends BaseController {
         this.commitService = commitService;
     }
 
+    @GetMapping(produces = "application/x-ndjson")
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
+    public ResponseEntity<StreamingResponseBody> getAllElementsStream(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @RequestParam(required = false) String commitId,
+        @RequestParam(required = false) Map<String, String> params) {
+
+        NodeService nodeService = getNodeService(projectId);
+        if (commitId != null && !commitId.isEmpty()) {
+            commitService.getCommit(projectId, commitId); //check commit exists
+        }
+        StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream, "application/x-ndjson");
+        return ResponseEntity.ok().header("Content-Type", "application/x-ndjson").body(stream);
+    }
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = ElementsResponse.class))})
@@ -65,7 +81,7 @@ public class ElementsController extends BaseController {
         if (commitId != null && !commitId.isEmpty()) {
             commitService.getCommit(projectId, commitId); //check commit exists
         }
-        StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream);
+        StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream, MediaType.APPLICATION_JSON_VALUE);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(stream);
     }
 
