@@ -54,7 +54,7 @@ public class ElementsController extends BaseController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
-    @ApiResponse(responseCode="200", content={@Content(schema=@Schema(implementation=ElementsResponse.class))})
+    @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = ElementsResponse.class))})
     public ResponseEntity<StreamingResponseBody> getAllElements(
         @PathVariable String projectId,
         @PathVariable String refId,
