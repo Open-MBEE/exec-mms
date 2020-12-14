@@ -29,6 +29,4 @@ public interface NodeService {
     ElementsResponse delete(String projectId, String refId, String id, String user);
 
     ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user);
-
-    boolean isCommitIdValid(String projectId, String commitId);
 }

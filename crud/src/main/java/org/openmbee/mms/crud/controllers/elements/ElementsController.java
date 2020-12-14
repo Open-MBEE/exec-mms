@@ -9,12 +9,15 @@ import java.util.Map;
 
 import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
+import org.openmbee.mms.core.services.CommitService;
 import org.openmbee.mms.crud.controllers.BaseController;
 import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.core.pubsub.EmbeddedHookService;
 import org.openmbee.mms.crud.hooks.ElementUpdateHook;
+import org.openmbee.mms.crud.services.DefaultCommitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +40,16 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 public class ElementsController extends BaseController {
 
     private EmbeddedHookService embeddedHookService;
+    private CommitService commitService;
 
     @Autowired
     public void setEmbeddedHookService(EmbeddedHookService embeddedHookService) {
         this.embeddedHookService = embeddedHookService;
+    }
+
+    @Autowired
+    public void setCommitService(@Qualifier("defaultCommitService")CommitService commitService) {
+        this.commitService = commitService;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,8 +62,8 @@ public class ElementsController extends BaseController {
         @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
-        if (!nodeService.isCommitIdValid(projectId, commitId)) {
-            throw new BadRequestException("commitId not valid");
+        if (commitId != null && !commitId.isEmpty()) {
+            commitService.getCommit(projectId, commitId); //check commit exists
         }
         StreamingResponseBody stream = outputStream -> nodeService.readAsStream(projectId, refId, params, outputStream);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(stream);

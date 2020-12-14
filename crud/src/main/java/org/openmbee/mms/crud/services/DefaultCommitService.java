@@ -93,16 +93,12 @@ public class DefaultCommitService implements CommitService {
     public CommitsResponse getCommit(String projectId, String commitId) {
         ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
-        try {
-            Optional<CommitJson> commit = commitIndex.findById(commitId);
-            if (commit.isPresent()) {
-                res.getCommits().add(commit.get());
-            } else {
-                throw new NotFoundException(res);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new InternalErrorException(e);
+
+        Optional<CommitJson> commit = commitIndex.findById(commitId);
+        if (commit.isPresent()) {
+            res.getCommits().add(commit.get());
+        } else {
+            throw new NotFoundException("Commit not found");
         }
         return res;
     }

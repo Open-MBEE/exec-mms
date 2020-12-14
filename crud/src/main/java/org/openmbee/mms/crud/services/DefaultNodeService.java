@@ -308,12 +308,4 @@ public class DefaultNodeService implements NodeService {
         }
         return "";
     }
-
-    public boolean isCommitIdValid(String projectId, String commitId) {
-        ContextHolder.setContext(projectId, "master");
-        if (commitId == null || commitId.isEmpty() || commitRepository.findByCommitId(commitId).isPresent()) {
-            return true;
-        }
-        return false;
-    }
 }
