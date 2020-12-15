@@ -1,7 +1,7 @@
 package org.openmbee.mms.crud.config;
 
 import java.util.Map;
-import org.openmbee.mms.core.exceptions.SdvcException;
+import org.openmbee.mms.core.exceptions.MMSException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -15,8 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class ExceptionHandlerConfig extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { SdvcException.class })
-    protected ResponseEntity<Object> handleSdvcException(SdvcException ex, WebRequest request) {
+    @ExceptionHandler(value = { MMSException.class })
+    protected ResponseEntity<Object> handleMMSException(MMSException ex, WebRequest request) {
         if (ex.getMessageObject() instanceof String) {
             ex.setMessageObject(Map.of("message", ex.getMessageObject()));
         }

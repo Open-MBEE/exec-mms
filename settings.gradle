@@ -1,4 +1,4 @@
-rootProject.name = 'sdvc'
+rootProject.name = 'mms'
 
 FileTree buildFiles = fileTree(rootDir) {
     List excludes = gradle.startParameter.projectProperties.get("excludeProjects")?.split(",")

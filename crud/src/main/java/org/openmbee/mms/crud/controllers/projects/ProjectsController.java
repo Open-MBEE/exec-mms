@@ -10,7 +10,7 @@ import org.openmbee.mms.core.config.Privileges;
 import org.openmbee.mms.core.config.ProjectSchemas;
 import org.openmbee.mms.core.dao.ProjectDAO;
 import org.openmbee.mms.core.dao.ProjectIndex;
-import org.openmbee.mms.core.exceptions.SdvcException;
+import org.openmbee.mms.core.exceptions.MMSException;
 import org.openmbee.mms.core.objects.ProjectsRequest;
 import org.openmbee.mms.core.objects.ProjectsResponse;
 import org.openmbee.mms.core.exceptions.DeletedException;
@@ -160,7 +160,7 @@ public class ProjectsController extends BaseController {
                         permissionService.setProjectInherit(true, json.getProjectId());
                     }
                 }
-            } catch (SdvcException ex) {
+            } catch (MMSException ex) {
                 response.addRejection(new Rejection(json, ex.getCode().value(), ex.getMessageObject().toString()));
                 continue;
             }

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import org.openmbee.mms.core.config.Privileges;
 import org.openmbee.mms.core.exceptions.BadRequestException;
-import org.openmbee.mms.core.exceptions.SdvcException;
+import org.openmbee.mms.core.exceptions.MMSException;
 import org.openmbee.mms.core.objects.RefsRequest;
 import org.openmbee.mms.core.objects.RefsResponse;
 import org.openmbee.mms.core.objects.Rejection;
@@ -97,7 +97,7 @@ public class BranchesController extends BaseController {
 
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
                 response.getRefs().add(res);
-            } catch (SdvcException e) {
+            } catch (MMSException e) {
                 response.addRejection(new Rejection(branch, e.getCode().value(), e.getMessageObject().toString()));
             }
         }
