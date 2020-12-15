@@ -93,16 +93,12 @@ public class DefaultCommitService implements CommitService {
     public CommitsResponse getCommit(String projectId, String commitId) {
         ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
-        try {
-            Optional<CommitJson> commit = commitIndex.findById(commitId);
-            if (commit.isPresent()) {
-                res.getCommits().add(commit.get());
-            } else {
-                throw new NotFoundException(res);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new InternalErrorException(e);
+
+        Optional<CommitJson> commit = commitIndex.findById(commitId);
+        if (commit.isPresent()) {
+            res.getCommits().add(commit.get());
+        } else {
+            throw new NotFoundException("Commit not found");
         }
         return res;
     }
@@ -111,21 +107,16 @@ public class DefaultCommitService implements CommitService {
     public CommitsResponse getElementCommits(String projectId, String refId, String elementId, Map<String, String> params) {
         ContextHolder.setContext(projectId);
         CommitsResponse res = new CommitsResponse();
-        try {
-            Optional<Branch> ref = branchRepository.findByBranchId(refId);
-            if (!ref.isPresent()) {
-                throw new NotFoundException("Branch not found");
-            }
-            List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
-            Set<String> commitIds = new HashSet<>();
-            for (Commit commit: refCommits) {
-                commitIds.add(commit.getDocId());
-            }
-            res.getCommits().addAll(commitIndex.elementHistory(elementId, commitIds));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new InternalErrorException(e);
+        Optional<Branch> ref = branchRepository.findByBranchId(refId);
+        if (!ref.isPresent()) {
+            throw new NotFoundException("Branch not found");
         }
+        List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
+        Set<String> commitIds = new HashSet<>();
+        for (Commit commit: refCommits) {
+            commitIds.add(commit.getDocId());
+        }
+        res.getCommits().addAll(commitIndex.elementHistory(elementId, commitIds));
         return res;
     }
 

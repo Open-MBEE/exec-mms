@@ -53,7 +53,7 @@ public class AuthenticationController {
 
     @GetMapping(value = "/authentication")
     @PreAuthorize("isAuthenticated()")
-    public JwtAuthenticationResponse createAuthenticationToken() {
+    public JwtAuthenticationResponse getAuthenticationToken() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
