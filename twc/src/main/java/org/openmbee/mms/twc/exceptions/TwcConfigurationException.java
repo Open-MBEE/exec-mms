@@ -1,9 +1,9 @@
 package org.openmbee.mms.twc.exceptions;
 
-import org.openmbee.mms.core.exceptions.SdvcException;
+import org.openmbee.mms.core.exceptions.MMSException;
 import org.springframework.http.HttpStatus;
 
-public class TwcConfigurationException extends SdvcException {
+public class TwcConfigurationException extends MMSException {
     public TwcConfigurationException(HttpStatus code, Object messageObject) {
         super(code, messageObject);
     }

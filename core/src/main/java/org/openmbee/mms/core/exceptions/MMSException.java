@@ -2,20 +2,20 @@ package org.openmbee.mms.core.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public abstract class SdvcException extends RuntimeException {
+public abstract class MMSException extends RuntimeException {
 
     private HttpStatus code;
     private Object messageObject;
 
-    public SdvcException() {
+    public MMSException() {
     }
 
-    public SdvcException(HttpStatus code, Object messageObject) {
+    public MMSException(HttpStatus code, Object messageObject) {
         this.code = code;
         this.messageObject = messageObject;
     }
 
-    public SdvcException(int code, Object messageObject) {
+    public MMSException(int code, Object messageObject) {
         this.code = HttpStatus.resolve(code);
         this.messageObject = messageObject;
     }
