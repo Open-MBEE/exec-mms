@@ -42,10 +42,10 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Value("${elasticsearch.limit.result}")
+    @Value("${elasticsearch.limit.result:10000}")
     protected int resultLimit;
 
-    @Value("${elasticsearch.limit.term}")
+    @Value("${elasticsearch.limit.term:1000}")
     protected int termLimit;
 
     @Value("${elasticsearch.limit.get:100000}")
