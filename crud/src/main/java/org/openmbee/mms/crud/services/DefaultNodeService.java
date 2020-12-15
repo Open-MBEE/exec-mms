@@ -103,7 +103,7 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public void readAsStream(String projectId, String refId,
-        Map<String, String> params, OutputStream stream) throws IOException {
+        Map<String, String> params, OutputStream stream, String accept) throws IOException {
 
         String commitId = params.getOrDefault("commitId", null);
         ContextHolder.setContext(projectId, refId);
@@ -116,24 +116,33 @@ public class DefaultNodeService implements NodeService {
         } else {
             nodes = nodeRepository.findAllByDeleted(false);
         }
-        stream.write("{\"elements\":[".getBytes(StandardCharsets.UTF_8));
+        String separator = "\n";
+        if (!"application/x-ndjson".equals(accept)) {
+            stream.write("{\"elements\":[".getBytes(StandardCharsets.UTF_8));
+            separator = ",";
+        }
+        final String sep = separator;
         AtomicInteger counter = new AtomicInteger();
         batches(nodes, streamLimit).forEach(ns -> {
             try {
                 if (counter.get() == 0) {
                     counter.getAndIncrement();
                 } else {
-                    stream.write(",".getBytes(StandardCharsets.UTF_8));
+                    stream.write(sep.getBytes(StandardCharsets.UTF_8));
                 }
                 Collection<ElementJson> result = nodeGetHelper.processGetJsonFromNodes(ns, commitId, this)
                     .getActiveElementMap().values();
-                stream.write(result.stream().map(this::toJson).collect(Collectors.joining(","))
+                stream.write(result.stream().map(this::toJson).collect(Collectors.joining(sep))
                     .getBytes(StandardCharsets.UTF_8));
             } catch (IOException ioe) {
                 logger.error("Error writing to stream", ioe);
             }
         });
-        stream.write("]}".getBytes(StandardCharsets.UTF_8));
+        if (!"application/x-ndjson".equals(accept)) {
+            stream.write("]}".getBytes(StandardCharsets.UTF_8));
+        } else {
+            stream.write("\n".getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     @Override
