@@ -20,9 +20,9 @@ public class AuthProviderConfig {
     private UserDetailsServiceImpl userDetailsService;
     private PasswordEncoder passwordEncoder;
 
-    @Value("${sdvc.admin.username}")
+    @Value("${mms.admin.username}")
     private String adminUsername;
-    @Value("${sdvc.admin.password}")
+    @Value("${mms.admin.password}")
     private String adminPassword;
 
     @Autowired

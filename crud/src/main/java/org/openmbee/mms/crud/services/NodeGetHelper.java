@@ -19,9 +19,17 @@ import static org.openmbee.mms.core.config.ContextHolder.getContext;
 @Service
 public class NodeGetHelper extends NodeOperation {
 
+    public NodeGetInfo processGetJsonFromNodes(List<Node> nodes, NodeService service) {
+        NodeGetInfo info = initInfoFromNodes(nodes, null);
+        return processLatest(info, service);
+    }
+
     public NodeGetInfo processGetJson(List<ElementJson> elements, NodeService service) {
         NodeGetInfo info = initInfo(elements, null);
+        return processLatest(info, service);
+    }
 
+    private NodeGetInfo processLatest(NodeGetInfo info, NodeService service) {
         for (String nodeId : info.getReqElementMap().keySet()) {
             if (!existingNodeContainsNodeId(info, nodeId)) {
                 continue;
@@ -39,19 +47,29 @@ public class NodeGetHelper extends NodeOperation {
         return info;
     }
 
+    public NodeGetInfo processGetJsonFromNodes(List<Node> nodes, String commitId, NodeService service) {
+        if (commitId == null || commitId.isEmpty()) {
+            return processGetJsonFromNodes(nodes, service);
+        }
+        NodeGetInfo info = initInfoFromNodes(nodes, null);
+        return processCommit(info, commitId, service);
+    }
+
     public NodeGetInfo processGetJson(List<ElementJson> elements, String commitId, NodeService service) {
         if (commitId == null || commitId.isEmpty()) {
             return processGetJson(elements, service);
         }
+        NodeGetInfo info = initInfo(elements, null); //gets all current nodes
+        return processCommit(info, commitId, service);
+    }
 
+    private NodeGetInfo processCommit(NodeGetInfo info, String commitId, NodeService service) {
         Optional<Commit> commit = commitRepository.findByCommitId(commitId);
         if (!commit.isPresent() ) {
             throw new BadRequestException("commitId is invalid");
         }
         Instant time = commit.get().getTimestamp(); //time of commit
         List<String> refCommitIds = null; //get it later if needed
-
-        NodeGetInfo info = initInfo(elements, null); //gets all current nodes
         for (String nodeId : info.getReqElementMap().keySet()) {
             if (!existingNodeContainsNodeId(info, nodeId)) { // nodeId not found
                 continue;

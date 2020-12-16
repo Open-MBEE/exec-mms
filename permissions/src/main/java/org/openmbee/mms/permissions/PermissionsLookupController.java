@@ -3,7 +3,7 @@ package org.openmbee.mms.permissions;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
-import org.openmbee.mms.core.exceptions.SdvcException;
+import org.openmbee.mms.core.exceptions.MMSException;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.security.MethodSecurityService;
 import org.openmbee.mms.permissions.objects.PermissionLookup;
@@ -59,7 +59,7 @@ public class PermissionsLookupController {
                 if (!result) {
                     res.setAllPassed(false);
                 }
-            } catch (SdvcException e) {
+            } catch (MMSException e) {
                 res.addRejection(new Rejection(lookup, e.getCode().value(), e.getMessage()));
                 res.setAllPassed(false);
             } catch (Exception e) {

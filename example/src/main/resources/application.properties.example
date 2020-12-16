@@ -1,6 +1,8 @@
 # See authenticator module for example configuration
-sdvc.admin.username=test
-sdvc.admin.password=test
+mms.admin.username=test
+mms.admin.password=test
+
+mms.stream.batch.size=100000
 
 jwt.secret=make_me_something_really_long
 jwt.expiration=86400
@@ -50,6 +52,7 @@ elasticsearch.limit.result=10000
 elasticsearch.limit.term=1000
 elasticsearch.limit.scrollTimeout=1000
 elasticsearch.limit.get=100000
+elasticsearch.limit.index=5000
 
 #Configuration for TWC
 #port is for REST interface
