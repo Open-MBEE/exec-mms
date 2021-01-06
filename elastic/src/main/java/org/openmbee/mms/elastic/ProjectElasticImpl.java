@@ -78,8 +78,10 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
         try {
             DeleteIndexRequest request = new DeleteIndexRequest(projectId.toLowerCase() + "_node");
             DeleteIndexRequest request2 = new DeleteIndexRequest(projectId.toLowerCase() + "_commit");
+            DeleteIndexRequest request3 = new DeleteIndexRequest(projectId.toLowerCase() + "_metadata");
             client.indices().delete(request, RequestOptions.DEFAULT).isAcknowledged();
             client.indices().delete(request2, RequestOptions.DEFAULT).isAcknowledged();
+            client.indices().delete(request3, RequestOptions.DEFAULT).isAcknowledged();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
