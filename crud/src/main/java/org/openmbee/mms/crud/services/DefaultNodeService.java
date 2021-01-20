@@ -224,12 +224,13 @@ public class DefaultNodeService implements NodeService {
                 commit.setBranchId(cmjs.getRefId());
                 commit.setCommitType(CommitType.COMMIT);
                 commit.setCreator(cmjs.getCreator());
-                commit.setDocId(cmjs.getId());
+                commit.setCommitId(cmjs.getCommitId());
                 commit.setTimestamp(now);
                 commit.setComment(cmjs.getComment());
-                
+
                 this.commitRepository.save(commit);
                 this.commitIndex.index(cmjs);
+
                 this.nodeRepository.getTransactionManager().commit(status);
             } catch (Exception e) {
                 logger.error("commitChanges error: ", e);

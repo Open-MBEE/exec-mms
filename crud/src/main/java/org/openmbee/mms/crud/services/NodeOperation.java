@@ -66,6 +66,7 @@ public class NodeOperation {
 
     public void initCommitJson(CommitJson cmjs, Instant now) {
         cmjs.setId(UUID.randomUUID().toString());
+        cmjs.setCommitId(UUID.randomUUID().toString());
         cmjs.setDocId(cmjs.getId());
         cmjs.setCreated(formatter.format(now));
         cmjs.setAdded(new ArrayList<>());
@@ -130,7 +131,7 @@ public class NodeOperation {
         cmjs.getAdded().add(newObj);
 
         n.setNodeId(e.getId());
-        n.setInitialCommit(e.getDocId());
+        n.setInitialCommit(e.getCommitId());
     }
 
     public void processElementUpdated(ElementJson e, Node n, NodeChangeInfo info) {
@@ -155,7 +156,7 @@ public class NodeOperation {
         e.setInRefIds(inRefIds);
         String docId = UUID.randomUUID().toString();
         e.setDocId(docId);
-        e.setCommitId(cmjs.getId());
+        e.setCommitId(cmjs.getCommitId());
 
         if(!preserveTimestamps) {
             e.setModified(cmjs.getCreated());
@@ -163,7 +164,7 @@ public class NodeOperation {
         }
 
         n.setDocId(e.getDocId());
-        n.setLastCommit(cmjs.getId());
+        n.setLastCommit(cmjs.getCommitId());
         n.setDeleted(false);
         n.setNodeType(0);
 

@@ -150,7 +150,7 @@ public class DefaultBranchService implements BranchService {
             Optional<Commit> parentCommit = commitRepository.findLatestByRef(refOption.get());
             parentCommit.ifPresent(parent -> {
                 b.setParentCommit(parent.getId());
-                branch.setParentCommitId(parent.getDocId()); //commit id is same as its docId
+                branch.setParentCommitId(parent.getCommitId()); //commit id is same as its docId
             });
         }
 

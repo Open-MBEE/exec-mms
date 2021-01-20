@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${elasticsearch.limit.result:10000}")
     protected int resultLimit;

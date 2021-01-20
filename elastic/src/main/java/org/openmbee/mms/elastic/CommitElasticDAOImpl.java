@@ -1,12 +1,9 @@
 package org.openmbee.mms.elastic;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -31,31 +28,39 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     public void indexAll(Collection<? extends BaseJson> jsons) {
-        this.indexAll(getIndex(), jsons);
+        this.indexAll(getIndex(), associateCommits(jsons));
     }
 
     public void index(BaseJson json) {
+        if (json.get(CommitJson.COMMITID).toString().isEmpty()) {
+            CommitJson commitJson = (CommitJson) json;
+            commitJson.put(CommitJson.COMMITID, UUID.randomUUID().toString());
+        }
         this.index(getIndex(), json);
     }
 
-    public Optional<CommitJson> findById(String docId) {
-        return this.findById(getIndex(), docId);
+    public void index(BaseJson json, String commitId) {
+        this.index(getIndex(), addCommitId(json, commitId));
     }
 
-    public List<CommitJson> findAllById(Set<String> docIds) {
-        return this.findAllById(getIndex(), docIds);
+    public Optional<CommitJson> findById(String commitId) {
+        return Optional.of(getFullCommit(commitId));
     }
 
-    public void deleteById(String docId) {
-        this.deleteById(getIndex(), docId);
+    public List<CommitJson> findAllById(Set<String> commitIds) {
+        return getFullCommits(commitIds);
+    }
+
+    public void deleteById(String commitId) {
+        this.deleteById(getIndex(), commitId);
     }
 
     public void deleteAll(Collection<? extends BaseJson> jsons) {
         this.deleteAll(getIndex(), jsons);
     }
 
-    public boolean existsById(String docId) {
-        return this.existsById(getIndex(), docId);
+    public boolean existsById(String commitId) {
+        return this.existsById(getIndex(), commitId);
     }
 
     /**
@@ -75,14 +80,14 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             .should(addedQuery)
             .should(updatedQuery)
             .should(deletedQuery)
-            .filter(QueryBuilders.termsQuery(CommitJson.ID, commitIds))
+            .filter(QueryBuilders.termsQuery(CommitJson.COMMITID, commitIds))
             .minimumShouldMatch(1);
         return query;
     }
 
     /**
      * Returns the commit history of a element
-     * <p> Returns a list of commit metadata for the specificed id
+     * <p> Returns a list of commit metadata for the specified id
      *
      * <p>
      *
@@ -93,26 +98,25 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     @Override
     public List<CommitJson> elementHistory(String nodeId, Set<String> commitIds) {
         try {
-            List<CommitJson> commits = new ArrayList<>();
-            SearchRequest searchRequest = new SearchRequest(getIndex());
             QueryBuilder query = getCommitHistoryQuery(nodeId, commitIds);
-            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-            sourceBuilder.query(query);
-            sourceBuilder.size(this.resultLimit); // TODO handle paging requests
-            sourceBuilder.sort(new FieldSortBuilder(CommitJson.CREATED).order(SortOrder.DESC));
-            searchRequest.source(sourceBuilder);
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
+            SearchHits hits = getCommitResults(query);
             if (hits.getTotalHits().value == 0) {
-                return commits;
+                return new ArrayList<>();
             }
+            LinkedHashMap<String, List<CommitJson>> rawCommits = new LinkedHashMap<>();
             for (SearchHit hit : hits.getHits()) {
-                Map<String, Object> source = hit.getSourceAsMap();// gets "_source"
-                CommitJson ob = newInstance();
-                ob.putAll(source);
-                commits.add(ob);
+                CommitJson ob = new CommitJson();
+                ob.putAll(hit.getSourceAsMap());
+                if (!rawCommits.containsKey(ob.getCommitId())) {
+                    rawCommits.put(ob.getCommitId(), new ArrayList<>());
+                }
+                rawCommits.get(ob.getCommitId()).add(ob); // gets "_source"
             }
-            return commits;
+            ArrayList<CommitJson> result = new ArrayList<>();
+            for (String key : rawCommits.keySet()) {
+                result.add(mungCommits(rawCommits.get(key)));
+            }
+            return result;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -126,5 +130,102 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     @Override
     public CommitJson update(CommitJson commitJson) {
         return this.update(getIndex(), commitJson);
+    }
+
+    private Collection<? extends BaseJson> associateCommits(Collection<? extends BaseJson> jsons) {
+        String initialCommitId = jsons.stream().findFirst().orElseThrow().getCommitId();
+        return jsons.stream().map(json -> addCommitId(json, initialCommitId)).collect(Collectors.toList());
+    }
+
+    private List<CommitJson> getFullCommits(Collection<String> commitIds) {
+        return commitIds.stream().map(this::getFullCommit).collect(Collectors.toList());
+    }
+
+    private CommitJson getFullCommit(String commitId) {
+        try {
+            QueryBuilder commitQuery = QueryBuilders.boolQuery()
+                .should(QueryBuilders.termQuery(CommitJson.COMMITID, commitId))
+                .should(QueryBuilders.termQuery(CommitJson.ID, commitId)) // Should it still be supported?
+                .minimumShouldMatch(1);
+            SearchHits hits = getCommitResults(commitQuery);
+            if (hits.getTotalHits().value == 0) {
+                return new CommitJson();
+            }
+            List<CommitJson> rawCommits = new ArrayList<>();
+            for (SearchHit hit : hits.getHits()) {
+                CommitJson ob = new CommitJson();
+                ob.putAll(hit.getSourceAsMap());
+                rawCommits.add(ob); // gets "_source"
+            }
+            return mungCommits(rawCommits);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    private SearchHits getCommitResults(QueryBuilder query) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(getIndex());
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(query);
+        sourceBuilder.size(this.resultLimit); // TODO handle paging requests
+        sourceBuilder.sort(new FieldSortBuilder(CommitJson.CREATED).order(SortOrder.DESC));
+        searchRequest.source(sourceBuilder);
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        return searchResponse.getHits();
+    }
+
+    private static CommitJson mungCommits(List<CommitJson> commits) {
+        return commits.stream().reduce(new CommitJson(), (partial, raw) -> {
+            if (partial.getAdded() == null) {
+                partial.setAdded(new ArrayList<>());
+            }
+            if (partial.getUpdated() == null) {
+                partial.setUpdated(new ArrayList<>());
+            }
+            if (partial.getDeleted() == null) {
+                partial.setDeleted(new ArrayList<>());
+            }
+            if (partial.getSource() == null) {
+                partial.setSource("");
+            }
+            if (partial.getComment() == null) {
+                partial.setComment("");
+            }
+            if (partial.getId() == null) {
+                partial.setId("");
+            }
+            if (partial.getCommitId() == null) {
+                partial.setCommitId("");
+            }
+
+            if (partial.getAdded().isEmpty() && raw.getAdded() != null) {
+                partial.getAdded().addAll(raw.getAdded());
+            }
+            if (partial.getUpdated().isEmpty() && raw.getUpdated() != null) {
+                partial.getUpdated().addAll(raw.getUpdated());
+            }
+            if (partial.getDeleted().isEmpty() && raw.getDeleted() != null) {
+                partial.getDeleted().addAll(raw.getDeleted());
+            }
+            if (partial.getSource().isEmpty() && raw.getSource() != null) {
+                partial.setSource(raw.getSource());
+            }
+            if (partial.getComment().isEmpty() && raw.getComment() != null) {
+                partial.setComment(raw.getComment());
+            }
+            if (partial.getId().isEmpty() && raw.getCommitId() != null) {
+                partial.setId(raw.getCommitId());
+            }
+            if (partial.getCommitId().isEmpty() && raw.getCommitId() != null) {
+                partial.setCommitId(raw.getCommitId());
+            }
+            return partial;
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    // Should be the same type?
+    private static <T extends BaseJson> T addCommitId(T json, String associationId) {
+        return (T) json.put(CommitJson.COMMITID, associationId);
     }
 }

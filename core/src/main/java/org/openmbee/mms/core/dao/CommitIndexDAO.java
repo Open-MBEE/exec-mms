@@ -13,6 +13,8 @@ public interface CommitIndexDAO {
 
     void index(BaseJson json);
 
+    void index(BaseJson json, String commitId);
+
     Optional<CommitJson> findById(String docId);
 
     List<CommitJson> findAllById(Set<String> docIds);

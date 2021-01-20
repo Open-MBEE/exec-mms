@@ -77,7 +77,7 @@ public class DefaultCommitService implements CommitService {
                 CommitJson json = new CommitJson();
                 json.setCreated(Formats.FORMATTER.format(c.getTimestamp()));
                 json.setCreator(c.getCreator());
-                json.setId(c.getDocId());
+                json.setId(c.getCommitId());
                 json.setComment(c.getComment());
                 resJson.add(json);
             }
@@ -114,7 +114,7 @@ public class DefaultCommitService implements CommitService {
         List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
         Set<String> commitIds = new HashSet<>();
         for (Commit commit: refCommits) {
-            commitIds.add(commit.getDocId());
+            commitIds.add(commit.getCommitId());
         }
         res.getCommits().addAll(commitIndex.elementHistory(elementId, commitIds));
         return res;

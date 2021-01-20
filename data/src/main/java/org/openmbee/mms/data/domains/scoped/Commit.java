@@ -23,7 +23,7 @@ public class Commit implements Serializable {
     private Instant timestamp;
 
     @Column(unique = true)
-    private String docId;
+    private String commitId;
     private String branchId;
     private String creator;
 
@@ -48,12 +48,12 @@ public class Commit implements Serializable {
         this.timestamp = timestamp;
     }
 
-    public String getDocId() {
-        return docId;
+    public String getCommitId() {
+        return commitId;
     }
 
-    public void setDocId(String docId) {
-        this.docId = docId;
+    public void setCommitId(String commitId) {
+        this.commitId = commitId;
     }
 
     public String getBranchId() {
