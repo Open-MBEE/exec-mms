@@ -13,9 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
@@ -28,6 +26,7 @@ import org.openmbee.mms.crud.hooks.ElementUpdateHook;
 import org.openmbee.mms.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +51,9 @@ public class ElementsController extends BaseController {
 
     private EmbeddedHookService embeddedHookService;
     private CommitService commitService;
+
+    @Value("${mms.stream.batch.size:5000}")
+    private int streamLimit;
 
     @Autowired
     public void setEmbeddedHookService(EmbeddedHookService embeddedHookService) {
@@ -134,6 +136,11 @@ public class ElementsController extends BaseController {
         Authentication auth,
         HttpEntity<byte[]> requestEntity) {
 
+        String commitId = UUID.randomUUID().toString(); // Generate a commitId from the start
+        params.put("commitId", commitId);
+        ElementsRequest req = new ElementsRequest();
+        List<ElementJson> elements = new ArrayList<>();
+
         InputStream stream = new ByteArrayInputStream(Objects.requireNonNull(requestEntity.getBody()));
         StreamingResponseBody response =  outputStream -> {
             ObjectMapper om = new ObjectMapper();
@@ -145,11 +152,18 @@ public class ElementsController extends BaseController {
                     logger.debug("Current Token: " + parser.getCurrentName());
                     if (parser.nextToken() == JsonToken.START_ARRAY && "elements".equals(parser.getCurrentName())) {
                         logger.debug("Found Array: " + parser.getCurrentName());
-                        while (parser.nextToken() == JsonToken.START_OBJECT) {
+                        while (parser.nextToken() != JsonToken.END_OBJECT) {
                             ElementJson node = om.readValue(parser, ElementJson.class);
-                            outputStream.write(node.get("id").toString().getBytes(StandardCharsets.UTF_8));
+                            elements.add(node);
+                            //outputStream.write(node.getType().getBytes(StandardCharsets.UTF_8));
+                            //outputStream.write(node.get("id").toString().getBytes(StandardCharsets.UTF_8));
                         }
                     }
+                }
+                req.setElements(elements);
+                if (!req.getElements().isEmpty()) {
+                    NodeService nodeService = getNodeService(projectId);
+                    nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
                 }
             } catch (IOException e) {
                 logger.debug("Error in stream handling: ", e);

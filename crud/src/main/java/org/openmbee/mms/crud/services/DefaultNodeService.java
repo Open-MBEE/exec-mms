@@ -194,6 +194,11 @@ public class DefaultNodeService implements NodeService {
             .processPostJson(req.getElements(), overwriteJson,
                 createCommit(user, refId, projectId, req), this);
 
+        String commitId = params.get("commitId");
+        if (commitId != null && !commitId.isEmpty()) {
+            info.getCommitJson().setCommitId(commitId);
+        }
+
         commitChanges(info);
 
         ElementsResponse response = new ElementsResponse();
@@ -220,15 +225,21 @@ public class DefaultNodeService implements NodeService {
                 }
                 this.nodeIndex.removeFromRef(info.getOldDocIds());
 
-                Commit commit = new Commit();
-                commit.setBranchId(cmjs.getRefId());
-                commit.setCommitType(CommitType.COMMIT);
-                commit.setCreator(cmjs.getCreator());
-                commit.setCommitId(cmjs.getCommitId());
-                commit.setTimestamp(now);
-                commit.setComment(cmjs.getComment());
-
-                this.commitRepository.save(commit);
+                Optional<Commit> existing = this.commitRepository.findByCommitId(cmjs.getCommitId());
+                existing.ifPresentOrElse(
+                    current -> {
+                        this.logger.debug(String.format("Commit object %s already exists. Skipping record creation.", current.getCommitId()));
+                    },
+                    () -> {
+                        Commit commit = new Commit();
+                        commit.setBranchId(cmjs.getRefId());
+                        commit.setCommitType(CommitType.COMMIT);
+                        commit.setCreator(cmjs.getCreator());
+                        commit.setCommitId(cmjs.getCommitId());
+                        commit.setTimestamp(now);
+                        commit.setComment(cmjs.getComment());
+                        this.commitRepository.save(commit);
+                    });
                 this.commitIndex.index(cmjs);
 
                 this.nodeRepository.getTransactionManager().commit(status);

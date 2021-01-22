@@ -181,8 +181,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void index(String index, BaseJson<?> json) {
         try {
-            client.index(new IndexRequest(index).id(json.getDocId()).source(json),
-                REQUEST_OPTIONS);
+            client.index(new IndexRequest(index).id(json.getDocId()).source(json), REQUEST_OPTIONS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
