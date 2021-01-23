@@ -172,6 +172,7 @@ public class DefaultBranchService implements BranchService {
             return branch;
         } catch (Exception e) {
             logger.error("Couldn't create branch: {}", branch.getId(), e);
+            //TODO should clean up any created tables/rows?
             throw new InternalErrorException(e);
         }
     }

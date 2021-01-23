@@ -208,7 +208,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         return response;
     }
 
-    private BulkProcessor getBulkProcessor(RestHighLevelClient client) {
+    protected BulkProcessor getBulkProcessor(RestHighLevelClient client) {
         return getBulkProcessor(client, null);
     }
 
