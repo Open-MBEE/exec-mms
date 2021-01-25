@@ -18,29 +18,74 @@ import org.openmbee.mms.core.dao.CommitIndexDAO;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.CommitJson;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> implements CommitIndexDAO {
+
+    @Value("${elasticsearch.limit.index}")
+    int indexLimit;
 
     protected CommitJson newInstance() {
         return new CommitJson();
     }
 
     public void indexAll(Collection<? extends BaseJson> jsons) {
-        this.indexAll(getIndex(), associateCommits(jsons));
+        this.indexAll(getIndex(), jsons);
     }
 
     public void index(BaseJson json) {
-        if (json.get(CommitJson.COMMITID).toString().isEmpty()) {
-            CommitJson commitJson = (CommitJson) json;
-            commitJson.put(CommitJson.COMMITID, UUID.randomUUID().toString());
-        }
-        this.index(getIndex(), json);
+        index((CommitJson) json);
     }
 
-    public void index(BaseJson json, String commitId) {
-        this.index(getIndex(), addCommitId(json, commitId));
+    public void index(CommitJson json) {
+        if (json.getCommitId().isEmpty()) {
+            json.setCommitId(UUID.randomUUID().toString());
+        }
+
+        int commitCount = getCommitSize(json);
+        List<CommitJson> broken = new ArrayList<>();
+        if (commitCount > indexLimit) {
+            List<Map<String, Object>> allActions = new ArrayList<>();
+            allActions.addAll(json.getAdded().stream().peek(toAdd -> toAdd.put("action", "added")).collect(Collectors.toList()));
+            allActions.addAll(json.getUpdated().stream().peek(toUpdate -> toUpdate.put("action", "updated")).collect(Collectors.toList()));
+            allActions.addAll(json.getDeleted().stream().peek(toDelete -> toDelete.put("action", "deleted")).collect(Collectors.toList()));
+
+            while (!allActions.isEmpty()) {
+                CommitJson currentCommitCopy = new CommitJson();
+                currentCommitCopy.setCommitId(json.getCommitId());
+                currentCommitCopy.setSource(json.getSource());
+                currentCommitCopy.setCreated(json.getCreated());
+                currentCommitCopy.setCreator(json.getCreator());
+                currentCommitCopy.setModified(json.getModified());
+                currentCommitCopy.setModifier(json.getModifier());
+                currentCommitCopy.setAdded(new ArrayList<>());
+                currentCommitCopy.setUpdated(new ArrayList<>());
+                currentCommitCopy.setDeleted(new ArrayList<>());
+
+                while (getCommitSize(currentCommitCopy) < indexLimit && !allActions.isEmpty()) {
+                    Map<String, Object> action = allActions.remove(0);
+                    switch (action.getOrDefault("action", "none").toString()) {
+                        case "added":
+                            currentCommitCopy.getAdded().add(action);
+                            break;
+                        case "updated":
+                            currentCommitCopy.getUpdated().add(action);
+                            break;
+                        case "deleted":
+                            currentCommitCopy.getDeleted().add(action);
+                            break;
+                    }
+                }
+                broken.add(currentCommitCopy);
+
+            }
+            this.indexAll(broken);
+
+        } else {
+            this.index(getIndex(), json);
+        }
     }
 
     public Optional<CommitJson> findById(String commitId) {
@@ -52,7 +97,10 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     public void deleteById(String commitId) {
-        this.deleteById(getIndex(), commitId);
+        List<CommitJson> docs = getDocs(commitId);
+        docs.forEach(commit -> {
+           this.deleteById(getIndex(), commit.getDocId());
+        });
     }
 
     public void deleteAll(Collection<? extends BaseJson> jsons) {
@@ -60,7 +108,12 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     public boolean existsById(String commitId) {
-        return this.existsById(getIndex(), commitId);
+        List<CommitJson> docs = getDocs(commitId);
+        List<Boolean> result = new ArrayList<>();
+        docs.forEach(commit -> {
+            result.add(this.existsById(getIndex(), commit.getDocId()));
+        });
+        return !result.stream().allMatch(b -> b);
     }
 
     /**
@@ -132,16 +185,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         return this.update(getIndex(), commitJson);
     }
 
-    private Collection<? extends BaseJson> associateCommits(Collection<? extends BaseJson> jsons) {
-        String initialCommitId = jsons.stream().findFirst().orElseThrow().getCommitId();
-        return jsons.stream().map(json -> addCommitId(json, initialCommitId)).collect(Collectors.toList());
-    }
-
-    private List<CommitJson> getFullCommits(Collection<String> commitIds) {
-        return commitIds.stream().map(this::getFullCommit).collect(Collectors.toList());
-    }
-
-    private CommitJson getFullCommit(String commitId) {
+    private List<CommitJson> getDocs(String commitId) {
         try {
             QueryBuilder commitQuery = QueryBuilders.boolQuery()
                 .should(QueryBuilders.termQuery(CommitJson.COMMITID, commitId))
@@ -149,7 +193,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
                 .minimumShouldMatch(1);
             SearchHits hits = getCommitResults(commitQuery);
             if (hits.getTotalHits().value == 0) {
-                return new CommitJson();
+                return new ArrayList<>();
             }
             List<CommitJson> rawCommits = new ArrayList<>();
             for (SearchHit hit : hits.getHits()) {
@@ -157,10 +201,18 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
                 ob.putAll(hit.getSourceAsMap());
                 rawCommits.add(ob); // gets "_source"
             }
-            return mungCommits(rawCommits);
+            return rawCommits;
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
+    }
+
+    private List<CommitJson> getFullCommits(Collection<String> commitIds) {
+        return commitIds.stream().map(this::getFullCommit).collect(Collectors.toList());
+    }
+
+    private CommitJson getFullCommit(String commitId) {
+        return mungCommits(getDocs(commitId));
     }
 
     private SearchHits getCommitResults(QueryBuilder query) throws IOException {
@@ -223,9 +275,17 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         });
     }
 
-    @SuppressWarnings("unchecked")
-    // Should be the same type?
-    private static <T extends BaseJson> T addCommitId(T json, String associationId) {
-        return (T) json.put(CommitJson.COMMITID, associationId);
+    private static int getCommitSize(CommitJson commitJson) {
+        int commitCount = 0;
+        if (commitJson.getAdded() != null) {
+            commitCount = commitCount + commitJson.getAdded().size();
+        }
+        if (commitJson.getUpdated() != null) {
+            commitCount = commitCount + commitJson.getUpdated().size();
+        }
+        if (commitJson.getDeleted() != null) {
+            commitCount = commitCount + commitJson.getDeleted().size();
+        }
+        return commitCount;
     }
 }

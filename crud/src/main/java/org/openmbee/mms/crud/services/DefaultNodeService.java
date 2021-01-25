@@ -189,15 +189,11 @@ public class DefaultNodeService implements NodeService {
         ContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
         nodePostHelper.setPreserveTimestamps(Boolean.parseBoolean(params.get("preserveTimestamps")));
+        String commitId = params.get("commitId");
 
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,
-                createCommit(user, refId, projectId, req), this);
-
-        String commitId = params.get("commitId");
-        if (commitId != null && !commitId.isEmpty()) {
-            info.getCommitJson().setCommitId(commitId);
-        }
+                createCommit(user, refId, projectId, req, commitId), this);
 
         commitChanges(info);
 
@@ -294,7 +290,7 @@ public class DefaultNodeService implements NodeService {
         ContextHolder.setContext(projectId, refId);
 
         NodeChangeInfo info = nodeDeleteHelper
-            .processDeleteJson(req.getElements(), createCommit(user, refId, projectId, req),
+            .processDeleteJson(req.getElements(), createCommit(user, refId, projectId, req, null),
                 this);
         ElementsResponse response = new ElementsResponse();
 
@@ -306,13 +302,18 @@ public class DefaultNodeService implements NodeService {
     }
 
     private CommitJson createCommit(String creator, String refId, String projectId,
-        ElementsRequest req) {
+        ElementsRequest req, String commitId) {
         CommitJson cmjs = new CommitJson();
         cmjs.setCreator(creator);
         cmjs.setComment(req.getComment());
         cmjs.setSource(req.getSource());
         cmjs.setRefId(refId);
         cmjs.setProjectId(projectId);
+
+        if (commitId != null && !commitId.isEmpty()) {
+            cmjs.setCommitId(commitId);
+        }
+
         return cmjs;
     }
 
