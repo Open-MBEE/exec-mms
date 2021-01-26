@@ -66,9 +66,6 @@ public class NodeOperation {
 
     public void initCommitJson(CommitJson cmjs, Instant now) {
         cmjs.setId(UUID.randomUUID().toString());
-        if (cmjs.getCommitId() == null || cmjs.getCommitId().isEmpty()) {
-            cmjs.setCommitId(cmjs.getId());
-        }
         cmjs.setDocId(cmjs.getId());
         cmjs.setCreated(formatter.format(now));
         cmjs.setAdded(new ArrayList<>());
@@ -158,7 +155,7 @@ public class NodeOperation {
         e.setInRefIds(inRefIds);
         String docId = UUID.randomUUID().toString();
         e.setDocId(docId);
-        e.setCommitId(cmjs.getCommitId());
+        e.setCommitId(cmjs.getId());
 
         if(!preserveTimestamps) {
             e.setModified(cmjs.getCreated());

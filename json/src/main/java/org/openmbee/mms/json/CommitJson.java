@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,22 @@ public class CommitJson extends BaseJson<CommitJson> {
     public static final String DELETED = "deleted";
     public static final String UPDATED = "updated";
     public static final String SOURCE = "source";
+
+    public static CommitJson copy(CommitJson original) {
+        CommitJson copy = new CommitJson();
+        copy.setId(original.getId());
+        copy.setSource(original.getSource());
+        copy.setCreated(original.getCreated());
+        copy.setCreator(original.getCreator());
+        copy.setModified(original.getModified());
+        copy.setModifier(original.getModifier());
+        copy.setRefId(original.getRefId());
+        copy.setProjectId(original.getProjectId());
+        copy.setAdded(new ArrayList<>());
+        copy.setUpdated(new ArrayList<>());
+        copy.setDeleted(new ArrayList<>());
+        return copy;
+    }
 
     @Schema(accessMode = AccessMode.READ_ONLY)
     public String getComment() {

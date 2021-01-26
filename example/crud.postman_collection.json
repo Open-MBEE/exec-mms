@@ -617,9 +617,9 @@
 							"",
 							"pm.test(\"commit history is right\", function() {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0]._commitId).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[1]._commitId).to.eql(pm.environment.get(\"commitId2\"))",
-							"    pm.expect(jsonData.commits[2]._commitId).to.eql(pm.environment.get(\"commitId1\"))",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[2].id).to.eql(pm.environment.get(\"commitId1\"))",
 							"})",
 							"",
 							""
@@ -664,8 +664,8 @@
 							"",
 							"pm.test(\"commit history is right\", function() {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0]._commitId).to.eql(pm.environment.get(\"commitId3\"))",
-							"    pm.expect(jsonData.commits[1]._commitId).to.eql(pm.environment.get(\"commitId1\"))",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId3\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
 							"})",
 							"",
 							""
@@ -710,8 +710,8 @@
 							"",
 							"pm.test(\"commit history is right\", function() {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.commits[0]._commitId).to.eql(pm.environment.get(\"commitId4\"))",
-							"    pm.expect(jsonData.commits[1]._commitId).to.eql(pm.environment.get(\"commitId1\"))",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId4\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
 							"})",
 							""
 						],
@@ -2468,53 +2468,12 @@
 			"response": []
 		},
 		{
-			"name": "recreate project cc under org a",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"response has project cc\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.projects[0].id).to.eql('cc');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cc\", \n\t\t\t\"name\": \"cc\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/projects",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"projects"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "create webhook on project aa",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-                        "id": "2ba7a873-1bdf-4e86-8329-7069064232a9",
+						"id": "2ba7a873-1bdf-4e86-8329-7069064232a9",
 						"exec": [
 							"pm.test(\"webhook created with returned id\", function () {",
 							"    var jsonData = pm.response.json();",

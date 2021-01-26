@@ -228,10 +228,10 @@ public class DefaultNodeService implements NodeService {
                     },
                     () -> {
                         Commit commit = new Commit();
+                        commit.setCommitId(cmjs.getId());
                         commit.setBranchId(cmjs.getRefId());
                         commit.setCommitType(CommitType.COMMIT);
                         commit.setCreator(cmjs.getCreator());
-                        commit.setCommitId(cmjs.getCommitId());
                         commit.setTimestamp(now);
                         commit.setComment(cmjs.getComment());
                         this.commitRepository.save(commit);
@@ -311,7 +311,7 @@ public class DefaultNodeService implements NodeService {
         cmjs.setProjectId(projectId);
 
         if (commitId != null && !commitId.isEmpty()) {
-            cmjs.setCommitId(commitId);
+            cmjs.setId(commitId);
         }
 
         return cmjs;

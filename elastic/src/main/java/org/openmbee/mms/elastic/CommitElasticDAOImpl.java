@@ -40,10 +40,6 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     public void index(CommitJson json) {
-        if (json.getCommitId().isEmpty()) {
-            json.setCommitId(UUID.randomUUID().toString());
-        }
-
         int commitCount = getCommitSize(json);
         List<CommitJson> broken = new ArrayList<>();
         if (commitCount > indexLimit) {
@@ -53,17 +49,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             allActions.addAll(json.getDeleted().stream().peek(toDelete -> toDelete.put("action", "deleted")).collect(Collectors.toList()));
 
             while (!allActions.isEmpty()) {
-                CommitJson currentCommitCopy = new CommitJson();
-                currentCommitCopy.setCommitId(json.getCommitId());
-                currentCommitCopy.setSource(json.getSource());
-                currentCommitCopy.setCreated(json.getCreated());
-                currentCommitCopy.setCreator(json.getCreator());
-                currentCommitCopy.setModified(json.getModified());
-                currentCommitCopy.setModifier(json.getModifier());
-                currentCommitCopy.setAdded(new ArrayList<>());
-                currentCommitCopy.setUpdated(new ArrayList<>());
-                currentCommitCopy.setDeleted(new ArrayList<>());
-
+                CommitJson currentCommitCopy = CommitJson.copy(json);
                 while (getCommitSize(currentCommitCopy) < indexLimit && !allActions.isEmpty()) {
                     Map<String, Object> action = allActions.remove(0);
                     switch (action.getOrDefault("action", "none").toString()) {
@@ -133,7 +119,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             .should(addedQuery)
             .should(updatedQuery)
             .should(deletedQuery)
-            .filter(QueryBuilders.termsQuery(CommitJson.COMMITID, commitIds))
+            .filter(QueryBuilders.termsQuery(CommitJson.ID, commitIds))
             .minimumShouldMatch(1);
         return query;
     }
@@ -160,10 +146,10 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             for (SearchHit hit : hits.getHits()) {
                 CommitJson ob = new CommitJson();
                 ob.putAll(hit.getSourceAsMap());
-                if (!rawCommits.containsKey(ob.getCommitId())) {
-                    rawCommits.put(ob.getCommitId(), new ArrayList<>());
+                if (!rawCommits.containsKey(ob.getId())) {
+                    rawCommits.put(ob.getId(), new ArrayList<>());
                 }
-                rawCommits.get(ob.getCommitId()).add(ob); // gets "_source"
+                rawCommits.get(ob.getId()).add(ob); // gets "_source"
             }
             ArrayList<CommitJson> result = new ArrayList<>();
             for (String key : rawCommits.keySet()) {
@@ -188,8 +174,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     private List<CommitJson> getDocs(String commitId) {
         try {
             QueryBuilder commitQuery = QueryBuilders.boolQuery()
-                .should(QueryBuilders.termQuery(CommitJson.COMMITID, commitId))
-                .should(QueryBuilders.termQuery(CommitJson.ID, commitId)) // Should it still be supported?
+                .should(QueryBuilders.termQuery(CommitJson.ID, commitId))
                 .minimumShouldMatch(1);
             SearchHits hits = getCommitResults(commitQuery);
             if (hits.getTotalHits().value == 0) {
@@ -246,8 +231,8 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             if (partial.getId() == null) {
                 partial.setId("");
             }
-            if (partial.getCommitId() == null) {
-                partial.setCommitId("");
+            if (partial.getId() == null) {
+                partial.setId("");
             }
 
             if (partial.getAdded().isEmpty() && raw.getAdded() != null) {
@@ -268,8 +253,8 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             if (partial.getId().isEmpty() && raw.getCommitId() != null) {
                 partial.setId(raw.getCommitId());
             }
-            if (partial.getCommitId().isEmpty() && raw.getCommitId() != null) {
-                partial.setCommitId(raw.getCommitId());
+            if (partial.getId().isEmpty() && raw.getId() != null) {
+                partial.setId(raw.getId());
             }
             return partial;
         });
