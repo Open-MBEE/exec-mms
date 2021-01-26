@@ -125,9 +125,10 @@ public class ElementsController extends BaseController {
         }
         throw new BadRequestException(response.addMessage("Empty"));
     }
-
+    /*
     @PostMapping(value = "/stream", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    */
     public ResponseEntity<StreamingResponseBody> createOrUpdateElementsStream(
         @PathVariable String projectId,
         @PathVariable String refId,

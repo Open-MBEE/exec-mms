@@ -52,7 +52,9 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
                 CommitJson currentCommitCopy = CommitJson.copy(json);
                 while (getCommitSize(currentCommitCopy) < indexLimit && !allActions.isEmpty()) {
                     Map<String, Object> action = allActions.remove(0);
-                    switch (action.getOrDefault("action", "none").toString()) {
+                    String compare = action.getOrDefault("action", "none").toString();
+                    action.remove("action");
+                    switch (compare) {
                         case "added":
                             currentCommitCopy.getAdded().add(action);
                             break;
@@ -174,8 +176,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     private List<CommitJson> getDocs(String commitId) {
         try {
             QueryBuilder commitQuery = QueryBuilders.boolQuery()
-                .should(QueryBuilders.termQuery(CommitJson.ID, commitId))
-                .minimumShouldMatch(1);
+                .filter(QueryBuilders.termQuery(CommitJson.ID, commitId));
             SearchHits hits = getCommitResults(commitQuery);
             if (hits.getTotalHits().value == 0) {
                 return new ArrayList<>();
@@ -231,19 +232,17 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             if (partial.getId() == null) {
                 partial.setId("");
             }
-            if (partial.getId() == null) {
-                partial.setId("");
-            }
 
-            if (partial.getAdded().isEmpty() && raw.getAdded() != null) {
+            if (raw.getAdded() != null) {
                 partial.getAdded().addAll(raw.getAdded());
             }
-            if (partial.getUpdated().isEmpty() && raw.getUpdated() != null) {
+            if (raw.getUpdated() != null) {
                 partial.getUpdated().addAll(raw.getUpdated());
             }
-            if (partial.getDeleted().isEmpty() && raw.getDeleted() != null) {
+            if (raw.getDeleted() != null) {
                 partial.getDeleted().addAll(raw.getDeleted());
             }
+
             if (partial.getSource().isEmpty() && raw.getSource() != null) {
                 partial.setSource(raw.getSource());
             }

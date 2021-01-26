@@ -221,7 +221,7 @@ public class DefaultNodeService implements NodeService {
                 }
                 this.nodeIndex.removeFromRef(info.getOldDocIds());
 
-                Optional<Commit> existing = this.commitRepository.findByCommitId(cmjs.getCommitId());
+                Optional<Commit> existing = this.commitRepository.findByCommitId(cmjs.getId());
                 existing.ifPresentOrElse(
                     current -> {
                         this.logger.debug(String.format("Commit object %s already exists. Skipping record creation.", current.getCommitId()));
