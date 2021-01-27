@@ -67,6 +67,7 @@ public class NodeOperation {
     public void initCommitJson(CommitJson cmjs, Instant now) {
         if (cmjs.getId() == null || cmjs.getId().isEmpty()) {
             cmjs.setId(UUID.randomUUID().toString());
+            cmjs.setDocId(cmjs.getId());
         }
         if (cmjs.getDocId() == null || cmjs.getDocId().isEmpty()) {
             cmjs.setDocId(UUID.randomUUID().toString());

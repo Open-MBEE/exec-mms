@@ -2872,6 +2872,58 @@
 			},
 			"response": []
 		},
+        {
+            "name": "get org c projects",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"response has 1 project random\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.projects.length).to.eql(1);",
+                            "    pm.expect(jsonData.projects[0].name).to.eql('random');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json",
+                        "disabled": true
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{host}}/projects?orgId={{orgIdC}}",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects"
+                    ],
+                    "query": [
+                        {
+                            "key": "orgId",
+                            "value": "{{orgIdC}}"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
 		{
 			"name": "add element random to project random without id",
 			"event": [

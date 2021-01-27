@@ -50,6 +50,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
 
             while (!allActions.isEmpty()) {
                 CommitJson currentCommitCopy = CommitJson.copy(json);
+                currentCommitCopy.setDocId(UUID.randomUUID().toString());
                 while (getCommitSize(currentCommitCopy) < commitLimit && !allActions.isEmpty()) {
                     Map<String, Object> action = allActions.remove(0);
                     String compare = action.getOrDefault("action", "none").toString();
@@ -229,6 +230,18 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             if (partial.getId() == null) {
                 partial.setId("");
             }
+            if (partial.getCreated() == null) {
+                partial.setCreated("");
+            }
+            if (partial.getCreator() == null) {
+                partial.setCreator("");
+            }
+            if (partial.getRefId() == null) {
+                partial.setRefId("");
+            }
+            if (partial.getProjectId() == null) {
+                partial.setProjectId("");
+            }
 
             if (raw.getAdded() != null) {
                 partial.getAdded().addAll(raw.getAdded());
@@ -246,11 +259,20 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             if (partial.getComment().isEmpty() && raw.getComment() != null) {
                 partial.setComment(raw.getComment());
             }
-            if (partial.getId().isEmpty() && raw.getCommitId() != null) {
-                partial.setId(raw.getCommitId());
-            }
             if (partial.getId().isEmpty() && raw.getId() != null) {
                 partial.setId(raw.getId());
+            }
+            if (partial.getCreated().isEmpty() && raw.getCreated() != null) {
+                partial.setCreated(raw.getCreated());
+            }
+            if (partial.getCreator().isEmpty() && raw.getCreator() != null) {
+                partial.setCreator(raw.getCreator());
+            }
+            if (partial.getRefId().isEmpty() && raw.getRefId() != null) {
+                partial.setRefId(raw.getRefId());
+            }
+            if (partial.getProjectId().isEmpty() && raw.getProjectId() != null) {
+                partial.setProjectId(raw.getProjectId());
             }
             return partial;
         });
