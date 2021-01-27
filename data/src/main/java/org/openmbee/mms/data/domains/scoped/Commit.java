@@ -24,11 +24,11 @@ public class Commit implements Serializable {
 
     @Column(unique = true)
     private String commitId;
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 512)
     private String branchId;
     private String creator;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 512)
     private String comment;
 
     @Column(columnDefinition = "smallint")

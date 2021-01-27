@@ -2468,6 +2468,47 @@
 			"response": []
 		},
 		{
+			"name": "recreate project cc under org a",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has project cc\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('cc');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"cc\", \n\t\t\t\"name\": \"cc\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "create webhook on project aa",
 			"event": [
 				{
