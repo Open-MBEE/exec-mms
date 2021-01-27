@@ -24,8 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> implements CommitIndexDAO {
 
-    @Value("${elasticsearch.limit.index}")
-    int indexLimit;
+    @Value("${elasticsearch.limit.commit:10000}")
+    int commitLimit;
 
     protected CommitJson newInstance() {
         return new CommitJson();
@@ -42,7 +42,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     public void index(CommitJson json) {
         int commitCount = getCommitSize(json);
         List<CommitJson> broken = new ArrayList<>();
-        if (commitCount > indexLimit) {
+        if (commitCount > commitLimit) {
             List<Map<String, Object>> allActions = new ArrayList<>();
             allActions.addAll(json.getAdded().stream().peek(toAdd -> toAdd.put("action", "added")).collect(Collectors.toList()));
             allActions.addAll(json.getUpdated().stream().peek(toUpdate -> toUpdate.put("action", "updated")).collect(Collectors.toList()));
@@ -50,7 +50,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
 
             while (!allActions.isEmpty()) {
                 CommitJson currentCommitCopy = CommitJson.copy(json);
-                while (getCommitSize(currentCommitCopy) < indexLimit && !allActions.isEmpty()) {
+                while (getCommitSize(currentCommitCopy) < commitLimit && !allActions.isEmpty()) {
                     Map<String, Object> action = allActions.remove(0);
                     String compare = action.getOrDefault("action", "none").toString();
                     action.remove("action");
@@ -139,25 +139,22 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     @Override
     public List<CommitJson> elementHistory(String nodeId, Set<String> commitIds) {
         try {
+            List<CommitJson> commits = new ArrayList<>();
             QueryBuilder query = getCommitHistoryQuery(nodeId, commitIds);
             SearchHits hits = getCommitResults(query);
             if (hits.getTotalHits().value == 0) {
                 return new ArrayList<>();
             }
-            LinkedHashMap<String, List<CommitJson>> rawCommits = new LinkedHashMap<>();
             for (SearchHit hit : hits.getHits()) {
-                CommitJson ob = new CommitJson();
-                ob.putAll(hit.getSourceAsMap());
-                if (!rawCommits.containsKey(ob.getId())) {
-                    rawCommits.put(ob.getId(), new ArrayList<>());
-                }
-                rawCommits.get(ob.getId()).add(ob); // gets "_source"
+                Map<String, Object> source = hit.getSourceAsMap();// gets "_source"
+                CommitJson ob = newInstance();
+                ob.putAll(source);
+                ob.remove(CommitJson.ADDED);
+                ob.remove(CommitJson.UPDATED);
+                ob.remove(CommitJson.DELETED);
+                commits.add(ob);
             }
-            ArrayList<CommitJson> result = new ArrayList<>();
-            for (String key : rawCommits.keySet()) {
-                result.add(mungCommits(rawCommits.get(key)));
-            }
-            return result;
+            return commits;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

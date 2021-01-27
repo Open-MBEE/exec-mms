@@ -27,6 +27,7 @@ public class CommitJson extends BaseJson<CommitJson> {
         copy.setCreator(original.getCreator());
         copy.setModified(original.getModified());
         copy.setModifier(original.getModifier());
+        copy.setComment(original.getComment());
         copy.setRefId(original.getRefId());
         copy.setProjectId(original.getProjectId());
         copy.setAdded(new ArrayList<>());

@@ -24,9 +24,11 @@ public class Commit implements Serializable {
 
     @Column(unique = true)
     private String commitId;
+    @Column(columnDefinition = "TEXT")
     private String branchId;
     private String creator;
 
+    @Column(columnDefinition = "TEXT")
     private String comment;
 
     @Column(columnDefinition = "smallint")
@@ -81,7 +83,7 @@ public class Commit implements Serializable {
     }
 
     public String getComment() {
-        return comment;
+        return comment == null ? "" : comment;
     }
 
     public void setComment(String comment) {
