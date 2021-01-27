@@ -59,7 +59,7 @@
             "_projectId": {
                 "type": "keyword"
             },
-            "_commitId": {
+            "_docId": {
                 "type": "keyword"
             },
             "type": {
