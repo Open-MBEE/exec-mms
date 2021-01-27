@@ -59,21 +59,15 @@ public class ProjectsController extends BaseController {
 
     @GetMapping
     public ProjectsResponse getAllProjects(Authentication auth,
-                                           @RequestParam(required = false) Map<String, String> params) {
-
+                                           @RequestParam(required = false) String orgId) {
         ProjectsResponse response = new ProjectsResponse();
-        List<Project> allProjects = projectRepository.findAll();
-        String orgId = params.getOrDefault("orgId", null);
+        List<Project> allProjects = orgId != null ? projectRepository.findAllByOrgId(orgId) : projectRepository.findAll();
         for (Project proj : allProjects) {
             if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
                 ContextHolder.setContext(proj.getProjectId());
                 if(proj.getDocId() != null  && !proj.isDeleted()) {
                     Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
-                    projectJsonOption.ifPresentOrElse(json -> {
-                        if (orgId == null || json.getOrgId().equals(orgId)) {
-                            response.getProjects().add(json);
-                        }
-                    }, ()-> {
+                    projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), ()-> {
                         logger.error("Project json not found for id: {}", proj.getProjectId());
                     });
                 }

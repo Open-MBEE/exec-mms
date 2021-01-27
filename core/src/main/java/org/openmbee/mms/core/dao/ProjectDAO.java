@@ -15,4 +15,6 @@ public interface ProjectDAO {
     void delete(Project p);
 
     List<Project> findAll();
+
+    List<Project> findAllByOrgId(String id);
 }
