@@ -19,11 +19,13 @@ public class Branch {
 
     private String description;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 512)
     private String branchId;
     private String docId;
+    @Column(length = 512)
     private String branchName;
 
+    @Column(length = 512)
     private String parentRefId;
     private Long parentCommit;
 

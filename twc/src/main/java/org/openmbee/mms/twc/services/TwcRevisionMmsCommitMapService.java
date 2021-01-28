@@ -75,7 +75,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
             List<Commit> refCommits = commitRepository.findByRefAndTimestampAndLimit(ref.get(), null, 0);
             Set<String> commitIds = new HashSet<>();
             refCommits.stream().forEach(commit -> {
-                commitIds.add(commit.getDocId());
+                commitIds.add(commit.getCommitId());
             });
             List<CommitJson> commitJsonList = commitIndex.findAllById(commitIds);
             if (null != commitJsonList && commitJsonList.size() > 0) {

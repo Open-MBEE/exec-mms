@@ -6,8 +6,8 @@ buildscript {
     }
     repositories {
         mavenCentral()
-        maven { url 'https://repo.spring.io/plugins-release' }
         gradlePluginPortal()
+        maven { url 'https://repo.spring.io/plugins-release' }
     }
 }
 

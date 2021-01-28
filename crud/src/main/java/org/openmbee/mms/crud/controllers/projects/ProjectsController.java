@@ -1,10 +1,7 @@
 package org.openmbee.mms.crud.controllers.projects;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.config.Privileges;
 import org.openmbee.mms.core.config.ProjectSchemas;
@@ -35,6 +32,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/projects")
 @Tag(name = "Projects")
@@ -55,10 +58,10 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping
-    public ProjectsResponse getAllProjects(Authentication auth) {
-
+    public ProjectsResponse getAllProjects(Authentication auth,
+                                           @RequestParam(required = false) String orgId) {
         ProjectsResponse response = new ProjectsResponse();
-        List<Project> allProjects = projectRepository.findAll();
+        List<Project> allProjects = orgId != null ? projectRepository.findAllByOrgId(orgId) : projectRepository.findAll();
         for (Project proj : allProjects) {
             if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
                 ContextHolder.setContext(proj.getProjectId());

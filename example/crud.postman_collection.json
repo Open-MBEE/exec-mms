@@ -2514,7 +2514,7 @@
 				{
 					"listen": "test",
 					"script": {
-                        "id": "2ba7a873-1bdf-4e86-8329-7069064232a9",
+						"id": "2ba7a873-1bdf-4e86-8329-7069064232a9",
 						"exec": [
 							"pm.test(\"webhook created with returned id\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2872,6 +2872,58 @@
 			},
 			"response": []
 		},
+        {
+            "name": "get org c projects",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"response has 1 project random\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.projects.length).to.eql(1);",
+                            "    pm.expect(jsonData.projects[0].name).to.eql('random');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json",
+                        "disabled": true
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{host}}/projects?orgId={{orgIdC}}",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects"
+                    ],
+                    "query": [
+                        {
+                            "key": "orgId",
+                            "value": "{{orgIdC}}"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
 		{
 			"name": "add element random to project random without id",
 			"event": [
@@ -3386,7 +3438,46 @@
 				}
 			},
 			"response": []
-		}
+		},
+        {
+            "name": "get nonexistent commit",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 404\", function () {",
+                            "    pm.response.to.have.status(404);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{host}}/projects/aa/commits/missing",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "aa",
+                        "commits",
+                        "missing"
+                    ]
+                }
+            },
+            "response": []
+        }
 	],
 	"auth": {
 		"type": "bearer",

@@ -42,6 +42,11 @@ public class ProjectDAOImpl implements ProjectDAO {
     }
 
     @Override
+    public List<Project> findAllByOrgId(String id) {
+        return projectRepository.findAllByOrganizationOrganizationId(id);
+    }
+
+    @Override
     public Project save(Project proj) {
         if (proj.getId() == null) {
             try {

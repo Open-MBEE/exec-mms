@@ -65,8 +65,13 @@ public class NodeOperation {
     }
 
     public void initCommitJson(CommitJson cmjs, Instant now) {
-        cmjs.setId(UUID.randomUUID().toString());
-        cmjs.setDocId(cmjs.getId());
+        if (cmjs.getId() == null || cmjs.getId().isEmpty()) {
+            cmjs.setId(UUID.randomUUID().toString());
+            cmjs.setDocId(cmjs.getId());
+        }
+        if (cmjs.getDocId() == null || cmjs.getDocId().isEmpty()) {
+            cmjs.setDocId(UUID.randomUUID().toString());
+        }
         cmjs.setCreated(formatter.format(now));
         cmjs.setAdded(new ArrayList<>());
         cmjs.setDeleted(new ArrayList<>());
@@ -130,7 +135,7 @@ public class NodeOperation {
         cmjs.getAdded().add(newObj);
 
         n.setNodeId(e.getId());
-        n.setInitialCommit(e.getDocId());
+        n.setInitialCommit(e.getCommitId());
     }
 
     public void processElementUpdated(ElementJson e, Node n, NodeChangeInfo info) {

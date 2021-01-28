@@ -1,12 +1,19 @@
 package org.openmbee.mms.crud.controllers.elements;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
@@ -16,10 +23,11 @@ import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.core.pubsub.EmbeddedHookService;
 import org.openmbee.mms.crud.hooks.ElementUpdateHook;
-import org.openmbee.mms.crud.services.DefaultCommitService;
+import org.openmbee.mms.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,6 +52,9 @@ public class ElementsController extends BaseController {
     private EmbeddedHookService embeddedHookService;
     private CommitService commitService;
 
+    @Value("${mms.stream.batch.size:5000}")
+    private int streamLimit;
+
     @Autowired
     public void setEmbeddedHookService(EmbeddedHookService embeddedHookService) {
         this.embeddedHookService = embeddedHookService;
@@ -53,6 +64,8 @@ public class ElementsController extends BaseController {
     public void setCommitService(@Qualifier("defaultCommitService")CommitService commitService) {
         this.commitService = commitService;
     }
+
+    private static final JsonFactory jfactory = new JsonFactory();
 
     @GetMapping
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
@@ -111,6 +124,55 @@ public class ElementsController extends BaseController {
             return nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
         }
         throw new BadRequestException(response.addMessage("Empty"));
+    }
+    /*
+    @PostMapping(value = "/stream", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
+    */
+    public ResponseEntity<StreamingResponseBody> createOrUpdateElementsStream(
+        @PathVariable String projectId,
+        @PathVariable String refId,
+        @RequestParam(required = false) Map<String, String> params,
+        @Parameter(hidden = true) @RequestHeader(value = "Accept", defaultValue = "application/json") String accept,
+        Authentication auth,
+        HttpEntity<byte[]> requestEntity) {
+
+        String commitId = UUID.randomUUID().toString(); // Generate a commitId from the start
+        params.put("commitId", commitId);
+        ElementsRequest req = new ElementsRequest();
+        List<ElementJson> elements = new ArrayList<>();
+
+        InputStream stream = new ByteArrayInputStream(Objects.requireNonNull(requestEntity.getBody()));
+        StreamingResponseBody response =  outputStream -> {
+            ObjectMapper om = new ObjectMapper();
+            try (JsonParser parser = jfactory.createParser(stream)) {
+                if(parser.nextToken() != JsonToken.START_OBJECT) {
+                    throw new BadRequestException("Expected an object");
+                }
+                while (parser.nextToken() != JsonToken.END_OBJECT) {
+                    logger.debug("Current Token: " + parser.getCurrentName());
+                    if (parser.nextToken() == JsonToken.START_ARRAY && "elements".equals(parser.getCurrentName())) {
+                        logger.debug("Found Array: " + parser.getCurrentName());
+                        while (parser.nextToken() != JsonToken.END_OBJECT) {
+                            ElementJson node = om.readValue(parser, ElementJson.class);
+                            elements.add(node);
+                            //outputStream.write(node.getType().getBytes(StandardCharsets.UTF_8));
+                            //outputStream.write(node.get("id").toString().getBytes(StandardCharsets.UTF_8));
+                        }
+                    }
+                }
+                req.setElements(elements);
+                if (!req.getElements().isEmpty()) {
+                    NodeService nodeService = getNodeService(projectId);
+                    nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
+                }
+            } catch (IOException e) {
+                logger.debug("Error in stream handling: ", e);
+            }
+        };
+        return ResponseEntity.ok()
+            .header("Content-Type", accept.equals("application/x-ndjson") ? accept : "application/json")
+            .body(response);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
