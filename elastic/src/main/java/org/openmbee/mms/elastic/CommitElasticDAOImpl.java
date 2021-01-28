@@ -81,7 +81,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     public Optional<CommitJson> findById(String commitId) {
-        return Optional.of(getFullCommit(commitId));
+        return getFullCommit(commitId);
     }
 
     public List<CommitJson> findAllById(Set<String> commitIds) {
@@ -195,11 +195,16 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     private List<CommitJson> getFullCommits(Collection<String> commitIds) {
-        return commitIds.stream().map(this::getFullCommit).collect(Collectors.toList());
+        return commitIds.stream().map(this::getFullCommit).filter(Optional::isPresent)
+            .map(Optional::get).collect(Collectors.toList());
     }
 
-    private CommitJson getFullCommit(String commitId) {
-        return mungCommits(getDocs(commitId));
+    private Optional<CommitJson> getFullCommit(String commitId) {
+        List<CommitJson> commits = getDocs(commitId);
+        if (commits.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(mungCommits(commits));
     }
 
     private SearchHits getCommitResults(QueryBuilder query) throws IOException {
