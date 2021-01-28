@@ -150,7 +150,7 @@ public class DefaultBranchService implements BranchService {
             Optional<Commit> parentCommit = commitRepository.findLatestByRef(refOption.get());
             parentCommit.ifPresent(parent -> {
                 b.setParentCommit(parent.getId());
-                branch.setParentCommitId(parent.getDocId()); //commit id is same as its docId
+                branch.setParentCommitId(parent.getCommitId()); //commit id is same as its docId
             });
         }
 
@@ -172,6 +172,7 @@ public class DefaultBranchService implements BranchService {
             return branch;
         } catch (Exception e) {
             logger.error("Couldn't create branch: {}", branch.getId(), e);
+            //TODO should clean up any created tables/rows?
             throw new InternalErrorException(e);
         }
     }

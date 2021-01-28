@@ -23,10 +23,12 @@ public class Commit implements Serializable {
     private Instant timestamp;
 
     @Column(unique = true)
-    private String docId;
+    private String commitId;
+    @Column(length = 512)
     private String branchId;
     private String creator;
 
+    @Column(length = 512)
     private String comment;
 
     @Column(columnDefinition = "smallint")
@@ -48,12 +50,12 @@ public class Commit implements Serializable {
         this.timestamp = timestamp;
     }
 
-    public String getDocId() {
-        return docId;
+    public String getCommitId() {
+        return commitId;
     }
 
-    public void setDocId(String docId) {
-        this.docId = docId;
+    public void setCommitId(String commitId) {
+        this.commitId = commitId;
     }
 
     public String getBranchId() {
@@ -81,7 +83,7 @@ public class Commit implements Serializable {
     }
 
     public String getComment() {
-        return comment;
+        return comment == null ? "" : comment;
     }
 
     public void setComment(String comment) {

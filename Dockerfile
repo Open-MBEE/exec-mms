@@ -4,5 +4,6 @@ WORKDIR /mms
 RUN ./gradlew --no-daemon bootJar
 
 RUN cp /mms/example/build/libs/example*.jar /app.jar
-ENTRYPOINT ["java", "-Djdk.tls.client.protocols=TLSv1", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app.jar"]
+ENV JDK_JAVA_OPTIONS "-XX:MaxRAMPercentage=90.0"
+ENTRYPOINT ["java", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app.jar"]
 EXPOSE 8080

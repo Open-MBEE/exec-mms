@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.elasticsearch.action.bulk.BulkRequest;
+import java.util.concurrent.TimeUnit;
+import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -101,7 +102,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         if (docIds.isEmpty()) {
             return;
         }
-        BulkRequest bulk = new BulkRequest();
+        BulkProcessor bulkProcessor = getBulkProcessor(client);
         Map<String, Object> parameters = Collections.singletonMap("refId",
             ContextHolder.getContext().getBranchId());
         for (String docId : docIds) {
@@ -109,12 +110,14 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
             Script inline = new Script(ScriptType.INLINE, "painless", script,
                 parameters);
             request.script(inline);
-            bulk.add(request);
+            bulkProcessor.add(request);
         }
         try {
-            client.bulk(bulk, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            if (!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
+                logger.error("Timed out in bulk processing");
+            }
+        } catch (InterruptedException e) {
+            logger.error("Index all interrupted: ", e);
         }
     }
 

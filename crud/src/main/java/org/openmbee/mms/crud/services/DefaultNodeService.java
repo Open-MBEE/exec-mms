@@ -189,10 +189,11 @@ public class DefaultNodeService implements NodeService {
         ContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
         nodePostHelper.setPreserveTimestamps(Boolean.parseBoolean(params.get("preserveTimestamps")));
+        String commitId = params.get("commitId");
 
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,
-                createCommit(user, refId, projectId, req), this);
+                createCommit(user, refId, projectId, req, commitId), this);
 
         commitChanges(info);
 
@@ -220,16 +221,23 @@ public class DefaultNodeService implements NodeService {
                 }
                 this.nodeIndex.removeFromRef(info.getOldDocIds());
 
-                Commit commit = new Commit();
-                commit.setBranchId(cmjs.getRefId());
-                commit.setCommitType(CommitType.COMMIT);
-                commit.setCreator(cmjs.getCreator());
-                commit.setDocId(cmjs.getId());
-                commit.setTimestamp(now);
-                commit.setComment(cmjs.getComment());
-                
-                this.commitRepository.save(commit);
+                Optional<Commit> existing = this.commitRepository.findByCommitId(cmjs.getId());
+                existing.ifPresentOrElse(
+                    current -> {
+                        this.logger.debug(String.format("Commit object %s already exists. Skipping record creation.", current.getCommitId()));
+                    },
+                    () -> {
+                        Commit commit = new Commit();
+                        commit.setCommitId(cmjs.getId());
+                        commit.setBranchId(cmjs.getRefId());
+                        commit.setCommitType(CommitType.COMMIT);
+                        commit.setCreator(cmjs.getCreator());
+                        commit.setTimestamp(now);
+                        commit.setComment(cmjs.getComment());
+                        this.commitRepository.save(commit);
+                    });
                 this.commitIndex.index(cmjs);
+
                 this.nodeRepository.getTransactionManager().commit(status);
             } catch (Exception e) {
                 logger.error("commitChanges error: ", e);
@@ -282,7 +290,7 @@ public class DefaultNodeService implements NodeService {
         ContextHolder.setContext(projectId, refId);
 
         NodeChangeInfo info = nodeDeleteHelper
-            .processDeleteJson(req.getElements(), createCommit(user, refId, projectId, req),
+            .processDeleteJson(req.getElements(), createCommit(user, refId, projectId, req, null),
                 this);
         ElementsResponse response = new ElementsResponse();
 
@@ -294,13 +302,18 @@ public class DefaultNodeService implements NodeService {
     }
 
     private CommitJson createCommit(String creator, String refId, String projectId,
-        ElementsRequest req) {
+        ElementsRequest req, String commitId) {
         CommitJson cmjs = new CommitJson();
         cmjs.setCreator(creator);
         cmjs.setComment(req.getComment());
         cmjs.setSource(req.getSource());
         cmjs.setRefId(refId);
         cmjs.setProjectId(projectId);
+
+        if (commitId != null && !commitId.isEmpty()) {
+            cmjs.setId(commitId);
+        }
+
         return cmjs;
     }
 

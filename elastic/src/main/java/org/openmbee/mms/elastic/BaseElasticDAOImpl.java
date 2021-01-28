@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${elasticsearch.limit.result:10000}")
     protected int resultLimit;
@@ -181,8 +181,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void index(String index, BaseJson<?> json) {
         try {
-            client.index(new IndexRequest(index).id(json.getDocId()).source(json),
-                REQUEST_OPTIONS);
+            client.index(new IndexRequest(index).id(json.getDocId()).source(json), REQUEST_OPTIONS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -209,7 +208,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         return response;
     }
 
-    private BulkProcessor getBulkProcessor(RestHighLevelClient client) {
+    protected BulkProcessor getBulkProcessor(RestHighLevelClient client) {
         return getBulkProcessor(client, null);
     }
 
