@@ -49,9 +49,12 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             allActions.addAll(json.getDeleted().stream().peek(toDelete -> toDelete.put("action", "deleted")).collect(Collectors.toList()));
 
             while (!allActions.isEmpty()) {
-                CommitJson currentCommitCopy = CommitJson.copy(json);
+                CommitJson currentCommitCopy = CommitJson.copy(new CommitJson(), json);
+                currentCommitCopy.setAdded(new ArrayList<>());
+                currentCommitCopy.setUpdated(new ArrayList<>());
+                currentCommitCopy.setDeleted(new ArrayList<>());
                 currentCommitCopy.setDocId(UUID.randomUUID().toString());
-                while (getCommitSize(currentCommitCopy) < commitLimit && !allActions.isEmpty()) {
+                do {
                     Map<String, Object> action = allActions.remove(0);
                     String compare = action.getOrDefault("action", "none").toString();
                     action.remove("action");
@@ -66,7 +69,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
                             currentCommitCopy.getDeleted().add(action);
                             break;
                     }
-                }
+                } while(getCommitSize(currentCommitCopy) < commitLimit && !allActions.isEmpty());
                 broken.add(currentCommitCopy);
 
             }
@@ -211,82 +214,18 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     private static CommitJson mungCommits(List<CommitJson> commits) {
-        return commits.stream().reduce(new CommitJson(), (partial, raw) -> {
-            if (partial.getAdded() == null) {
-                partial.setAdded(new ArrayList<>());
-            }
-            if (partial.getUpdated() == null) {
-                partial.setUpdated(new ArrayList<>());
-            }
-            if (partial.getDeleted() == null) {
-                partial.setDeleted(new ArrayList<>());
-            }
-            if (partial.getSource() == null) {
-                partial.setSource("");
-            }
-            if (partial.getComment() == null) {
-                partial.setComment("");
-            }
-            if (partial.getId() == null) {
-                partial.setId("");
-            }
-            if (partial.getCreated() == null) {
-                partial.setCreated("");
-            }
-            if (partial.getCreator() == null) {
-                partial.setCreator("");
-            }
-            if (partial.getRefId() == null) {
-                partial.setRefId("");
-            }
-            if (partial.getProjectId() == null) {
-                partial.setProjectId("");
-            }
-
-            if (raw.getAdded() != null) {
-                partial.getAdded().addAll(raw.getAdded());
-            }
-            if (raw.getUpdated() != null) {
-                partial.getUpdated().addAll(raw.getUpdated());
-            }
-            if (raw.getDeleted() != null) {
-                partial.getDeleted().addAll(raw.getDeleted());
-            }
-
-            if (partial.getSource().isEmpty() && raw.getSource() != null) {
-                partial.setSource(raw.getSource());
-            }
-            if (partial.getComment().isEmpty() && raw.getComment() != null) {
-                partial.setComment(raw.getComment());
-            }
-            if (partial.getId().isEmpty() && raw.getId() != null) {
-                partial.setId(raw.getId());
-            }
-            if (partial.getCreated().isEmpty() && raw.getCreated() != null) {
-                partial.setCreated(raw.getCreated());
-            }
-            if (partial.getCreator().isEmpty() && raw.getCreator() != null) {
-                partial.setCreator(raw.getCreator());
-            }
-            if (partial.getRefId().isEmpty() && raw.getRefId() != null) {
-                partial.setRefId(raw.getRefId());
-            }
-            if (partial.getProjectId().isEmpty() && raw.getProjectId() != null) {
-                partial.setProjectId(raw.getProjectId());
-            }
-            return partial;
-        });
+        return commits.stream().reduce(new CommitJson(), CommitJson::copy);
     }
 
     private static int getCommitSize(CommitJson commitJson) {
         int commitCount = 0;
-        if (commitJson.getAdded() != null) {
+        if (commitJson.getAdded() != null && !commitJson.getAdded().isEmpty()) {
             commitCount = commitCount + commitJson.getAdded().size();
         }
-        if (commitJson.getUpdated() != null) {
+        if (commitJson.getUpdated() != null && !commitJson.getUpdated().isEmpty()) {
             commitCount = commitCount + commitJson.getUpdated().size();
         }
-        if (commitJson.getDeleted() != null) {
+        if (commitJson.getDeleted() != null && !commitJson.getDeleted().isEmpty()) {
             commitCount = commitCount + commitJson.getDeleted().size();
         }
         return commitCount;

@@ -19,20 +19,31 @@ public class CommitJson extends BaseJson<CommitJson> {
     public static final String UPDATED = "updated";
     public static final String SOURCE = "source";
 
-    public static CommitJson copy(CommitJson original) {
-        CommitJson copy = new CommitJson();
-        copy.setId(original.getId());
-        copy.setSource(original.getSource());
-        copy.setCreated(original.getCreated());
-        copy.setCreator(original.getCreator());
-        copy.setModified(original.getModified());
-        copy.setModifier(original.getModifier());
-        copy.setComment(original.getComment());
-        copy.setRefId(original.getRefId());
-        copy.setProjectId(original.getProjectId());
-        copy.setAdded(new ArrayList<>());
-        copy.setUpdated(new ArrayList<>());
-        copy.setDeleted(new ArrayList<>());
+    public static CommitJson copy(CommitJson copy, CommitJson original) {
+        if (copy.getAdded() == null) {
+            copy.setAdded(new ArrayList<>());
+        }
+        if (copy.getUpdated() == null) {
+            copy.setUpdated(new ArrayList<>());
+        }
+        if (copy.getDeleted() == null) {
+            copy.setDeleted(new ArrayList<>());
+        }
+
+        if (original.getAdded() != null) {
+            copy.getAdded().addAll(original.getAdded());
+            original.remove(CommitJson.ADDED);
+        }
+        if (original.getUpdated() != null) {
+            copy.getUpdated().addAll(original.getUpdated());
+            original.remove(CommitJson.UPDATED);
+        }
+        if (original.getDeleted() != null) {
+            copy.getDeleted().addAll(original.getDeleted());
+            original.remove(CommitJson.DELETED);
+        }
+
+        copy.putAll(original);
         return copy;
     }
 
