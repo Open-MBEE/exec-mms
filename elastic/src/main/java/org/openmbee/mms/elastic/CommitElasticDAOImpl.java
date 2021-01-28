@@ -101,11 +101,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
 
     public boolean existsById(String commitId) {
         List<CommitJson> docs = getDocs(commitId);
-        List<Boolean> result = new ArrayList<>();
-        docs.forEach(commit -> {
-            result.add(this.existsById(getIndex(), commit.getDocId()));
-        });
-        return !result.stream().allMatch(b -> b);
+        return !docs.isEmpty();
     }
 
     /**
