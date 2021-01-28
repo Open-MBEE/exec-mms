@@ -3438,7 +3438,46 @@
 				}
 			},
 			"response": []
-		}
+		},
+        {
+            "name": "get nonexistent commit",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 404\", function () {",
+                            "    pm.response.to.have.status(404);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{host}}/projects/aa/commits/missing",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "aa",
+                        "commits",
+                        "missing"
+                    ]
+                }
+            },
+            "response": []
+        }
 	],
 	"auth": {
 		"type": "bearer",
