@@ -79,6 +79,8 @@ public class DefaultCommitService implements CommitService {
                 json.setCreator(c.getCreator());
                 json.setId(c.getCommitId());
                 json.setComment(c.getComment());
+                json.setRefId(c.getBranchId());
+                json.setProjectId(projectId);
                 resJson.add(json);
             }
         }, () -> {
