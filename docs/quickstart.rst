@@ -13,11 +13,10 @@ Dependencies
   Java SE Development Kit 11+
         Installation instructions: `JDK-11 download <https://www.oracle.com/java/technologies/javase-jdk11-downloads.html>`_
 
-  Postgresql
+  Postgresql or Mysql 5.7
     Install postgres (PostgreSQL) 11, instructions for Docker: `PostgreSQL with Docker <https://hub.docker.com/_/postgres>`_
     `docker run -d -e POSTGRES_PASSWORD=test1234 -e POSTGRES_USER=mmsuser -e POSTGRES_DB=mms -p 5432:5432 postgres:11-alpine`
-
-  or Mysql 5.7 `Mysql with Docker <https://hub.docker.com/_/mysql/>`_
+    Or mysql: `Mysql with Docker <https://hub.docker.com/_/mysql/>`_
     `docker run -d -e MYSQL_ROOT_PASSWORD=test1234 -e MYSQL_DATABASE=mms -p 3306:3306 mysql:5.7`
 
   Elasticsearch
@@ -27,3 +26,9 @@ Dependencies
   MinIO
     Install MinIO for artifact storage. `Instructions for MinIO <https://docs.min.io/>`_
     `docker run -d -p 9000:9000 -e "MINIO_ACCESS_KEY=admintest" -e "MINIO_SECRET_KEY=admintest" minio/minio server /data`
+
+MMS Application
+---------------
+  MMS
+    Install MMS and run the web server:
+    ``
