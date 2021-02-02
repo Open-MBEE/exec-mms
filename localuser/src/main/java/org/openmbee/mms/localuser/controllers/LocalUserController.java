@@ -60,7 +60,7 @@ public class LocalUserController {
 
         try {
             if (requesterAdmin || requester.equals(req.getUsername())) {
-                userDetailsService.changeUserPassword(req.getUsername(), req.getPassword());
+                userDetailsService.changeUserPassword(req.getUsername(), req.getPassword(), requesterAdmin);
             } else {
                 throw new UnauthorizedException("Not authorized");
             }

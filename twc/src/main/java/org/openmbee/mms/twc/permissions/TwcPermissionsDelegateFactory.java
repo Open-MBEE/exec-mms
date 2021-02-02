@@ -40,6 +40,9 @@ public class TwcPermissionsDelegateFactory implements PermissionsDelegateFactory
 
     @Override
     public PermissionsDelegate getPermissionsDelegate(Project project) {
+        if(!twcConfig.isUseAuthDelegation()) {
+            return null;
+        }
 
         TwcProjectDetails twcProjectDetails = getTwcDetails(project);
         if(twcProjectDetails != null) {
@@ -52,12 +55,20 @@ public class TwcPermissionsDelegateFactory implements PermissionsDelegateFactory
 
     @Override
     public PermissionsDelegate getPermissionsDelegate(Organization organization) {
+        if(!twcConfig.isUseAuthDelegation()) {
+            return null;
+        }
+
         //TODO implement this once category-level permissions are implemented in TWC
         return null;
     }
 
     @Override
     public PermissionsDelegate getPermissionsDelegate(Branch branch) {
+        if(!twcConfig.isUseAuthDelegation()) {
+            return null;
+        }
+
         TwcProjectDetails twcProjectDetails = getTwcDetails(branch.getProject());
         if(twcProjectDetails != null) {
             return autowire(new TwcBranchPermissionsDelegate(branch, twcProjectDetails.getTeamworkCloud(),

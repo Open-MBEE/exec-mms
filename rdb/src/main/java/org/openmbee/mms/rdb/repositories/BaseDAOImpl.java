@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.util.regex.Pattern;
+
 public abstract class BaseDAOImpl {
 
     private CrudDataSources crudDataSources;
@@ -36,6 +38,10 @@ public abstract class BaseDAOImpl {
 
     public String getSuffix() {
         String refId = ContextHolder.getContext().getBranchId();
-        return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
+        if(Pattern.matches("^[a-zA-Z0-9-_]*$", refId)) { 
+            return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
+        } else {
+            throw new IllegalArgumentException("Bad branch id, aborting current operation.");
+        }
     }
 }

@@ -51,14 +51,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setFirstName(req.getFirstname());
         user.setLastName(req.getLastname());
         user.setUsername(req.getUsername());
-        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setPassword(encodePassword(req.getPassword()));
         user.setEnabled(true);
         user.setAdmin(req.isAdmin());
         return userRepository.save(user);
     }
 
     @Transactional
-    public void changeUserPassword(String username, String password) {
+    public void changeUserPassword(String username, String password, boolean asAdmin) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if(! userOptional.isPresent()) {
             throw new UsernameNotFoundException(
@@ -66,11 +66,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         User user = userOptional.get();
-        if(user.getPassword() == null || user.getPassword().isEmpty()) {
+        if(!asAdmin && (user.getPassword() == null || user.getPassword().isEmpty())) {
             throw new ForbiddenException("Cannot change or set passwords for external users.");
         }
 
-        user.setPassword(passwordEncoder.encode(password));
+        //TODO password strength test?
+        user.setPassword(encodePassword(password));
         userRepository.save(user);
+    }
+
+    private String encodePassword(String password) {
+        return (password != null && !password.isEmpty()) ? passwordEncoder.encode(password) : null;
     }
 }

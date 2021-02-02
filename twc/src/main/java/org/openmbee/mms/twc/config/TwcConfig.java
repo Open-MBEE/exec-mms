@@ -8,6 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Configuration
 @ConfigurationProperties("twc")
@@ -18,12 +20,22 @@ public class TwcConfig {
 
     private List<TeamworkCloud> instances;
 
+    private boolean useAuthDelegation = false;
+
     public List<TeamworkCloud> getInstances() {
         return instances;
     }
 
     public void setInstances(List<TeamworkCloud> instances) {
         this.instances = instances;
+    }
+
+    public boolean isUseAuthDelegation() {
+        return useAuthDelegation;
+    }
+
+    public void setUseAuthDelegation(boolean useAuthDelegation) {
+        this.useAuthDelegation = useAuthDelegation;
     }
 
     public TwcAuthenticationProvider getAuthNProvider(String associatedTWC) {
@@ -39,11 +51,21 @@ public class TwcConfig {
     }
 
     public TeamworkCloud getTeamworkCloud(String twcUrl) {
+        String host = stripHost(twcUrl);
         for(TeamworkCloud twc : getInstances()) {
-            if (twc.hasKnownName(twcUrl)) {
+            if (twc.hasKnownName(host)) {
                 return twc;
             }
         }
         return null;
+    }
+
+    private static String stripHost(String url) {
+        Pattern pattern = Pattern.compile("(https?://)?([\\w-\\.]*)(:\\d+)?");
+        Matcher matcher = pattern.matcher(url);
+        if(matcher.matches()) {
+            return matcher.group(2);
+        }
+        return url;
     }
 }
