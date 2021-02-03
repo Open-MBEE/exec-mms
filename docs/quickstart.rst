@@ -2,9 +2,6 @@
 Quick Start
 ============
 
-Test Setup
-==========
-
 Dependencies
 ************
   Docker
