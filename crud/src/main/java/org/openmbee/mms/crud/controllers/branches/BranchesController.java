@@ -118,6 +118,6 @@ public class BranchesController extends BaseController {
     }
 
     static boolean isBranchIdValid(String branchId) {
-        return branchId != null && branchId.matches(BRANCH_ID_VALID_PATTERN);
+        return branchId != null && BRANCH_ID_VALID_PATTERN.matcher(branchId).matches();
     }
 }

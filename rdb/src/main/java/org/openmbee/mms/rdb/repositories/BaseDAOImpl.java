@@ -40,7 +40,7 @@ public abstract class BaseDAOImpl {
 
     public String getSuffix() {
         String refId = ContextHolder.getContext().getBranchId();
-        if(Pattern.matches(BRANCH_ID_VALID_PATTERN, refId)) {
+        if(BRANCH_ID_VALID_PATTERN.matcher(refId).matches()) {
             return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
         } else {
             throw new IllegalArgumentException("Bad branch id, aborting current operation.");
