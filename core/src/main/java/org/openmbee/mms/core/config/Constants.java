@@ -17,6 +17,8 @@ public class Constants {
 
     public static final String MASTER_BRANCH = "master";
 
+    public static final String BRANCH_ID_VALID_PATTERN = "^[\\w-]+$";
+
     public static final Map<String, List> RPmap = new LinkedHashMap<>();
     public static final List<String> aPriv;
     public static final List<String> rPriv;

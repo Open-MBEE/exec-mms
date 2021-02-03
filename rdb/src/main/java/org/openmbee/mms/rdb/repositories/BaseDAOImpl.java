@@ -11,6 +11,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.regex.Pattern;
 
+import static org.openmbee.mms.core.config.Constants.BRANCH_ID_VALID_PATTERN;
+
 public abstract class BaseDAOImpl {
 
     private CrudDataSources crudDataSources;
@@ -38,7 +40,7 @@ public abstract class BaseDAOImpl {
 
     public String getSuffix() {
         String refId = ContextHolder.getContext().getBranchId();
-        if(Pattern.matches("^[a-zA-Z0-9-_]*$", refId)) { 
+        if(Pattern.matches(BRANCH_ID_VALID_PATTERN, refId)) {
             return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
         } else {
             throw new IllegalArgumentException("Bad branch id, aborting current operation.");

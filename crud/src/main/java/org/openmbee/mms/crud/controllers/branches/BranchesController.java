@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.openmbee.mms.core.config.Constants.BRANCH_ID_VALID_PATTERN;
+
 @RestController
 @RequestMapping("/projects/{projectId}/refs")
 @Tag(name = "Refs")
 public class BranchesController extends BaseController {
-
-    private static final String BRANCH_ID_VALID_PATTERN = "^[\\w-]+$";
 
     private BranchService branchService;
 
