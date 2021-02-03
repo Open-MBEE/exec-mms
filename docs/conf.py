@@ -12,7 +12,7 @@
 #
 import os
 import sys
-import sphinx_rtd_theme
+
 sys.path.insert(0, os.path.abspath('../..'))
 sys.setrecursionlimit(1500)
 
@@ -35,7 +35,7 @@ release = '4.0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx_rtd_theme"
+    'sphinx_rtd_theme',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -56,18 +56,23 @@ html_theme = 'sphinx_rtd_theme'
 
 html_theme_options = {
     'analytics_id': '',
-    'analytics_anonymize_ip': False,
     'logo_only': False,
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
-    'vcs_pageview_mode': '',
     'style_nav_header_background': 'white',
     'collapse_navigation': True,
     'sticky_navigation': True,
     'navigation_depth': 4,
     'includehidden': True,
     'titles_only': False
+}
+
+html_sidebars = {
+    '**': ['globaltoc.html',
+           'relations.html',
+           'sourcelink.html',
+           'searchbox.html']
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
