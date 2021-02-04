@@ -17,24 +17,24 @@ Dependencies
     Install postgres (PostgreSQL) 11, instructions for Docker: `PostgreSQL with Docker <https://hub.docker.com/_/postgres>`_
     ::
 
-      `docker run -d -e POSTGRES_PASSWORD=test1234 -e POSTGRES_USER=mmsuser -e POSTGRES_DB=mms -p 5432:5432 --name=postgres postgres:11-alpine`
+      docker run -d -e POSTGRES_PASSWORD=test1234 -e POSTGRES_USER=mmsuser -e POSTGRES_DB=mms -p 5432:5432 --name=postgres postgres:11-alpine
 
     Or mysql: `Mysql with Docker <https://hub.docker.com/_/mysql/>`_
     ::
 
-      `docker run -d -e MYSQL_ROOT_PASSWORD=test1234 -e MYSQL_DATABASE=mms -p 3306:3306 --name=mysql mysql:5.7`
+      docker run -d -e MYSQL_ROOT_PASSWORD=test1234 -e MYSQL_DATABASE=mms -p 3306:3306 --name=mysql mysql:5.7
 
   Elasticsearch
     Install Elasticsearch 7.8.  If you use Docker instructions are available here: `Setting up Elasticsearch with Docker <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html>`_
     ::
 
-      `docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name=elasticsearch docker.elastic.co/elasticsearch/elasticsearch:7.8.1`
+      docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name=elasticsearch docker.elastic.co/elasticsearch/elasticsearch:7.8.1
 
   MinIO
     Install MinIO for artifact storage. `Instructions for MinIO <https://docs.min.io/>`_
     ::
 
-      `docker run -d -p 9000:9000 -e "MINIO_ACCESS_KEY=admintest" -e "MINIO_SECRET_KEY=admintest" --name=minio minio/minio server /data`
+      docker run -d -p 9000:9000 -e "MINIO_ACCESS_KEY=admintest" -e "MINIO_SECRET_KEY=admintest" --name=minio minio/minio server /data
 
 Running MMS
 ***********
@@ -46,19 +46,19 @@ Running MMS
     First, create a container from an MMS image. In the example below, the container is using the host network for simplicity.
     ::
 
-      `docker create --name=mms --network="host" -e "SPRING_CONFIG_LOCATION=/mms.properties" openmbee/mms:4.0.0-b5`
+      docker create --name=mms --network="host" -e "SPRING_CONFIG_LOCATION=/mms.properties" openmbee/mms:4.0.0-b5
 
   Copy properties
     If using the above command, copy the properties file to the defined spring config location.
     ::
 
-      `docker cp mms.properties mms:/mms.properties`
+      docker cp mms.properties mms:/mms.properties
 
   Start the container
     Finally, start the container with the injected properties file.
     ::
 
-      `docker start mms`
+      docker start mms
 
 More Information
 ****************

@@ -24,10 +24,12 @@ Configuration
     The dn pattern for the user. Required.
 
   ldap.user.attributes.username
-    The attribute to use for the username. Optional. Default: uid
+    The attribute to use for the username. Optional.
+    `Default: uid`
 
   ldap.user.attributes.email
-    The attribute to use for the email address. Optional. Default: mail
+    The attribute to use for the email address. Optional.
+    `Default: mail`
 
   ldap.group.role.attribute
     The attribute to use for the group role. Optional.
