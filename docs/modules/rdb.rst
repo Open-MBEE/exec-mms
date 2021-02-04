@@ -1,12 +1,13 @@
 .. _rdb:
 
+===
 RDB
 ===
 
 The RDB Module implements the JPA Repositories defined in the CRUD Module.
 
 Configuration
-*************
+-------------
 
 The following are a list of options to configure the RDB Module for MMS.
 
@@ -38,7 +39,7 @@ The following are a list of options to configure the RDB Module for MMS.
     The DDL generation option. Accepted values are `none`, `create`, `create-drop`, `validate`, and `update` Required.
 
 Required Properties
-*******************
+-------------------
 
 These properties are required for the MMS application to provide all available features. They are set by default, but are listed here for completeness.
 

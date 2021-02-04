@@ -1,12 +1,13 @@
 .. _storage:
 
+=======
 Storage
 =======
 
 Storage is the default implementation of the Artifact interface. It is compatible with S3 compliant APIs.
 
 Configuration
-*************
+-------------
 
   s3.access_key
     This is the access key for the S3 bucket. Required.

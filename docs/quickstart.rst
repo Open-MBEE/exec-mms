@@ -1,12 +1,14 @@
 .. _quickstart:
 
+===========
 Quick Start
-============
+===========
 
 This quick start will focus on running all dependencies and the MMS application as docker containers. This is most suitable for testing environments. For production deployments, we recommend the `MMS Reference Implementation <https://github.com/Open-MBEE/mmsri>`_ as a starting point.
 
 Dependencies
-************
+------------
+
   Docker
     We suggest using Docker to set up PostgreSQL and Elasticsearch.  Installation instructions are found here: `Docker documentation <https://docs.docker.com/>`_
 
@@ -37,7 +39,8 @@ Dependencies
       docker run -d -p 9000:9000 -e "MINIO_ACCESS_KEY=admintest" -e "MINIO_SECRET_KEY=admintest" --name=minio minio/minio server /data
 
 Running MMS
-***********
+-----------
+
   Configure the application
     Each module of MMS can define configuration properties required to function. These properties can be defined in a single location, by default, called application.properties. Place application.properties in the classpath for MMS to use the defined values. For an example, see `example application.properties <https://github.com/Open-MBEE/mms/blob/develop/example/src/main/resources/application.properties.example>`_
     Alternatively, the properties file can be given by defining the environment variable `SPRING_CONFIG_LOCATION`.
@@ -61,5 +64,6 @@ Running MMS
       docker start mms
 
 More Information
-****************
+----------------
+
   For more information and hints, check the `docker-compose.yml <https://github.com/Open-MBEE/mms/blob/develop/docker-compose.yml>`_ in the project root to see how we stand up an instance for testing purposes.

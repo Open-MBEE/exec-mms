@@ -1,5 +1,6 @@
 .. _jupyter:
 
+=======
 Jupyter
 =======
 

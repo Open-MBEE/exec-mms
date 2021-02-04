@@ -1,12 +1,13 @@
 .. _elastic:
 
+=======
 Elastic
 =======
 
 The Elastic Module implements the NodeIndex interface from the crud module.
 
 Configuration
-*************
+-------------
 
 The following are a list of options to configure the Elastic Module for MMS.
 
@@ -50,6 +51,6 @@ The following are a list of options to configure the Elastic Module for MMS.
     | `Default: 10000`
 
 Elastic Mappings
-****************
+----------------
 
 Elastic mappings are necessary to index fields correctly in Elasticsearch. These mappings are available `here <https://github.com/Open-MBEE/mms/tree/develop/elastic/src/main/resources/elastic_mappings>`_.

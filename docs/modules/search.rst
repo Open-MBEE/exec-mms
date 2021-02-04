@@ -1,5 +1,6 @@
 .. _mmssearch:
 
+======
 Search
 ======
 

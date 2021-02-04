@@ -1,12 +1,14 @@
 .. _twc:
 
+===
 TWC
 ===
 
 The TWC Module provides integration with NoMagic's Teamwork Cloud.
 
 Configuration
-*************
+-------------
+
 The TWC Module supports multiple instances of TWC. The following configuration are available, where twc.instances is a list.
 
   twc.instances[i].url

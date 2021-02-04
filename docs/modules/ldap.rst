@@ -1,12 +1,13 @@
 .. _ldap:
 
+====
 LDAP
 ====
 
 The LDAP Module provides the ability to authenticate users from an LDAP Identity provider.
 
 Configuration
-*************
+-------------
 
   ldap.provider.base
     The base string to use. Required.
