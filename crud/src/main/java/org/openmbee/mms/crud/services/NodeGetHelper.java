@@ -35,6 +35,10 @@ public class NodeGetHelper extends NodeOperation {
                 continue;
             }
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
+            if (indexElement == null) {
+                rejectNotFound(info, nodeId);
+                continue;
+            }
             if (info.getExistingNodeMap().get(nodeId).isDeleted()) {
                 rejectDeleted(info, nodeId, indexElement);
                 continue;
@@ -75,6 +79,10 @@ public class NodeGetHelper extends NodeOperation {
                 continue;
             }
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
+            if (indexElement == null) {
+                rejectNotFound(info, nodeId);
+                continue;
+            }
             Instant modified = Instant.from(formatter.parse(indexElement.getModified()));
             Instant created = Instant.from(formatter.parse(indexElement.getCreated()));
 

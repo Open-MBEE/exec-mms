@@ -27,6 +27,9 @@ public class NodeDeleteHelper extends NodeOperation {
                 info.addRejection(nodeId, new Rejection(indexElement, 304, "Already deleted"));
                 continue;
             }
+            if (indexElement == null) {
+                indexElement = Map.of("id", nodeId);
+            }
             ElementJson request = info.getReqElementMap().get(nodeId);
             request.putAll(indexElement);
             processElementDeleted(request, node, info);

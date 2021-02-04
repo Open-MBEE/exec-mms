@@ -34,7 +34,7 @@ public class NodePostHelper extends NodeOperation {
 
         String jsonModified = element.getModified();
         Object existingModified = existing.get(BaseJson.MODIFIED);
-        if (jsonModified != null && !jsonModified.isEmpty()) {
+        if (jsonModified != null && !jsonModified.isEmpty() && existingModified != null) {
             try {
                 Date jsonModDate = Formats.SDF.parse(jsonModified);
                 Date existingModDate = Formats.SDF.parse(existingModified.toString());
@@ -72,8 +72,9 @@ public class NodePostHelper extends NodeOperation {
                 added = true;
             } else if (indexElement == null) {
                 logger.warn("node db and index mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
-                info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
-                continue;
+                //info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
+                //continue;
+                indexElement = new ElementJson().setId(n.getNodeId()).setDocId(n.getDocId());
             }
 
             if (!added) {
