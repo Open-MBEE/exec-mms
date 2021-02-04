@@ -40,6 +40,8 @@ public class NodeGetHelper extends NodeOperation {
                 continue;
             }
             if (indexElement == null) {
+                logger.warn("node db and index mismatch on element get: nodeId: " + nodeId +
+                    ", docId not found: " + info.getExistingNodeMap().get(nodeId).getDocId());
                 rejectNotFound(info, nodeId);
                 continue;
             }
@@ -80,8 +82,21 @@ public class NodeGetHelper extends NodeOperation {
             }
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
             if (indexElement == null) {
-                rejectNotFound(info, nodeId);
-                continue;
+                Node n = info.getExistingNodeMap().get(nodeId);
+                logger.warn("node db and index mismatch on element commit get: nodeId: " + nodeId +
+                    ", docId not found: " + n.getDocId());
+                Optional<Commit> last = commitRepository.findByCommitId(n.getLastCommit());
+                Optional<Commit> first = commitRepository.findByCommitId(n.getInitialCommit());
+                if (!last.isPresent() || !first.isPresent()) {
+                    rejectNotFound(info, nodeId);
+                    continue;
+                }
+                indexElement = new ElementJson().setId(nodeId).setDocId(n.getDocId());
+                indexElement.setModified(formatter.format(last.get().getTimestamp()));
+                indexElement.setModifier(last.get().getCreator());
+                indexElement.setCommitId(last.get().getCommitId());
+                indexElement.setCreator(first.get().getCreator());
+                indexElement.setCreated(formatter.format(first.get().getTimestamp()));
             }
             Instant modified = Instant.from(formatter.parse(indexElement.getModified()));
             Instant created = Instant.from(formatter.parse(indexElement.getCreated()));

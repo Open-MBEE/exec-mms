@@ -28,6 +28,8 @@ public class NodeDeleteHelper extends NodeOperation {
                 continue;
             }
             if (indexElement == null) {
+                logger.warn("node db and index mismatch on element delete: nodeId: " + nodeId +
+                    ", docId not found: " + info.getExistingNodeMap().get(nodeId).getDocId());
                 indexElement = Map.of("id", nodeId);
             }
             ElementJson request = info.getReqElementMap().get(nodeId);
