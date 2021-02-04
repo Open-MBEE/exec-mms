@@ -5,11 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.openmbee.mms.core.config.Formats;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.NodeChangeInfo;
 import org.openmbee.mms.core.services.NodeService;
+import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.CommitJson;
 import org.openmbee.mms.json.ElementJson;
@@ -75,6 +77,11 @@ public class NodePostHelper extends NodeOperation {
                 //info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
                 //continue;
                 indexElement = new ElementJson().setId(n.getNodeId()).setDocId(n.getDocId());
+                Optional<Commit> init = commitRepository.findByCommitId(n.getInitialCommit());
+                if (init.isPresent()) {
+                    indexElement.setCreator(init.get().getCreator());
+                    indexElement.setCreated(formatter.format(init.get().getTimestamp()));
+                }
             }
 
             if (!added) {
