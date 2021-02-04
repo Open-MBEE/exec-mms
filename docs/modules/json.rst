@@ -3,4 +3,4 @@
 JSON
 ====
 
-The JSON Module provides data objects for marshalling JSON to and from Java POJOs
+The JSON Module provides data objects for marshalling JSON to and from POJOs
