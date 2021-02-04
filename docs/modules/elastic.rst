@@ -24,7 +24,7 @@ The following are a list of options to configure the Elastic Module for MMS.
 
     | `Default: 10000`
 
-  elasticsearch.limit.term=1000
+  elasticsearch.limit.term
     The maximum number of terms that a search query should contain. Optional.
 
     | `Default: 1000`
