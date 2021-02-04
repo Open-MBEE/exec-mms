@@ -35,12 +35,12 @@ public class NodeGetHelper extends NodeOperation {
                 continue;
             }
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
-            if (indexElement == null) {
-                rejectNotFound(info, nodeId);
+            if (info.getExistingNodeMap().get(nodeId).isDeleted()) {
+                rejectDeleted(info, nodeId, indexElement == null ? new ElementJson().setId(nodeId) : indexElement);
                 continue;
             }
-            if (info.getExistingNodeMap().get(nodeId).isDeleted()) {
-                rejectDeleted(info, nodeId, indexElement);
+            if (indexElement == null) {
+                rejectNotFound(info, nodeId);
                 continue;
             }
             if (service != null) {
