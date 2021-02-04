@@ -44,6 +44,6 @@ These properties are required for the MMS application to provide all available f
 
   ::
 
-  `spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true`
-  `spring.jpa.open-in-view=false`
-  `spring.main.allow-bean-definition-overriding=true`
+    spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+    spring.jpa.open-in-view=false
+    spring.main.allow-bean-definition-overriding=true
