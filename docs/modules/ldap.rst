@@ -25,11 +25,13 @@ Configuration
 
   ldap.user.attributes.username
     The attribute to use for the username. Optional.
-    `Default: uid`
+
+    | `Default: uid`
 
   ldap.user.attributes.email
     The attribute to use for the email address. Optional.
-    `Default: mail`
+
+    | `Default: mail`
 
   ldap.group.role.attribute
     The attribute to use for the group role. Optional.

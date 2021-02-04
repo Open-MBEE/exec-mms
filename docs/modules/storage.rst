@@ -19,4 +19,5 @@ Configuration
 
   s3.bucket
     This is the name of the S3 bucket. Optional.
-    `Default: mms`
+
+    | `Default: mms`
