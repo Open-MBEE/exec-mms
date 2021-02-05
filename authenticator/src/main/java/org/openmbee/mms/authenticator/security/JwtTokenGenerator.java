@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import javax.crypto.SecretKey;
 
+import org.openmbee.mms.core.services.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtTokenGenerator implements Serializable {
+public class JwtTokenGenerator implements Serializable, TokenService {
 
     private static final long serialVersionUID = 6463567580980594813L;
     private static final String CLAIM_KEY_USERNAME = "sub";
@@ -103,15 +104,26 @@ public class JwtTokenGenerator implements Serializable {
         return expirationDate.before(new Date());
     }
 
+    @Override
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
+
         List<String> authorities = new ArrayList<>();
         for (GrantedAuthority ga : userDetails.getAuthorities()) {
             authorities.add(ga.getAuthority());
         }
-        claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-        claims.put(CLAIM_KEY_USERID, userDetails.getUsername());
-        claims.put(CLAIM_KEY_ENABLED, userDetails.isEnabled());
+        return generateToken(userDetails.getUsername(), userDetails.isEnabled(), authorities);
+    }
+
+    @Override
+    public String generateToken(String principal, Collection<String> authorities) {
+        return generateToken(principal, true, authorities);
+    }
+
+    private String generateToken(String principal, boolean enabled, Collection<String> authorities) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(CLAIM_KEY_USERNAME, principal);
+        claims.put(CLAIM_KEY_USERID, principal);
+        claims.put(CLAIM_KEY_ENABLED, enabled);
         claims.put(CLAIM_KEY_CREATED, new Date());
         claims.put(CLAIM_KEY_AUTHORITIES, authorities);
         return generateToken(claims);

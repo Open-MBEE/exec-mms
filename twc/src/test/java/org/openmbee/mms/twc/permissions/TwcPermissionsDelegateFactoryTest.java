@@ -21,8 +21,19 @@ public class TwcPermissionsDelegateFactoryTest {
 
     @Test
     public void testTwcOrg() {
+        ApplicationContext applicationContext = mock(ApplicationContext.class);
+        TwcConfig twcConfig = mock(TwcConfig.class);
+        TwcMetadataService twcMetadataService = mock(TwcMetadataService.class);
+
+        when(twcConfig.isUseAuthDelegation()).thenReturn(true);
+
+        TwcPermissionsDelegateFactory twcPermissionsDelegateFactory = new TwcPermissionsDelegateFactory();
+        twcPermissionsDelegateFactory.setApplicationContext(applicationContext);
+        twcPermissionsDelegateFactory.setTwcConfig(twcConfig);
+        twcPermissionsDelegateFactory.setTwcMetadataService(twcMetadataService);
+
         //These are not supported
-        assertNull( new TwcPermissionsDelegateFactory().getPermissionsDelegate(new Organization()));
+        assertNull( twcPermissionsDelegateFactory.getPermissionsDelegate(new Organization()));
     }
 
     @Test
@@ -31,6 +42,8 @@ public class TwcPermissionsDelegateFactoryTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         TwcConfig twcConfig = mock(TwcConfig.class);
         TwcMetadataService twcMetadataService = mock(TwcMetadataService.class);
+
+        when(twcConfig.isUseAuthDelegation()).thenReturn(true);
 
         TwcPermissionsDelegateFactory twcPermissionsDelegateFactory = new TwcPermissionsDelegateFactory();
         twcPermissionsDelegateFactory.setApplicationContext(applicationContext);
@@ -69,6 +82,8 @@ public class TwcPermissionsDelegateFactoryTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         TwcConfig twcConfig = mock(TwcConfig.class);
         TwcMetadataService twcMetadataService = mock(TwcMetadataService.class);
+
+        when(twcConfig.isUseAuthDelegation()).thenReturn(true);
 
         TwcPermissionsDelegateFactory twcPermissionsDelegateFactory = new TwcPermissionsDelegateFactory();
         twcPermissionsDelegateFactory.setApplicationContext(applicationContext);
@@ -143,6 +158,8 @@ public class TwcPermissionsDelegateFactoryTest {
         TwcConfig twcConfig = mock(TwcConfig.class);
         TwcMetadataService twcMetadataService = mock(TwcMetadataService.class);
 
+        when(twcConfig.isUseAuthDelegation()).thenReturn(true);
+
         TwcPermissionsDelegateFactory twcPermissionsDelegateFactory = new TwcPermissionsDelegateFactory();
         twcPermissionsDelegateFactory.setApplicationContext(applicationContext);
         twcPermissionsDelegateFactory.setTwcConfig(twcConfig);
@@ -183,6 +200,8 @@ public class TwcPermissionsDelegateFactoryTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         TwcConfig twcConfig = mock(TwcConfig.class);
         TwcMetadataService twcMetadataService = mock(TwcMetadataService.class);
+
+        when(twcConfig.isUseAuthDelegation()).thenReturn(true);
 
         TwcPermissionsDelegateFactory twcPermissionsDelegateFactory = new TwcPermissionsDelegateFactory();
         twcPermissionsDelegateFactory.setApplicationContext(applicationContext);

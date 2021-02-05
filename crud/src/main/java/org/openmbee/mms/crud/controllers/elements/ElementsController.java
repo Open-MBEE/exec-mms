@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import org.openmbee.mms.core.objects.ElementsCommitResponse;
 import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
 import org.openmbee.mms.core.services.CommitService;
@@ -107,7 +108,7 @@ public class ElementsController extends BaseController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
-    public ElementsResponse createOrUpdateElements(
+    public ElementsCommitResponse createOrUpdateElements(
         @PathVariable String projectId,
         @PathVariable String refId,
         @RequestBody ElementsRequest req,
@@ -194,13 +195,13 @@ public class ElementsController extends BaseController {
 
     @DeleteMapping(value = "/{elementId}")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
-    public ElementsResponse deleteElement(
+    public ElementsCommitResponse deleteElement(
         @PathVariable String projectId,
         @PathVariable String refId,
         @PathVariable String elementId,
         Authentication auth) {
 
-        ElementsResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
+        ElementsCommitResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
         return res;
     }
