@@ -45,8 +45,14 @@ public class BranchesController extends BaseController {
         if (!permissionService.isProjectPublic(projectId)) {
             List<RefJson> filtered = new ArrayList<>();
             for (RefJson ref: res.getRefs()) {
-                if (mss.hasBranchPrivilege(auth, projectId, ref.getId(), Privileges.BRANCH_READ.name(), false)) {
-                    filtered.add(ref);
+                try {
+                    if (mss.hasBranchPrivilege(auth, projectId, ref.getId(),
+                        Privileges.BRANCH_READ.name(), false)) {
+                        filtered.add(ref);
+                    }
+                } catch (MMSException e) {
+                    logger.warn("error in getting branch permissions: projectId=" +
+                        projectId + ", refId=" + ref.getId(), e);
                 }
             }
             res.setRefs(filtered);

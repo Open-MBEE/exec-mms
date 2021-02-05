@@ -5,11 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.openmbee.mms.core.config.Formats;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.NodeChangeInfo;
 import org.openmbee.mms.core.services.NodeService;
+import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.CommitJson;
 import org.openmbee.mms.json.ElementJson;
@@ -34,7 +36,7 @@ public class NodePostHelper extends NodeOperation {
 
         String jsonModified = element.getModified();
         Object existingModified = existing.get(BaseJson.MODIFIED);
-        if (jsonModified != null && !jsonModified.isEmpty()) {
+        if (jsonModified != null && !jsonModified.isEmpty() && existingModified != null) {
             try {
                 Date jsonModDate = Formats.SDF.parse(jsonModified);
                 Date existingModDate = Formats.SDF.parse(existingModified.toString());
@@ -72,8 +74,14 @@ public class NodePostHelper extends NodeOperation {
                 added = true;
             } else if (indexElement == null) {
                 logger.warn("node db and index mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
-                info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
-                continue;
+                //info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
+                //continue;
+                indexElement = new ElementJson().setId(n.getNodeId()).setDocId(n.getDocId());
+                Optional<Commit> init = commitRepository.findByCommitId(n.getInitialCommit());
+                if (init.isPresent()) {
+                    indexElement.setCreator(init.get().getCreator());
+                    indexElement.setCreated(formatter.format(init.get().getTimestamp()));
+                }
             }
 
             if (!added) {
