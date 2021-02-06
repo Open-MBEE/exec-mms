@@ -23,6 +23,7 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.dao.NodeIndexDAO;
+import org.openmbee.mms.core.exceptions.MMSException;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.ElementJson;
@@ -35,11 +36,11 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         return new ElementJson();
     }
 
-    public void indexAll(Collection<? extends BaseJson> jsons) {
+    public void indexAll(Collection<? extends BaseJson> jsons) throws MMSException {
         this.indexAll(getIndex(), jsons);
     }
 
-    public void index(BaseJson json) {
+    public void index(BaseJson json) throws MMSException {
         this.index(getIndex(), json);
     }
 
@@ -51,11 +52,11 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         return this.findAllById(getIndex(), docIds);
     }
 
-    public void deleteById(String docId) {
+    public void deleteById(String docId) throws MMSException {
         this.deleteById(getIndex(), docId);
     }
 
-    public void deleteAll(Collection<? extends BaseJson> jsons) {
+    public void deleteAll(Collection<? extends BaseJson> jsons) throws MMSException {
         this.deleteAll(getIndex(), jsons);
     }
 

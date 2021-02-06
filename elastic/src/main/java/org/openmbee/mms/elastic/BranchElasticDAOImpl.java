@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.openmbee.mms.core.dao.BranchIndexDAO;
+import org.openmbee.mms.core.exceptions.MMSException;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.RefJson;
 import org.springframework.stereotype.Component;
@@ -19,12 +20,12 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
     }
 
     @Override
-    public void indexAll(Collection<? extends BaseJson> jsons) {
+    public void indexAll(Collection<? extends BaseJson> jsons) throws MMSException {
         this.indexAll(getIndex(), jsons);
     }
 
     @Override
-    public void index(BaseJson json) {
+    public void index(BaseJson json) throws MMSException {
         this.index(getIndex(), json);
     }
 
@@ -36,11 +37,11 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
         return this.findAllById(getIndex(), docIds);
     }
 
-    public void deleteById(String docId) {
+    public void deleteById(String docId) throws MMSException {
         this.deleteById(getIndex(), docId);
     }
 
-    public void deleteAll(Collection<? extends BaseJson> jsons) {
+    public void deleteAll(Collection<? extends BaseJson> jsons) throws MMSException {
         this.deleteAll(getIndex(), jsons);
     }
 
@@ -49,7 +50,7 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
     }
 
     @Override
-    public RefJson update(RefJson refJson) {
+    public RefJson update(RefJson refJson) throws MMSException {
         return this.update(getIndex(), refJson);
     }
 
