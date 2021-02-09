@@ -36,16 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-
 
 @Service("defaultNodeService")
-@EnableTransactionManagement
 public class DefaultNodeService implements NodeService {
 
     @Value("${mms.stream.batch.size:100000}")
@@ -64,8 +56,6 @@ public class DefaultNodeService implements NodeService {
     protected NodeDeleteHelper nodeDeleteHelper;
 
     protected Collection<EventService> eventPublisher;
-
-    protected PlatformTransactionManager platformTransactionManager;
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -105,11 +95,6 @@ public class DefaultNodeService implements NodeService {
     @Autowired
     public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
-    }
-
-    @Autowired
-    public void setPlatformTransactionManager(PlatformTransactionManager platformTransactionManager) {
-        this.platformTransactionManager = platformTransactionManager;
     }
 
     @Override
@@ -218,12 +203,7 @@ public class DefaultNodeService implements NodeService {
         return response;
     }
 
-    @Transactional
     public void commitChanges(NodeChangeInfo info) {
-        //TODO: Test rollback on IndexDAO failure
-        TransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = this.nodeRepository.getTransactionManager().getTransaction(def);
-
         Map<String, Node> nodes = info.getToSaveNodeMap();
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
@@ -234,6 +214,7 @@ public class DefaultNodeService implements NodeService {
                     this.nodeIndex.indexAll(json.values());
                 }
                 this.nodeIndex.removeFromRef(info.getOldDocIds());
+                this.commitIndex.index(cmjs);
 
                 Optional<Commit> existing = this.commitRepository.findByCommitId(cmjs.getId());
                 existing.ifPresentOrElse(
@@ -250,9 +231,7 @@ public class DefaultNodeService implements NodeService {
                         commit.setComment(cmjs.getComment());
                         this.commitRepository.save(commit);
                     });
-                this.commitIndex.index(cmjs);
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
-                this.nodeRepository.getTransactionManager().commit(status);
             } catch (Exception e) {
                 logger.error("commitChanges error: {}", e.getMessage());
             }
