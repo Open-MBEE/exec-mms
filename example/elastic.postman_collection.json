@@ -79,7 +79,13 @@
 			],
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"elastic\",\n\t\t\t\"name\": \"elastic\"\n\t\t}\n\t]\n}",
