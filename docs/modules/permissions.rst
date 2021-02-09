@@ -6,9 +6,8 @@ Permissions
 
 The Permissions Module provides permissions to MMS.
 
-=====================
 Default Access Levels
-=====================
+---------------------
 
 The MMS includes 3 hierarchical levels of permissions in the default implementation. Permissions are inherited from the parent level.
 
@@ -32,9 +31,8 @@ From these levels, 3 levels of access permissions are provided by default:
   Read
     Can read all elements on this level.
 
-===================
 Setting Permissions
-===================
+-------------------
 
 The Permissions module provides several ReST endpoints for managing permissions.
 
@@ -66,8 +64,7 @@ Permissions acceptable values
     "public": true
   }
 
-================
 More Information
-================
+----------------
 
 For more information, see the OpenAPI Documentation.
