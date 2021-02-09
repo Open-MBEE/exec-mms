@@ -15,7 +15,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.mms.core.dao.CommitIndexDAO;
-import org.openmbee.mms.core.exceptions.MMSException;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.CommitJson;
@@ -32,15 +31,15 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         return new CommitJson();
     }
 
-    public void indexAll(Collection<? extends BaseJson> jsons) throws MMSException {
+    public void indexAll(Collection<? extends BaseJson> jsons) {
         this.indexAll(getIndex(), jsons);
     }
 
-    public void index(BaseJson json) throws MMSException {
+    public void index(BaseJson json) {
         index((CommitJson) json);
     }
 
-    public void index(CommitJson json) throws MMSException {
+    public void index(CommitJson json) {
         int commitCount = getCommitSize(json);
         List<CommitJson> broken = new ArrayList<>();
         if (commitCount > commitLimit) {
@@ -89,14 +88,14 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         return getFullCommits(commitIds);
     }
 
-    public void deleteById(String commitId) throws MMSException {
+    public void deleteById(String commitId) {
         List<CommitJson> docs = getDocs(commitId);
         docs.forEach(commit -> {
            this.deleteById(getIndex(), commit.getDocId());
         });
     }
 
-    public void deleteAll(Collection<? extends BaseJson> jsons) throws MMSException {
+    public void deleteAll(Collection<? extends BaseJson> jsons) {
         this.deleteAll(getIndex(), jsons);
     }
 
@@ -167,7 +166,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     }
 
     @Override
-    public CommitJson update(CommitJson commitJson) throws MMSException {
+    public CommitJson update(CommitJson commitJson) {
         return this.update(getIndex(), commitJson);
     }
 
