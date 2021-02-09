@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.openmbee.mms.core.exceptions.BadRequestException;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.core.objects.ElementsCommitResponse;
 import org.openmbee.mms.core.objects.EventObject;
 import org.openmbee.mms.core.services.EventService;
@@ -234,6 +235,7 @@ public class DefaultNodeService implements NodeService {
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
             } catch (Exception e) {
                 logger.error("commitChanges error: {}", e.getMessage());
+                throw new InternalErrorException("Error committing changes.");
             }
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));
