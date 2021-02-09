@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -170,16 +169,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         for (BaseJson json : jsons) {
             bulkProcessor.add(new IndexRequest(index).id(json.getDocId()).source(json));
         }
-        try {
-            if (!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
-                logger.error("Timed out in bulk processing");
-                throw new InternalErrorException("Timeout error in bulk processing");
-            }
-        } catch (InterruptedException e) {
-            logger.error("Index all interrupted: ", e);
-            throw new InternalErrorException(e);
-        }
-
+        bulkProcessor.close();
     }
 
     public void index(String index, BaseJson<?> json) {
@@ -212,8 +202,18 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     }
 
     protected BulkProcessor getBulkProcessor(RestHighLevelClient client) {
-        BulkProcessor.Builder bpBuilder = BulkProcessor.builder((request, bulkListener) -> client
-            .bulkAsync(request, RequestOptions.DEFAULT, bulkListener), getListener());
+        BulkProcessor.Builder bpBuilder = BulkProcessor.builder((request, bulkListener) -> {
+            try {
+                BulkResponse response = client.bulk(request, RequestOptions.DEFAULT);
+                if (response.hasFailures()) {
+                    String failure = response.buildFailureMessage();
+                    logger.error("Bulk response error: {}", failure);
+                    throw new InternalErrorException(failure);
+                }
+            } catch (IOException ioe) {
+                throw new InternalErrorException(ioe);
+            }
+        }, getListener());
         bpBuilder.setBulkActions(bulkLimit);
         bpBuilder.setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB));
         bpBuilder.setConcurrentRequests(1);
@@ -225,25 +225,17 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     private BulkProcessor.Listener getListener() {
         return new BulkProcessor.Listener() {
-            private final Logger logger = LoggerFactory.getLogger(getClass());
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                if (response.hasFailures()) {
-                    response.iterator().forEachRemaining(action -> {
-                        if (action.isFailed()) {
-                            logger.error("Error in bulk processing: {}", action.getFailureMessage());
-                        }
-                    });
-                }
+
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                logger.error("Error in bulk processing: ", failure);
                 throw new InternalErrorException(failure);
             }
         };

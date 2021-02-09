@@ -113,13 +113,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
             request.script(inline);
             bulkProcessor.add(request);
         }
-        try {
-            if (!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
-                logger.error("Timed out in bulk processing");
-            }
-        } catch (InterruptedException e) {
-            logger.error("Index all interrupted: ", e);
-        }
+        bulkProcessor.close();
     }
 
     @Override
