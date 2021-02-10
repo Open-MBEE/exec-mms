@@ -32,34 +32,34 @@ public class LdapSecurityConfig {
 
     private static Logger logger = LoggerFactory.getLogger(LdapSecurityConfig.class);
 
-    @Value("${ldap.provider.url}")
+    @Value("${ldap.provider.url:null}")
     private String providerUrl;
 
-    @Value("${ldap.provider.userdn}")
+    @Value("${ldap.provider.userdn:null}")
     private String providerUserDn;
 
-    @Value("${ldap.provider.password}")
+    @Value("${ldap.provider.password:null}")
     private String providerPassword;
 
-    @Value("${ldap.provider.base}")
+    @Value("${ldap.provider.base:null}")
     private String providerBase;
 
-    @Value("${ldap.user.dn.pattern}")
+    @Value("${ldap.user.dn.pattern:null}")
     private String userDnPattern;
 
-    @Value("${ldap.user.attributes.username}")
+    @Value("${ldap.user.attributes.username:null}")
     private String userAttributesUsername;
 
-    @Value("${ldap.user.attributes.email}")
+    @Value("${ldap.user.attributes.email:null}")
     private String userAttributesEmail;
 
-    @Value("${ldap.group.search.base}")
+    @Value("${ldap.group.search.base:null}")
     private String groupSearchBase;
 
-    @Value("${ldap.group.role.attribute}")
+    @Value("${ldap.group.role.attribute:null}")
     private String groupRoleAttribute;
 
-    @Value("${ldap.group.search.filter}")
+    @Value("${ldap.group.search.filter:null}")
     private String groupSearchFilter;
 
     private UserRepository userRepository;
@@ -79,17 +79,19 @@ public class LdapSecurityConfig {
     public void configureLdapAuth(AuthenticationManagerBuilder auth,
         LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
         throws Exception {
-        logger.debug("LDAP IS HAPPENING!!!");
+        if (providerUrl != null) {
+            logger.debug("LDAP Module is loading...");
         /*
             see this article : https://spring.io/guides/gs/authenticating-ldap/
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
             We need to delegate the creation of the contextSource out of the builder-configuration.
         */
-        auth.ldapAuthentication().userDnPatterns(userDnPattern).groupSearchBase(groupSearchBase)
-            .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
-            .rolePrefix("")
-            .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator)
-            .contextSource(contextSource);
+            auth.ldapAuthentication().userDnPatterns(userDnPattern).groupSearchBase(groupSearchBase)
+                .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
+                .rolePrefix("")
+                .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator)
+                .contextSource(contextSource);
+        }
     }
 
     @Bean
