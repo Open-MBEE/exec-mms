@@ -8,6 +8,9 @@ Adds ldap authentication provider, ldap groups the user belongs to that are also
 Configuration
 ^^^^^^^^^^^^^
 
+  ldap.enabled
+    Boolean value to enable the ldap module. Required.
+
   ldap.provider.base
     The base string to use. Required.
 
