@@ -1,0 +1,587 @@
+{
+	"info": {
+		"_postman_id": "41251e24-17eb-4133-8e98-edbaa90de5c2",
+		"name": "elastic",
+		"description": "elastic-fail tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login using admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add org elastic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has org elastic\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.orgs[0].id).to.eql('elastic');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"orgs\": [\n\t\t{\n\t\t\t\"id\": \"elastic\",\n\t\t\t\"name\": \"elastic\"\n\t\t}\n\t]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/orgs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"orgs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add project elastic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has project elastic\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.projects[0].id).to.eql('elastic');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"elastic\", \n\t\t\t\"name\": \"elastic\",\n\t\t\t\"orgId\": \"elastic\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add element to elastic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has element\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(2);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t},\n        {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update bad element to elastic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 500\", function () {",
+							"    pm.response.to.have.status(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n        {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"y\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": {}\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get x",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response has element x\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0].name).to.eql('x');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get z",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response has element z\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0].name).to.eql('z');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements/z",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements",
+						"z"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update element to elastic",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"commitId2\", pm.response.json().elements[0]._commitId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"y\"\n\t\t},\n        {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"y\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get x again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response has element x\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0].name).to.eql('y');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements/x",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements",
+						"x"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check ref commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has 2 commit\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check element x commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has 2 commit\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements/x/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements",
+						"x",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check element z commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has 2 commit\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements/z/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements",
+						"z",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -15,6 +15,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.mms.core.dao.CommitIndexDAO;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.CommitJson;
@@ -156,7 +157,8 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             }
             return commits;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -186,7 +188,8 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
             }
             return rawCommits;
         } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+            logger.error(ioe.getMessage(), ioe);
+            throw new InternalErrorException(ioe);
         }
     }
 

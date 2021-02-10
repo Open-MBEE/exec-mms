@@ -92,7 +92,8 @@ public class ElasticSearchService implements SearchService {
             Collection<OrderedResult<ElementJson>> filteredElementJson = filterIndexedElementsUsingDatabaseNodes(allNodes, elementJsonMap, deletedElements, showDeletedAsRejected);
             return prepareResponse(filteredElementJson, deletedElements, from, size);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
 
     }
