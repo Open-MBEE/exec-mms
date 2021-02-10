@@ -9,6 +9,6 @@ public class LdapCondition implements Condition {
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         Environment env = context.getEnvironment();
-        return "true".equals(env.getProperty("ldap.provider.url"));
+        return "true".equals(env.getProperty("ldap.enabled"));
     }
 }
