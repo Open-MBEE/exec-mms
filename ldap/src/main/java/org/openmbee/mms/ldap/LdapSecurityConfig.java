@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
@@ -27,39 +28,40 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
+@ConditionalOnProperty(prefix = "ldap.provider", name = "url")
 @EnableTransactionManagement
 public class LdapSecurityConfig {
 
     private static Logger logger = LoggerFactory.getLogger(LdapSecurityConfig.class);
 
-    @Value("${ldap.provider.url:null}")
+    @Value("${ldap.provider.url:#{null}}")
     private String providerUrl;
 
-    @Value("${ldap.provider.userdn:null}")
+    @Value("${ldap.provider.userdn:#{null}}")
     private String providerUserDn;
 
-    @Value("${ldap.provider.password:null}")
+    @Value("${ldap.provider.password:#{null}}")
     private String providerPassword;
 
-    @Value("${ldap.provider.base:null}")
+    @Value("${ldap.provider.base:#{null}")
     private String providerBase;
 
-    @Value("${ldap.user.dn.pattern:null}")
+    @Value("${ldap.user.dn.pattern:uid={0}}")
     private String userDnPattern;
 
-    @Value("${ldap.user.attributes.username:null}")
+    @Value("${ldap.user.attributes.username:uid}")
     private String userAttributesUsername;
 
-    @Value("${ldap.user.attributes.email:null}")
+    @Value("${ldap.user.attributes.email:mail}")
     private String userAttributesEmail;
 
-    @Value("${ldap.group.search.base:null}")
+    @Value("${ldap.group.search.base:#{''}}")
     private String groupSearchBase;
 
-    @Value("${ldap.group.role.attribute:null}")
+    @Value("${ldap.group.role.attribute:cn}")
     private String groupRoleAttribute;
 
-    @Value("${ldap.group.search.filter:null}")
+    @Value("${ldap.group.search.filter:(uniqueMember={0})}")
     private String groupSearchFilter;
 
     private UserRepository userRepository;
@@ -80,7 +82,7 @@ public class LdapSecurityConfig {
         LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
         throws Exception {
         if (providerUrl != null) {
-            logger.debug("LDAP Module is loading...");
+            logger.info("LDAP Module is loading...");
         /*
             see this article : https://spring.io/guides/gs/authenticating-ldap/
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
