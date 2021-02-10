@@ -5,7 +5,7 @@ Artifacts
 
 Allows artifacts (binary objects) to be attached to elements. Attached artifact info are added to an element object under the ``_artifacts`` key and versioned as part of element data.
 
-.. code-block::
+.. code-block:: JSON
 
        {
            "id": "elementId",
@@ -26,7 +26,7 @@ Adds endpoints for getting and uploading binary content
 
 Adds ArtifactStorage interface - this allows different implementations to be used if desired given the right module
 
-.. code-block::
+.. code-block:: java
 
        public interface ArtifactStorage {
 
