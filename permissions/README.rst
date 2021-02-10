@@ -47,7 +47,8 @@ The Permissions module provides several REST endpoints for managing permissions.
 For each of these endpoints, a payload must be sent with acceptable values
 
 Permissions acceptable values
-::
+
+.. code-block:: JSON
 
   {
     "users / groups": {
