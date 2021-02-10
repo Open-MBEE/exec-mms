@@ -157,7 +157,7 @@
 						"exec": [
 							"pm.test(\"response has element\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"    pm.expect(jsonData.elements.length).to.eql(2);",
 							"});",
 							"",
 							"pm.environment.set(\"commitId1\", pm.response.json().elements[0]._commitId);"
@@ -177,7 +177,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t},\n        {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects/elastic/refs/master/elements",
@@ -221,7 +221,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": {}\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"elements\": [\n        {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"y\"\n\t\t},\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": {}\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects/elastic/refs/master/elements",
@@ -285,6 +285,51 @@
 			"response": []
 		},
 		{
+			"name": "get z",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response has element z\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0].name).to.eql('z');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements/z",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements",
+						"z"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "update element to elastic",
 			"event": [
 				{
@@ -312,7 +357,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"y\"\n\t\t}\n\t]\n}"
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"y\"\n\t\t},\n        {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"y\"\n\t\t}\n\t]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects/elastic/refs/master/elements",
@@ -419,7 +464,7 @@
 			"response": []
 		},
 		{
-			"name": "check element commit history",
+			"name": "check element x commit history",
 			"event": [
 				{
 					"listen": "test",
@@ -457,6 +502,51 @@
 						"master",
 						"elements",
 						"x",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check element z commit history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has 2 commit\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits.length).to.eql(2);",
+							"});",
+							"",
+							"pm.test(\"commit history is right\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commits[0].id).to.eql(pm.environment.get(\"commitId2\"))",
+							"    pm.expect(jsonData.commits[1].id).to.eql(pm.environment.get(\"commitId1\"))",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/projects/elastic/refs/master/elements/z/commits",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"elastic",
+						"refs",
+						"master",
+						"elements",
+						"z",
 						"commits"
 					]
 				}

@@ -79,6 +79,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         try {
             client.delete(new DeleteRequest(index, docId), REQUEST_OPTIONS);
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
     }
@@ -91,6 +92,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             }
             client.bulk(bulkIndex, REQUEST_OPTIONS);
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
     }
@@ -102,6 +104,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             getRequest.storedFields("_none_");
             return client.exists(getRequest, REQUEST_OPTIONS);
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
     }
@@ -118,6 +121,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                 return Optional.empty();
             }
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
     }
@@ -145,6 +149,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             }
             return listOfResponses;
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
     }
@@ -176,6 +181,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         try {
             client.index(new IndexRequest(index).id(json.getDocId()).source(json), REQUEST_OPTIONS);
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
     }
@@ -196,6 +202,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                 }
             }
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
         return response;
@@ -211,6 +218,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                     throw new InternalErrorException(failure);
                 }
             } catch (IOException ioe) {
+                logger.error(ioe.getMessage(), ioe);
                 throw new InternalErrorException(ioe);
             }
         }, getListener());

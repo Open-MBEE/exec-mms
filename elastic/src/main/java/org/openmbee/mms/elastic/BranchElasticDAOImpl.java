@@ -20,12 +20,12 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
     }
 
     @Override
-    public void indexAll(Collection<? extends BaseJson> jsons) throws MMSException {
+    public void indexAll(Collection<? extends BaseJson> jsons) {
         this.indexAll(getIndex(), jsons);
     }
 
     @Override
-    public void index(BaseJson json) throws MMSException {
+    public void index(BaseJson json) {
         this.index(getIndex(), json);
     }
 
@@ -37,11 +37,11 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
         return this.findAllById(getIndex(), docIds);
     }
 
-    public void deleteById(String docId) throws MMSException {
+    public void deleteById(String docId) {
         this.deleteById(getIndex(), docId);
     }
 
-    public void deleteAll(Collection<? extends BaseJson> jsons) throws MMSException {
+    public void deleteAll(Collection<? extends BaseJson> jsons) {
         this.deleteAll(getIndex(), jsons);
     }
 
@@ -50,7 +50,7 @@ public class BranchElasticDAOImpl extends BaseElasticDAOImpl<RefJson> implements
     }
 
     @Override
-    public RefJson update(RefJson refJson) throws MMSException {
+    public RefJson update(RefJson refJson) {
         return this.update(getIndex(), refJson);
     }
 

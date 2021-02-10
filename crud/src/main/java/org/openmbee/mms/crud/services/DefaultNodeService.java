@@ -214,7 +214,7 @@ public class DefaultNodeService implements NodeService {
                 if (json != null && !json.isEmpty()) {
                     this.nodeIndex.indexAll(json.values());
                 }
-                this.nodeIndex.removeFromRef(info.getOldDocIds());
+                try { this.nodeIndex.removeFromRef(info.getOldDocIds()); } catch(Exception e) {}
                 this.commitIndex.index(cmjs);
 
                 Optional<Commit> existing = this.commitRepository.findByCommitId(cmjs.getId());
@@ -235,7 +235,7 @@ public class DefaultNodeService implements NodeService {
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
             } catch (Exception e) {
                 logger.error("commitChanges error: {}", e.getMessage());
-                throw new InternalErrorException("Error committing changes.");
+                throw new InternalErrorException("Error committing changes: " + e.getMessage());
             }
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));

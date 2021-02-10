@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -23,7 +22,7 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.dao.NodeIndexDAO;
-import org.openmbee.mms.core.exceptions.MMSException;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.ElementJson;
@@ -36,11 +35,11 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         return new ElementJson();
     }
 
-    public void indexAll(Collection<? extends BaseJson> jsons) throws MMSException {
+    public void indexAll(Collection<? extends BaseJson> jsons) {
         this.indexAll(getIndex(), jsons);
     }
 
-    public void index(BaseJson json) throws MMSException {
+    public void index(BaseJson json) {
         this.index(getIndex(), json);
     }
 
@@ -52,11 +51,11 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         return this.findAllById(getIndex(), docIds);
     }
 
-    public void deleteById(String docId) throws MMSException {
+    public void deleteById(String docId) {
         this.deleteById(getIndex(), docId);
     }
 
-    public void deleteAll(Collection<? extends BaseJson> jsons) throws MMSException {
+    public void deleteAll(Collection<? extends BaseJson> jsons) {
         this.deleteAll(getIndex(), jsons);
     }
 
@@ -83,7 +82,8 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
             ob.putAll(searchResponse.getHits().getAt(0).getSourceAsMap());
             return Optional.of(ob);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -145,7 +145,8 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
                 }
                 count += this.termLimit;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logger.error(e.getMessage(), e);
+                throw new InternalErrorException(e);
             }
         }
         return Optional.empty();
