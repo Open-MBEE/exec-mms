@@ -1,7 +1,1 @@
-.. _mmssearch:
-
-======
-Search
-======
-
-The Search Module
+.. include:: ../../rdb/README.rst

@@ -1,7 +1,1 @@
-.. _core:
-
-====
-Core
-====
-
-The Core module provides essential classes and helpers for the MMS.
+.. include:: ../../core/README.rst
