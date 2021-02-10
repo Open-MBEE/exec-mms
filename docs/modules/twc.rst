@@ -12,16 +12,16 @@ Configuration
 The TWC Module supports multiple instances of TWC. The following configuration are available, where twc.instances is a list.
 
   twc.instances[i].url
-    The url of the ReST interface of TWC.
+    The url of the REST interface of TWC.
 
   twc.instances[i].protocol
-    The protocol to use for the ReST interface of TWC.
+    The protocol to use for the REST interface of TWC.
 
   twc.instances[i].port
-    The port for the ReST interface of TWC.
+    The port for the REST interface of TWC.
 
   twc.instances[i].aliases
-    A list of aliases for the ReST interface of TWC.
+    A list of aliases for the REST interface of TWC.
 
   twc.instances[i].adminUsername
     The admin username to use with the defined instance. Required.

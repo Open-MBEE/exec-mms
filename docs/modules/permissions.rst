@@ -34,7 +34,7 @@ From these levels, 3 levels of access permissions are provided by default:
 Setting Permissions
 -------------------
 
-The Permissions module provides several ReST endpoints for managing permissions.
+The Permissions module provides several REST endpoints for managing permissions.
 
   /orgs/{orgId}/permissions
     Update permissions for organizations.
