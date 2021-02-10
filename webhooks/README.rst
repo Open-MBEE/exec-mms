@@ -7,9 +7,10 @@ Adds endpoints for registering webhooks per project
 
 Current triggers are on commit or branch creation
 
-  Commit event:
+Commit event
+^^^^^^^^^^^^
 
-::
+.. code-block:: JSON
 
        {
            "projectId": "projectId",
@@ -19,9 +20,10 @@ Current triggers are on commit or branch creation
        }
 
 
-  Branch event:
+Branch event
+^^^^^^^^^^^^
 
-::
+.. code-block:: JSON
 
        {
            "projectId": "projectId",
