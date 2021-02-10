@@ -14,4 +14,4 @@ Service Factory
 
 ``defaultProjectService`` - auto creates ``master`` branch on project creation
 
-see ``cameo`` module for ``cameoNodeService`` and ``cameoProjectService`` for an extension example for a different schema
+see :ref:`cameo` module for ``cameoNodeService`` and ``cameoProjectService`` for an extension example for a different schema
