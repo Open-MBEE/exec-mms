@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.openmbee.mms.core.config.Constants.BRANCH_ID_VALID_PATTERN;
+
 @RestController
 @RequestMapping("/projects/{projectId}/refs")
 @Tag(name = "Refs")
 public class BranchesController extends BaseController {
-
-    private static final String BRANCH_ID_VALID_PATTERN = "^[\\w-]+$";
 
     private BranchService branchService;
 
@@ -45,8 +45,14 @@ public class BranchesController extends BaseController {
         if (!permissionService.isProjectPublic(projectId)) {
             List<RefJson> filtered = new ArrayList<>();
             for (RefJson ref: res.getRefs()) {
-                if (mss.hasBranchPrivilege(auth, projectId, ref.getId(), Privileges.BRANCH_READ.name(), false)) {
-                    filtered.add(ref);
+                try {
+                    if (mss.hasBranchPrivilege(auth, projectId, ref.getId(),
+                        Privileges.BRANCH_READ.name(), false)) {
+                        filtered.add(ref);
+                    }
+                } catch (MMSException e) {
+                    logger.warn("error in getting branch permissions: projectId=" +
+                        projectId + ", refId=" + ref.getId(), e);
                 }
             }
             res.setRefs(filtered);
@@ -118,6 +124,6 @@ public class BranchesController extends BaseController {
     }
 
     static boolean isBranchIdValid(String branchId) {
-        return branchId != null && branchId.matches(BRANCH_ID_VALID_PATTERN);
+        return branchId != null && BRANCH_ID_VALID_PATTERN.matcher(branchId).matches();
     }
 }

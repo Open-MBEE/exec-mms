@@ -88,6 +88,9 @@ public class DatabaseDefinitionService {
                         + databaseProjectString(project) + "';"));
             }
             statement.executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
+			
+			//TODO: if using PG 13, can use the following
+			//statement.executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project) + " WITH (FORCE)"));
         }
     }
 

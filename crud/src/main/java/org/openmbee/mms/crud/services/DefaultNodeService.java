@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.openmbee.mms.core.exceptions.BadRequestException;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
+import org.openmbee.mms.core.objects.ElementsCommitResponse;
 import org.openmbee.mms.core.objects.EventObject;
 import org.openmbee.mms.core.services.EventService;
 import org.openmbee.mms.core.services.NodeChangeInfo;
@@ -21,7 +23,6 @@ import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
-import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.CommitType;
 import org.openmbee.mms.data.domains.scoped.Node;
@@ -36,10 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-
 
 @Service("defaultNodeService")
 public class DefaultNodeService implements NodeService {
@@ -143,6 +140,7 @@ public class DefaultNodeService implements NodeService {
         } else {
             stream.write("\n".getBytes(StandardCharsets.UTF_8));
         }
+        stream.close();
     }
 
     @Override
@@ -183,8 +181,8 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
-        Map<String, String> params, String user) {
+    public ElementsCommitResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
+                                                 Map<String, String> params, String user) {
 
         ContextHolder.setContext(projectId, refId);
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
@@ -197,29 +195,27 @@ public class DefaultNodeService implements NodeService {
 
         commitChanges(info);
 
-        ElementsResponse response = new ElementsResponse();
+        ElementsCommitResponse response = new ElementsCommitResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
+        if(!info.getUpdatedMap().isEmpty()) {
+            response.setCommitId(info.getCommitJson().getId());
+        }
         return response;
     }
 
-    //@Transactional
-    protected void commitChanges(NodeChangeInfo info) {
-        //TODO: Test rollback on IndexDAO failure
-        TransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = this.nodeRepository.getTransactionManager().getTransaction(def);
-
+    public void commitChanges(NodeChangeInfo info) {
         Map<String, Node> nodes = info.getToSaveNodeMap();
         Map<String, ElementJson> json = info.getUpdatedMap();
         CommitJson cmjs = info.getCommitJson();
         Instant now = info.getNow();
         if (!nodes.isEmpty()) {
             try {
-                this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
                 if (json != null && !json.isEmpty()) {
                     this.nodeIndex.indexAll(json.values());
                 }
-                this.nodeIndex.removeFromRef(info.getOldDocIds());
+                try { this.nodeIndex.removeFromRef(info.getOldDocIds()); } catch(Exception e) {}
+                this.commitIndex.index(cmjs);
 
                 Optional<Commit> existing = this.commitRepository.findByCommitId(cmjs.getId());
                 existing.ifPresentOrElse(
@@ -236,13 +232,10 @@ public class DefaultNodeService implements NodeService {
                         commit.setComment(cmjs.getComment());
                         this.commitRepository.save(commit);
                     });
-                this.commitIndex.index(cmjs);
-
-                this.nodeRepository.getTransactionManager().commit(status);
+                this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
             } catch (Exception e) {
-                logger.error("commitChanges error: ", e);
-                this.nodeRepository.getTransactionManager().rollback(status);
-                throw new InternalErrorException("Error committing transaction");
+                logger.error("commitChanges error: {}", e.getMessage());
+                throw new InternalErrorException("Error committing changes: " + e.getMessage());
             }
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(cmjs.getProjectId(), cmjs.getRefId(), "commit", cmjs)));
@@ -262,7 +255,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse delete(String projectId, String refId, String id, String user) {
+    public ElementsCommitResponse delete(String projectId, String refId, String id, String user) {
         ElementsRequest req = buildRequest(id);
         return delete(projectId, refId, req, user);
     }
@@ -286,18 +279,21 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user) {
+    public ElementsCommitResponse delete(String projectId, String refId, ElementsRequest req, String user) {
         ContextHolder.setContext(projectId, refId);
 
         NodeChangeInfo info = nodeDeleteHelper
             .processDeleteJson(req.getElements(), createCommit(user, refId, projectId, req, null),
                 this);
-        ElementsResponse response = new ElementsResponse();
+        ElementsCommitResponse response = new ElementsCommitResponse();
 
         commitChanges(info);
 
         response.getElements().addAll(info.getDeletedMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
+        if(!info.getDeletedMap().isEmpty()) {
+            response.setCommitId(info.getCommitJson().getId());
+        }
         return response;
     }
 

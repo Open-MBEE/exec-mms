@@ -1,0 +1,689 @@
+{
+	"info": {
+		"_postman_id": "08899a00-32ae-46c2-b593-0f07541c561e",
+		"name": "groups",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login using admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"response has token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.a('string');",
+							"    pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{adminUsername}}\",\n\t\"password\": \"{{adminPassword}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authentication",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create new group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/groups/localgroup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create user for group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"groupuser\",\n\t\"password\" : \"password1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/user",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add user to group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"user added\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.added.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"ADD\",\n    \"users\": [\"groupuser\"]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/groups/localgroup/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get groups",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"there's at least 1 group\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.groups).to.include('localgroup');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/groups",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get group users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"group has 1 user\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.users[0]).to.eql('groupuser');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/groups/localgroup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create duplicate group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/groups/localgroup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add existing user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"user rejected\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.rejected.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"ADD\",\n    \"users\": [\"groupuser\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/groups/localgroup/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bad add user to not found group request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"ADD\",\n    \"users\": [\"groupuser\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/groups/nogroup/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"nogroup",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bad action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"BLAH\",\n    \"users\": [\"groupuser\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/groups/localgroup/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "empty users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"ADD\",\n    \"users\": []\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/groups/localgroup/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user don't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"user rejected\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.rejected.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"ADD\",\n    \"users\": [\"nouser\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/groups/localgroup/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete non empty group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/groups/localgroup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove user from group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"user removed\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.removed.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action\": \"REMOVE\",\n    \"users\": [\"groupuser\"]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/groups/localgroup/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete empty group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/groups/localgroup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get non existent group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/groups/localgroup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"groups",
+						"localgroup"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	}
+}

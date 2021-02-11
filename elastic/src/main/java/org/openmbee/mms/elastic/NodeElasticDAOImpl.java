@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -23,6 +22,7 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.dao.NodeIndexDAO;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.ElementJson;
@@ -82,7 +82,8 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
             ob.putAll(searchResponse.getHits().getAt(0).getSourceAsMap());
             return Optional.of(ob);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -112,13 +113,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
             request.script(inline);
             bulkProcessor.add(request);
         }
-        try {
-            if (!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
-                logger.error("Timed out in bulk processing");
-            }
-        } catch (InterruptedException e) {
-            logger.error("Index all interrupted: ", e);
-        }
+        bulkProcessor.close();
     }
 
     @Override
@@ -150,7 +145,8 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
                 }
                 count += this.termLimit;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logger.error(e.getMessage(), e);
+                throw new InternalErrorException(e);
             }
         }
         return Optional.empty();

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -30,6 +29,7 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.slf4j.Logger;
@@ -79,7 +79,8 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         try {
             client.delete(new DeleteRequest(index, docId), REQUEST_OPTIONS);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -91,7 +92,8 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             }
             client.bulk(bulkIndex, REQUEST_OPTIONS);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -102,7 +104,8 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             getRequest.storedFields("_none_");
             return client.exists(getRequest, REQUEST_OPTIONS);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -118,7 +121,8 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                 return Optional.empty();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -145,7 +149,8 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             }
             return listOfResponses;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -169,21 +174,15 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         for (BaseJson json : jsons) {
             bulkProcessor.add(new IndexRequest(index).id(json.getDocId()).source(json));
         }
-        try {
-            if (!bulkProcessor.awaitClose(1200L, TimeUnit.SECONDS)) {
-                logger.error("Timed out in bulk processing");
-            }
-        } catch (InterruptedException e) {
-            logger.error("Index all interrupted: ", e);
-        }
-
+        bulkProcessor.close();
     }
 
     public void index(String index, BaseJson<?> json) {
         try {
             client.index(new IndexRequest(index).id(json.getDocId()).source(json), REQUEST_OPTIONS);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
     }
 
@@ -203,42 +202,26 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(), e);
+            throw new InternalErrorException(e);
         }
         return response;
     }
 
     protected BulkProcessor getBulkProcessor(RestHighLevelClient client) {
-        return getBulkProcessor(client, null);
-    }
-
-    private BulkProcessor getBulkProcessor(RestHighLevelClient client,  BulkProcessor.Listener listener) {
-        if (listener == null) {
-            listener = new BulkProcessor.Listener() {
-                private final Logger logger = LoggerFactory.getLogger(getClass());
-                @Override
-                public void beforeBulk(long executionId, BulkRequest request) {
+        BulkProcessor.Builder bpBuilder = BulkProcessor.builder((request, bulkListener) -> {
+            try {
+                BulkResponse response = client.bulk(request, RequestOptions.DEFAULT);
+                if (response.hasFailures()) {
+                    String failure = response.buildFailureMessage();
+                    logger.error("Bulk response error: {}", failure);
+                    throw new InternalErrorException(failure);
                 }
-
-                @Override
-                public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-                    if (response.hasFailures()) {
-                        response.iterator().forEachRemaining(action -> {
-                            if (action.isFailed()) {
-                                logger.error("Error in bulk processing: {}", action.getFailureMessage());
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                    logger.error("Error in bulk processing: ", failure);
-                }
-            };
-        }
-        BulkProcessor.Builder bpBuilder = BulkProcessor.builder((request, bulkListener) -> client
-            .bulkAsync(request, RequestOptions.DEFAULT, bulkListener), listener);
+            } catch (IOException ioe) {
+                logger.error(ioe.getMessage(), ioe);
+                throw new InternalErrorException(ioe);
+            }
+        }, getListener());
         bpBuilder.setBulkActions(bulkLimit);
         bpBuilder.setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB));
         bpBuilder.setConcurrentRequests(1);
@@ -246,5 +229,23 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         bpBuilder.setBackoffPolicy(BackoffPolicy.constantBackoff(TimeValue.timeValueMillis(100), 3));
 
         return bpBuilder.build();
+    }
+
+    private BulkProcessor.Listener getListener() {
+        return new BulkProcessor.Listener() {
+            @Override
+            public void beforeBulk(long executionId, BulkRequest request) {
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                throw new InternalErrorException(failure);
+            }
+        };
     }
 }

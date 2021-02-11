@@ -166,7 +166,7 @@ public class DefaultBranchService implements BranchService {
             for (Node n: nodeRepository.findAllByDeleted(false)) {
                 docIds.add(n.getDocId());
             }
-            nodeIndex.addToRef(docIds);
+            try { nodeIndex.addToRef(docIds); } catch(Exception e) {}
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(projectId, branch.getId(), "branch_created", branch)));
             return branch;

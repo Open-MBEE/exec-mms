@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
+import org.openmbee.mms.core.objects.ElementsCommitResponse;
 import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
 import org.openmbee.mms.data.domains.scoped.Node;
@@ -17,8 +18,8 @@ public interface NodeService {
 
     ElementsResponse read(String projectId, String refId, ElementsRequest req, Map<String, String> params);
 
-    ElementsResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
-        Map<String, String> params, String user);
+    ElementsCommitResponse createOrUpdate(String projectId, String refId, ElementsRequest req,
+                                          Map<String, String> params, String user);
 
     void extraProcessPostedElement(ElementJson element, Node node, NodeChangeInfo info);
 
@@ -26,7 +27,7 @@ public interface NodeService {
 
     void extraProcessGotElement(ElementJson element, Node node, NodeGetInfo info);
 
-    ElementsResponse delete(String projectId, String refId, String id, String user);
+    ElementsCommitResponse delete(String projectId, String refId, String id, String user);
 
-    ElementsResponse delete(String projectId, String refId, ElementsRequest req, String user);
+    ElementsCommitResponse delete(String projectId, String refId, ElementsRequest req, String user);
 }

@@ -11,11 +11,18 @@ public abstract class MMSException extends RuntimeException {
     }
 
     public MMSException(HttpStatus code, Object messageObject) {
+        if (messageObject instanceof Throwable) {
+            super.initCause((Throwable)messageObject);
+        }
         this.code = code;
         this.messageObject = messageObject;
+
     }
 
     public MMSException(int code, Object messageObject) {
+        if (messageObject instanceof Throwable) {
+            super.initCause((Throwable)messageObject);
+        }
         this.code = HttpStatus.resolve(code);
         this.messageObject = messageObject;
     }
@@ -36,4 +43,12 @@ public abstract class MMSException extends RuntimeException {
         this.messageObject = messageObject;
     }
 
+    @Override
+    public String getMessage() {
+        if (messageObject == null) {
+            return super.getMessage();
+        }
+        return (messageObject instanceof Throwable) ?
+                ((Throwable)messageObject).getMessage() : messageObject.toString();
+    }
 }

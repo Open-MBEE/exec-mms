@@ -1,0 +1,1 @@
+.. include:: ../../search/README.rst

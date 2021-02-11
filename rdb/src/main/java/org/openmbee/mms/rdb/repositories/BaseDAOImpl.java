@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import static org.openmbee.mms.core.config.Constants.BRANCH_ID_VALID_PATTERN;
+
 public abstract class BaseDAOImpl {
 
     private CrudDataSources crudDataSources;
@@ -36,6 +38,10 @@ public abstract class BaseDAOImpl {
 
     public String getSuffix() {
         String refId = ContextHolder.getContext().getBranchId();
-        return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
+        if(BRANCH_ID_VALID_PATTERN.matcher(refId).matches()) {
+            return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
+        } else {
+            throw new IllegalArgumentException("Bad branch id, aborting current operation.");
+        }
     }
 }
