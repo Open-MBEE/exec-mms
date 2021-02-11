@@ -11,7 +11,7 @@ buildscript {
     }
 }
 
-description = 'Structured Data Version Control'
+description = 'Model Management System Reference Implementation'
 
 ext {
     commonDependencies = [
