@@ -11,6 +11,9 @@ MMS Structured Data Version Control
    :target: https://circleci.com/gh/Open-MBEE/mms
    :alt: CircleCI
 
+.. image:: https://readthedocs.org/projects/model-management-system/badge/?version=latest
+  :target: https://model-management-system.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
 
 The MMS SDVC is a collection of modules built on top of the Spring Framework and is a part of Open-MBEE. For more information about Open-MBEE, visit the `Open-MBEE Website <https://openmbee.org/>`_
 
