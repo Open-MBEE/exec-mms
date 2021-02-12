@@ -43,7 +43,7 @@ public class LdapSecurityConfig {
     @Value("${ldap.provider.password:#{null}}")
     private String providerPassword;
 
-    @Value("${ldap.provider.base:#{null}")
+    @Value("${ldap.provider.base:#{null}}")
     private String providerBase;
 
     @Value("${ldap.user.dn.pattern:uid={0}}")
