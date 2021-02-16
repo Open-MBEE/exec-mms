@@ -212,3 +212,6 @@ subprojects {
         }
     }
 }
+project('example') {
+    uploadArchives.enabled = false
+}
