@@ -69,7 +69,7 @@ subprojects {
     apply plugin: 'signing'
 
     group = "org.openmbee.mms"
-    archivesBaseName = "mms-" + project.name
+    archivesBaseName = project.name
     version = rootProject.version
 
     Map<String, String> commonDependencies = rootProject.ext.commonDependencies
@@ -173,7 +173,7 @@ subprojects {
                     }
 
                     pom.project {
-                        name 'mms-' + project.name
+                        name project.name
                         packaging 'jar'
                         // optionally artifactId can be defined here
                         description project.description
