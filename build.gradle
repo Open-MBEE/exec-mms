@@ -59,19 +59,32 @@ subprojects {
         project.sourceCompatibility = '10'
         project.targetCompatibility = '10'
     }
-    version = rootProject.version
 
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: "com.jfrog.artifactory"
     apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+
+    group = "org.openmbee.mms"
+    archivesBaseName = "mms-" + project.name
+    version = rootProject.version
 
     Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
+    task javadocJar(type: Jar) {
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource
+    }
+
     java {
-        //withJavadocJar()
-        //withSourcesJar()
+        withJavadocJar()
+        withSourcesJar()
     }
 
     javadoc {
@@ -79,6 +92,15 @@ subprojects {
             options.addBooleanOption('html5', true)
         }
     }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
     //https://docs.gradle.org/current/userguide/publishing_maven.html
     publishing {
         publications {
@@ -129,6 +151,58 @@ subprojects {
             userOrg = 'openmbee'
             licenses = ['Apache-2.0']
             vcsUrl = 'https://github.com/Open-MBEE/mms.git'
+        }
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name 'mms-' + project.name
+                    packaging 'jar'
+                    // optionally artifactId can be defined here
+                    description project.description
+                    url 'http://github.com/OpenMBEE/mms'
+
+                    scm {
+                        connection 'scm:git:https://github.com/Open-MBEE/mms.git'
+                        developerConnection 'scm:git:https://github.com/Open-MBEE/mms.git'
+                        url 'https://github.com/Open-MBEE/mms.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'huijun'
+                            name 'Jason Han'
+                        }
+                        developer {
+                            id 'dlam'
+                            name 'Doris Lam'
+                        }
+                        developer {
+                            id 'ward'
+                            name 'Ward Schweitzer'
+                        }
+                    }
+                }
+            }
         }
     }
 }
