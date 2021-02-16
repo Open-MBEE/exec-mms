@@ -100,7 +100,9 @@ subprojects {
     }
 
     signing {
-        sign configurations.archives
+        if (project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')) {
+            sign configurations.archives
+        }
     }
 
     //https://docs.gradle.org/current/userguide/publishing_maven.html
@@ -158,49 +160,51 @@ subprojects {
 
     uploadArchives {
         repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
+                mavenDeployer {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'mms-' + project.name
-                    packaging 'jar'
-                    // optionally artifactId can be defined here
-                    description project.description
-                    url 'http://github.com/OpenMBEE/mms'
-
-                    scm {
-                        connection 'scm:git:https://github.com/Open-MBEE/mms.git'
-                        developerConnection 'scm:git:https://github.com/Open-MBEE/mms.git'
-                        url 'https://github.com/Open-MBEE/mms.git'
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
                     }
 
-                    licenses {
-                        license {
-                            name 'The Apache License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
+                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
                     }
 
-                    developers {
-                        developer {
-                            id 'huijun'
-                            name 'Jason Han'
+                    pom.project {
+                        name 'mms-' + project.name
+                        packaging 'jar'
+                        // optionally artifactId can be defined here
+                        description project.description
+                        url 'http://github.com/OpenMBEE/mms'
+
+                        scm {
+                            connection 'scm:git:https://github.com/Open-MBEE/mms.git'
+                            developerConnection 'scm:git:https://github.com/Open-MBEE/mms.git'
+                            url 'https://github.com/Open-MBEE/mms.git'
                         }
-                        developer {
-                            id 'dlam'
-                            name 'Doris Lam'
+
+                        licenses {
+                            license {
+                                name 'The Apache License, Version 2.0'
+                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
                         }
-                        developer {
-                            id 'ward'
-                            name 'Ward Schweitzer'
+
+                        developers {
+                            developer {
+                                id 'huijun'
+                                name 'Jason Han'
+                            }
+                            developer {
+                                id 'dlam'
+                                name 'Doris Lam'
+                            }
+                            developer {
+                                id 'ward'
+                                name 'Ward Schweitzer'
+                            }
                         }
                     }
                 }
