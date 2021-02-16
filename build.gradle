@@ -75,10 +75,12 @@ subprojects {
     Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
     task javadocJar(type: Jar) {
+        archiveClassifier = "javadoc"
         from javadoc
     }
 
     task sourcesJar(type: Jar) {
+        archiveClassifier = "sources"
         from sourceSets.main.allSource
     }
 
