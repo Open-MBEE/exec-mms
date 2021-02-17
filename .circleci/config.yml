@@ -55,7 +55,7 @@ jobs:
           - run:
                 name: Deploy snapshot to sonatype
                 command: echo "CircleCI publishing not implemented yet."
-   deploy_release:
+  deploy_release:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
       steps:
