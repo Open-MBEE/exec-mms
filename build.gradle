@@ -104,7 +104,7 @@ subprojects {
                 from project.components.java
                 pom {
                     name = project.name
-                    description = project.description
+                    description = project.name + ', a module of the MMS'
                     url = 'http://github.com/OpenMBEE/mms'
                     licenses {
                         license {
@@ -191,7 +191,4 @@ subprojects {
             vcsUrl = 'https://github.com/Open-MBEE/mms.git'
         }
     }
-}
-project('example') {
-    publishing.publications.remove(publishing.publications.mavenJava)
 }
