@@ -53,17 +53,14 @@ jobs:
           - attach_workspace:
                 at: ~/
           - run:
-                name: Deploy snapshot to Artifactory
-                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$SNAPSHOT_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
+                name: Deploy snapshot to sonatype
+                command: echo "CircleCI publishing not implemented yet."
   deploy_release:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
       steps:
           - attach_workspace:
                 at: ~/
-          - run:
-                name: Deploy release to Artifactory
-                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PartifactoryUrl=$ARTIFACTORY_URL -PartifactoryRepository=$RELEASE_ARTIFACTORY_REPOSITORY -PartifactoryUsername=$ARTIFACTORY_USERNAME -PartifactoryPassword=$ARTIFACTORY_PASSWORD --info --stacktrace artifactoryPublish
           - run:
                 name: Deploy release to Bintray
                 command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY --info --stacktrace bintrayUpload
