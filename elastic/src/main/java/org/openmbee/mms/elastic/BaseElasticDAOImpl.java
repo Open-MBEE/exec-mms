@@ -8,10 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.bulk.BackoffPolicy;
-import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
+
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -24,12 +22,10 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
+import org.openmbee.mms.elastic.utils.BulkProcessor;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.slf4j.Logger;
@@ -209,43 +205,6 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     }
 
     protected BulkProcessor getBulkProcessor(RestHighLevelClient client) {
-        BulkProcessor.Builder bpBuilder = BulkProcessor.builder((request, bulkListener) -> {
-            try {
-                BulkResponse response = client.bulk(request, RequestOptions.DEFAULT);
-                if (response.hasFailures()) {
-                    String failure = response.buildFailureMessage();
-                    logger.error("Bulk response error: {}", failure);
-                    throw new InternalErrorException(failure);
-                }
-            } catch (IOException ioe) {
-                logger.error(ioe.getMessage(), ioe);
-                throw new InternalErrorException(ioe);
-            }
-        }, getListener());
-        bpBuilder.setBulkActions(bulkLimit);
-        bpBuilder.setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB));
-        bpBuilder.setConcurrentRequests(1);
-        bpBuilder.setFlushInterval(TimeValue.timeValueSeconds(5));
-        bpBuilder.setBackoffPolicy(BackoffPolicy.constantBackoff(TimeValue.timeValueMillis(100), 3));
-
-        return bpBuilder.build();
-    }
-
-    private BulkProcessor.Listener getListener() {
-        return new BulkProcessor.Listener() {
-            @Override
-            public void beforeBulk(long executionId, BulkRequest request) {
-            }
-
-            @Override
-            public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-
-            }
-
-            @Override
-            public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                throw new InternalErrorException(failure);
-            }
-        };
+        return new BulkProcessor(client, REQUEST_OPTIONS, bulkLimit);
     }
 }
