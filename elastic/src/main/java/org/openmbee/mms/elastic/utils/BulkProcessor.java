@@ -1,7 +1,7 @@
 package org.openmbee.mms.elastic.utils;
 
-import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -9,15 +9,13 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BulkProcessor {
 
     protected int bulkLimit;
     RestHighLevelClient client;
     RequestOptions options;
-    List<DocWriteRequest<?>> allRequests = new ArrayList<>();
+    BulkRequest bulkRequest = new BulkRequest();
 
     public BulkProcessor(RestHighLevelClient client, RequestOptions options, int bulkLimit) {
         this.client = client;
@@ -26,31 +24,35 @@ public class BulkProcessor {
     }
 
     public void add(IndexRequest action) {
-        allRequests.add(action);
+        bulkRequest.add(action);
         clear();
     }
 
     public void add(UpdateRequest action) {
-        allRequests.add(action);
+        bulkRequest.add(action);
         clear();
     }
 
     public void clear() {
-        if (allRequests.size() >= bulkLimit) {
-            bulkBatchRequests(allRequests);
-            allRequests = new ArrayList<>();
+        if (bulkRequest.numberOfActions() >= bulkLimit) {
+            bulkBatchRequests();
         }
     }
 
     public void close() {
-        bulkBatchRequests(allRequests);
+        if (bulkRequest.numberOfActions() > 0) {
+            bulkBatchRequests();
+        }
     }
 
-    protected void bulkBatchRequests(List<DocWriteRequest<?>> actionRequest) {
-        BulkRequest bulkRequest = new BulkRequest();
-        actionRequest.forEach(bulkRequest::add);
+    protected void bulkBatchRequests() {
         try {
-            client.bulk(bulkRequest, options);
+            BulkResponse response = client.bulk(bulkRequest, options);
+            if (response.hasFailures()) {
+                String failure = response.buildFailureMessage();
+                throw new InternalErrorException(failure);
+            }
+            bulkRequest = new BulkRequest();
         } catch (IOException ioe) {
             throw new InternalErrorException(ioe);
         }
