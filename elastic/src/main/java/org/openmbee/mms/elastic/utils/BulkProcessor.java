@@ -11,8 +11,6 @@ import org.openmbee.mms.core.exceptions.InternalErrorException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class BulkProcessor {
 
@@ -38,19 +36,14 @@ public class BulkProcessor {
     }
 
     public void clear() {
-        if (allRequests.size() > bulkLimit) {
+        if (allRequests.size() >= bulkLimit) {
             bulkBatchRequests(allRequests);
             allRequests = new ArrayList<>();
         }
     }
 
     public void close() {
-        batches(allRequests, bulkLimit).forEach(this::bulkBatchRequests);
-    }
-
-    protected static <T> Stream<List<T>> batches(List<T> source, int length) {
-        return IntStream.iterate(0, i -> i < source.size(), i -> i + length)
-            .mapToObj(i -> source.subList(i, Math.min(i + length, source.size())));
+        bulkBatchRequests(allRequests);
     }
 
     protected void bulkBatchRequests(List<DocWriteRequest<?>> actionRequest) {
