@@ -91,6 +91,8 @@ public class NodePostHelper extends NodeOperation {
                     }
                 } else {
                     updated = true;
+                    element.setCreated(indexElement.getCreated());
+                    element.setCreator(indexElement.getCreator());
                 }
             }
 
