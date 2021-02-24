@@ -1,7 +1,8 @@
 package org.openmbee.mms.rdb.repositories;
 
 import org.openmbee.mms.core.config.ContextHolder;
-import org.openmbee.mms.core.config.ContextObject;
+import org.openmbee.mms.core.exceptions.BadRequestException;
+import org.openmbee.mms.rdb.config.DatabaseDefinitionService;
 import org.openmbee.mms.rdb.datasources.CrudDataSources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +39,10 @@ public abstract class BaseDAOImpl {
 
     public String getSuffix() {
         String refId = ContextHolder.getContext().getBranchId();
-        if(BRANCH_ID_VALID_PATTERN.matcher(refId).matches()) {
-            return refId.equals(ContextObject.MASTER_BRANCH) ? "" : refId.toLowerCase();
+        if (BRANCH_ID_VALID_PATTERN.matcher(refId).matches()) {
+            return DatabaseDefinitionService.getNodeTableName(refId);
         } else {
-            throw new IllegalArgumentException("Bad branch id, aborting current operation.");
+            throw new BadRequestException("Bad branch id, aborting current operation.");
         }
     }
 }
