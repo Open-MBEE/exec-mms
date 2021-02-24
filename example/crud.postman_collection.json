@@ -3477,6 +3477,92 @@
                 }
             },
             "response": []
+        },
+        {
+            "name": "create branch with long id",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"refs\": [\n\t\t{\n\t\t\t\"name\": \"long\",\n            \"id\": \"a123456789012345678901234567890123456789012345678901234567890\"\n\t\t}\n\t]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects/aa/refs",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "aa",
+                        "refs"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "post to long branch",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"name\": \"blah\",\n\t\t\t\"id\": \"blah\"\n\t\t}\n\t]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects/aa/refs/a123456789012345678901234567890123456789012345678901234567890/elements",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "aa",
+                        "refs",
+                        "a123456789012345678901234567890123456789012345678901234567890",
+                        "elements"
+                    ]
+                }
+            },
+            "response": []
         }
 	],
 	"auth": {

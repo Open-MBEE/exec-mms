@@ -1,5 +1,9 @@
 package org.openmbee.mms.rdb.config;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -158,11 +162,11 @@ public class DatabaseDefinitionService {
             return;
         }
 
-        final String targetNodeTable = String.format("nodes%s", target);
+        final String targetNodeTable = String.format("nodes%s", getSuffix(target));
         StringBuilder parentNodeTable = new StringBuilder("nodes");
 
         if (parent != null && !parent.equalsIgnoreCase("master")) {
-            parentNodeTable.append(String.format("%s", parent));
+            parentNodeTable.append(String.format("%s", getSuffix(parent)));
         }
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
@@ -202,5 +206,23 @@ public class DatabaseDefinitionService {
             "org.openmbee.mms.rdb.config.SuffixedPhysicalNamingStrategy");
 
         return properties;
+    }
+
+    static public String getSuffix(String refId) {
+        String res = refId;
+        if (refId.equals(ContextObject.MASTER_BRANCH)) {
+            res = "";
+        } else if (refId.length() <= 50) {
+            res = refId.toLowerCase();
+        } else {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-1");
+                byte[] encodedhash = digest.digest(refId.getBytes(StandardCharsets.UTF_8));
+                res = new BigInteger(1, encodedhash).toString(16).toLowerCase();
+            } catch (NoSuchAlgorithmException e) {
+                res = refId.toLowerCase().substring(0, 50);
+            }
+        }
+        return res;
     }
 }
