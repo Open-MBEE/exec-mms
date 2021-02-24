@@ -162,11 +162,11 @@ public class DatabaseDefinitionService {
             return;
         }
 
-        final String targetNodeTable = String.format("nodes%s", getSuffix(target));
+        final String targetNodeTable = String.format("nodes%s", getNodeTableName(target));
         StringBuilder parentNodeTable = new StringBuilder("nodes");
 
         if (parent != null && !parent.equalsIgnoreCase("master")) {
-            parentNodeTable.append(String.format("%s", getSuffix(parent)));
+            parentNodeTable.append(String.format("%s", getNodeTableName(parent)));
         }
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(
@@ -208,7 +208,14 @@ public class DatabaseDefinitionService {
         return properties;
     }
 
-    static public String getSuffix(String refId) {
+    /**
+     * Returns the suffix that should be appended to 'nodes' table given refId
+     * Empty for 'master', lowercased refId if refId.length <= 50, SHA-1 hash of refId otherwise
+     *
+     * @param refId
+     * @return
+     */
+    static public String getNodeTableName(String refId) {
         String res = refId;
         if (refId.equals(ContextObject.MASTER_BRANCH)) {
             res = "";

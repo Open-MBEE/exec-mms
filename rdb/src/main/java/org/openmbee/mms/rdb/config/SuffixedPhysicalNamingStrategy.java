@@ -32,7 +32,7 @@ public class SuffixedPhysicalNamingStrategy implements PhysicalNamingStrategy {
     @Override
     public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
         String refId = ContextHolder.getContext().getBranchId();
-        refId = DatabaseDefinitionService.getSuffix(refId);
+        refId = DatabaseDefinitionService.getNodeTableName(refId);
         return new Identifier(compoundKey(name.getText(), refId), name.isQuoted());
     }
 
