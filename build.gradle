@@ -153,6 +153,11 @@ subprojects {
     signing {
         if (project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')) {
             sign publishing.publications.mavenJava
+        } else if (project.hasProperty('signingKey') && project.hasProperty('signingPassword')) {
+            def signingKey = findProperty("signingKey")
+            def signingPassword = findProperty("signingPassword")
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            sign publishing.publications.mavenJava
         }
     }
 

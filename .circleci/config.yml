@@ -54,7 +54,7 @@ jobs:
                 at: ~/
           - run:
                 name: Deploy snapshot to sonatype
-                command: echo "CircleCI publishing not implemented yet."
+                command: ./gradlew -PsigningKey=$signingKey -PsigningPassword=$signingPassword -PossrhUsername=$ossrhUsername -PossrhPassword=$ossrhPassword publish
   deploy_release:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
