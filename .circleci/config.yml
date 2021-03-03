@@ -54,7 +54,7 @@ jobs:
                 at: ~/
           - run:
                 name: Deploy snapshot to sonatype
-                command: echo "CircleCI publishing not implemented yet."
+                command: ./gradlew -PossrhUsername=$OSSRH_USERNAME -PossrhPassword=$OSSRH_PASSWORD -PsigningKey="$SIGNING_KEY" -PsigningPassword=$SIGNING_PASSWORD publish
   deploy_release:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
@@ -62,8 +62,8 @@ jobs:
           - attach_workspace:
                 at: ~/
           - run:
-                name: Deploy release to Bintray
-                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY --info --stacktrace bintrayUpload
+                name: Deploy release to sonatype
+                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PossrhUsername=$OSSRH_USERNAME -PossrhPassword=$OSSRH_PASSWORD -PsigningKey="$SIGNING_KEY" -PsigningPassword=$SIGNING_PASSWORD --info --stacktrace publish
 
 workflows:
     version: 2
