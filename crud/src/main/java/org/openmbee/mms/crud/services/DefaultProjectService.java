@@ -41,6 +41,7 @@ public class DefaultProjectService implements ProjectService {
     protected BranchDAO branchRepository;
     protected BranchIndexDAO branchIndex;
     protected Collection<EventService> eventPublisher;
+    protected ProjectDeleteService projectDeleteService;
 
     @Autowired
     public void setProjectRepository(ProjectDAO projectRepository) {
@@ -70,6 +71,11 @@ public class DefaultProjectService implements ProjectService {
     @Autowired
     public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
+    }
+
+    @Autowired
+    public void setProjectDeleteService(ProjectDeleteService projectDeleteService) {
+        this.projectDeleteService = projectDeleteService;
     }
 
     public ProjectJson create(ProjectJson project) {
@@ -115,6 +121,8 @@ public class DefaultProjectService implements ProjectService {
             return project;
         } catch (Exception e) {
             logger.error("Couldn't create project: {}", project.getProjectId(), e);
+            //Need to clean up in case of partial creation
+            projectDeleteService.deleteProject(proj.getProjectId(), true);
         }
         throw new InternalErrorException("Could not create project");
     }

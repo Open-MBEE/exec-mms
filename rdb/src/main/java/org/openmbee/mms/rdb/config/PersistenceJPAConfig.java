@@ -100,6 +100,10 @@ public class PersistenceJPAConfig {
         properties.setProperty("hibernate.jdbc.lob.non_contextual_creation",
             env.getProperty("spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation",
                 "true"));
+        properties.setProperty("javax.persistence.sharedCache.mode",
+            env.getProperty("javax.persistence.sharedCache.mode", "DISABLE_SELECTIVE"));
+        properties.setProperty("hibernate.validationQuery", "SELECT 1");
+        properties.setProperty("hibernate.testOnBorrow", "true");
 
         return properties;
     }

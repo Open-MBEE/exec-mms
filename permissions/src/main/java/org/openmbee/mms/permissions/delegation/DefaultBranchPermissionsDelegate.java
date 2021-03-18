@@ -103,7 +103,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
         }
 
         branch.setInherit(inherit);
-        branchRepo.save(branch);
+        branch = branchRepo.save(branch);
 
         BranchUserPerm perm = new BranchUserPerm(branch, user.get(), role.get(), false);
         branchUserPermRepo.save(perm);

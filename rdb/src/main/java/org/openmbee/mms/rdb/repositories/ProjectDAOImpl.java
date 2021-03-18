@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class ProjectDAOImpl implements ProjectDAO {
@@ -45,8 +47,10 @@ public class ProjectDAOImpl implements ProjectDAO {
     public List<Project> findAllByOrgId(String id) {
         return projectRepository.findAllByOrganizationOrganizationId(id);
     }
-
+	
+    
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Project save(Project proj) {
         if (proj.getId() == null) {
             try {
@@ -60,14 +64,18 @@ public class ProjectDAOImpl implements ProjectDAO {
     }
 
     @Override
-    public void delete(Project p) {
-        projectRepository.delete(p);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void delete(String projectId) {
+        try {
+            projectRepository.findByProjectId(projectId).ifPresent(v -> projectRepository.delete(v));
+        } catch(Exception ex) {
+            logger.error("Could not delete project from project Repository");
+        }
 
         try {
-            projectOperations.deleteProjectDatabase(p);
+            projectOperations.deleteProjectDatabase(projectId);
         } catch(SQLException ex) {
             logger.error("DELETE PROJECT DATABASE EXCEPTION\nPotential connection issue, query statement mishap, or unexpected RDB behavior.");
-            throw new InternalErrorException(ex);
         }
     }
 

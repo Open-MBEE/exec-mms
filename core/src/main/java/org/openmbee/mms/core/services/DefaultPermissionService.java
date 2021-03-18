@@ -376,8 +376,7 @@ public class DefaultPermissionService implements PermissionService {
                     throw new NotFoundException("Branch " +  projectId + " " + branchId + " not found");
                 case CREATE:
                     Branch b = new Branch(getProject(projectId), branchId, false);
-                    branchRepo.save(b);
-                    return b;
+                    return branchRepo.save(b);
                 default:
                     //do nothing
                     break;

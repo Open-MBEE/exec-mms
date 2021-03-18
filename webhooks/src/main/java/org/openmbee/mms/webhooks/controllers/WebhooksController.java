@@ -45,6 +45,7 @@ public class WebhooksController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public WebhookResponse getAllWebhooks(@PathVariable String projectId) {
 

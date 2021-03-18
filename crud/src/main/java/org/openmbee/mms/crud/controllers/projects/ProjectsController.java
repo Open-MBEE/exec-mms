@@ -47,36 +47,45 @@ public class ProjectsController extends BaseController {
 
     ProjectDAO projectRepository;
     ProjectIndex projectIndex;
+    ProjectDeleteService projectDeleteService;
     ProjectSchemas schemas;
 
 
     @Autowired
-    public ProjectsController(ProjectDAO projectRepository, ProjectIndex projectIndex, ProjectSchemas schemas) {
+    public ProjectsController(ProjectDAO projectRepository, ProjectIndex projectIndex, ProjectSchemas schemas,
+                              ProjectDeleteService projectDeleteService) {
         this.projectRepository = projectRepository;
         this.projectIndex = projectIndex;
         this.schemas = schemas;
+        this.projectDeleteService = projectDeleteService;
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public ProjectsResponse getAllProjects(Authentication auth,
                                            @RequestParam(required = false) String orgId) {
         ProjectsResponse response = new ProjectsResponse();
         List<Project> allProjects = orgId != null ? projectRepository.findAllByOrgId(orgId) : projectRepository.findAll();
         for (Project proj : allProjects) {
-            if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
-                ContextHolder.setContext(proj.getProjectId());
-                if(proj.getDocId() != null  && !proj.isDeleted()) {
-                    Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
-                    projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), ()-> {
-                        logger.error("Project json not found for id: {}", proj.getProjectId());
-                    });
+            try {
+                if (mss.hasProjectPrivilege(auth, proj.getProjectId(), Privileges.PROJECT_READ.name(), true)) {
+                    ContextHolder.setContext(proj.getProjectId());
+                    if (proj.getDocId() != null && !proj.isDeleted()) {
+                        Optional<ProjectJson> projectJsonOption = projectIndex.findById(proj.getDocId());
+                        projectJsonOption.ifPresentOrElse(json -> response.getProjects().add(json), () -> {
+                            logger.error("Project json not found for id: {}", proj.getProjectId());
+                        });
+                    }
                 }
+            } catch(NotFoundException ex) {
+                logger.error("Project " + proj.getProjectId() + " was not found when getting all projects.");
             }
         }
         return response;
     }
 
     @GetMapping(value = "/{projectId}")
+    @Transactional(readOnly = true)
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public ProjectsResponse getProject(
         @PathVariable String projectId) {
@@ -182,25 +191,10 @@ public class ProjectsController extends BaseController {
         @PathVariable String projectId,
         @RequestParam(required = false, defaultValue = "false") boolean hard) {
 
-        ProjectsResponse response = new ProjectsResponse();
-        Optional<Project> projectOption = projectRepository.findByProjectId(projectId);
-        if (!projectOption.isPresent()) {
-            throw new NotFoundException(response.addMessage("Project not found"));
+        if(!isProjectIdValid(projectId)) {
+            throw new BadRequestException("Invalid project id");
         }
-        Project project = projectOption.get();
-        project.setDeleted(true);
-        ProjectJson projectJson = new ProjectJson();
-        projectJson.merge(convertToMap(project));
-        List<ProjectJson> res = new ArrayList<>();
-        res.add(projectJson);
-        if (hard) {
-            projectRepository.delete(project);
-            projectIndex.delete(projectId);
-        } else {
-            projectRepository.save(project);
-            // TODO soft delete for index?
-        }
-        return response.setProjects(res);
+        return projectDeleteService.deleteProject(projectId, hard);
     }
 
     private ProjectService getProjectService(ProjectJson json) {

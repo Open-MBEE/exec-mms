@@ -83,13 +83,13 @@ public class DatabaseDefinitionService {
         return !created.isEmpty();
     }
 
-    public void deleteProjectDatabase(Project project) throws SQLException {
-        try (Connection connection = crudDataSources.getDataSource(ContextObject.DEFAULT_PROJECT).getConnection();
+    public void deleteProjectDatabase(String projectId) throws SQLException {
+        try(Connection connection = crudDataSources.getDataSource(ContextObject.DEFAULT_PROJECT).getConnection();
                 Statement statement = connection.createStatement()) {
             if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
                 statement.execute(connection.nativeSQL(
                     "SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '"
-                        + databaseProjectString(project) + "';"));
+                        + databaseProjectString(projectId) + "';"));
             }
             statement.executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(project)));
 			
@@ -99,8 +99,12 @@ public class DatabaseDefinitionService {
     }
 
     private String databaseProjectString(Project project) {
-		String prefix = env.getProperty("rdb.project.prefix", "");
-        return String.format("\"%s_%s\"", prefix, project.getProjectId());
+		return databaseProjectString(project.getProjectId());
+    }
+
+    private String databaseProjectString(String projectId) {
+        String prefix = env.getProperty("rdb.project.prefix", "");
+        return String.format("\"%s_%s\"", prefix, projectId);
     }
 
     public void createBranch() {
@@ -136,6 +140,14 @@ public class DatabaseDefinitionService {
         try (Connection conn = crudDataSources.getDataSource(project).getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(INITIAL_REF)) {
                 ps.execute();
+            } catch(SQLException ex) {
+                //Only throw if master branch not found
+                try (PreparedStatement ps1 = conn.prepareStatement("select * from branches where branchid = 'master';")) {
+                    ResultSet rs = ps1.executeQuery();
+                    if(!rs.next()) {
+                        throw ex;
+                    }
+                }
             }
         }
     }

@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -35,6 +36,7 @@ public class EventListener implements ApplicationListener<EventObject> {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void onApplicationEvent(EventObject eventObject) {
         List<Webhook> webhooks = eventRepository.findAllByProject_ProjectId(eventObject.getProjectId());
 
