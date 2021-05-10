@@ -210,7 +210,7 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         sourceBuilder.size(this.resultLimit); // TODO handle paging requests
         sourceBuilder.sort(new FieldSortBuilder(CommitJson.CREATED).order(SortOrder.DESC));
         searchRequest.source(sourceBuilder);
-        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchResponse searchResponse = client.search(searchRequest, REQUEST_OPTIONS);
         return searchResponse.getHits();
     }
 
