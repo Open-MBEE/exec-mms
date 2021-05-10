@@ -42,7 +42,6 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
 
     public void index(CommitJson json) {
         int commitCount = getCommitSize(json);
-        List<CommitJson> broken = new ArrayList<>();
         if (commitCount > commitLimit) {
             List<Map<String, Object>> allActions = new ArrayList<>();
             allActions.addAll(json.getAdded().stream().peek(toAdd -> toAdd.put("action", "added")).collect(Collectors.toList()));
@@ -71,10 +70,8 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
                             break;
                     }
                 } while(getCommitSize(currentCommitCopy) < commitLimit && !allActions.isEmpty());
-                broken.add(currentCommitCopy);
-
+                this.index(getIndex(), currentCommitCopy);
             }
-            this.indexAll(broken);
 
         } else {
             this.index(getIndex(), json);
