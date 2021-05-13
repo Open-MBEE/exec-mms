@@ -135,6 +135,7 @@ public class DefaultNodeService implements NodeService {
                     .getBytes(StandardCharsets.UTF_8));
             } catch (IOException ioe) {
                 logger.error("Error writing to stream", ioe);
+                throw new InternalErrorException("Error writing to stream.");
             }
         });
         if (!"application/x-ndjson".equals(accept)) {
