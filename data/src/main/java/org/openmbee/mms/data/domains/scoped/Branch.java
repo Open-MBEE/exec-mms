@@ -17,6 +17,7 @@ public class Branch {
     @Column(name = "id", updatable = false, nullable = false)
     Long id;
 
+    @Column(length = 512)
     private String description;
 
     @Column(unique = true, length = 512)
