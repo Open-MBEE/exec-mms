@@ -236,12 +236,7 @@ public class DefaultNodeService implements NodeService {
                     });
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
             } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                String sStackTrace = sw.toString();
-
-                logger.error("Error in commitChanges: {}", sStackTrace);
+                logger.error("Error in commitChanges: ", e);
                 throw new InternalErrorException("Error committing changes: " + e.getMessage());
             }
             eventPublisher.forEach((pub) -> pub.publish(
