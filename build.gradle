@@ -63,8 +63,6 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
-    apply plugin: "com.jfrog.artifactory"
-    apply plugin: 'com.jfrog.bintray'
     apply plugin: 'signing'
 
     group = "org.openmbee.mms"
@@ -157,42 +155,6 @@ subprojects {
             def signingKey = signingKey.replaceAll(/\\n/, "\n")
             useInMemoryPgpKeys(signingKey, signingPassword)
             sign publishing.publications.mavenJava
-        }
-    }
-
-    //https://www.jfrog.com/confluence/display/JFROG/Gradle+Artifactory+Plugin
-    //can use this or set artifactory info directly under publishing/repositories?
-    artifactory {
-        contextUrl = 'https://mms.jfrog.io/mms'
-        publish {
-            repository {
-                repoKey = project.getProperties().get('artifactoryRepository')
-                username = project.getProperties().get('artifactoryUsername')
-                password = project.getProperties().get('artifactoryPassword')
-                maven = true
-            }
-            defaults {
-                publications('mavenJava')
-                publishArtifacts = true
-                // Properties to be attached to the published artifacts.
-                //properties = ['qa.level': 'basic', 'dev.team' : 'core']
-                // Publish generated POM files to Artifactory (true by default)
-                publishPom = true
-            }
-        }
-    }
-
-    bintray {
-        user = project.getProperties().get('bintrayUser')
-        key = project.getProperties().get('bintrayKey')
-        publications = ['mavenJava']
-        publish = true
-        pkg {
-            repo = 'maven'
-            name = 'mms-' + project.name
-            userOrg = 'openmbee'
-            licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/Open-MBEE/mms.git'
         }
     }
 }
