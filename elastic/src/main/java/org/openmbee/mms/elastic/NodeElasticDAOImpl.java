@@ -74,7 +74,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             sourceBuilder.query(query);
             searchRequest.source(sourceBuilder);
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            SearchResponse searchResponse = client.search(searchRequest, REQUEST_OPTIONS);
             if (searchResponse.getHits().getTotalHits().value == 0) {
                 return Optional.empty();
             }
@@ -136,7 +136,7 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
                 searchSourceBuilder.size(1);
                 searchRequest.source(searchSourceBuilder);
 
-                SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+                SearchResponse searchResponse = client.search(searchRequest, REQUEST_OPTIONS);
                 SearchHit[] searchHits = searchResponse.getHits().getHits();
                 if (searchHits != null && searchHits.length > 0) {
                     ElementJson elementJson = newInstance();
