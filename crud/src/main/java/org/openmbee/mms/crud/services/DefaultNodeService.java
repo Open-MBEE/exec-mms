@@ -133,6 +133,7 @@ public class DefaultNodeService implements NodeService {
                     .getBytes(StandardCharsets.UTF_8));
             } catch (IOException ioe) {
                 logger.error("Error writing to stream", ioe);
+                throw new InternalErrorException("Error writing to stream.");
             }
         });
         if (!"application/x-ndjson".equals(accept)) {
@@ -234,7 +235,7 @@ public class DefaultNodeService implements NodeService {
                     });
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
             } catch (Exception e) {
-                logger.error("commitChanges error: {}", e.getMessage());
+                logger.error("Error in commitChanges: ", e);
                 throw new InternalErrorException("Error committing changes: " + e.getMessage());
             }
             eventPublisher.forEach((pub) -> pub.publish(

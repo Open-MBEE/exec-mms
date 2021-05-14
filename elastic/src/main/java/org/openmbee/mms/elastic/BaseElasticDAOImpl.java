@@ -52,7 +52,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     protected static int readTimeout = 1000000000;
     protected RestHighLevelClient client;
-    private static final RequestOptions REQUEST_OPTIONS;
+    protected static final RequestOptions REQUEST_OPTIONS;
     static {
         RequestOptions.Builder requestBuilder = RequestOptions.DEFAULT.toBuilder();
         // TODO: Should be configureable
