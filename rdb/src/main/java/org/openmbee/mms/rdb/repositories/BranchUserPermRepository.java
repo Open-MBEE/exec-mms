@@ -1,5 +1,6 @@
 package org.openmbee.mms.rdb.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ public interface BranchUserPermRepository extends JpaRepository<BranchUserPerm, 
     Set<BranchUserPerm> findAllByBranchAndInherited(Branch b, boolean inherited);
 
     Optional<BranchUserPerm> findByBranchAndUserAndInheritedIsFalse(Branch b, User u);
+
+    List<BranchUserPerm> findAllByUser_UsernameAndBranch_Project_ProjectId(String user, String projectId);
 
     boolean existsByBranchAndUser_UsernameAndRoleIn(Branch b, String user, Set<Role> roles);
 

@@ -26,11 +26,13 @@ dependencies {
         project(':search'),
         project(':storage'),
         project(':groups'),
+        project(':rdb'),
         'org.springframework.boot:spring-boot-starter-web',
         'org.postgresql:postgresql:42.2.5',
         //'mysql:mysql-connector-java:8.0.17',
         'org.springdoc:springdoc-openapi-ui:1.3.1',
-        'org.springdoc:springdoc-openapi-security:1.3.1'
+        'org.springdoc:springdoc-openapi-security:1.3.1',
+        'io.jsonwebtoken:jjwt-api:0.10.5'
 
     )
     testImplementation(
