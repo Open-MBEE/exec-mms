@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -41,7 +40,6 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
         http.csrf().disable().authorizeRequests().anyRequest().permitAll().and().httpBasic();
         http.headers().cacheControl();
         http.addFilterAfter(corsFilter(), ExceptionTranslationFilter.class);
-        http.addFilterAfter(new LoggingFilter(), AnonymousAuthenticationFilter.class);
         authSecurityConfig.setAuthConfig(http);
     }
 
