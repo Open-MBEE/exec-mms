@@ -22,6 +22,8 @@ public interface OrgGroupPermRepository extends JpaRepository<OrgGroupPerm, Long
 
     List<OrgGroupPerm> findAllByOrganizationAndRole_Name(Organization org, String r);
 
+    List<OrgGroupPerm> findAllByGroup_Name(String group);
+
     boolean existsByOrganizationAndGroup_NameInAndRoleIn(Organization org, Set<String> user, Set<Role> roles);
 
     void deleteByOrganizationAndGroup_NameIn(Organization org, Set<String> groups);
