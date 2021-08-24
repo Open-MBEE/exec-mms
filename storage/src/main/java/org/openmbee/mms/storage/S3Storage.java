@@ -4,6 +4,7 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -36,11 +37,11 @@ public class S3Storage implements ArtifactStorage {
     @Value("${s3.endpoint}")
     private String ENDPOINT;
 
-    @Value("${s3.access_key}")
-    private String ACCESS_KEY;
+    @Value("${s3.access_key:#{null}}")
+    private Optional<String> ACCESS_KEY;
 
-    @Value("${s3.secret_key}")
-    private String SECRET_KEY;
+    @Value("${s3.secret_key:#{null}}")
+    private Optional<String> SECRET_KEY;
 
     @Value("${s3.region}")
     private String REGION;
@@ -53,18 +54,21 @@ public class S3Storage implements ArtifactStorage {
 
     private AmazonS3 getClient() {
         if (s3Client == null) {
-            AWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY);
             ClientConfiguration clientConfiguration = new ClientConfiguration();
             clientConfiguration.setSignerOverride("AWSS3V4SignerType");
 
-            s3Client = AmazonS3ClientBuilder
+            AmazonS3ClientBuilder builder = AmazonS3ClientBuilder
                 .standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ENDPOINT, REGION))
                 .withPathStyleAccessEnabled(true)
-                .withClientConfiguration(clientConfiguration)
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .build();
+                .withClientConfiguration(clientConfiguration);
 
+            if (ACCESS_KEY.isPresent() && SECRET_KEY.isPresent()) {
+                AWSCredentials credentials = new BasicAWSCredentials(ACCESS_KEY.get(), SECRET_KEY.get());
+                s3Client = builder.withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
+            } else {
+                s3Client = builder.withCredentials(DefaultAWSCredentialsProviderChain.getInstance()).build();
+            }
             if (!s3Client.doesBucketExistV2(getBucket())) {
                 try {
                     s3Client.createBucket(getBucket());
@@ -99,6 +103,7 @@ public class S3Storage implements ArtifactStorage {
         try {
             getClient().putObject(por);
         } catch (RuntimeException e) {
+            logger.error("Error storing artifact: ", e);
             throw new InternalErrorException(e);
         }
         return location;
