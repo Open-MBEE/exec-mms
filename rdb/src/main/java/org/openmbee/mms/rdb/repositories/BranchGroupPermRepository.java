@@ -20,6 +20,8 @@ public interface BranchGroupPermRepository extends JpaRepository<BranchGroupPerm
 
     Optional<BranchGroupPerm> findByBranchAndGroupAndInheritedIsFalse(Branch b, Group g);
 
+    List<BranchGroupPerm> findAllByGroup_NameAndBranch_Project_ProjectId(String group, String projectId);
+
     boolean existsByBranchAndGroup_NameInAndRoleIn(Branch b, Set<String> groups, Set<Role> roles);
 
     void deleteByBranchAndGroup_NameInAndInheritedIsFalse(Branch b, Set<String> groups);
