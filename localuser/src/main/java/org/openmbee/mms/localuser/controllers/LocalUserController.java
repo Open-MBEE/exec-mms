@@ -43,7 +43,7 @@ public class LocalUserController {
     }
 
     @GetMapping(value = "/users")
-    @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
+    @PreAuthorize("isAuthenticated()")
     public UsersResponse getUsers() {
         UsersResponse res = new UsersResponse();
         res.setUsers(userDetailsService.getUsers());
