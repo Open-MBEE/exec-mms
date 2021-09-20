@@ -157,4 +157,37 @@ subprojects {
             sign publishing.publications.mavenJava
         }
     }
+
 }
+
+task copyJar {
+    copy {
+        from layout.projectDirectory.dir("example/build/libs")
+        into layout.buildDirectory.dir("libs")
+        include "*.jar"
+        rename '(.*)', 'app.jar'
+    }
+    copy {
+        from layout.projectDirectory.dir("example/src/main/resources")
+        into layout.buildDirectory.dir("config")
+        include "*.properties"
+    }
+}
+
+copyJar.dependsOn(':example:bootJar')
+
+
+
+task runJava(type: JavaExec, dependsOn: copyJar) {
+    workingDir layout.buildDirectory
+
+    environment "SPRING_PROFILES_ACTIVE", "local"
+
+    ignoreExitValue true
+    classpath = files(project.buildDir.toPath().toString() + "/libs/app.jar")
+    standardOutput = System.out
+    errorOutput = System.err
+    jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED', '-Djdk.tls.client.protocols="TLSv1.1"'
+
+}
+
