@@ -1,8 +1,11 @@
 package org.openmbee.mms.ldap;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
+import org.openmbee.mms.data.domains.global.Base;
 import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
@@ -52,8 +55,17 @@ public class LdapSecurityConfig {
     @Value("${ldap.user.attributes.username:uid}")
     private String userAttributesUsername;
 
+    @Value("${ldap.user.attributes.firstname:givenname}")
+    private String userAttributesFirstName;
+
+    @Value("${ldap.user.attributes.lastname:sn}")
+    private String userAttributesLastName;
+
     @Value("${ldap.user.attributes.email:mail}")
     private String userAttributesEmail;
+
+    @Value("${ldap.user.attributes.update:24}")
+    private int userAttributesUpdate;
 
     @Value("${ldap.group.search.base:#{''}}")
     private String groupSearchBase;
@@ -115,18 +127,17 @@ public class LdapSecurityConfig {
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
                 Optional<User> userOptional = userRepository.findByUsername(username);
+
                 if (!userOptional.isPresent()) {
-                    User newUser = new User();
-                    newUser.setEmail(userData.getStringAttribute(userAttributesEmail));
-                    newUser.setUsername(userData.getStringAttribute(userAttributesUsername));
-                    newUser.setEnabled(true);
-                    newUser.setAdmin(false);
-                    userRepository.save(newUser);
+                    User newUser = saveLdapUser(userData);
 
                     userOptional = Optional.of(newUser);
                 }
 
                 User user = userOptional.get();
+                if (user.getModified().isBefore(Instant.now().minus(userAttributesUpdate, ChronoUnit.HOURS))) {
+                    saveLdapUser(userData, user);
+                }
                 user.setPassword(null);
                 String userDn = userAttributesUsername + "=" + user.getUsername() + "," + providerBase;
 
@@ -178,4 +189,28 @@ public class LdapSecurityConfig {
         return contextSource;
     }
 
+    private User saveLdapUser(DirContextOperations userData, User saveUser) {
+        if (!saveUser.getEmail().equals(userData.getStringAttribute(userAttributesEmail))) {
+            saveUser.setEmail(userData.getStringAttribute(userAttributesEmail));
+        }
+        if (!saveUser.getFirstName().equals(userData.getStringAttribute(userAttributesFirstName))) {
+            saveUser.setFirstName(userData.getStringAttribute(userAttributesFirstName));
+        }
+        if (!saveUser.getLastName().equals(userData.getStringAttribute(userAttributesLastName))) {
+            saveUser.setLastName(userData.getStringAttribute(userAttributesLastName));
+        }
+
+        saveUser.setEnabled(true);
+        saveUser.setAdmin(false);
+
+        return saveUser;
+    }
+
+    private User saveLdapUser(DirContextOperations userData) {
+        User user = saveLdapUser(userData, new User());
+        user.setUsername(userData.getStringAttribute(userAttributesUsername));
+        userRepository.save(user);
+
+        return user;
+    }
 }
