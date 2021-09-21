@@ -200,16 +200,16 @@ public class LdapSecurityConfig {
             saveUser.setLastName(userData.getStringAttribute(userAttributesLastName));
         }
 
-        saveUser.setEnabled(true);
-        saveUser.setAdmin(false);
-
         return saveUser;
     }
 
     private User saveLdapUser(DirContextOperations userData) {
         User user = saveLdapUser(userData, new User());
         user.setUsername(userData.getStringAttribute(userAttributesUsername));
+        user.setEnabled(true);
+        user.setAdmin(false);
         userRepository.save(user);
+
 
         return user;
     }
