@@ -129,7 +129,7 @@ public class LdapSecurityConfig {
                 Optional<User> userOptional = userRepository.findByUsername(username);
 
                 if (!userOptional.isPresent()) {
-                    User newUser = saveLdapUser(userData);
+                    User newUser = createLdapUser(userData);
 
                     userOptional = Optional.of(newUser);
                 }
@@ -203,7 +203,7 @@ public class LdapSecurityConfig {
         return saveUser;
     }
 
-    private User saveLdapUser(DirContextOperations userData) {
+    private User createLdapUser(DirContextOperations userData) {
         User user = saveLdapUser(userData, new User());
         user.setUsername(userData.getStringAttribute(userAttributesUsername));
         user.setEnabled(true);
