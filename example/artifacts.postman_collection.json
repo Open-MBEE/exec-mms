@@ -206,6 +206,7 @@
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
                             "    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.include('arta/x/jpg/')",
+                            "    pm.expect(jsonData.elements[0]['_artifacts'][0].checksum).to.include('c946d2fc350ad561fdb3c23c86a81343')",
                             "    pm.environment.set(\"commit-1-loc\", pm.response.json().elements[0]['_artifacts'][0].location);",
                             "    pm.environment.set(\"x-commit-1\", jsonData.elements[0][\"_commitId\"]);",
 							"});",
@@ -310,7 +311,8 @@
 							"pm.test(\"response element has 1 artifact\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
-							"});"
+                            "    pm.expect(jsonData.elements[0]['_artifacts'][0].checksum).to.include('5407655262fcca873c2f407f2dead2cf')",
+                            "});"
 						],
 						"type": "text/javascript"
 					}

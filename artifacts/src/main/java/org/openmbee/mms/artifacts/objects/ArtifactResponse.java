@@ -3,6 +3,7 @@ package org.openmbee.mms.artifacts.objects;
 public class ArtifactResponse {
     private String mimeType;
     private String extension;
+    private String checksum;
     private byte[] data;
 
     public String getMimeType() {
@@ -19,6 +20,14 @@ public class ArtifactResponse {
 
     public void setExtension(String extension) {
         this.extension = extension;
+    }
+
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
     }
 
     public byte[] getData() {
