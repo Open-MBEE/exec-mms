@@ -190,13 +190,22 @@ public class LdapSecurityConfig {
     }
 
     private User saveLdapUser(DirContextOperations userData, User saveUser) {
-        if (!saveUser.getEmail().equals(userData.getStringAttribute(userAttributesEmail))) {
+        if (userData.attributeExists(userAttributesEmail) &&
+            userData.getStringAttribute(userAttributesEmail) != null &&
+            !saveUser.getEmail().equals(userData.getStringAttribute(userAttributesEmail))
+        ) {
             saveUser.setEmail(userData.getStringAttribute(userAttributesEmail));
         }
-        if (!saveUser.getFirstName().equals(userData.getStringAttribute(userAttributesFirstName))) {
+        if (userData.attributeExists(userAttributesFirstName) &&
+            userData.getStringAttribute(userAttributesFirstName) != null &&
+            !saveUser.getFirstName().equals(userData.getStringAttribute(userAttributesFirstName))
+        ) {
             saveUser.setFirstName(userData.getStringAttribute(userAttributesFirstName));
         }
-        if (!saveUser.getLastName().equals(userData.getStringAttribute(userAttributesLastName))) {
+        if (userData.attributeExists(userAttributesLastName) &&
+            userData.getStringAttribute(userAttributesLastName) != null &&
+            !saveUser.getLastName().equals(userData.getStringAttribute(userAttributesLastName))
+        ) {
             saveUser.setLastName(userData.getStringAttribute(userAttributesLastName));
         }
 
