@@ -16,6 +16,9 @@ ldap.provider.password=
 ldap.user.dn.pattern=uid={0}
 ldap.user.attributes.username=
 ldap.user.attributes.email=
+ldap.user.attributes.firstname=
+ldap.user.attributes.lastname=
+ldap.user.attributes.update=24
 ldap.group.role.attribute=cn
 ldap.group.search.base=
 ldap.group.search.filter=uniqueMember={0}

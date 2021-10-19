@@ -16,10 +16,14 @@ import org.openmbee.mms.artifacts.json.ArtifactJson;
 import org.openmbee.mms.json.ElementJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class DefaultArtifactService implements ArtifactService {
@@ -54,6 +58,7 @@ public class DefaultArtifactService implements ArtifactService {
         response.setData(data);
         response.setExtension(artifact.getExtension());
         response.setMimeType(artifact.getMimeType());
+        response.setChecksum(artifact.getChecksum());
         return response;
     }
 
@@ -79,9 +84,10 @@ public class DefaultArtifactService implements ArtifactService {
 
         String mimeType = getMimeTypeOfFile(file);
         String fileExtension = getFileExtension(file);
+        String checksum = getChecksumOfFile(file);
         String artifactLocation = artifactStorage.store(fileContents, elementJson, mimeType);
 
-        elementJson = attachOrUpdateArtifact(elementJson, artifactLocation, fileExtension, mimeType, "internal");
+        elementJson = attachOrUpdateArtifact(elementJson, artifactLocation, fileExtension, mimeType, "internal", checksum);
         ElementsRequest elementsRequest = new ElementsRequest();
         elementsRequest.setElements(Arrays.asList(elementJson));
         return nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
@@ -113,7 +119,7 @@ public class DefaultArtifactService implements ArtifactService {
         }
     }
 
-    private ElementJson attachOrUpdateArtifact(ElementJson elementJson, String artifactLocation, String fileExtension, String mimeType, String type) {
+    private ElementJson attachOrUpdateArtifact(ElementJson elementJson, String artifactLocation, String fileExtension, String mimeType, String type, String checksum) {
 
         List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
         ArtifactJson artifact;
@@ -128,6 +134,7 @@ public class DefaultArtifactService implements ArtifactService {
         artifact.setExtension(fileExtension);
         artifact.setMimeType(mimeType);
         artifact.setLocationType(type);
+        artifact.setChecksum(checksum);
 
         ArtifactJson.setArtifacts(elementJson, artifacts);
         return elementJson;
@@ -164,6 +171,16 @@ public class DefaultArtifactService implements ArtifactService {
 
     private String getMimeTypeOfFile(MultipartFile file) {
         return file.getContentType();
+    }
+
+    public static String getChecksumOfFile(MultipartFile file) {
+        String checksum = "";
+        try {
+            checksum = DigestUtils.md5DigestAsHex(file.getBytes());
+        } catch (IOException ioe) {
+            throw new BadRequestException(ioe);
+        }
+        return checksum;
     }
 
     private NodeService getNodeService(String projectId) {
