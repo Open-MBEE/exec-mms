@@ -24,6 +24,8 @@ public interface ProjectGroupPermRepository extends JpaRepository<ProjectGroupPe
 
     List<ProjectGroupPerm> findAllByProjectAndRole_Name(Project proj, String r);
 
+    List<ProjectGroupPerm> findAllByGroup_Name(String group);
+
     boolean existsByProjectAndGroup_NameInAndRoleIn(Project proj, Set<String> groups, Set<Role> roles);
 
     void deleteByProjectAndGroup_NameInAndInheritedIsFalse(Project proj, Set<String> groups);

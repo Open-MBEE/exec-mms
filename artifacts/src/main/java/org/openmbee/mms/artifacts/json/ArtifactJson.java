@@ -20,6 +20,7 @@ public class ArtifactJson extends HashMap<String, Object> {
     public static final String EXTENSION = "extension";
     public static final String LOCATION = "location";
     public static final String LOCATIONTYPE = "locationType";
+    public static final String CHECKSUM = "checksum";
 
     public ArtifactJson() {
         super();
@@ -74,6 +75,18 @@ public class ArtifactJson extends HashMap<String, Object> {
     @JsonProperty(LOCATIONTYPE)
     public ArtifactJson setLocationType(String locationType) {
         this.put(LOCATIONTYPE, locationType);
+        return  this;
+    }
+
+    @JsonProperty(CHECKSUM)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    public String getChecksum() {
+        return (String) this.get(CHECKSUM);
+    }
+
+    @JsonProperty(CHECKSUM)
+    public ArtifactJson setChecksum(String checksum) {
+        this.put(CHECKSUM, checksum);
         return  this;
     }
 
