@@ -1,7 +1,7 @@
 package org.openmbee.mms.elastic.services;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 
 @Service
 public class ElasticSearchService implements SearchService {
-    private final Logger logger = LogManager.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
