@@ -209,12 +209,15 @@ public class ElasticSearchService implements SearchService {
             if (scrollId != null) {
                 SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
                 searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
-                ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
-                clearScrollRequest.addScrollId(scrollId);
-                client.clearScrollAsync(clearScrollRequest, RequestOptions.DEFAULT, listener);
             }
 
         } while (scrollId != null && searchResponse.getHits().getHits() != null && searchResponse.getHits().getHits().length != 0);
+
+        if (scrollId != null) {
+            ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.addScrollId(scrollId);
+            client.clearScrollAsync(clearScrollRequest, RequestOptions.DEFAULT, listener);
+        }
 
         return result;
     }
