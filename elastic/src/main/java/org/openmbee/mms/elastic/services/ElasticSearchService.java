@@ -1,5 +1,8 @@
 package org.openmbee.mms.elastic.services;
 
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.search.ClearScrollRequest;
+import org.elasticsearch.action.search.ClearScrollResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
@@ -45,6 +48,19 @@ public class ElasticSearchService implements SearchService {
     protected long scrollTimeout;
     protected RestHighLevelClient client;
     protected NodeDAO nodeRepository;
+
+    protected ActionListener<ClearScrollResponse> listener = new ActionListener<>() {
+        @Override
+        public void onResponse(ClearScrollResponse clearScrollResponse) {
+            logger.debug("Cleared: " + clearScrollResponse.getNumFreed());
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            logger.error("Scroll clear failure: ");
+            logger.error(e.getMessage());
+        }
+    };
 
     @Autowired
     public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
@@ -196,6 +212,12 @@ public class ElasticSearchService implements SearchService {
             }
 
         } while (scrollId != null && searchResponse.getHits().getHits() != null && searchResponse.getHits().getHits().length != 0);
+
+        if (scrollId != null) {
+            ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.addScrollId(scrollId);
+            client.clearScrollAsync(clearScrollRequest, RequestOptions.DEFAULT, listener);
+        }
 
         return result;
     }
