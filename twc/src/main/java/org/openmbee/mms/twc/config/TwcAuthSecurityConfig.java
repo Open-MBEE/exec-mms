@@ -1,7 +1,7 @@
 package org.openmbee.mms.twc.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openmbee.mms.twc.security.TwcAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableWebSecurity
 @EnableTransactionManagement
 public class TwcAuthSecurityConfig {
-    private static Logger logger = LogManager.getLogger(TwcAuthSecurityConfig.class);
+    private static Logger logger = LoggerFactory.getLogger(TwcAuthSecurityConfig.class);
 
     public void setAuthConfig(HttpSecurity http) throws Exception {
         http.addFilterBefore(twcAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
