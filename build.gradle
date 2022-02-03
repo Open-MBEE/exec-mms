@@ -56,8 +56,8 @@ subprojects {
     }
 
     plugins.withType(JavaPlugin) {
-        project.sourceCompatibility = '10'
-        project.targetCompatibility = '10'
+        project.sourceCompatibility = '15'
+        project.targetCompatibility = '15'
     }
 
     apply plugin: 'java-library'
