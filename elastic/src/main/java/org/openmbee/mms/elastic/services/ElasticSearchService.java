@@ -104,7 +104,14 @@ public class ElasticSearchService implements SearchService {
                 showDeletedAsRejected = true;
             }
 
-            performRecursiveSearch(allNodeDocIds, params, recurse, elementJsonMap,0);
+            Map<String, List<String>> normalizedParams = new HashMap<>();
+            params.forEach((k, v) -> {
+                List<String> values = new ArrayList<>();
+                values.add(v);
+                normalizedParams.put(k, values);
+            });
+
+            performRecursiveSearch(allNodeDocIds, normalizedParams, recurse, elementJsonMap,0);
             Collection<OrderedResult<ElementJson>> filteredElementJson = filterIndexedElementsUsingDatabaseNodes(allNodes, elementJsonMap, deletedElements, showDeletedAsRejected);
             return prepareResponse(filteredElementJson, deletedElements, from, size);
         } catch (IOException e) {
@@ -114,7 +121,7 @@ public class ElasticSearchService implements SearchService {
 
     }
 
-    private void performRecursiveSearch(Set<String> allNodeDocIds, Map<String, String> params, Map<String, String> recurse,
+    private void performRecursiveSearch(Set<String> allNodeDocIds, Map<String, List<String>> params, Map<String, String> recurse,
                                         Map<String, OrderedResult<ElementJson>> elementJsonMap, Integer count) throws IOException {
         Set<String> fields = new HashSet<>(params.keySet());
         if(recurse != null) {
@@ -122,14 +129,16 @@ public class ElasticSearchService implements SearchService {
         }
         SearchConfiguration searchConfiguration = getSearchConfiguration(fields);
         List<ElementJson> elementJsonList = doSearch(searchConfiguration, allNodeDocIds, params);
+        List<ElementJson> obList = new ArrayList<>();
         for(ElementJson ob : elementJsonList) {
             if(!elementJsonMap.containsKey(ob.getId())) {
                 elementJsonMap.put(ob.getId(), new OrderedResult<>(ob, count++));
-                Map<String, String> recursiveParams = buildRecursiveParams(ob, recurse);
-                if(!recursiveParams.isEmpty()) {
-                    performRecursiveSearch(allNodeDocIds, recursiveParams, recurse, elementJsonMap, count);
-                }
+                obList.add(ob);
             }
+        }
+        Map<String, List<String>> recursiveParams = buildRecursiveParams(obList, recurse);
+        if(!recursiveParams.isEmpty()) {
+            performRecursiveSearch(allNodeDocIds, recursiveParams, recurse, elementJsonMap, count);
         }
     }
 
@@ -159,30 +168,34 @@ public class ElasticSearchService implements SearchService {
         }
     }
 
-    private Map<String, String> buildRecursiveParams(ElementJson ob, Map<String, String> recurse) {
-        Map<String, String> recursiveParams = new HashMap<>();
+    private Map<String, List<String>> buildRecursiveParams(List<ElementJson> obList, Map<String, String> recurse) {
+        Map<String, List<String>> recursiveParams = new HashMap<>();
 
         if(recurse == null || recurse.isEmpty()) {
             return recursiveParams;
         }
 
         for(Map.Entry<String, String> e : recurse.entrySet()) {
-            Object o = ob.get(e.getKey());
-            if(o == null) {
-                continue;
+            for (ElementJson ob : obList) {
+                Object o = ob.get(e.getKey());
+                if (o == null) {
+                    continue;
+                }
+                List<String> oList = new ArrayList<>();
+                oList.add(o.toString());
+                recursiveParams.put(e.getValue(), oList);
             }
-            recursiveParams.put(e.getValue(), o.toString());
         }
         return recursiveParams;
     }
 
 
-    private List<ElementJson> doSearch(SearchConfiguration searchConfiguration, Set<String> allNodeDocIds, Map<String, String> params) throws IOException {
+    private List<ElementJson> doSearch(SearchConfiguration searchConfiguration, Set<String> allNodeDocIds, Map<String, List<String>> params) throws IOException {
         SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
 
-        for(Map.Entry<String, String> e : params.entrySet()) {
-           searchConfiguration.addQueryForField(query, e.getKey(), e.getValue());
+        for(Map.Entry<String, List<String>> e : params.entrySet()) {
+            searchConfiguration.addQueryForField(query, e.getKey(), String.join(",", e.getValue()));
         }
 
         return performElasticQuery(allNodeDocIds, searchRequest, query);
