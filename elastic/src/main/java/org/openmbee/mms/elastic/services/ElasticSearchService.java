@@ -195,7 +195,7 @@ public class ElasticSearchService implements SearchService {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
 
         for(Map.Entry<String, List<String>> e : params.entrySet()) {
-            searchConfiguration.addQueryForField(query, e.getKey(), String.join(",", e.getValue()));
+            searchConfiguration.addQueryForField(query, e.getKey(), e.getValue());
         }
 
         return performElasticQuery(allNodeDocIds, searchRequest, query);
