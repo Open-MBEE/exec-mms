@@ -1,12 +1,7 @@
 package org.openmbee.mms.core.builders;
 
 import org.openmbee.mms.core.objects.PermissionUpdateResponse;
-import org.openmbee.mms.data.domains.global.BranchGroupPerm;
-import org.openmbee.mms.data.domains.global.BranchUserPerm;
-import org.openmbee.mms.data.domains.global.OrgGroupPerm;
-import org.openmbee.mms.data.domains.global.OrgUserPerm;
-import org.openmbee.mms.data.domains.global.ProjectGroupPerm;
-import org.openmbee.mms.data.domains.global.ProjectUserPerm;
+import org.openmbee.mms.data.domains.global.*;
 
 import java.util.*;
 
@@ -135,6 +130,34 @@ public class PermissionUpdateResponseBuilder {
             action, v.getGroup().getName(), v.getRole().getName(), v.getBranch().getProject().getOrganization().getOrganizationId(),
             v.getBranch().getProject().getOrganization().getOrganizationName(), v.getBranch().getProject().getProjectId(),
             v.getBranch().getProject().getProjectName(),v.getBranch().getBranchId(), v.isInherited());
+        doInsert(update);
+    }
+
+    public void insertPermissionUpdates_GroupUserPerm(PermissionUpdateResponse.Action action, Collection<GroupUserPerm> perms) {
+        perms.forEach(v -> insertPermissionUpdate(action, v));
+    }
+
+    public void insertPermissionUpdate(PermissionUpdateResponse.Action action, GroupUserPerm v) {
+        if(v == null)
+            return;
+
+        PermissionUpdateResponse.PermissionUpdate update = new PermissionUpdateResponse.PermissionUpdate(
+            action, v.getUser().getUsername(), v.getRole().getName(), v.getGroup().getGroupId(), v.getGroup().getName(),
+            null, null, null, false);
+        doInsert(update);
+    }
+
+    public void insertPermissionUpdates_GroupGroupPerm(PermissionUpdateResponse.Action action, Collection<GroupGroupPerm> perms) {
+        perms.forEach(v -> insertPermissionUpdate(action, v));
+    }
+
+    public void insertPermissionUpdate(PermissionUpdateResponse.Action action, GroupGroupPerm v) {
+        if(v == null)
+            return;
+
+        PermissionUpdateResponse.PermissionUpdate update = new PermissionUpdateResponse.PermissionUpdate(
+            action, v.getGroup().getName(), v.getRole().getName(), v.getGroup().getGroupId(), v.getGroup().getName(),
+            null, null, null, false);
         doInsert(update);
     }
 

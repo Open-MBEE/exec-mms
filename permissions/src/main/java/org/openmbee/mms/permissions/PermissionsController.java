@@ -131,4 +131,23 @@ public class PermissionsController {
         res.setInherit(permissionService.isBranchInherit(projectId, refId));
         return res;
     }
+
+    @PostMapping(value = "/groups/{groupName}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    @PreAuthorize("@mss.hasOrgPrivilege(authentication, #groupName, 'GROUP_UPDATE_PERMISSIONS', false)")
+    public PermissionUpdatesResponse updateGroupPermissions(
+        @PathVariable String groupName,
+        @RequestBody PermissionsRequest req) {
+
+        PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
+
+        if (req.getGroups() != null) {
+            responseBuilder.insert(permissionService.updateGroupGroupPerms(req.getGroups(), groupName));
+        }
+        if (req.getUsers() != null) {
+            responseBuilder.insert(permissionService.updateGroupUserPerms(req.getUsers(), groupName));
+        }
+        return responseBuilder.getPermissionUpdatesReponse();
+    }
+
 }

@@ -3,6 +3,7 @@ package org.openmbee.mms.permissions.delegation;
 import org.openmbee.mms.core.delegation.PermissionsDelegate;
 import org.openmbee.mms.core.delegation.PermissionsDelegateFactory;
 import org.openmbee.mms.data.domains.global.Branch;
+import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.data.domains.global.Organization;
 import org.openmbee.mms.data.domains.global.Project;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class DefaultPermissionsDelegateFactory implements PermissionsDelegateFac
     @Override
     public PermissionsDelegate getPermissionsDelegate(Branch branch) {
         return autowire(new DefaultBranchPermissionsDelegate(branch));
+    }
+
+    @Override
+    public PermissionsDelegate getPermissionsDelegate(Group group) {
+        return autowire(new DefaultGroupPermissionsDelegate(group));
     }
 
     private PermissionsDelegate autowire(PermissionsDelegate permissionsDelegate) {

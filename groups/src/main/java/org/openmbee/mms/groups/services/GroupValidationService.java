@@ -27,6 +27,6 @@ public class GroupValidationService {
 
     public boolean canDeleteGroup(Group group){
         return !isRestrictedGroup(group.getName()) &&
-            (group.getUsers() == null || group.getUsers().isEmpty());
+            ((group.getType() == Group.VALID_GROUP_TYPES.REMOTE) || (group.getUsers() == null || group.getUsers().isEmpty()));
     }
 }

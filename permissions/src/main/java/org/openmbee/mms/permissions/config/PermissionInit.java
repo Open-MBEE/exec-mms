@@ -1,5 +1,8 @@
 package org.openmbee.mms.permissions.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.openmbee.mms.core.objects.PermissionUpdateRequest;
+import org.openmbee.mms.core.services.PermissionService;
 import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.data.domains.global.Privilege;
 import org.openmbee.mms.data.domains.global.Role;
@@ -24,6 +27,8 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
     private RoleRepository roleRepo;
 
     private GroupRepository groupRepo;
+
+    private PermissionService permissionService;
 
     @Autowired
     public void setPrivRepo(PrivilegeRepository privRepo) {
@@ -79,6 +84,7 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
         if (!(evGroupIn.isPresent())) {
             Group evGroup = new Group();
             evGroup.setName("everyone");
+            evGroup.setType(Group.VALID_GROUP_TYPES.LOCAL);
             groupRepo.saveAndFlush(evGroup);
         }
     }
