@@ -55,11 +55,6 @@ subprojects {
         maven { url 'https://repo.spring.io/plugins-release' }
     }
 
-    plugins.withType(JavaPlugin) {
-        project.sourceCompatibility = '15'
-        project.targetCompatibility = '15'
-    }
-
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
@@ -162,5 +157,4 @@ subprojects {
             sign publishing.publications.mavenJava
         }
     }
-
 }
