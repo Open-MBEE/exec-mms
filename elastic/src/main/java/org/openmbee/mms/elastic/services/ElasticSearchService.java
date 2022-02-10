@@ -176,15 +176,15 @@ public class ElasticSearchService implements SearchService {
         }
 
         for(Map.Entry<String, String> e : recurse.entrySet()) {
+            List<String> oList = new ArrayList<>();
             for (ElementJson ob : obList) {
                 Object o = ob.get(e.getKey());
                 if (o == null) {
                     continue;
                 }
-                List<String> oList = new ArrayList<>();
                 oList.add(o.toString());
-                recursiveParams.put(e.getValue(), oList);
             }
+            recursiveParams.put(e.getValue(), oList);
         }
         return recursiveParams;
     }
