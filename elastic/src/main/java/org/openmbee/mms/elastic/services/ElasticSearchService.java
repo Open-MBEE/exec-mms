@@ -184,7 +184,9 @@ public class ElasticSearchService implements SearchService {
                 }
                 oList.add(o.toString());
             }
-            recursiveParams.put(e.getValue(), oList);
+            if (!oList.isEmpty()) {
+                recursiveParams.put(e.getValue(), oList);
+            }
         }
         return recursiveParams;
     }
