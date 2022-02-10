@@ -45,7 +45,6 @@ public class SearchConfiguration {
                 logger.error("Could not find mapping for field " + field);
                 return query;
             }
-            logger.error(value.toString());
             switch (searchType){
                 case TERM:
                     if (value instanceof List) {
