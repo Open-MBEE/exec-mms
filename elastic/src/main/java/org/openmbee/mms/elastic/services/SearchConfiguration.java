@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SearchConfiguration {
@@ -35,9 +36,9 @@ public class SearchConfiguration {
         }
     }
 
-    public BoolQueryBuilder addQueryForField(BoolQueryBuilder query, String field, String value) {
+    public BoolQueryBuilder addQueryForField(BoolQueryBuilder query, String field, Object value) {
         if("*".equals(field)) {
-            query.must(QueryBuilders.multiMatchQuery(value, "*"));
+            query.must(QueryBuilders.multiMatchQuery(value.toString(), "*"));
         } else {
             EnumSearchType searchType = config.get(field);
             if(searchType == null) {
@@ -46,7 +47,11 @@ public class SearchConfiguration {
             }
             switch (searchType){
                 case TERM:
-                    query.must(QueryBuilders.termQuery(field, value));
+                    if (value instanceof List) {
+                        query.must(QueryBuilders.termsQuery(field, ((List<?>) value).toArray()));
+                    } else if (value instanceof String) {
+                        query.must(QueryBuilders.termQuery(field, value));
+                    }
                     break;
                 case MATCH:
                     query.must(QueryBuilders.matchQuery(field, value));
