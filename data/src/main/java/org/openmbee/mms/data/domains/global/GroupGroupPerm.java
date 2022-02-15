@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @Table(name = "group_group_perms",
     indexes = {
         @Index(columnList = "group_id"),
-        @Index(columnList = "group_id,group_id")
+        @Index(columnList = "group_id,groupPerm_id")
     })
 public class GroupGroupPerm extends Base {
 
@@ -17,7 +17,7 @@ public class GroupGroupPerm extends Base {
     private Group group;
 
     @ManyToOne
-    private Group groupPerms;
+    private Group groupPerm;
 
     @ManyToOne
     private Role role;
@@ -26,7 +26,7 @@ public class GroupGroupPerm extends Base {
 
     public GroupGroupPerm(Group group, Group u, Role r) {
         this.group = group;
-        this.groupPerms = u;
+        this.groupPerm = u;
         this.role = r;
     }
 
@@ -38,12 +38,12 @@ public class GroupGroupPerm extends Base {
         this.group = group;
     }
 
-    public Group getGroupPerms() {
-        return groupPerms;
+    public Group getGroupPerm() {
+        return groupPerm;
     }
 
-    public void setGroupPerms(Group group) {
-        this.groupPerms = group;
+    public void setGroupPerm(Group group) {
+        this.groupPerm = group;
     }
 
     public Role getRole() {

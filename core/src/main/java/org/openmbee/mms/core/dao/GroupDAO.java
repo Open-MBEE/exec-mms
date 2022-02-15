@@ -7,9 +7,7 @@ import java.util.Optional;
 
 public interface GroupDAO {
 
-    Optional<Group> findByGroupId(String id);
-
-    Optional<Group> findByGroupName(String name);
+    Optional<Group> findByGroupName(String id);
 
     Group save(Group group);
 

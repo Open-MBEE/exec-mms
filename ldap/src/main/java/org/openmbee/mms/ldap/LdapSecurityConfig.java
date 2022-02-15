@@ -159,6 +159,8 @@ public class LdapSecurityConfig {
                         groupRoleAttribute);
 
                 Set<Group> addGroups = new HashSet<>();
+                Optional<Group> evGroup = groupRepository.findByName(AuthorizationConstants.EVERYONE);
+                evGroup.ifPresent(addGroups::add);
                 for (String memberGroup : memberGroups) {
                     Optional<Group> group = groupRepository.findByName(memberGroup);
                     group.ifPresent(addGroups::add);
@@ -171,7 +173,6 @@ public class LdapSecurityConfig {
                 if (user.isAdmin()) {
                     auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
                 }
-                auths.add(new SimpleGrantedAuthority(AuthorizationConstants.EVERYONE));
                 return auths;
             }
         }

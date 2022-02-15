@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
@@ -65,6 +66,21 @@ public class GroupsController {
     }
 
     @Autowired
+    public void setPermissionService(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
+
+    @Autowired
+    public void setMss(MethodSecurityService mss) {
+        this.mss = mss;
+    }
+
+    @Autowired
+    public void setObjectMapper(ObjectMapper om) {
+        this.om = om;
+    }
+
+    @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -82,8 +98,13 @@ public class GroupsController {
         }
 
         for (GroupJson group : groupPost.getGroups()) {
-            if (group.getName() == null || group.getId().isEmpty()) {
+
+            if (group.getName() == null || group.getName().isEmpty()) {
                 group.setName(UUID.randomUUID().toString());
+            }
+
+            if (!groupValidationService.isValidGroupName(group.getName())) {
+                throw new BadRequestException(GroupConstants.INVALID_GROUP_NAME);
             }
 
             if (group.getType() == null || group.getType().isEmpty()) {
@@ -100,12 +121,12 @@ public class GroupsController {
                 }
                 newGroup = false;
             }
-            g.setName(group.getId());
+            g.setName(group.getName());
             g.setType(group.getType());
-            logger.info("Saving group: {}", g.getGroupId());
+            logger.info("Saving group: {}", g.getName());
             Group saved = groupRepository.save(g);
             if (newGroup) {
-                permissionService.initGroupPerms(group.getId(), auth.getName());
+                permissionService.initGroupPerms(group.getName(), auth.getName());
             }
             group.merge(convertToMap(saved));
             response.getGroups().add(group);
@@ -123,7 +144,7 @@ public class GroupsController {
         GroupsResponse response = new GroupsResponse();
         List<Group> allGroups = groupRepository.findAll();
         for (Group group : allGroups) {
-            if (mss.hasGroupPrivilege(auth, group.getGroupId(), Privileges.GROUP_READ.name(), true)) {
+            if (mss.hasGroupPrivilege(auth, group.getName(), Privileges.GROUP_READ.name(), true)) {
                 GroupJson groupJson = new GroupJson();
                 groupJson.merge(convertToMap(group));
                 response.getGroups().add(groupJson);
@@ -140,7 +161,7 @@ public class GroupsController {
 
         GroupsResponse response = new GroupsResponse();
         Optional<Group> groupOption = groupRepository.findByName(groupName);
-        if (!groupOption.isPresent()) {
+        if (groupOption.isEmpty()) {
             throw new NotFoundException(response.addMessage("Group not found."));
         }
         GroupJson groupJson = new GroupJson();
@@ -155,11 +176,31 @@ public class GroupsController {
     @Transactional
     public void deleteLocalGroup(@PathVariable String groupName) {
         Group groupObj = groupRepository.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
+        if (groupValidationService.isRestrictedGroup(groupObj.getName())) {
+            throw new BadRequestException(GroupConstants.NO_DELETE_RESTRICTED);
+        }
         if (groupValidationService.canDeleteGroup(groupObj)) {
             this.groupRepository.delete(groupObj);
         } else {
             throw new BadRequestException(GroupConstants.GROUP_NOT_EMPTY);
         }
+    }
+
+    @GetMapping("/{groupName}/users")
+    @PreAuthorize("@mss.hasGroupPrivilege(authentication, #groupName, 'GROUP_READ', true)")
+    @Transactional
+    public GroupUsersResponse getAllGroupUsers( @PathVariable String groupName) {
+
+        GroupUsersResponse response = new GroupUsersResponse();
+        Set<String> usernames = new HashSet<>();
+        Group groupObj = groupRepository.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
+        if (groupObj.getType() == Group.VALID_GROUP_TYPES.REMOTE) {
+            usernames.addAll(userRepository.findAll().stream().filter(user -> (user.getGroups().contains(groupObj))).map(User::getUsername).collect(Collectors.toSet()));
+        }else {
+            usernames.addAll(groupObj.getUsers().stream().map(User::getUsername).collect(Collectors.toSet()));
+        }
+        response.getUsers().addAll(usernames);
+        return response;
     }
 
     @PostMapping("/{groupName}/users")
@@ -221,7 +262,7 @@ public class GroupsController {
         return response;
     }
 
-    protected void handleSingleResponse(BaseResponse res) {
+    protected void handleSingleResponse(BaseResponse<GroupsResponse> res) {
         if (res.getRejected() != null && !res.getRejected().isEmpty()) {
             List<Rejection> rejected = res.getRejected();
             int code = rejected.get(0).getCode();

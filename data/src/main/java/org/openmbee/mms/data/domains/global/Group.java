@@ -3,6 +3,7 @@ package org.openmbee.mms.data.domains.global;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.persistence.*;
 
@@ -39,13 +40,10 @@ public class Group extends Base {
         this.name = name;
         this.type = VALID_GROUP_TYPES.REMOTE;
         this.typeString = VALID_GROUP_TYPES.REMOTE.toString().toLowerCase();
+        this.users = new ArrayList<>();
     }
 
-    public String getGroupId() { return name; }
-
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public void setName(String name) {
         this.name = name;
@@ -81,6 +79,22 @@ public class Group extends Base {
 
     public void setUsers(Collection<User> users) {
         this.users = users;
+    }
+
+    public Collection<GroupGroupPerm> getGroupPerms() {
+        return this.groupPerms;
+    }
+
+    public void setGroupPerms(Collection<GroupGroupPerm> groupPerms) {
+        this.groupPerms = groupPerms;
+    }
+
+    public Collection<GroupUserPerm> getUserPerms() {
+        return this.userPerms;
+    }
+
+    public void setUserPerms(Collection<GroupUserPerm> userPerms) {
+        this.userPerms = userPerms;
     }
 
     public boolean isPublic() {

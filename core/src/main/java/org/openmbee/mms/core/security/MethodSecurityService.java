@@ -50,6 +50,10 @@ public class MethodSecurityService {
         this.branchRepository = branchRepository;
     }
 
+    @Autowired
+    public void setGroupRepository(GroupDAO groupRepository) {
+        this.groupRepository = groupRepository;
+    }
 
     public boolean hasOrgPrivilege(Authentication authentication, String orgId, String privilege, boolean allowAnonIfPublic) {
         CompletableFuture<Boolean> permissionsFuture = CompletableFuture.supplyAsync(() ->
@@ -147,7 +151,7 @@ public class MethodSecurityService {
     }
 
     private boolean groupExists(String groupName) {
-        Optional<Group> g = groupRepository.findByGroupId(groupName);
+        Optional<Group> g = groupRepository.findByGroupName(groupName);
         return g.isPresent();
     }
 

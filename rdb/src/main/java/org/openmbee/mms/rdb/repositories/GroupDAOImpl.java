@@ -19,11 +19,6 @@ public class GroupDAOImpl implements GroupDAO {
     }
 
     @Override
-    public Optional<Group> findByGroupId(String id) {
-        return groupRepository.findByName(id);
-    }
-
-    @Override
     public Optional<Group> findByGroupName(String name) {
         return groupRepository.findByName(name);
     }

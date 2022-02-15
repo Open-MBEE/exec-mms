@@ -3,7 +3,10 @@ package org.openmbee.mms.localuser.security;
 import java.util.List;
 import java.util.Optional;
 
+import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.core.exceptions.ForbiddenException;
+import org.openmbee.mms.data.domains.global.Group;
+import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
 import org.openmbee.mms.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UserRepository userRepository;
+    private GroupRepository groupRepository;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setGroupRepository(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
     }
 
     @Autowired
@@ -54,6 +63,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setPassword(encodePassword(req.getPassword()));
         user.setEnabled(true);
         user.setAdmin(req.isAdmin());
+        Optional<Group> evGroup = groupRepository.findByName(AuthorizationConstants.EVERYONE);
+        if (evGroup.isPresent()) {
+            evGroup.get().getUsers().add(user);
+            groupRepository.save(evGroup.get());
+        }
         return userRepository.save(user);
     }
 

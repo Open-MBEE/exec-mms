@@ -15,11 +15,16 @@ public class GroupsResponse extends BaseResponse<GroupsResponse> {
     @Schema(required = true)
     private List<GroupJson> groups;
 
+    public GroupsResponse() {
+        this.groups = new ArrayList<>();
+    }
+
     public List<GroupJson> getGroups() {
-        return groups;
+        return this.groups;
     }
 
     public void setGroups(List<GroupJson> groups) {
         this.groups = groups;
     }
+
 }

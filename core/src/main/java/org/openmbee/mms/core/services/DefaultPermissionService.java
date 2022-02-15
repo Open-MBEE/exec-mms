@@ -93,8 +93,8 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public void initGroupPerms(String groupId, String creator) {
-        Group group = getGroup(groupId);
+    public void initGroupPerms(String groupName, String creator) {
+        Group group = getGroup(groupName);
         PermissionsDelegate permissionsDelegate = getPermissionsDelegate(group);
         permissionsDelegate.initializePermissions(creator);
     }
@@ -177,8 +177,8 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public PermissionUpdatesResponse updateGroupUserPerms(PermissionUpdateRequest req, String groupId) {
-        Group group = getGroup(groupId);
+    public PermissionUpdatesResponse updateGroupUserPerms(PermissionUpdateRequest req, String groupName) {
+        Group group = getGroup(groupName);
         PermissionsDelegate permissionsDelegate = getPermissionsDelegate(group);
         PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
         responseBuilder.getUsers().insert(permissionsDelegate.updateUserPermissions(req));
@@ -188,8 +188,8 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public PermissionUpdatesResponse updateGroupGroupPerms(PermissionUpdateRequest req, String groupId) {
-        Group group = getGroup(groupId);
+    public PermissionUpdatesResponse updateGroupGroupPerms(PermissionUpdateRequest req, String groupName) {
+        Group group = getGroup(groupName);
         PermissionsDelegate permissionsDelegate = getPermissionsDelegate(group);
         PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
         responseBuilder.getGroups().insert(permissionsDelegate.updateGroupPermissions(req));
@@ -282,13 +282,11 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public boolean hasGroupPrivilege(String privilege, String user, Set<String> groups, String groupId) {
+    public boolean hasGroupPrivilege(String privilege, String user, Set<String> groups, String groupName) {
         //Return true, however admin are only allowed "delete" perms on Remote group types
         if (groups.contains(AuthorizationConstants.MMSADMIN)) return true;
 
-        Group group = getGroup(groupId);
-        //Return false if group is remotely managed
-        if (group.getType().equals(Group.VALID_GROUP_TYPES.REMOTE)) return false;
+        Group group = getGroup(groupName);
 
         PermissionsDelegate permissionsDelegate = getPermissionsDelegate(group);
         return permissionsDelegate.hasPermission(user, groups, privilege);
@@ -334,7 +332,7 @@ public class DefaultPermissionService implements PermissionService {
     @Override
     @Transactional
     public boolean isGroupPublic(String groupName) {
-        Optional<Group> group = groupRepo.findByGroupId(groupName);
+        Optional<Group> group = groupRepo.findByGroupName(groupName);
         if (!group.isPresent()) {
             throw new NotFoundException("org " + groupName + " not found");
         }
@@ -401,16 +399,16 @@ public class DefaultPermissionService implements PermissionService {
 
     @Override
     @Transactional
-    public PermissionResponse getGroupGroupRoles(String groupId) {
-        Group group = getGroup(groupId);
+    public PermissionResponse getGroupGroupRoles(String groupName) {
+        Group group = getGroup(groupName);
         PermissionsDelegate permissionsDelegate = getPermissionsDelegate(group);
         return permissionsDelegate.getGroupRoles();
     }
 
     @Override
     @Transactional
-    public PermissionResponse getGroupUserRoles(String groupId) {
-        Group group = getGroup(groupId);
+    public PermissionResponse getGroupUserRoles(String groupName) {
+        Group group = getGroup(groupName);
         PermissionsDelegate permissionsDelegate = getPermissionsDelegate(group);
         return permissionsDelegate.getUserRoles();
     }
@@ -453,11 +451,11 @@ public class DefaultPermissionService implements PermissionService {
         return proj.get();
     }
 
-    private Group getGroup(String groupId) {
-        Optional<Group> group = groupRepo.findByGroupId(groupId);
+    private Group getGroup(String groupName) {
+        Optional<Group> group = groupRepo.findByGroupName(groupName);
 
         if (!group.isPresent()) {
-            throw new NotFoundException("Project " + groupId + " not found");
+            throw new NotFoundException("Project " + groupName + " not found");
         }
         return group.get();
     }
@@ -531,7 +529,7 @@ public class DefaultPermissionService implements PermissionService {
         }
 
         throw new InternalErrorException(
-            "No valid permissions scheme found for organization " + group.getGroupId()
+            "No valid permissions scheme found for organization " + group.getName()
                 + " (" + group.getName() + ")");
     }
 }

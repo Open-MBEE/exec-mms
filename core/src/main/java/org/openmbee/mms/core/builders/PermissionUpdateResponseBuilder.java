@@ -142,7 +142,7 @@ public class PermissionUpdateResponseBuilder {
             return;
 
         PermissionUpdateResponse.PermissionUpdate update = new PermissionUpdateResponse.PermissionUpdate(
-            action, v.getUser().getUsername(), v.getRole().getName(), v.getGroup().getGroupId(), v.getGroup().getName(),
+            action, v.getUser().getUsername(), v.getRole().getName(), v.getGroup().getName(), v.getGroup().getName(),
             null, null, null, false);
         doInsert(update);
     }
@@ -156,7 +156,7 @@ public class PermissionUpdateResponseBuilder {
             return;
 
         PermissionUpdateResponse.PermissionUpdate update = new PermissionUpdateResponse.PermissionUpdate(
-            action, v.getGroup().getName(), v.getRole().getName(), v.getGroup().getGroupId(), v.getGroup().getName(),
+            action, v.getGroup().getName(), v.getRole().getName(), v.getGroup().getName(), v.getGroup().getName(),
             null, null, null, false);
         doInsert(update);
     }

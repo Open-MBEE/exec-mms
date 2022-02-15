@@ -16,7 +16,6 @@ import org.openmbee.mms.data.domains.global.User;
 import org.openmbee.mms.permissions.exceptions.PermissionException;
 import org.openmbee.mms.rdb.repositories.GroupGroupPermRepository;
 import org.openmbee.mms.rdb.repositories.GroupUserPermRepository;
-import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -29,19 +28,13 @@ import static org.openmbee.mms.core.config.AuthorizationConstants.EVERYONE;
 
 public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
 
-    private GroupRepository groupRepo;
     private GroupUserPermRepository groupUserPermRepo;
     private GroupGroupPermRepository groupGroupPermRepo;
 
-    private Group group;
+    private final Group group;
 
     public DefaultGroupPermissionsDelegate(Group group) {
         this.group = group;
-    }
-
-    @Autowired
-    public void setGroupRepo(GroupRepository groupRepo) {
-        this.groupRepo = groupRepo;
     }
 
     @Autowired
@@ -58,18 +51,20 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
     public boolean hasPermission(String user, Set<String> groupPerms, String privilege) {
 
         Optional<Privilege> priv = getPrivRepo().findByName(privilege);
-        if (!priv.isPresent()) {
+        if (priv.isEmpty()) {
             throw new PermissionException(HttpStatus.BAD_REQUEST, "No such privilege");
+        }
+
+        //Return false if group is remotely managed
+        if (group.getType().equals(Group.VALID_GROUP_TYPES.REMOTE) && privilege.equalsIgnoreCase("GROUP_EDIT")) {
+            throw new PermissionException(HttpStatus.BAD_REQUEST, "Unable to edit remote groups.");
         }
 
         Set<Role> roles = priv.get().getRoles();
         if (groupUserPermRepo.existsByGroupAndUser_UsernameAndRoleIn(group, user, roles)) {
             return true;
         }
-        if (!groupPerms.isEmpty() && groupGroupPermRepo.existsByGroupAndGroup_NameInAndRoleIn(group, groupPerms, roles)) {
-            return true;
-        }
-        return false;
+        return !groupPerms.isEmpty() && groupGroupPermRepo.existsByGroupAndGroup_NameInAndRoleIn(group, groupPerms, roles);
     }
 
     @Override
@@ -86,20 +81,26 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
         Optional<User> user = getUserRepo().findByUsername(creator);
         Optional<Role> role = getRoleRepo().findByName(AuthorizationConstants.ADMIN);
 
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "User not found");
-        } else if (!role.isPresent()) {
+        } else if (role.isEmpty()) {
             throw new PermissionException(HttpStatus.NOT_FOUND, "Role not found");
         }
 
         GroupUserPerm perm = new GroupUserPerm(group, user.get(), role.get());
         groupUserPermRepo.save(perm);
 
-        Optional<Group> groupPerm = getGroupRepo().findByName(AuthorizationConstants.EVERYONE);
         Optional<Role> eRole = getRoleRepo().findByName(AuthorizationConstants.READER);
+        Optional<Group> ePerm = getGroupRepo().findByName(AuthorizationConstants.EVERYONE);
 
-        GroupGroupPerm gPerm = new GroupGroupPerm(group, groupPerm.get(), eRole.get());
-        groupGroupPermRepo.save(gPerm);
+        if (ePerm.isEmpty()) {
+            return;
+        } else if (eRole.isEmpty()) {
+            throw new PermissionException(HttpStatus.NOT_FOUND, "Role not found");
+        }
+
+        GroupGroupPerm evPerm = new GroupGroupPerm(group, ePerm.get(), eRole.get());
+        groupGroupPermRepo.save(evPerm);
     }
 
     @Override
@@ -113,7 +114,7 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
     @Override
     public void setPublic(boolean isPublic) {
         group.setPublic(isPublic);
-        groupRepo.save(group);
+        getGroupRepo().save(group);
     }
 
     @Override
@@ -125,7 +126,7 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
                     Optional<User> user = getUserRepo().findByUsername(p.getName());
                     Optional<Role> role = getRoleRepo().findByName(p.getRole());
-                    if (!user.isPresent() || !role.isPresent()) {
+                    if (user.isEmpty() || role.isEmpty()) {
                         //throw exception or skip
                         continue;
                     }
@@ -246,7 +247,7 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
     @Override
     public PermissionResponse getUserRoles() {
         PermissionResponse res = PermissionResponse.getDefaultResponse();
-        for (GroupUserPerm perm: groupUserPermRepo.findAllByGroup_GroupId(group.getGroupId())) {
+        for (GroupUserPerm perm: groupUserPermRepo.findAllByGroup_Name(group.getName())) {
             res.getPermissions().add(new PermissionResponse.Permission(
                 perm.getUser().getUsername(),
                 perm.getRole().getName(),
@@ -259,9 +260,9 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
     @Override
     public PermissionResponse getGroupRoles() {
         PermissionResponse res = PermissionResponse.getDefaultResponse();
-        for (GroupGroupPerm perm: groupGroupPermRepo.findAllByGroup_GroupId(group.getGroupId())) {
+        for (GroupGroupPerm perm: groupGroupPermRepo.findAllByGroup_Name(group.getName())) {
             res.getPermissions().add(new PermissionResponse.Permission(
-                perm.getGroup().getName(),
+                perm.getGroupPerm().getName(),
                 perm.getRole().getName(),
                 false
             ));

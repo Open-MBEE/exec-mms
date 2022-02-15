@@ -16,13 +16,11 @@ public interface GroupGroupPermRepository extends JpaRepository<GroupGroupPerm, 
 
     List<GroupGroupPerm> findAllByGroup(Group group);
 
-    List<GroupGroupPerm> findAllByGroup_GroupId(String groupId);
+    List<GroupGroupPerm> findAllByGroup_Name(String group);
 
     Optional<GroupGroupPerm> findByGroupAndGroup(Group b, Group group);
 
     List<GroupGroupPerm> findAllByGroupAndRole_Name(Group group, String r);
-
-    List<GroupGroupPerm> findAllByGroup_Name(String group);
 
     boolean existsByGroupAndGroup_NameInAndRoleIn(Group group, Set<String> user, Set<Role> roles);
 

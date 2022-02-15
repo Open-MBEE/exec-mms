@@ -11,6 +11,7 @@ public class GroupConstants {
     public static final String TYPE = "type";
     public static final String NO_USERS_PROVIDED = "No users provided";
     public static final String RESTRICTED_GROUP = "Restricted group";
+    public static final String NO_DELETE_RESTRICTED = "Unable to delete restricted group";
     public static final String REMOTE_GROUP = "Unable to add users to remote group";
     public static final String INVALID_GROUP_TYPE= "Invalid group type";
 

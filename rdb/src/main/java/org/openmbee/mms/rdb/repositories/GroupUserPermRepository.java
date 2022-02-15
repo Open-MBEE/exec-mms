@@ -13,7 +13,7 @@ public interface GroupUserPermRepository extends JpaRepository<GroupUserPerm, Lo
 
     List<GroupUserPerm> findAllByGroup(Group group);
 
-    List<GroupUserPerm> findAllByGroup_GroupId(String groupId);
+    List<GroupUserPerm> findAllByGroup_Name(String groupName);
 
     Optional<GroupUserPerm> findByGroupAndUser(Group b, User u);
 

@@ -2,6 +2,8 @@ package org.openmbee.mms.twc.permissions;
 
 import org.openmbee.mms.core.delegation.PermissionsDelegate;
 import org.openmbee.mms.core.delegation.PermissionsDelegateFactory;
+import org.openmbee.mms.data.domains.global.Group;
+import org.openmbee.mms.permissions.delegation.DefaultGroupPermissionsDelegate;
 import org.openmbee.mms.twc.TeamworkCloud;
 import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.data.domains.global.Branch;
@@ -76,6 +78,11 @@ public class TwcPermissionsDelegateFactory implements PermissionsDelegateFactory
         }
 
         return null;
+    }
+
+    @Override
+    public PermissionsDelegate getPermissionsDelegate(Group group) {
+        return autowire(new DefaultGroupPermissionsDelegate(group));
     }
 
     private PermissionsDelegate autowire(PermissionsDelegate permissionsDelegate) {

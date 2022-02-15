@@ -14,7 +14,7 @@ public interface PermissionService {
 
     void initBranchPerms(String projectId, String branchId, boolean inherit, String creator);
 
-    void initGroupPerms(String groupId, String creator);
+    void initGroupPerms(String groupName, String creator);
 
     PermissionUpdatesResponse updateOrgUserPerms(PermissionUpdateRequest req, String orgId);
 
@@ -28,9 +28,9 @@ public interface PermissionService {
 
     PermissionUpdateResponse updateBranchGroupPerms(PermissionUpdateRequest req, String projectId, String branchId);
 
-    PermissionUpdatesResponse updateGroupUserPerms(PermissionUpdateRequest req, String groupId);
+    PermissionUpdatesResponse updateGroupUserPerms(PermissionUpdateRequest req, String groupName);
 
-    PermissionUpdatesResponse updateGroupGroupPerms(PermissionUpdateRequest req, String groupId);
+    PermissionUpdatesResponse updateGroupGroupPerms(PermissionUpdateRequest req, String groupName);
 
     PermissionUpdatesResponse setProjectInherit(boolean isInherit, String projectId);
 
@@ -48,7 +48,7 @@ public interface PermissionService {
 
     boolean hasBranchPrivilege(String privilege, String user, Set<String> groups, String projectId, String branchId);
 
-    boolean hasGroupPrivilege(String privilege, String user, Set<String> groups, String groupId);
+    boolean hasGroupPrivilege(String privilege, String user, Set<String> groups, String groupName);
 
     boolean isProjectInherit(String projectId);
 
@@ -72,7 +72,7 @@ public interface PermissionService {
 
     PermissionResponse getBranchUserRoles(String projectId, String branchId);
 
-    PermissionResponse getGroupGroupRoles(String groupId);
+    PermissionResponse getGroupGroupRoles(String groupName);
 
-    PermissionResponse getGroupUserRoles(String groupId);
+    PermissionResponse getGroupUserRoles(String groupName);
 }
