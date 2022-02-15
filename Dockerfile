@@ -1,4 +1,4 @@
-FROM openjdk:11.0.8-jdk
+FROM openjdk:15-jdk-slim
 COPY . /mms
 WORKDIR /mms
 RUN ./gradlew --no-daemon bootJar
