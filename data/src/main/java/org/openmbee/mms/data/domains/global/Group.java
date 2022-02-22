@@ -8,14 +8,15 @@ import java.util.Collection;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "groups")
+@Table(name = "groups", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Group extends Base {
 
 
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "groups")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "groups_id", referencedColumnName = "id"))
     private Collection<User> users;
 
     @JsonIgnore
@@ -35,7 +36,9 @@ public class Group extends Base {
     @JsonProperty("public")
     private boolean isPublic;
 
-    public Group() {}
+    public Group() {
+        this.users = new ArrayList<>();
+    }
     public Group(String name) {
         this.name = name;
         this.type = VALID_GROUP_TYPES.REMOTE;
@@ -74,7 +77,7 @@ public class Group extends Base {
     }
 
     public Collection<User> getUsers() {
-        return users;
+        return this.users;
     }
 
     public void setUsers(Collection<User> users) {

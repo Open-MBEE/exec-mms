@@ -118,8 +118,9 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
             allUsers.removeAll(evGroup.getUsers());
             if (allUsers.size() > 0) {
                 evGroup.getUsers().addAll(allUsers);
+                groupRepo.saveAndFlush(evGroup);
             }
-            groupRepo.saveAndFlush(evGroup);
+
         }
 
     }

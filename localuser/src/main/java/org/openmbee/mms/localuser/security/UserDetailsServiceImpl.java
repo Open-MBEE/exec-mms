@@ -3,11 +3,7 @@ package org.openmbee.mms.localuser.security;
 import java.util.List;
 import java.util.Optional;
 
-import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.core.exceptions.ForbiddenException;
-import org.openmbee.mms.data.domains.global.Group;
-import org.openmbee.mms.rdb.repositories.GroupRepository;
-import org.openmbee.mms.rdb.repositories.UserRepository;
 import org.openmbee.mms.data.domains.global.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,21 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl extends AbstractUserDetailsServiceImpl implements UserDetailsService {
 
-    private UserRepository userRepository;
-    private GroupRepository groupRepository;
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setGroupRepository(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
 
     @Autowired
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
@@ -40,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = getUserRepo().findByUsername(username);
 
         if (!user.isPresent()) {
             throw new UsernameNotFoundException(
@@ -50,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return getUserRepo().findAll();
     }
 
     @Transactional
@@ -63,17 +47,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setPassword(encodePassword(req.getPassword()));
         user.setEnabled(true);
         user.setAdmin(req.isAdmin());
-        Optional<Group> evGroup = groupRepository.findByName(AuthorizationConstants.EVERYONE);
-        if (evGroup.isPresent()) {
-            evGroup.get().getUsers().add(user);
-            groupRepository.save(evGroup.get());
-        }
-        return userRepository.save(user);
+        return saveUser(user);
     }
 
     @Transactional
     public void changeUserPassword(String username, String password, boolean asAdmin) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
+        Optional<User> userOptional = getUserRepo().findByUsername(username);
         if(! userOptional.isPresent()) {
             throw new UsernameNotFoundException(
                     String.format("No user found with username '%s'.", username));
@@ -86,7 +65,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         //TODO password strength test?
         user.setPassword(encodePassword(password));
-        userRepository.save(user);
+        getUserRepo().save(user);
     }
 
     private String encodePassword(String password) {
