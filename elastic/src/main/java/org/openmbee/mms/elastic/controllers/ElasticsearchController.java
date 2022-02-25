@@ -35,7 +35,7 @@ public class ElasticsearchController {
     }
 
     enum Type {elements, commits};
-    /*
+
     @PostMapping(value = "/projects/{projectId}/elasticsearch/{type}")
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public ResponseEntity<StreamingResponseBody> searchProject(
@@ -49,40 +49,16 @@ public class ElasticsearchController {
         Request req = new Request("GET", "/" + index + "/_search" );
         req.addParameters(params);
         req.setJsonEntity(query);
-        StreamingResponseBody stream = outputStream -> {
-            try {
-                Response res = client.performRequest(req);
-                res.getEntity().getContent().transferTo(outputStream);
-                res.getEntity().getContent().close();
-            } catch (IOException e) {
-                logger.error("elasticsearch passthru error", e);
-            }
-            outputStream.close();
-        };
-        return ResponseEntity.ok()
-            .header("Content-Type", "application/json")
-            .body(stream);
-    }
-*/
-
-    @PostMapping(value = "/projects/{projectId}/elasticsearch/{type}")
-    @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
-    public String searchProject(
-        @PathVariable String projectId,
-        @PathVariable Type type,
-        @RequestBody String query,
-        @RequestParam(required = false) Map<String, String> params) {
-
-        ContextHolder.setContext(projectId);
-        String index = type == Type.elements ? Index.NODE.get() : Index.COMMIT.get();
-        Request req = new Request("GET", "/" + index + "/_search" );
-        req.setJsonEntity(query);
-        req.addParameters(params);
         try {
             Response res = client.performRequest(req);
-            byte[] results = res.getEntity().getContent().readAllBytes();
-            res.getEntity().getContent().close();
-            return new String(results, StandardCharsets.UTF_8);
+            StreamingResponseBody stream = outputStream -> {
+                res.getEntity().getContent().transferTo(outputStream);
+                res.getEntity().getContent().close();
+                outputStream.close();
+            };
+            return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(stream);
         } catch (IOException e) {
             logger.error("elasticsearch passthru error", e);
             throw new InternalErrorException(e.getMessage());
