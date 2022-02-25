@@ -20,11 +20,14 @@ public class ElasticsearchConfig {
 
     @Bean(name = "clientElastic", destroyMethod = "close")
     public RestHighLevelClient restClient() {
-
         RestClientBuilder builder = RestClient.builder(new HttpHost(elasticsearchHost, elasticsearchPort, elasticsearchHttp));
         builder.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(10000).setSocketTimeout(1000000));
         RestHighLevelClient client = new RestHighLevelClient(builder);
         return client;
     }
 
+    @Bean(name = "lowLevelElasticClient", destroyMethod = "close")
+    public RestClient lowLevelClient() {
+        return RestClient.builder(new HttpHost(elasticsearchHost, elasticsearchPort, elasticsearchHttp)).build();
+    }
 }
