@@ -32,7 +32,7 @@ instructions are found here: `Docker documentation <https://docs.docker.com/>`_
 Java SE Development Kit 11
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Installation instructions: `JDK-11 download <https://www.oracle.com/java/technologies/javase-jdk11-downloads.html>`_
+Installation instructions: `JDK-17 download <https://www.oracle.com/java/technologies/javase-jdk17-downloads.html>`_
 
 Postgresql
 ^^^^^^^^^^
