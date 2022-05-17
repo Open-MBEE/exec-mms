@@ -1,18 +1,18 @@
 version: 2.1
 orbs:
-  node: circleci/docker@2.1.1
+    docker: circleci/docker@2.1.1
 executors:
-    openjdk_executor:
-        docker:
-            - image: cimg/openjdk:17.0.3
-        environment:
-            _JAVA_OPTIONS: "-Xmx3g"
-            GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  openjdk_executor:
+    docker:
+      - image: cimg/openjdk:17.0.3
+    environment:
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 jobs:
   build_and_test:
     executor:
-      name: node/default
+      name: docker/docker
     working_directory: /home/circleci/mms
     steps:
       - checkout
