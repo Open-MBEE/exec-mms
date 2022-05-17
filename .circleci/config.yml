@@ -1,10 +1,10 @@
 version: 2.1
 orbs:
-  node: circleci/node@1.1.6
+  node: circleci/docker@2.1.1
 executors:
     openjdk_executor:
         docker:
-            - image: circleci/openjdk:11.0.8-jdk
+            - image: cimg/openjdk:17.0.3
         environment:
             _JAVA_OPTIONS: "-Xmx3g"
             GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -23,7 +23,7 @@ jobs:
           name: "Create and start all services from the docker-compose configuration"
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            docker-compose up -d
+            docker-compose up --build -d
             docker run --network container:mms curlimages/curl --retry 8 --retry-delay 10 --retry-max-time 90 --retry-connrefused http://mms:8080/healthcheck
 
       - run: 
