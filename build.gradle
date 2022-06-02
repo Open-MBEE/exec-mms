@@ -16,7 +16,7 @@ description = 'Model Management System Reference Implementation'
 ext {
     commonDependencies = [
         'swagger-annotations'           : 'io.swagger.core.v3:swagger-annotations:2.1.2',
-        'hibernate-core'                : 'org.hibernate:hibernate-core:5.4.14.Final',
+        'hibernate-core'                : 'org.hibernate:hibernate-core:5.6.0.Final',
         'servlet-api'                   : 'javax.servlet:javax.servlet-api:4.0.1',
         'slf4j-api'                     : 'org.slf4j:slf4j-api:1.7.30',
         'spring-boot'                   : "org.springframework.boot:spring-boot:$springBootVersion",
