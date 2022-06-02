@@ -44,6 +44,8 @@ spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
 spring.jpa.open-in-view=false
 
 spring.main.allow-bean-definition-overriding=true
+spring.main.allow-circular-references=true
+spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #Configuration for Elasticsearch
 elasticsearch.host=localhost

@@ -29,8 +29,7 @@ import static org.springframework.http.HttpMethod.*;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
 @EnableAsync
-public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implements
-    WebMvcConfigurer {
+public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     @Autowired
     AuthSecurityConfig authSecurityConfig;
