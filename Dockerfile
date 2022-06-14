@@ -1,7 +1,7 @@
-FROM openjdk:11-jdk-slim
+FROM openjdk:17.0.2-slim as build
 COPY . /mms
 WORKDIR /mms
-RUN ./gradlew --no-daemon bootJar
+RUN ./gradlew --no-daemon bootJar --warning-mode all
 
 RUN find . -type f -name example-*.jar -not -iname '*javadoc*' -not -iname '*sources*' -exec cp '{}' '/app.jar' ';'
 ENV JDK_JAVA_OPTIONS "-XX:MaxRAMPercentage=90.0"

@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "1ca92623-8c37-47d1-8d35-5684f4a0cdb8",
+		"_postman_id": "34257752-6305-4dae-b6d8-b71fa98b9963",
 		"name": "search",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7302261"
 	},
 	"item": [
 		{
@@ -11,7 +12,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "217210a9-1489-4057-b89f-bc0b44111569",
 						"exec": [
 							"",
 							"pm.test(\"Status code is 200\", function () {",
@@ -67,7 +67,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "10fb6974-d6a5-4c9f-a4d8-1fc0c6739c33",
 						"exec": [
 							"pm.test(\"response has org s\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -109,7 +108,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "db56bdc2-e7bb-49af-9a7e-93359c7c1fd5",
 						"exec": [
 							"pm.test(\"response has project ss\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -151,7 +149,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f23976f1-afb8-495f-892a-dcbcc7360665",
 						"exec": [
 							"pm.test(\"response has elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -199,7 +196,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4ea3441a-8a0f-421a-ba27-67ac1351775d",
 						"exec": [
 							"pm.test(\"response has 1 element\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -241,7 +237,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4ea3441a-8a0f-421a-ba27-67ac1351775d",
 						"exec": [
 							"pm.test(\"response has 2 elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -288,7 +283,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c59583b1-35e6-4c27-8aaf-b9dbc98c1b13",
 						"exec": [
 							"pm.test(\"response has 1 elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -337,7 +331,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4ea3441a-8a0f-421a-ba27-67ac1351775d",
 						"exec": [
 							"pm.test(\"response has 0 elements\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -372,6 +365,47 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "search for name a",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"response has 1 element\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements.length).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/projects/ss/refs/master/search?name=a",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"ss",
+						"refs",
+						"master",
+						"search"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "a"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -388,7 +422,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "a38d93e6-1de5-4875-8f80-a5a6cec3dcd4",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -398,13 +431,11 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "0866a69c-ea90-48f6-bedf-269b559b40d8",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

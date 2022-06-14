@@ -54,7 +54,11 @@ public class SearchConfiguration {
                     }
                     break;
                 case MATCH:
-                    query.must(QueryBuilders.matchQuery(field, value));
+                    if (value instanceof List) {
+                        query.must(QueryBuilders.matchQuery(field, ((List)value).get(0)));
+                    } else {
+                        query.must(QueryBuilders.matchQuery(field, value));
+                    }
                     break;
                 default:
                     break;
