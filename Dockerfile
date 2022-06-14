@@ -1,4 +1,4 @@
-FROM openjdk:19-slim as build
+FROM openjdk:17.0.2-slim as build
 COPY . /mms
 WORKDIR /mms
 RUN ./gradlew --no-daemon bootJar --warning-mode all
