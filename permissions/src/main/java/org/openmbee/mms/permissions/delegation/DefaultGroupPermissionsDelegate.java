@@ -106,7 +106,7 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
     @Override
     public boolean setInherit(boolean isInherit) {
         if(isInherit) {
-            throw new IllegalArgumentException("Cannot inherit permissions for an Group");
+            throw new IllegalArgumentException("Cannot inherit permissions for a Group");
         }
         return false;
     }

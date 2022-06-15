@@ -3,7 +3,6 @@ package org.openmbee.mms.twc.permissions;
 import org.openmbee.mms.core.delegation.PermissionsDelegate;
 import org.openmbee.mms.core.delegation.PermissionsDelegateFactory;
 import org.openmbee.mms.data.domains.global.Group;
-import org.openmbee.mms.permissions.delegation.DefaultGroupPermissionsDelegate;
 import org.openmbee.mms.twc.TeamworkCloud;
 import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.data.domains.global.Branch;
@@ -33,11 +32,6 @@ public class TwcPermissionsDelegateFactory implements PermissionsDelegateFactory
     @Autowired
     public void setTwcConfig(TwcConfig twcConfig) {
         this.twcConfig = twcConfig;
-    }
-
-    @Autowired
-    public void setTwcMetadataService(TwcMetadataService twcMetadataService) {
-        this.twcMetadataService = twcMetadataService;
     }
 
     @Override
@@ -82,7 +76,12 @@ public class TwcPermissionsDelegateFactory implements PermissionsDelegateFactory
 
     @Override
     public PermissionsDelegate getPermissionsDelegate(Group group) {
-        return autowire(new DefaultGroupPermissionsDelegate(group));
+        if(!twcConfig.isUseAuthDelegation()) {
+            return null;
+        }
+
+            return autowire(new TwcGroupPermissionsDelegate(group));
+
     }
 
     private PermissionsDelegate autowire(PermissionsDelegate permissionsDelegate) {

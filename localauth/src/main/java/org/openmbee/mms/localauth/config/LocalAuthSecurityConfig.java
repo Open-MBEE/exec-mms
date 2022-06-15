@@ -1,4 +1,4 @@
-package org.openmbee.mms.localuser.config;
+package org.openmbee.mms.localauth.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +10,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class LocalUserSecurityConfig {
+public class LocalAuthSecurityConfig {
 
-    private static Logger logger = LoggerFactory.getLogger(LocalUserSecurityConfig.class);
+    private static Logger logger = LoggerFactory.getLogger(LocalAuthSecurityConfig.class);
 
     @Autowired
     public void configureDaoAuth(AuthenticationManagerBuilder auth,

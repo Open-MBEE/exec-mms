@@ -1,4 +1,4 @@
-package org.openmbee.mms.localuser.security;
+package org.openmbee.mms.users.security;
 
 import java.util.List;
 import org.openmbee.mms.data.domains.global.User;

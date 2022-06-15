@@ -1,4 +1,4 @@
-package org.openmbee.mms.localuser.controllers;
+package org.openmbee.mms.users.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.openmbee.mms.core.config.AuthorizationConstants;
@@ -7,9 +7,9 @@ import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.core.exceptions.UnauthorizedException;
 import org.openmbee.mms.core.utils.AuthenticationUtils;
 import org.openmbee.mms.data.domains.global.User;
-import org.openmbee.mms.localuser.security.UserCreateRequest;
-import org.openmbee.mms.localuser.security.UserDetailsServiceImpl;
-import org.openmbee.mms.localuser.security.UsersResponse;
+import org.openmbee.mms.users.security.UsersDetailsService;
+import org.openmbee.mms.users.security.UsersCreateRequest;
+import org.openmbee.mms.users.security.UsersResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,22 +22,22 @@ import java.util.List;
 
 @RestController
 @Tag(name = "Auth")
-public class LocalUserController {
+public class UsersController {
 
-    private UserDetailsServiceImpl userDetailsService;
+    private UsersDetailsService usersDetailsService;
 
     @Autowired
-    public LocalUserController(UserDetailsServiceImpl userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public UsersController(UsersDetailsService usersDetailsService) {
+        this.usersDetailsService = usersDetailsService;
     }
 
     @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
-    public UserCreateRequest createUser(@RequestBody UserCreateRequest req) {
+    public UsersCreateRequest createUser(@RequestBody UsersCreateRequest req) {
         try {
-            userDetailsService.loadUserByUsername(req.getUsername());
+            usersDetailsService.loadUserByUsername(req.getUsername());
         } catch (UsernameNotFoundException e) {
-            userDetailsService.register(req);
+            usersDetailsService.register(req);
             return req;
         }
         throw new BadRequestException("User already exists");
@@ -49,9 +49,9 @@ public class LocalUserController {
         UsersResponse res = new UsersResponse();
         List<User> users = new ArrayList<>();
         if (user != null) {
-            users.add(userDetailsService.loadUserByUsername(user).getUser());
+            users.add(usersDetailsService.loadUserByUsername(user).getUser());
         } else {
-            users = userDetailsService.getUsers();
+            users = usersDetailsService.getUsers();
         }
         res.setUsers(users);
         return res;
@@ -59,7 +59,7 @@ public class LocalUserController {
 
     @PostMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public Object updatePassword(@RequestBody UserCreateRequest req,
+    public Object updatePassword(@RequestBody UsersCreateRequest req,
         Authentication auth) {
         final String requester = auth.getName();
         final boolean requesterAdmin = AuthenticationUtils
@@ -67,7 +67,7 @@ public class LocalUserController {
 
         try {
             if (requesterAdmin || requester.equals(req.getUsername())) {
-                userDetailsService.changeUserPassword(req.getUsername(), req.getPassword(), requesterAdmin);
+                usersDetailsService.changeUserPassword(req.getUsername(), req.getPassword(), requesterAdmin);
             } else {
                 throw new UnauthorizedException("Not authorized");
             }

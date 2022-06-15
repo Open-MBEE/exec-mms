@@ -1,4 +1,4 @@
-package org.openmbee.mms.localuser.config;
+package org.openmbee.mms.localauth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

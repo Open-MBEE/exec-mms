@@ -1,12 +1,12 @@
-package org.openmbee.mms.ldap;
+package org.openmbee.mms.ldap.config;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
-import org.openmbee.mms.data.domains.global.Base;
 import org.openmbee.mms.data.domains.global.Group;
+import org.openmbee.mms.ldap.security.LdapUsersDetailsService;
 import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
 import org.openmbee.mms.data.domains.global.User;
@@ -55,14 +55,7 @@ public class LdapSecurityConfig {
     @Value("${ldap.user.attributes.username:uid}")
     private String userAttributesUsername;
 
-    @Value("${ldap.user.attributes.firstname:givenname}")
-    private String userAttributesFirstName;
 
-    @Value("${ldap.user.attributes.lastname:sn}")
-    private String userAttributesLastName;
-
-    @Value("${ldap.user.attributes.email:mail}")
-    private String userAttributesEmail;
 
     @Value("${ldap.user.attributes.update:24}")
     private int userAttributesUpdate;
@@ -78,6 +71,7 @@ public class LdapSecurityConfig {
 
     private UserRepository userRepository;
     private GroupRepository groupRepository;
+    private LdapUsersDetailsService userDetailsService;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -87,6 +81,11 @@ public class LdapSecurityConfig {
     @Autowired
     public void setGroupRepository(GroupRepository groupRepository) {
         this.groupRepository = groupRepository;
+    }
+
+    @Autowired
+    public void setUserDetailsService(LdapUsersDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Autowired
@@ -129,14 +128,14 @@ public class LdapSecurityConfig {
                 Optional<User> userOptional = userRepository.findByUsername(username);
 
                 if (!userOptional.isPresent()) {
-                    User newUser = createLdapUser(userData);
+                    User newUser = userDetailsService.register(userDetailsService.parseLdapRegister(userData));
 
                     userOptional = Optional.of(newUser);
                 }
 
                 User user = userOptional.get();
                 if (user.getModified().isBefore(Instant.now().minus(userAttributesUpdate, ChronoUnit.HOURS))) {
-                    saveLdapUser(userData, user);
+                    userDetailsService.parseLdapUser(userData, user);
                 }
                 user.setPassword(null);
                 String userDn = userAttributesUsername + "=" + user.getUsername() + "," + providerBase;
@@ -144,8 +143,8 @@ public class LdapSecurityConfig {
                 List<Group> definedGroups = groupRepository.findAll();
                 OrFilter orFilter = new OrFilter();
 
-                for (int i = 0; i < definedGroups.size(); i++) {
-                    orFilter.or(new EqualsFilter(groupRoleAttribute, definedGroups.get(i).getName()));
+                for (Group definedGroup : definedGroups) {
+                    orFilter.or(new EqualsFilter(groupRoleAttribute, definedGroup.getName()));
                 }
 
                 AndFilter andFilter = new AndFilter();
@@ -166,7 +165,7 @@ public class LdapSecurityConfig {
                     group.ifPresent(addGroups::add);
                 }
                 user.setGroups(addGroups);
-                userRepository.save(user);
+                userDetailsService.saveUser(user);
 
                 List<GrantedAuthority> auths = AuthorityUtils
                     .createAuthorityList(memberGroups.toArray(new String[0]));
@@ -190,34 +189,18 @@ public class LdapSecurityConfig {
         return contextSource;
     }
 
-    private User saveLdapUser(DirContextOperations userData, User saveUser) {
-        if (saveUser.getEmail() == null ||
-            !saveUser.getEmail().equals(userData.getStringAttribute(userAttributesEmail))
-        ) {
-            saveUser.setEmail(userData.getStringAttribute(userAttributesEmail));
-        }
-        if (saveUser.getFirstName() == null ||
-            !saveUser.getFirstName().equals(userData.getStringAttribute(userAttributesFirstName))
-        ) {
-            saveUser.setFirstName(userData.getStringAttribute(userAttributesFirstName));
-        }
-        if (saveUser.getLastName() == null ||
-            !saveUser.getLastName().equals(userData.getStringAttribute(userAttributesLastName))
-        ) {
-            saveUser.setLastName(userData.getStringAttribute(userAttributesLastName));
-        }
-
-        return saveUser;
-    }
-
-    private User createLdapUser(DirContextOperations userData) {
-        User user = saveLdapUser(userData, new User());
-        user.setUsername(userData.getStringAttribute(userAttributesUsername));
-        user.setEnabled(true);
-        user.setAdmin(false);
-        userRepository.save(user);
 
 
-        return user;
-    }
+//    private User createLdapUser(DirContextOperations userData) {
+//        User user = saveLdapUser(userData, new User());
+//        user.setUsername(userData.getStringAttribute(userAttributesUsername));
+//        user.setEnabled(true);
+//        user.setAdmin(false);
+//        userRepository.save(user);
+//
+//
+//        return user;
+//    }
+
+
 }

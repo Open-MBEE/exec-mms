@@ -1,8 +1,8 @@
-package org.openmbee.mms.localuser.security;
+package org.openmbee.mms.users.security;
 
 import java.io.Serializable;
 
-public class UserCreateRequest implements Serializable {
+public class UsersCreateRequest implements Serializable {
 
     private static final long serialVersionUID = -849270125785286560L;
 
@@ -21,19 +21,19 @@ public class UserCreateRequest implements Serializable {
         this.email = email;
     }
 
-    public String getFirstname() {
+    public String getFirstName() {
         return firstname;
     }
 
-    public void setFirstname(String firstname) {
+    public void setFirstName(String firstname) {
         this.firstname = firstname;
     }
 
-    public String getLastname() {
+    public String getLastName() {
         return lastname;
     }
 
-    public void setLastname(String lastname) {
+    public void setLastName(String lastname) {
         this.lastname = lastname;
     }
 

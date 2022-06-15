@@ -1,6 +1,6 @@
-.. _localuser:
+.. _localauth:
 
-LocalUser
+Localauth
 ------------------------
 
 Adds endpoint for adding local users, admins and changing password, and local authentication provider

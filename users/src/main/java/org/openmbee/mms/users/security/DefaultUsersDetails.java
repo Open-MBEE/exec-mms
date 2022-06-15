@@ -1,4 +1,4 @@
-package org.openmbee.mms.localuser.security;
+package org.openmbee.mms.users.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,11 +10,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserDetailsImpl implements UserDetails {
+public class DefaultUsersDetails implements UsersDetails {
 
     private final User user;
 
-    public UserDetailsImpl(User user) {
+    public DefaultUsersDetails(User user) {
         this.user = user;
     }
 

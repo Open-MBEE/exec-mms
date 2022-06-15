@@ -1,7 +1,7 @@
-package org.openmbee.mms.localuser.config;
+package org.openmbee.mms.localauth.config;
 
-import org.openmbee.mms.localuser.security.UserCreateRequest;
-import org.openmbee.mms.localuser.security.UserDetailsServiceImpl;
+import org.openmbee.mms.localauth.security.LocalUsersDetailsService;
+import org.openmbee.mms.users.security.UsersCreateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class AuthProviderConfig {
 
-    private static Logger logger = LoggerFactory.getLogger(LocalUserSecurityConfig.class);
+    private static Logger logger = LoggerFactory.getLogger(LocalAuthSecurityConfig.class);
 
-    private UserDetailsServiceImpl userDetailsService;
+    private LocalUsersDetailsService userDetailsService;
     private PasswordEncoder passwordEncoder;
 
     @Value("${mms.admin.username}")
@@ -26,7 +26,7 @@ public class AuthProviderConfig {
     private String adminPassword;
 
     @Autowired
-    public void setUserDetailsService(UserDetailsServiceImpl userDetailsService) {
+    public void setUserDetailsService(LocalUsersDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
@@ -40,7 +40,7 @@ public class AuthProviderConfig {
         try {
             userDetailsService.loadUserByUsername(adminUsername);
         } catch (UsernameNotFoundException e) {
-            UserCreateRequest req = new UserCreateRequest();
+            UsersCreateRequest req = new UsersCreateRequest();
             req.setAdmin(true);
             req.setPassword(adminPassword);
             req.setUsername(adminUsername);
