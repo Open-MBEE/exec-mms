@@ -3,14 +3,14 @@ package org.openmbee.mms.twc.security;
 import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.data.domains.global.User;
+import org.openmbee.mms.users.security.UsersDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-class TwcUserDetails implements UserDetails {
+class TwcUserDetails implements UsersDetails {
 
     private final User user;
 

@@ -23,7 +23,7 @@ public class TwcAuthenticationFilterTest {
 	TwcConfig twcConfig;
 
 	@Mock
-    TwcUserDetailsService userDetailsService;
+    TwcUserDetailsService twcUserDetailsService;
 
 	@Mock
 	TwcAuthenticationProvider twcAuthProvider;
@@ -146,7 +146,7 @@ public class TwcAuthenticationFilterTest {
 		FilterChain chain = mock(FilterChain.class);
 		when(twcConfig.getAuthNProvider(anyString())).thenReturn(twcAuthProvider);
 		when(twcAuthProvider.getAuthentication(anyString())).thenReturn("twcUser");
-		when(userDetailsService.loadUserByUsername("twcUser")).thenReturn(mock(TwcUserDetails.class));
+		when(twcUserDetailsService.loadUserByUsername("twcUser")).thenReturn(mock(TwcUserDetails.class));
 
 		try {
 
