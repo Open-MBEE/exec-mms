@@ -1,7 +1,7 @@
 package org.openmbee.mms.localauth.config;
 
 import org.openmbee.mms.localauth.security.LocalUsersDetailsService;
-import org.openmbee.mms.users.security.UsersCreateRequest;
+import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

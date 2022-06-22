@@ -3,11 +3,13 @@ package org.openmbee.mms.twc.security;
 import org.openmbee.mms.data.domains.global.User;
 import org.openmbee.mms.twc.TeamworkCloud;
 import org.openmbee.mms.twc.config.TwcConfig;
+import org.openmbee.mms.twc.exceptions.TwcConfigurationException;
 import org.openmbee.mms.twc.utilities.AdminUtils;
-import org.openmbee.mms.users.security.UsersCreateRequest;
+import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.openmbee.mms.users.security.UsersDetails;
 import org.openmbee.mms.users.security.UsersDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,9 +60,14 @@ public class TwcUserDetailsService implements UsersDetailsService {
         return null;
     }
 
-    @Override
     public void changeUserPassword(String username, String password, boolean asAdmin) {
+        throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+            "Cannot Modify Password. Users for this server are controlled by Teamwork Cloud");
+    }
 
+    public String encodePassword(String password) {
+        throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+                "Cannot Modify Password. Users for this server are controlled by Teamwork Cloud");
     }
 
     @Override

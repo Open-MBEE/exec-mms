@@ -1,22 +1,20 @@
 package org.openmbee.mms.users.security;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
-import org.openmbee.mms.core.exceptions.ForbiddenException;
 import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.data.domains.global.User;
 import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
+import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DefaultUsersDetailsService implements UsersDetailsService {
+public abstract class AbstractUsersDetailsService implements UsersDetailsService {
 
     private UserRepository userRepository;
     private GroupRepository groupRepository;
@@ -27,13 +25,6 @@ public class DefaultUsersDetailsService implements UsersDetailsService {
 
     public UserRepository getUserRepo() {
         return this.userRepository;
-    }
-
-    protected PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -73,29 +64,6 @@ public class DefaultUsersDetailsService implements UsersDetailsService {
 
     public List<User> getUsers() {
         return getUserRepo().findAll();
-    }
-
-
-    @Transactional
-    public void changeUserPassword(String username, String password, boolean asAdmin) {
-        Optional<User> userOptional = getUserRepo().findByUsername(username);
-        if(! userOptional.isPresent()) {
-            throw new UsernameNotFoundException(
-                String.format("No user found with username '%s'.", username));
-        }
-
-        User user = userOptional.get();
-        if(!asAdmin && (user.getPassword() == null || user.getPassword().isEmpty())) {
-            throw new ForbiddenException("Cannot change or set passwords for external users.");
-        }
-
-        //TODO password strength test?
-        user.setPassword(encodePassword(password));
-        getUserRepo().save(user);
-    }
-
-    protected String encodePassword(String password) {
-        return (password != null && !password.isEmpty()) ? passwordEncoder.encode(password) : null;
     }
 
 

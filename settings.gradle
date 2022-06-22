@@ -29,4 +29,6 @@ buildFiles.each { File buildFile ->
     }
 }
 include 'users'
+include 'localldap'
+include 'localldap'
 

@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.data.domains.global.Group;
-import org.openmbee.mms.ldap.security.LdapUsersDetailsService;
+import org.openmbee.mms.ldap.security.LdapAuthoritiesConfig;
 import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
 import org.openmbee.mms.data.domains.global.User;
@@ -71,7 +71,7 @@ public class LdapSecurityConfig {
 
     private UserRepository userRepository;
     private GroupRepository groupRepository;
-    private LdapUsersDetailsService userDetailsService;
+    private LdapAuthoritiesConfig userDetailsService;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -84,7 +84,7 @@ public class LdapSecurityConfig {
     }
 
     @Autowired
-    public void setUserDetailsService(LdapUsersDetailsService userDetailsService) {
+    public void setUserDetailsService(LdapAuthoritiesConfig userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
@@ -107,87 +107,7 @@ public class LdapSecurityConfig {
         }
     }
 
-    @Bean
-    LdapAuthoritiesPopulator ldapAuthoritiesPopulator(@Qualifier("contextSource") BaseLdapPathContextSource baseContextSource) {
 
-        /*
-          Specificity here : we don't get the Role by reading the members of available groups (which is implemented by
-          default in Spring security LDAP), but we retrieve the groups from the field memberOf of the user.
-         */
-        class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
-
-            SpringSecurityLdapTemplate ldapTemplate;
-
-            private CustomLdapAuthoritiesPopulator(BaseLdapPathContextSource ldapContextSource) {
-                ldapTemplate = new SpringSecurityLdapTemplate(ldapContextSource);
-            }
-
-            @Override
-            public Collection<? extends GrantedAuthority> getGrantedAuthorities(
-                DirContextOperations userData, String username) {
-                Optional<User> userOptional = userRepository.findByUsername(username);
-
-                if (!userOptional.isPresent()) {
-                    User newUser = userDetailsService.register(userDetailsService.parseLdapRegister(userData));
-
-                    userOptional = Optional.of(newUser);
-                }
-
-                User user = userOptional.get();
-                if (user.getModified().isBefore(Instant.now().minus(userAttributesUpdate, ChronoUnit.HOURS))) {
-                    userDetailsService.parseLdapUser(userData, user);
-                }
-                user.setPassword(null);
-                String userDn = userAttributesUsername + "=" + user.getUsername() + "," + providerBase;
-
-                List<Group> definedGroups = groupRepository.findAll();
-                OrFilter orFilter = new OrFilter();
-
-                for (Group definedGroup : definedGroups) {
-                    orFilter.or(new EqualsFilter(groupRoleAttribute, definedGroup.getName()));
-                }
-
-                AndFilter andFilter = new AndFilter();
-                HardcodedFilter groupsFilter = new HardcodedFilter(
-                    groupSearchFilter.replace("{0}", userDn));
-                andFilter.and(groupsFilter);
-                andFilter.and(orFilter);
-
-                Set<String> memberGroups = ldapTemplate
-                    .searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""},
-                        groupRoleAttribute);
-
-                Set<Group> addGroups = new HashSet<>();
-                Optional<Group> evGroup = groupRepository.findByName(AuthorizationConstants.EVERYONE);
-                evGroup.ifPresent(addGroups::add);
-                for (String memberGroup : memberGroups) {
-                    Optional<Group> group = groupRepository.findByName(memberGroup);
-                    group.ifPresent(addGroups::add);
-                }
-                user.setGroups(addGroups);
-                userDetailsService.saveUser(user);
-
-                List<GrantedAuthority> auths = AuthorityUtils
-                    .createAuthorityList(memberGroups.toArray(new String[0]));
-                if (user.isAdmin()) {
-                    auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
-                }
-                return auths;
-            }
-        }
-
-        return new CustomLdapAuthoritiesPopulator(baseContextSource);
-
-    }
-
-    @Bean
-    public BaseLdapPathContextSource contextSource() {
-        DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
-            providerUrl);
-        contextSource.setUserDn(providerUserDn);
-        contextSource.setPassword(providerPassword);
-        return contextSource;
-    }
 
 
 

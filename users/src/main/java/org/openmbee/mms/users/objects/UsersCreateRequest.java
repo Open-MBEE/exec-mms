@@ -1,4 +1,4 @@
-package org.openmbee.mms.users.security;
+package org.openmbee.mms.users.objects;
 
 import java.io.Serializable;
 
@@ -12,6 +12,7 @@ public class UsersCreateRequest implements Serializable {
     private String firstname;
     private String lastname;
     private boolean admin;
+    private String type;
 
     public String getEmail() {
         return email;
@@ -61,4 +62,11 @@ public class UsersCreateRequest implements Serializable {
         this.admin = admin;
     }
 
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

@@ -20,6 +20,14 @@ public class User extends Base {
     private String lastName;
     private boolean admin;
 
+    public enum VALID_USER_TYPES {LOCAL, REMOTE}
+
+    @JsonIgnore
+    private VALID_USER_TYPES type;
+
+    @JsonProperty("type")
+    private String typeString;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -59,6 +67,28 @@ public class User extends Base {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public VALID_USER_TYPES getType() {
+        return this.type;
+    }
+
+    public String getTypeString() {
+        return this.typeString;
+    }
+
+    public void setType(VALID_USER_TYPES t) {
+        this.type = t;
+        this.typeString = t.toString().toLowerCase();
+    }
+
+    public void setType(String t) {
+        if (t.equalsIgnoreCase("local")) {
+            this.type = VALID_USER_TYPES.LOCAL;
+        }else {
+            this.type = VALID_USER_TYPES.REMOTE;
+        }
+        this.typeString = t;
     }
 
     public String getEmail() {
@@ -164,4 +194,5 @@ public class User extends Base {
     public void setAdmin(boolean admin) {
         this.admin = admin;
     }
+
 }
