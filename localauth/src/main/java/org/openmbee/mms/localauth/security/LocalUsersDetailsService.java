@@ -9,11 +9,13 @@ import org.openmbee.mms.users.security.AbstractUsersDetailsService;
 import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.openmbee.mms.users.security.UsersDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Primary
 @Service
 public class LocalUsersDetailsService extends AbstractUsersDetailsService implements UsersDetailsService {
 
@@ -34,7 +36,7 @@ public class LocalUsersDetailsService extends AbstractUsersDetailsService implem
         }
 
         User user = userOptional.get();
-        if (user.getType() == User.VALID_USER_TYPES.REMOTE) {
+        if (user.getType() == User.VALID_USER_TYPES.REMOTE || user.getPassword() == null) {
             throw new ForbiddenException("Cannot change or set passwords for external users.");
         }
 
@@ -50,7 +52,12 @@ public class LocalUsersDetailsService extends AbstractUsersDetailsService implem
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
         user.setUsername(req.getUsername());
-        user.setPassword(encodePassword(req.getPassword()));
+        if (req.getType() == null) {
+            req.setType("local");
+        }
+        if (req.getType().equals("local") && !(req.getPassword() == null)) {
+            user.setPassword(encodePassword(req.getPassword()));
+        }
         user.setEnabled(true);
         user.setAdmin(req.isAdmin());
         user.setType(req.getType());

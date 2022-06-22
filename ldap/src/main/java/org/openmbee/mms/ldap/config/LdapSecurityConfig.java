@@ -69,25 +69,6 @@ public class LdapSecurityConfig {
     @Value("${ldap.group.search.filter:(uniqueMember={0})}")
     private String groupSearchFilter;
 
-    private UserRepository userRepository;
-    private GroupRepository groupRepository;
-    private LdapAuthoritiesConfig userDetailsService;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setGroupRepository(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
-
-    @Autowired
-    public void setUserDetailsService(LdapAuthoritiesConfig userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     @Autowired
     public void configureLdapAuth(AuthenticationManagerBuilder auth,
         LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)

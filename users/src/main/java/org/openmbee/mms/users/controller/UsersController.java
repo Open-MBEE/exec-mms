@@ -13,7 +13,9 @@ import org.openmbee.mms.users.objects.UsersResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +55,18 @@ public class UsersController {
         } else {
             users = usersDetailsService.getUsers();
         }
+        res.setUsers(users);
+        return res;
+    }
+
+    @GetMapping(value = "/whoami")
+    @PreAuthorize("isAuthenticated()")
+    public UsersResponse getCurrentUser() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String user = authentication.getName();
+        UsersResponse res = new UsersResponse();
+        List<User> users = new ArrayList<>();
+        users.add(usersDetailsService.loadUserByUsername(user).getUser());
         res.setUsers(users);
         return res;
     }

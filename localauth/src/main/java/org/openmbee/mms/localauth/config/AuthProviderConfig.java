@@ -44,8 +44,9 @@ public class AuthProviderConfig {
             req.setAdmin(true);
             req.setPassword(adminPassword);
             req.setUsername(adminUsername);
+            req.setType("local");
             userDetailsService.register(req);
-            logger.info(String.format("Creating root user: %s with specified password.",
+            logger.info(String.format("Creating local root user: %s with specified password.",
                 adminUsername));
         }
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

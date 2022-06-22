@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +59,15 @@ public abstract class AbstractUsersDetailsService implements UsersDetailsService
 
     public User saveUser(User user) {
         Optional<Group> evGroup = getGroupRepo().findByName(AuthorizationConstants.EVERYONE);
-        evGroup.ifPresent(group -> user.getGroups().add(group));
+        if (evGroup.isPresent()) {
+            Group group =  evGroup.get();
+            if (user.getGroups() == null) {
+                user.setGroups(new ArrayList<>());
+            }
+            if (!user.getGroups().contains(group)) {
+                user.getGroups().add(group);
+            }
+        }
         return getUserRepo().save(user);
     }
 
