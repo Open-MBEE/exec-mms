@@ -91,16 +91,17 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
             roleRepo.saveAndFlush(role);
         }
         //Ensure ev group exists and is correct in the event someone messes it up
-        Optional<Group> evGroupIn = groupRepo.findByName("everyone");
+        Optional<Group> evGroupIn = groupRepo.findByName(AuthorizationConstants.EVERYONE);
         Group evGroup;
         if (evGroupIn.isEmpty()) {
             evGroup = new Group();
-            evGroup.setName("everyone");
+            evGroup.setName(AuthorizationConstants.EVERYONE);
         }else {
             evGroup = evGroupIn.get();
         }
-        if (evGroup.getType() != Group.VALID_GROUP_TYPES.REMOTE)
-        evGroup.setType(Group.VALID_GROUP_TYPES.REMOTE);
+        if (evGroup.getType() != Group.VALID_GROUP_TYPES.REMOTE) {
+            evGroup.setType("everyone");
+        }
         evGroup.setPublic(true);
         groupRepo.saveAndFlush(evGroup);
         Optional<GroupGroupPerm> evGroupPermOp = groupGroupPermRepo.findByGroupAndGroupPerm(evGroup,evGroup);
