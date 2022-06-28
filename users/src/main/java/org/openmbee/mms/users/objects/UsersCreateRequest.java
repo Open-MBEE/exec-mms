@@ -13,6 +13,7 @@ public class UsersCreateRequest implements Serializable {
     private String lastname;
     private boolean admin;
     private String type;
+    private Boolean enabled;
 
     public String getEmail() {
         return email;
@@ -69,4 +70,8 @@ public class UsersCreateRequest implements Serializable {
     public void setType(String type) {
         this.type = type;
     }
+
+    public Boolean isEnabled() { return enabled; }
+
+    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
 }

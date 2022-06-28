@@ -7,6 +7,7 @@ import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.core.exceptions.UnauthorizedException;
 import org.openmbee.mms.core.utils.AuthenticationUtils;
 import org.openmbee.mms.data.domains.global.User;
+import org.openmbee.mms.users.security.UsersDetails;
 import org.openmbee.mms.users.security.UsersDetailsService;
 import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.openmbee.mms.users.objects.UsersResponse;
@@ -16,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,28 +35,39 @@ public class UsersController {
         this.usersDetailsService = usersDetailsService;
     }
 
-    @PostMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
-    public UsersCreateRequest createUser(@RequestBody UsersCreateRequest req) {
+    public UsersResponse createOrUpdateUser(@RequestBody UsersCreateRequest req) {
+        UsersResponse res = new UsersResponse();
+        List<User> users = new ArrayList<>();
+        UsersDetails userDetails;
         try {
-            usersDetailsService.loadUserByUsername(req.getUsername());
+            userDetails = usersDetailsService.loadUserByUsername(req.getUsername());
         } catch (UsernameNotFoundException e) {
-            usersDetailsService.register(req);
-            return req;
+            users.add(usersDetailsService.register(req));
+            res.setUsers(users);
+            return res;
         }
-        throw new BadRequestException("User already exists");
+        users.add(usersDetailsService.update(req, userDetails.getUser()));
+        res.setUsers(users);
+        return res;
     }
 
     @GetMapping(value = "/users")
     @PreAuthorize("isAuthenticated()")
-    public UsersResponse getUsers(@RequestParam(required = false) String user) {
+    public UsersResponse getUsers() {
+        UsersResponse res = new UsersResponse();
+        List<User> users = usersDetailsService.getUsers();
+        res.setUsers(users);
+        return res;
+    }
+
+    @GetMapping(value = "/users/:username")
+    @PreAuthorize("isAuthenticated()")
+    public UsersResponse getUsers(@PathVariable String username) {
         UsersResponse res = new UsersResponse();
         List<User> users = new ArrayList<>();
-        if (user != null) {
-            users.add(usersDetailsService.loadUserByUsername(user).getUser());
-        } else {
-            users = usersDetailsService.getUsers();
-        }
+        users.add(usersDetailsService.loadUserByUsername(username).getUser());
         res.setUsers(users);
         return res;
     }

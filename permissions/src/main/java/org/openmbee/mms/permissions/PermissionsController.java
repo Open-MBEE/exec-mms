@@ -44,7 +44,7 @@ public class PermissionsController {
         if (req.getPublic() != null) {
             responseBuilder.setPublic(permissionService.setOrgPublic(req.getPublic(), orgId));
         }
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @PostMapping(value = "/projects/{projectId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -68,7 +68,7 @@ public class PermissionsController {
         if (req.getInherit() != null) {
             responseBuilder.insert(permissionService.setProjectInherit(req.getInherit(), projectId));
         }
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @PostMapping(value = "/projects/{projectId}/refs/{refId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -90,7 +90,7 @@ public class PermissionsController {
         if (req.getInherit() != null) {
             responseBuilder.insert(permissionService.setBranchInherit(req.getInherit(), projectId, refId));
         }
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @GetMapping(value = "/orgs/{orgId}/permissions")
@@ -159,7 +159,7 @@ public class PermissionsController {
         if (req.getUsers() != null) {
             responseBuilder.insert(permissionService.updateGroupUserPerms(req.getUsers(), groupName));
         }
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
 }

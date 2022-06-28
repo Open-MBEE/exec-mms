@@ -273,7 +273,7 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
     @Override
     public PermissionUpdatesResponse recalculateInheritedPerms() {
         //Do nothing, can't inherit permissions
-        return new PermissionUpdatesResponseBuilder().getPermissionUpdatesReponse();
+        return new PermissionUpdatesResponseBuilder().getPermissionUpdatesResponse();
     }
 
 }

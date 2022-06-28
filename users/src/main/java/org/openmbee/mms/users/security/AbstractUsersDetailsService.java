@@ -62,6 +62,30 @@ public abstract class AbstractUsersDetailsService implements UsersDetailsService
         return getUserRepo().save(user);
     }
 
+    public User update(UsersCreateRequest req, User user) {
+        if (req.getEmail() != null &&
+            !user.getEmail().equals(req.getEmail())
+        ) {
+            user.setEmail(req.getEmail());
+        }
+        if (req.getFirstName() != null &&
+            !user.getFirstName().equals(req.getFirstName())
+        ) {
+            user.setFirstName(req.getFirstName());
+        }
+        if (req.getLastName() != null &&
+            !user.getLastName().equals(req.getLastName())
+        ) {
+            user.setLastName(req.getLastName());
+        }
+        if (req.isEnabled() != null && user.isEnabled() != req.isEnabled())
+
+        if (req.getType() != null) {
+            user.setType(req.getType());
+        }
+        return user;
+    }
+
     public List<User> getUsers() {
         return getUserRepo().findAll();
     }

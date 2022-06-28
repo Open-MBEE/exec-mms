@@ -111,7 +111,7 @@ public class DefaultPermissionService implements PermissionService {
             responseBuilder.insert(recalculateInheritedPerms(proj));
         }
 
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -126,7 +126,7 @@ public class DefaultPermissionService implements PermissionService {
             responseBuilder.insert(recalculateInheritedPerms(proj));
         }
 
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -141,7 +141,7 @@ public class DefaultPermissionService implements PermissionService {
             responseBuilder.insert(recalculateInheritedPerms(b));
         }
 
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -156,7 +156,7 @@ public class DefaultPermissionService implements PermissionService {
             responseBuilder.insert(recalculateInheritedPerms(b));
         }
 
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -183,7 +183,7 @@ public class DefaultPermissionService implements PermissionService {
         PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
         responseBuilder.getUsers().insert(permissionsDelegate.updateUserPermissions(req));
 
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -194,7 +194,7 @@ public class DefaultPermissionService implements PermissionService {
         PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
         responseBuilder.getGroups().insert(permissionsDelegate.updateGroupPermissions(req));
 
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -207,7 +207,7 @@ public class DefaultPermissionService implements PermissionService {
         if (permissionsDelegate.setInherit(isInherit)) {
             responseBuilder.insert(recalculateInheritedPerms(project));
         }
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -220,7 +220,7 @@ public class DefaultPermissionService implements PermissionService {
         if (permissionsDelegate.setInherit(isInherit)) {
             responseBuilder.insert(recalculateInheritedPerms(branch));
         }
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     @Override
@@ -424,7 +424,7 @@ public class DefaultPermissionService implements PermissionService {
                 responseBuilder.insert(recalculateInheritedPerms(branch));
             }
         }
-        return responseBuilder.getPermissionUpdatesReponse();
+        return responseBuilder.getPermissionUpdatesResponse();
     }
 
     private PermissionUpdatesResponse recalculateInheritedPerms(Branch branch) {

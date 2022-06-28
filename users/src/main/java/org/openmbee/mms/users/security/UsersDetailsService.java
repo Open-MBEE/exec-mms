@@ -22,4 +22,5 @@ public interface UsersDetailsService extends org.springframework.security.core.u
 
     List<User> getUsers();
 
+    User update(UsersCreateRequest req, User user);
 }
