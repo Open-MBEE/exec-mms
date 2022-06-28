@@ -27,15 +27,15 @@ services:
       ports:
           - 9000:9000
 
-  # mms:
-  #   build: .
-  #   container_name: mms
-  #   hostname: mms
-  #   environment:
-  #       - "SPRING_PROFILES_ACTIVE=test"
-  #   depends_on:
-  #       - postgres
-  #       - elasticsearch
-  #       - minio
-  #   ports: 
-  #       - 8080:8080
+  mms:
+    build: .
+    container_name: mms
+    hostname: mms
+    environment:
+        - "SPRING_PROFILES_ACTIVE=test"
+    depends_on:
+        - postgres
+        - elasticsearch
+        - minio
+    ports:
+        - 8080:8080
