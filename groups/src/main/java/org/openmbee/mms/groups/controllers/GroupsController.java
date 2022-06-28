@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.core.config.Privileges;
@@ -139,14 +140,23 @@ public class GroupsController {
 
     @GetMapping
     @Transactional
-    public GroupsResponse getAllGroups( Authentication auth) {
+    public GroupsResponse getAllGroups(
+        @RequestParam(required = false) boolean users,
+        Authentication auth) {
 
         GroupsResponse response = new GroupsResponse();
         List<Group> allGroups = groupRepository.findAll();
         for (Group group : allGroups) {
-            if (mss.hasGroupPrivilege(auth, group.getName(), Privileges.GROUP_READ.name(), true)) {
+            if (mss.hasGroupPrivilege(auth, group.getName(), Privileges.GROUP_READ.name(), false)) {
+
                 GroupJson groupJson = new GroupJson();
                 groupJson.merge(convertToMap(group));
+                groupJson.remove("users");
+                if (users) {
+                    Set<User> userSet = group.getUsers();
+                    Set<String> usernames = userSet.stream().map(User::getUsername).collect(Collectors.toSet());
+                    groupJson.put("users", usernames);
+                }
                 response.getGroups().add(groupJson);
             }
         }
@@ -157,15 +167,24 @@ public class GroupsController {
     @Transactional
     @PreAuthorize("@mss.hasGroupPrivilege(authentication, #groupName, 'GROUP_READ', true)")
     public GroupsResponse getGroup(
-        @PathVariable String groupName) {
+        @PathVariable String groupName,
+        @RequestParam(required = false) boolean users
+    ) {
 
         GroupsResponse response = new GroupsResponse();
         Optional<Group> groupOption = groupRepository.findByName(groupName);
         if (groupOption.isEmpty()) {
             throw new NotFoundException(response.addMessage("Group not found."));
         }
+        Group group = groupOption.get();
         GroupJson groupJson = new GroupJson();
-        groupJson.merge(convertToMap(groupOption.get()));
+        groupJson.merge(convertToMap(group));
+        groupJson.remove("users");
+        if (users) {
+            Set<User> userSet = group.getUsers();
+            Set<String> usernames = userSet.stream().map(User::getUsername).collect(Collectors.toSet());
+            groupJson.put("users", usernames);
+        }
         response.getGroups().add(groupJson);
         return response;
     }

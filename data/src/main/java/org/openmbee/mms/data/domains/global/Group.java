@@ -3,8 +3,9 @@ package org.openmbee.mms.data.domains.global;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 
 @Entity
@@ -16,8 +17,8 @@ public class Group extends Base {
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "groups_id", referencedColumnName = "id"))
-    private Collection<User> users;
+    @JoinTable(name = "groups_users", joinColumns = @JoinColumn(name = "groups_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"), uniqueConstraints=@UniqueConstraint(columnNames={"users_id","groups_id"}))
+    private Set<User> users;
 
     @JsonIgnore
     private VALID_GROUP_TYPES type;
@@ -37,13 +38,13 @@ public class Group extends Base {
     private boolean isPublic;
 
     public Group() {
-        this.users = new ArrayList<>();
+        this.users = new HashSet<>();
     }
     public Group(String name) {
         this.name = name;
         this.type = VALID_GROUP_TYPES.REMOTE;
         this.typeString = VALID_GROUP_TYPES.REMOTE.toString().toLowerCase();
-        this.users = new ArrayList<>();
+        this.users = new HashSet<>();
     }
 
     public String getName() { return name; }
@@ -76,11 +77,11 @@ public class Group extends Base {
         this.typeString = t;
     }
 
-    public Collection<User> getUsers() {
+    public Set<User> getUsers() {
         return this.users;
     }
 
-    public void setUsers(Collection<User> users) {
+    public void setUsers(Set<User> users) {
         this.users = users;
     }
 

@@ -104,11 +104,12 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
             evGroup = new Group();
             evGroup.setName("everyone");
             evGroup.setType(Group.VALID_GROUP_TYPES.LOCAL);
+            evGroup.setPublic(true);
             evGroup.getUsers().addAll(userRepo.findAll());
             groupRepo.saveAndFlush(evGroup);
             if (evRole.isPresent()) {
                 GroupGroupPerm evGroupPerm = new GroupGroupPerm(evGroup, evGroup, evRole.get());
-                groupGroupPermRepo.save(evGroupPerm);
+                groupGroupPermRepo.saveAndFlush(evGroupPerm);
             }
         }else {
             evGroup = evGroupIn.get();

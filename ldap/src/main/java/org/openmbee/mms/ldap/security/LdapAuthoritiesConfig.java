@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Configuration
 public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
@@ -123,9 +124,9 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                 }
                 user.setGroups(addGroups);
                 saveUser(user);
-
+                Set<String> authGroups = addGroups.stream().map(Group::getName).collect(Collectors.toSet());
                 List<GrantedAuthority> auths = AuthorityUtils
-                    .createAuthorityList(memberGroups.toArray(new String[0]));
+                    .createAuthorityList(authGroups.toArray(new String[0]));
                 if (user.isAdmin()) {
                     auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
                 }
@@ -166,14 +167,6 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
         return saveUser(user);
     }
 
-    @Override
-    public User saveUser(User user) {
-
-        Optional<Group> evGroup = getGroupRepo().findByName(AuthorizationConstants.EVERYONE);
-        evGroup.ifPresent(group -> user.getGroups().add(group));
-        return getUserRepo().save(user);
-    }
-
     public void parseLdapUser(DirContextOperations userData, User saveUser) {
         if (saveUser.getEmail() == null ||
             !saveUser.getEmail().equals(userData.getStringAttribute(userAttributesEmail))
@@ -198,21 +191,11 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
 
     public UsersCreateRequest parseLdapRegister(DirContextOperations userData) {
         UsersCreateRequest createUser = new UsersCreateRequest();
-        if (createUser.getEmail() == null ||
-            !createUser.getEmail().equals(userData.getStringAttribute(userAttributesEmail))
-        ) {
-            createUser.setEmail(userData.getStringAttribute(userAttributesEmail));
-        }
-        if (createUser.getFirstName() == null ||
-            !createUser.getFirstName().equals(userData.getStringAttribute(userAttributesFirstName))
-        ) {
-            createUser.setFirstName(userData.getStringAttribute(userAttributesFirstName));
-        }
-        if (createUser.getLastName() == null ||
-            !createUser.getLastName().equals(userData.getStringAttribute(userAttributesLastName))
-        ) {
-            createUser.setLastName(userData.getStringAttribute(userAttributesLastName));
-        }
+
+        createUser.setEmail(userData.getStringAttribute(userAttributesEmail));
+        createUser.setFirstName(userData.getStringAttribute(userAttributesFirstName));
+        createUser.setLastName(userData.getStringAttribute(userAttributesLastName));
+        createUser.setUsername(userData.getStringAttribute(userAttributesUsername));
         createUser.setType("ldap");
 
         return createUser;

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,7 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
     @UniqueConstraint(columnNames = "email")})
 public class User extends Base {
 
+    @Column(unique = true)
     private String username;
+
     private String email;
     private String firstName;
     private String lastName;
@@ -47,18 +51,21 @@ public class User extends Base {
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "groups_id", referencedColumnName = "id"))
-    private Collection<Group> groups;
+    @JoinTable(name = "groups_users", joinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "groups_id", referencedColumnName = "id"), uniqueConstraints=@UniqueConstraint(columnNames={"users_id","groups_id"}))
+    private Set<Group> groups;
 
     public User() {
+        this.groups = new HashSet<>();
     }
 
     public User(String email, String username, String password, String firstName, String lastName, boolean admin) {
         this.email = email;
+        this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.admin = admin;
+        this.groups = new HashSet<>();
     }
 
     public String getUsername() {
@@ -183,7 +190,7 @@ public class User extends Base {
         return groups;
     }
 
-    public void setGroups(Collection<Group> groups) {
+    public void setGroups(Set<Group> groups) {
         this.groups = groups;
     }
 

@@ -64,7 +64,7 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
         if (groupUserPermRepo.existsByGroupAndUser_UsernameAndRoleIn(group, user, roles)) {
             return true;
         }
-        return !groupPerms.isEmpty() && groupGroupPermRepo.existsByGroupAndGroup_NameInAndRoleIn(group, groupPerms, roles);
+        return !groupPerms.isEmpty() && groupGroupPermRepo.existsByGroupAndGroupPerm_NameInAndRoleIn(group, groupPerms, roles);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
                     if (pair.getFirst() == null || pair.getSecond() == null) {
                         continue;
                     }
-                    Optional<GroupGroupPerm> exist = groupGroupPermRepo.findByGroupAndGroup(group, pair.getFirst());
+                    Optional<GroupGroupPerm> exist = groupGroupPermRepo.findByGroupAndGroupPerm(group, pair.getFirst());
                     GroupGroupPerm p1;
                     if (exist.isPresent()) {
                         p1 = exist.get();
@@ -236,9 +236,9 @@ public class DefaultGroupPermissionsDelegate extends AbstractDefaultPermissionsD
 
                     groupPerms.add(p.getName());
                     responseBuilder.insertPermissionUpdate(PermissionUpdateResponse.Action.REMOVE,
-                        groupGroupPermRepo.findByGroupAndGroup(group, groupPerm.get()).orElse(null));
+                        groupGroupPermRepo.findByGroupAndGroupPerm(group, groupPerm.get()).orElse(null));
                 });
-                groupGroupPermRepo.deleteByGroupAndGroup_NameIn(group, groupPerms);
+                groupGroupPermRepo.deleteByGroupAndGroupPerm_NameIn(group, groupPerms);
                 break;
         }
         return responseBuilder.getPermissionUpdateResponse();
