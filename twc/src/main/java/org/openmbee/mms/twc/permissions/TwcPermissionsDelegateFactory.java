@@ -23,6 +23,10 @@ public class TwcPermissionsDelegateFactory implements PermissionsDelegateFactory
     private TwcConfig twcConfig;
     private TwcMetadataService twcMetadataService;
 
+    @Autowired
+    public void setTwcMetadataService(TwcMetadataService twcMetadataService) {
+        this.twcMetadataService = twcMetadataService;
+    }
 
     @Autowired
     public void setApplicationContext(ApplicationContext applicationContext) {
