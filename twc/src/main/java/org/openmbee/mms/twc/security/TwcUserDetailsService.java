@@ -1,11 +1,14 @@
 package org.openmbee.mms.twc.security;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openmbee.mms.data.domains.global.User;
 import org.openmbee.mms.twc.TeamworkCloud;
 import org.openmbee.mms.twc.config.TwcConfig;
 import org.openmbee.mms.twc.exceptions.TwcConfigurationException;
 import org.openmbee.mms.twc.utilities.AdminUtils;
 import org.openmbee.mms.users.objects.UsersCreateRequest;
+import org.openmbee.mms.users.security.AbstractUsersDetailsService;
 import org.openmbee.mms.users.security.UsersDetails;
 import org.openmbee.mms.users.security.UsersDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
-public class TwcUserDetailsService implements UsersDetailsService {
+public class TwcUserDetailsService extends AbstractUsersDetailsService implements UsersDetailsService {
 
     private AdminUtils adminUtils;
     private TwcConfig twcConfig;
@@ -36,23 +39,39 @@ public class TwcUserDetailsService implements UsersDetailsService {
     @Override
     public UsersDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<TeamworkCloud> twcs = twcConfig.getInstances();
-        Optional<User> user = Optional.empty();
+        JSONObject twcUser = null;
         for (TeamworkCloud twc: twcs) {
-            user = adminUtils.getUserByUsername(username, twc);
-            if (user.isPresent()) {
+            twcUser = adminUtils.getUserByUsername(username, twc);
+            if (twcUser != null) {
                 break;
             }
         }
 
+        if (twcUser != null) {
+            Optional<User> user = getUserRepo().findByUsername(twcUser.getString("username"));
+            if (user.isEmpty()) {
+                User newUser = register(parseTwcRegister(twcUser));
+                user = Optional.of(newUser);
+            }
+            User u = user.get();
+            return new TwcUserDetails(u);
+        }
 
-        User u;
-        u = user.orElseGet(() -> addUser(username));
-        return new TwcUserDetails(u);
+        throw new UsernameNotFoundException("Username not found on any connected TWC Servers");
     }
 
     @Override
+    @Transactional
     public User register(UsersCreateRequest req) {
-        return null;
+        User user = new User();
+        user.setEmail(req.getEmail());
+        user.setFirstName(req.getFirstName());
+        user.setLastName(req.getLastName());
+        user.setUsername(req.getUsername());
+        user.setEnabled(true);
+        user.setAdmin(req.isAdmin());
+        user.setType(req.getType());
+        return saveUser(user);
     }
 
     @Override
@@ -81,7 +100,56 @@ public class TwcUserDetailsService implements UsersDetailsService {
         user.setUsername(username);
         //TODO: fill in user details from TWC
         user.setEnabled(true);
+        user.setType("twc");
         return saveUser(user);
     }
+
+    public UsersCreateRequest parseTwcRegister(JSONObject userData) {
+        UsersCreateRequest createUser = new UsersCreateRequest();
+
+        createUser.setUsername(userData.getString("username"));
+        JSONObject otherAttributes = userData.getJSONObject("otherAttributes");
+        if (otherAttributes.has("mail")) {
+            createUser.setEmail(otherAttributes.getString("mail"));
+        }
+        if (otherAttributes.has("name")) {
+            Map<String, String> name = getFirstAndLastName(otherAttributes.getString("name"));
+            createUser.setFirstName(name.get("firstName"));
+            createUser.setLastName(name.get("lastName"));
+        }
+        createUser.setType("twc");
+
+        return createUser;
+    }
+
+    private static Map<String, String> getFirstAndLastName(String fullName) {
+
+        Map<String, String> firstAndLastName = new HashMap<>();
+
+        if (StringUtils.hasLength(fullName)) {
+            String[] nameParts = fullName.trim().split(" ");
+
+            /*
+             * Remove Name Suffixes.
+             */
+            if (nameParts.length > 2 && nameParts[nameParts.length - 1].length() <= 3) {
+                nameParts = Arrays.copyOf(nameParts, nameParts.length - 1);
+            }
+
+            if (nameParts.length == 2) {
+                firstAndLastName.put("firstName", nameParts[0]);
+                firstAndLastName.put("lastName", nameParts[1]);
+            }
+
+            if (nameParts.length > 2) {
+                firstAndLastName.put("firstName", nameParts[0]);
+                firstAndLastName.put("lastName", nameParts[nameParts.length - 1]);
+            }
+        }
+
+        return firstAndLastName;
+
+    }
+
 
 }

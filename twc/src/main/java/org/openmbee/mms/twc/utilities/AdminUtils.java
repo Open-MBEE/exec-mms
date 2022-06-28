@@ -31,18 +31,13 @@ public class AdminUtils {
 
     };
 
-    public Optional<User> getUserByUsername(String username, TeamworkCloud twc) {
-        User user = null;
+    public JSONObject getUserByUsername(String username, TeamworkCloud twc) {
         ResponseEntity<String> respEntity = restUtils.getRestResponse(
             TeamworkCloudEndpoints.GETUSER.buildUrl(twc, username), twc);
 
         if (respEntity == null || respEntity.getBody() == null)
-            return Optional.empty();
+            return null;
 
-        JSONObject userObj = jsonUtils.parseStringtoJsonObject(respEntity.getBody());
-        user = new User();
-        user.setUsername(userObj.getString("username"));
-        user.setEnabled(userObj.getBoolean("enabled"));
-        return Optional.of(user);
+        return jsonUtils.parseStringtoJsonObject(respEntity.getBody());
     }
 }

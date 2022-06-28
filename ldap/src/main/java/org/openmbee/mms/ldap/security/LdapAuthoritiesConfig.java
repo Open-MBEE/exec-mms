@@ -85,7 +85,7 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                 DirContextOperations userData, String username) {
                 Optional<User> userOptional = getUserRepo().findByUsername(username);
 
-                if (!userOptional.isPresent()) {
+                if (userOptional.isEmpty()) {
                     User newUser = register(parseLdapRegister(userData));
 
                     userOptional = Optional.of(newUser);
@@ -122,8 +122,6 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                     Optional<Group> group = getGroupRepo().findByName(memberGroup);
                     group.ifPresent(addGroups::add);
                 }
-                user.setGroups(addGroups);
-                saveUser(user);
                 Set<String> authGroups = addGroups.stream().map(Group::getName).collect(Collectors.toSet());
                 List<GrantedAuthority> auths = AuthorityUtils
                     .createAuthorityList(authGroups.toArray(new String[0]));

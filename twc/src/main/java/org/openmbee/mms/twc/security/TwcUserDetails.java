@@ -31,7 +31,6 @@ class TwcUserDetails implements UsersDetails {
         if (user.isAdmin()) {
             authorities.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
         }
-        authorities.add(new SimpleGrantedAuthority(AuthorizationConstants.EVERYONE));
         return authorities;
     }
 

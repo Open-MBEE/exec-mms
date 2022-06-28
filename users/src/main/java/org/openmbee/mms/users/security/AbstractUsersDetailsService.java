@@ -33,7 +33,7 @@ public abstract class AbstractUsersDetailsService implements UsersDetailsService
     public UsersDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = getUserRepo().findByUsername(username);
 
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException(
                 String.format("No user found with username '%s'.", username));
         }
