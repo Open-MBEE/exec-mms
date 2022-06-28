@@ -1,8 +1,6 @@
 package org.openmbee.mms.permissions.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openmbee.mms.core.config.AuthorizationConstants;
-import org.openmbee.mms.core.objects.PermissionUpdateRequest;
 import org.openmbee.mms.core.services.PermissionService;
 import org.openmbee.mms.data.domains.global.*;
 import org.openmbee.mms.rdb.repositories.*;
@@ -14,7 +12,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.openmbee.mms.core.config.Constants.RPmap;
 import static org.openmbee.mms.core.config.Constants.aPriv;
@@ -34,8 +31,6 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
     private UserRepository userRepo;
 
     private GroupGroupPermRepository groupGroupPermRepo;
-
-    private PermissionService permissionService;
 
     @Autowired
     public void setPrivRepo(PrivilegeRepository privRepo) {
@@ -64,7 +59,6 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
 
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
-        logger.warn("I RAN!");
         for (String role : RPmap.keySet()) {
             Optional<Role> roleIn = roleRepo.findByName(role);
             if (!(roleIn.isPresent())) {
@@ -96,33 +90,32 @@ public class PermissionInit implements ApplicationListener<ApplicationReadyEvent
             role.setPrivileges(pSet);
             roleRepo.saveAndFlush(role);
         }
-
+        //Ensure ev group exists and is correct in the event someone messes it up
         Optional<Group> evGroupIn = groupRepo.findByName("everyone");
         Group evGroup;
         if (evGroupIn.isEmpty()) {
-            Optional<Role> evRole = roleRepo.findByName(AuthorizationConstants.READER);
             evGroup = new Group();
             evGroup.setName("everyone");
-            evGroup.setType(Group.VALID_GROUP_TYPES.LOCAL);
-            evGroup.setPublic(true);
-            evGroup.getUsers().addAll(userRepo.findAll());
-            groupRepo.saveAndFlush(evGroup);
-            if (evRole.isPresent()) {
-                GroupGroupPerm evGroupPerm = new GroupGroupPerm(evGroup, evGroup, evRole.get());
-                groupGroupPermRepo.saveAndFlush(evGroupPerm);
-            }
         }else {
             evGroup = evGroupIn.get();
-            //Validate Everyone group is properly populated
-            Set<User> allUsers = new HashSet<>(userRepo.findAll());
-            evGroup.getUsers().removeIf(user -> !allUsers.contains(user));
-            allUsers.removeAll(evGroup.getUsers());
-            if (allUsers.size() > 0) {
-                evGroup.getUsers().addAll(allUsers);
-                groupRepo.saveAndFlush(evGroup);
-            }
-
+        }
+        if (evGroup.getType() != Group.VALID_GROUP_TYPES.REMOTE)
+        evGroup.setType(Group.VALID_GROUP_TYPES.REMOTE);
+        evGroup.setPublic(true);
+        groupRepo.saveAndFlush(evGroup);
+        Optional<GroupGroupPerm> evGroupPermOp = groupGroupPermRepo.findByGroupAndGroupPerm(evGroup,evGroup);
+        Optional<Role> evRole = roleRepo.findByName(AuthorizationConstants.READER);
+        if (evGroupPermOp.isEmpty() && evRole.isPresent()) {
+                evGroupPermOp = Optional.of(new GroupGroupPerm(evGroup, evGroup, evRole.get()));
+                groupGroupPermRepo.saveAndFlush(evGroupPermOp.get());
+        }
+        //Ensure permissions are correct on ev group in the event someone messes it up
+        if (evGroupPermOp.isPresent() && evRole.isPresent() && evGroupPermOp.get().getRole() != evRole.get()) {
+            GroupGroupPerm evGroupPerm = evGroupPermOp.get();
+            evGroupPerm.setRole(evRole.get());
+            groupGroupPermRepo.saveAndFlush(evGroupPerm);
         }
 
     }
+
 }

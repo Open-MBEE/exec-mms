@@ -529,7 +529,7 @@ public class DefaultPermissionService implements PermissionService {
         }
 
         throw new InternalErrorException(
-            "No valid permissions scheme found for organization " + group.getName()
+            "No valid permissions scheme found for group " + group.getName()
                 + " (" + group.getName() + ")");
     }
 }

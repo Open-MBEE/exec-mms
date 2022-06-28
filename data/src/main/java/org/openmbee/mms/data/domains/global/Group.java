@@ -17,7 +17,7 @@ public class Group extends Base {
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "groups_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"), uniqueConstraints=@UniqueConstraint(columnNames={"users_id","groups_id"}))
+    @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), uniqueConstraints=@UniqueConstraint(columnNames={"users_id","groups_id"}))
     private Set<User> users;
 
     @JsonIgnore

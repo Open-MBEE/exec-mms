@@ -59,16 +59,6 @@ public abstract class AbstractUsersDetailsService implements UsersDetailsService
     }
 
     public User saveUser(User user) {
-        Optional<Group> evGroup = getGroupRepo().findByName(AuthorizationConstants.EVERYONE);
-        if (evGroup.isPresent()) {
-            Group group =  evGroup.get();
-            if (user.getGroups() == null) {
-                user.setGroups(new HashSet<>());
-            }
-            if (!user.getGroups().contains(group)) {
-                user.getGroups().add(group);
-            }
-        }
         return getUserRepo().save(user);
     }
 

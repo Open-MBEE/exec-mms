@@ -28,7 +28,3 @@ buildFiles.each { File buildFile ->
         project.buildFileName = buildFile.name
     }
 }
-include 'users'
-include 'localldap'
-include 'localldap'
-

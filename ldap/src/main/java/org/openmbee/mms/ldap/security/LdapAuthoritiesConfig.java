@@ -116,18 +116,18 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                         groupRoleAttribute);
 
                 Set<Group> addGroups = new HashSet<>();
-                Optional<Group> evGroup = getGroupRepo().findByName(AuthorizationConstants.EVERYONE);
-                evGroup.ifPresent(addGroups::add);
+
                 for (String memberGroup : memberGroups) {
                     Optional<Group> group = getGroupRepo().findByName(memberGroup);
                     group.ifPresent(addGroups::add);
                 }
-                Set<String> authGroups = addGroups.stream().map(Group::getName).collect(Collectors.toSet());
                 List<GrantedAuthority> auths = AuthorityUtils
-                    .createAuthorityList(authGroups.toArray(new String[0]));
+                    .createAuthorityList(addGroups.stream().map(Group::getName).distinct().toArray(String[]::new));
                 if (user.isAdmin()) {
                     auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
                 }
+                auths.add(new SimpleGrantedAuthority(AuthorizationConstants.EVERYONE));
+
                 return auths;
             }
         }

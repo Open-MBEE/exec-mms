@@ -9,6 +9,7 @@ import org.openmbee.mms.twc.exceptions.TwcConfigurationException;
 import org.openmbee.mms.twc.utilities.AdminUtils;
 import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.openmbee.mms.users.security.AbstractUsersDetailsService;
+import org.openmbee.mms.users.security.DefaultUsersDetails;
 import org.openmbee.mms.users.security.UsersDetails;
 import org.openmbee.mms.users.security.UsersDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class TwcUserDetailsService extends AbstractUsersDetailsService implement
                 user = Optional.of(newUser);
             }
             User u = user.get();
-            return new TwcUserDetails(u);
+            return new DefaultUsersDetails(u);
         }
 
         throw new UsernameNotFoundException("Username not found on any connected TWC Servers");
