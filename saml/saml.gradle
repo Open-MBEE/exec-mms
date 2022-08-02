@@ -1,0 +1,5 @@
+dependencies {
+    implementation project(':rdb')
+
+    implementation commonDependencies.'spring-security-saml'
+}
