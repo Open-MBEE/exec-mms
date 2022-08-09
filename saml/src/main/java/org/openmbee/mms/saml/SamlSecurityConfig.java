@@ -1,120 +1,176 @@
 package org.openmbee.mms.saml;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
 
-import org.openmbee.mms.core.config.AuthorizationConstants;
-import org.openmbee.mms.data.domains.global.Base;
-import org.openmbee.mms.data.domains.global.Group;
-import org.openmbee.mms.rdb.repositories.GroupRepository;
-import org.openmbee.mms.rdb.repositories.UserRepository;
-import org.openmbee.mms.data.domains.global.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.opensaml.saml2.metadata.provider.MetadataProvider;
+import org.opensaml.saml2.metadata.provider.MetadataProviderException;
+import org.opensaml.saml2.metadata.provider.ResourceBackedMetadataProvider;
+import org.opensaml.util.resource.ClasspathResource;
+import org.opensaml.util.resource.ResourceException;
+import org.opensaml.xml.parse.StaticBasicParserPool;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.security.saml.*;
+import org.springframework.security.saml.context.SAMLContextProviderImpl;
+import org.springframework.security.saml.key.JKSKeyManager;
+import org.springframework.security.saml.key.KeyManager;
+import org.springframework.security.saml.log.SAMLDefaultLogger;
+import org.springframework.security.saml.metadata.CachingMetadataManager;
+import org.springframework.security.saml.metadata.ExtendedMetadata;
+import org.springframework.security.saml.metadata.ExtendedMetadataDelegate;
+import org.springframework.security.saml.processor.*;
+import org.springframework.security.saml.util.VelocityFactory;
+import org.springframework.security.saml.websso.*;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+
+import org.openmbee.mms.saml.authentication.MMSSamlAuthenticationProvider;
 
 @Configuration
-@Conditional(SamlCondition.class)
-@EnableTransactionManagement
 public class SamlSecurityConfig {
 
-    private static Logger logger = LoggerFactory.getLogger(SamlSecurityConfig.class);
+    @Value("${saml.keystore.location}")
+    private String samlKeystoreLocation;
 
-    @Value("${saml.provider.url:#{null}}")
-    private String providerUrl;
+    @Value("${saml.keystore.password}")
+    private String samlKeystorePassword;
 
-    @Value("${saml.provider.userdn:#{null}}")
-    private String providerUserDn;
+    @Value("${saml.keystore.alias}")
+    private String samlKeystoreAlias;
 
-    @Value("${saml.provider.password:#{null}}")
-    private String providerPassword;
+    @Value("${saml.idp}")
+    private String defaultIdp;
 
-    @Value("${saml.provider.base:#{null}}")
-    private String providerBase;
-
-    @Value("${saml.user.dn.pattern:uid={0}}")
-    private String userDnPattern;
-
-    @Value("${saml.user.attributes.username:uid}")
-    private String userAttributesUsername;
-
-    @Value("${saml.user.attributes.firstname:givenname}")
-    private String userAttributesFirstName;
-
-    @Value("${saml.user.attributes.lastname:sn}")
-    private String userAttributesLastName;
-
-    @Value("${saml.user.attributes.email:mail}")
-    private String userAttributesEmail;
-
-    @Value("${saml.user.attributes.update:24}")
-    private int userAttributesUpdate;
-
-    @Value("${saml.group.search.base:#{''}}")
-    private String groupSearchBase;
-
-    @Value("${saml.group.role.attribute:cn}")
-    private String groupRoleAttribute;
-
-    @Value("${saml.group.search.filter:(uniqueMember={0})}")
-    private String groupSearchFilter;
-
-    private UserRepository userRepository;
-    private GroupRepository groupRepository;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setGroupRepository(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
-    @Bean
-    public FilterChainProxy samlFilter() throws Exception {
-        List<SecurityFilterChain> chains = new ArrayList<>();
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SSO/**"),
-            samlWebSSOProcessingFilter()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/discovery/**"),
-            samlDiscovery()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/login/**"),
-            samlEntryPoint));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/logout/**"),
-            samlLogoutFilter));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SingleLogout/**"),
-            samlLogoutProcessingFilter));
-        return new FilterChainProxy(chains);
+    @Bean(initMethod = "initialize")
+    public StaticBasicParserPool parserPool() {
+        return new StaticBasicParserPool();
     }
 
     @Bean
-    public SAMLProcessingFilter samlWebSSOProcessingFilter() throws Exception {
-        SAMLProcessingFilter samlWebSSOProcessingFilter = new SAMLProcessingFilter();
-        samlWebSSOProcessingFilter.setAuthenticationManager(authenticationManager());
-        samlWebSSOProcessingFilter.setAuthenticationSuccessHandler(successRedirectHandler());
-        samlWebSSOProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
-        return samlWebSSOProcessingFilter;
+    public SAMLAuthenticationProvider samlAuthenticationProvider() {
+        return new MMSSamlAuthenticationProvider();
     }
 
     @Bean
-    public SAMLDiscovery samlDiscovery() {
-        SAMLDiscovery idpDiscovery = new SAMLDiscovery();
-        return idpDiscovery;
+    public SAMLContextProviderImpl contextProvider() {
+        return new SAMLContextProviderImpl();
     }
 
     @Bean
+    public static SAMLBootstrap samlBootstrap() {
+        return new SAMLBootstrap();
+    }
+
+    @Bean
+    public SAMLDefaultLogger samlLogger() {
+        return new SAMLDefaultLogger();
+    }
+
+    @Bean
+    public WebSSOProfileConsumer webSSOprofileConsumer() {
+        return new WebSSOProfileConsumerImpl();
+    }
+
+    @Bean
+    @Qualifier("hokWebSSOprofileConsumer")
+    public WebSSOProfileConsumerHoKImpl hokWebSSOProfileConsumer() {
+        return new WebSSOProfileConsumerHoKImpl();
+    }
+
+    @Bean
+    public WebSSOProfile webSSOprofile() {
+        return new WebSSOProfileImpl();
+    }
+
+    @Bean
+    public WebSSOProfileConsumerHoKImpl hokWebSSOProfile() {
+        return new WebSSOProfileConsumerHoKImpl();
+    }
+
+    @Bean
+    public WebSSOProfileECPImpl ecpProfile() {
+        return new WebSSOProfileECPImpl();
+    }
+
+    @Bean
+    public SingleLogoutProfile logoutProfile() {
+        return new SingleLogoutProfileImpl();
+    }
+
+    @Bean
+    public KeyManager keyManager() {
+        DefaultResourceLoader loader = new DefaultResourceLoader();
+        Resource storeFile = loader.getResource(samlKeystoreLocation);
+        Map<String, String> passwords = new HashMap<>();
+        passwords.put(samlKeystoreAlias, samlKeystorePassword);
+        return new JKSKeyManager(storeFile, samlKeystorePassword, passwords, samlKeystoreAlias);
+    }
+
+    @Bean
+    public WebSSOProfileOptions defaultWebSSOProfileOptions() {
+        WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
+        webSSOProfileOptions.setIncludeScoping(false);
+        return webSSOProfileOptions;
+    }
+
+    @Bean
+    public SAMLEntryPoint samlEntryPoint() {
+        SAMLEntryPoint samlEntryPoint = new SAMLEntryPoint();
+        samlEntryPoint.setDefaultProfileOptions(defaultWebSSOProfileOptions());
+        return samlEntryPoint;
+    }
+
+    @Bean
+    public ExtendedMetadata extendedMetadata() {
+        ExtendedMetadata extendedMetadata = new ExtendedMetadata();
+        extendedMetadata.setIdpDiscoveryEnabled(false);
+        extendedMetadata.setSignMetadata(false);
+        return extendedMetadata;
+    }
+
+    @Bean
+    @Qualifier("okta")
+    public ExtendedMetadataDelegate oktaExtendedMetadataProvider() throws MetadataProviderException {
+        // Use the Spring Security SAML resource mechanism to load
+        // metadata from the Java classpath.  This works from Spring Boot
+        // self contained JAR file.
+        org.opensaml.util.resource.Resource resource = null;
+
+        try {
+            resource = new ClasspathResource("/saml/metadata/sso.xml");
+        } catch (ResourceException e) {
+            e.printStackTrace();
+        }
+
+        Timer timer = new Timer("saml-metadata");
+        ResourceBackedMetadataProvider provider = new ResourceBackedMetadataProvider(timer,resource);
+        provider.setParserPool(parserPool());
+        return new ExtendedMetadataDelegate(provider, extendedMetadata());
+    }
+
+    @Bean
+    @Qualifier("metadata")
+    public CachingMetadataManager metadata() throws MetadataProviderException, ResourceException {
+        List<MetadataProvider> providers = new ArrayList<>();
+        providers.add(oktaExtendedMetadataProvider());
+        CachingMetadataManager metadataManager = new CachingMetadataManager(providers);
+        metadataManager.setDefaultIDP(defaultIdp);
+        return metadataManager;
+    }
+
+    @Bean
+    @Qualifier("saml")
     public SavedRequestAwareAuthenticationSuccessHandler successRedirectHandler() {
         SavedRequestAwareAuthenticationSuccessHandler successRedirectHandler = new SavedRequestAwareAuthenticationSuccessHandler();
         successRedirectHandler.setDefaultTargetUrl("/home");
@@ -122,6 +178,7 @@ public class SamlSecurityConfig {
     }
 
     @Bean
+    @Qualifier("saml")
     public SimpleUrlAuthenticationFailureHandler authenticationFailureHandler() {
         SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
         failureHandler.setUseForward(true);
@@ -156,71 +213,6 @@ public class SamlSecurityConfig {
             new LogoutHandler[] { logoutHandler() });
     }
 
-    public MetadataGenerator metadataGenerator() {
-        MetadataGenerator metadataGenerator = new MetadataGenerator();
-        metadataGenerator.setEntityId(samlAudience);
-        metadataGenerator.setExtendedMetadata(extendedMetadata());
-        metadataGenerator.setIncludeDiscoveryExtension(false);
-        metadataGenerator.setKeyManager(keyManager());
-        return metadataGenerator;
-    }
-
-    @Bean
-    public MetadataGeneratorFilter metadataGeneratorFilter() {
-        return new MetadataGeneratorFilter(metadataGenerator());
-    }
-
-    @Bean
-    public ExtendedMetadata extendedMetadata() {
-        ExtendedMetadata extendedMetadata = new ExtendedMetadata();
-        extendedMetadata.setIdpDiscoveryEnabled(false);
-        return extendedMetadata;
-    }
-
-    @Bean
-    public KeyManager keyManager() {
-        DefaultResourceLoader loader = new DefaultResourceLoader();
-        Resource storeFile = loader.getResource(samlKeystoreLocation);
-        Map<String, String> passwords = new HashMap<>();
-        passwords.put(samlKeystoreAlias, samlKeystorePassword);
-        return new JKSKeyManager(storeFile, samlKeystorePassword, passwords, samlKeystoreAlias);
-    }
-
-    @Bean
-    @Qualifier("okta")
-    public ExtendedMetadataDelegate oktaExtendedMetadataProvider() throws MetadataProviderException {
-        org.opensaml.util.resource.Resource resource = null
-        try {
-            resource = new ClasspathResource("/saml/metadata/sso.xml");
-        } catch (ResourceException e) {
-            e.printStackTrace();
-        }
-        Timer timer = new Timer("saml-metadata")
-        ResourceBackedMetadataProvider provider = new ResourceBackedMetadataProvider(timer,resource);
-        provider.setParserPool(parserPool());
-        return new ExtendedMetadataDelegate(provider, extendedMetadata());
-    }
-
-    @Bean
-    @Qualifier("metadata")
-    public CachingMetadataManager metadata() throws MetadataProviderException, ResourceException {
-        List<MetadataProvider> providers = new ArrayList<>();
-        providers.add(oktaExtendedMetadataProvider());
-        CachingMetadataManager metadataManager = new CachingMetadataManager(providers);
-        metadataManager.setDefaultIDP(defaultIdp);
-        return metadataManager;
-    }
-
-    @Bean(initMethod = "initialize")
-    public StaticBasicParserPool parserPool() {
-        return new StaticBasicParserPool();
-    }
-
-    @Bean(name = "parserPoolHolder")
-    public ParserPoolHolder parserPoolHolder() {
-        return new ParserPoolHolder();
-    }
-
     @Bean
     public HTTPPostBinding httpPostBinding() {
         return new HTTPPostBinding(parserPool(), VelocityFactory.getEngine());
@@ -237,41 +229,5 @@ public class SamlSecurityConfig {
         bindings.add(httpRedirectDeflateBinding());
         bindings.add(httpPostBinding());
         return new SAMLProcessorImpl(bindings);
-    }
-
-    public class CustomSAMLAuthenticationProvider extends SAMLAuthenticationProvider {
-        @Override
-        public Collection<? extends GrantedAuthority> getEntitlements(SAMLCredential credential, Object userDetail) {
-            if (userDetail instanceof ExpiringUsernameAuthenticationToken) {
-                List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-                authorities.addAll(((ExpiringUsernameAuthenticationToken) userDetail).getAuthorities());
-                return authorities;
-            } else {
-                return Collections.emptyList();
-            }
-        }
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-
-        http.httpBasic().authenticationEntryPoint(samlEntryPoint);
-
-        http
-            .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
-            .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class)
-            .addFilterBefore(samlFilter(), CsrfFilter.class);
-
-        http
-            .authorizeRequests()
-            .antMatchers("/").permitAll()
-            .anyRequest().authenticated();
-
-        http
-            .logout()
-            .addLogoutHandler((request, response, authentication) -> {
-                response.sendRedirect("/saml/logout");
-            });
     }
 }

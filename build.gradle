@@ -23,8 +23,6 @@ ext {
         'spring-security-core'          : "org.springframework.security:spring-security-core:$springSecurityVersion",
         'spring-security-config'        : "org.springframework.security:spring-security-config:$springSecurityVersion",
         'spring-security-web'           : "org.springframework.security:spring-security-web:$springSecurityVersion",
-        'spring-security-ldap'          : "org.springframework.security:spring-security-ldap:$springSecurityVersion",
-        'spring-security-saml'          : "org.springframework.security.extensions:spring-security-saml2-core:1.0.10.RELEASE",
         'spring-tx'                     : "org.springframework:spring-tx:$springFrameworkVersion",
         'spring-webmvc'                 : "org.springframework:spring-webmvc:$springFrameworkVersion",
         'spring-aspects'                : "org.springframework:spring-aspects:$springFrameworkVersion",
@@ -54,7 +52,6 @@ subprojects {
         mavenCentral()
         gradlePluginPortal()
         maven { url 'https://repo.spring.io/plugins-release' }
-        maven { url 'https://build.shibboleth.net/maven/releases/' }
     }
 
     apply plugin: 'java-library'
