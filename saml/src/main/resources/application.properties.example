@@ -1,5 +1,6 @@
+saml.enabled=false
 spring.security.saml2.relyingparty.registration.okta.signing.credentials.private-key-location=classpath:local.key
 spring.security.saml2.relyingparty.registration.okta.signing.credentials.certificate-location=classpath:local.crt
 spring.security.saml2.relyingparty.registration.okta.singlelogout.binding=POST
 spring.security.saml2.relyingparty.registration.okta.singlelogout.response-url="{baseUrl}/logout/saml2/slo"
-spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri=https://dev-17700857.okta.com/app/exk61z7gjfJfUWDfy5d7/sso/saml/metadata
+spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri=https://someapp.okta.com/app/randomcharacters/sso/saml/metadata
