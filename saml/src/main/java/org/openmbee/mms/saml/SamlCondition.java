@@ -9,6 +9,6 @@ public class SamlCondition implements Condition {
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         Environment env = context.getEnvironment();
-        return "true".equals(env.getProperty("ldap.enabled"));
+        return "true".equals(env.getProperty("saml.enabled"));
     }
 }

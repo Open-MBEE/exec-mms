@@ -5,5 +5,6 @@ repositories {
 dependencies {
     implementation project(':rdb')
 
-    implementation "org.springframework.security.extensions:spring-security-saml2-core:1.0.10.RELEASE"
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.0.M1'
+    implementation 'org.springframework.security:spring-security-saml2-service-provider:5.7.2'
 }

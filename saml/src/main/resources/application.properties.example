@@ -1,11 +1,5 @@
-saml.enabled=false
-saml.provider.base=ou=something,dc=openmbee,dc=org
-saml.provider.url=ldaps://ldap.openmbee.org/${ldap.provider.base}
-saml.provider.userdn=
-saml.provider.password=
-saml.user.dn.pattern=uid={0}
-saml.user.attributes.username=
-saml.user.attributes.email=
-saml.group.role.attribute=cn
-saml.group.search.base=
-saml.group.search.filter=uniqueMember={0}
+spring.security.saml2.relyingparty.registration.okta.signing.credentials.private-key-location=classpath:local.key
+spring.security.saml2.relyingparty.registration.okta.signing.credentials.certificate-location=classpath:local.crt
+spring.security.saml2.relyingparty.registration.okta.singlelogout.binding=POST
+spring.security.saml2.relyingparty.registration.okta.singlelogout.response-url="{baseUrl}/logout/saml2/slo"
+spring.security.saml2.relyingparty.registration.okta.assertingparty.metadata-uri=https://dev-17700857.okta.com/app/exk61z7gjfJfUWDfy5d7/sso/saml/metadata
