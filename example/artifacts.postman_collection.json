@@ -700,7 +700,7 @@
 					"raw": "{\n\t\"username\": \"other\",\n\t\"password\": \"other\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/user",
+					"raw": "{{host}}/users",
 					"host": [
 						"{{host}}"
 					],

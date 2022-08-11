@@ -179,7 +179,7 @@
 					"raw": "{\n\t\"username\" : \"user2\",\n\t\"password\" : \"password2\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/user",
+					"raw": "{{host}}/users",
 					"host": [
 						"{{host}}"
 					],
@@ -611,7 +611,7 @@
 					"raw": "{\n\t\"username\" : \"admin2\",\n\t\"password\" : \"adminpassword\",\n\t\"admin\": true\n}"
 				},
 				"url": {
-					"raw": "{{host}}/user",
+					"raw": "{{host}}/users",
 					"host": [
 						"{{host}}"
 					],
