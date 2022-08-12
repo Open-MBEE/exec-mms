@@ -6,6 +6,8 @@ import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.data.domains.global.User;
 import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.openmbee.mms.users.security.AbstractUsersDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,9 @@ import java.util.stream.Collectors;
 
 @Configuration
 public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
+
+    private static Logger logger = LoggerFactory.getLogger(LdapAuthoritiesConfig.class);
+
     @Value("${ldap.user.attributes.username:uid}")
     private String userAttributesUsername;
 
@@ -65,12 +70,15 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
     @Value("${ldap.group.search.filter:(uniqueMember={0})}")
     private String groupSearchFilter;
 
+    @Value("${ldap.group.search.base:#{''}}")
+    private String groupSearchBase;
+
     @Bean
     LdapAuthoritiesPopulator ldapAuthoritiesPopulator(@Qualifier("contextSource") BaseLdapPathContextSource baseContextSource) {
 
         /*
           Specificity here : we don't get the Role by reading the members of available groups (which is implemented by
-          default in Spring security LDAP), but we retrieve the groups from the field memberOf of the user.
+          default in Spring security LDAP), but we retrieve the groups the user belongs to.
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
@@ -83,6 +91,7 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
             @Override
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
+                logger.debug("Populating authorities using LDAP");
                 Optional<User> userOptional = getUserRepo().findByUsername(username);
 
                 if (userOptional.isEmpty()) {
@@ -96,7 +105,14 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                     parseLdapUser(userData, user);
                 }
                 user.setPassword(null);
-                String userDn = userAttributesUsername + "=" + user.getUsername() + "," + providerBase;
+
+                StringBuilder userDnBuilder = new StringBuilder();
+                userDnBuilder.append(userData.getDn().toString());
+                if (providerBase != null && !providerBase.isEmpty()) {
+                    userDnBuilder.append(',');
+                    userDnBuilder.append(providerBase);
+                }
+                String userDn = userDnBuilder.toString();
 
                 List<Group> definedGroups = getGroupRepo().findAll();
                 OrFilter orFilter = new OrFilter();
@@ -111,9 +127,11 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                 andFilter.and(groupsFilter);
                 andFilter.and(orFilter);
 
+                String filter = andFilter.encode();
+                logger.debug("Searching LDAP with filter: {}", filter);
                 Set<String> memberGroups = ldapTemplate
-                    .searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""},
-                        groupRoleAttribute);
+                    .searchForSingleAttributeValues(groupSearchBase, filter, new Object[]{""}, groupRoleAttribute);
+                logger.debug("LDAP search result: {}", Arrays.toString(memberGroups.toArray()));
 
                 Set<Group> addGroups = new HashSet<>();
 
@@ -142,6 +160,7 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
             providerUrl);
         contextSource.setUserDn(providerUserDn);
         contextSource.setPassword(providerPassword);
+        contextSource.setBase(providerBase);
         return contextSource;
     }
 
