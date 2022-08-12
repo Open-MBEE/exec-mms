@@ -184,7 +184,7 @@
 						"{{host}}"
 					],
 					"path": [
-						"user"
+						"users"
 					]
 				}
 			},
@@ -616,7 +616,7 @@
 						"{{host}}"
 					],
 					"path": [
-						"user"
+						"users"
 					]
 				}
 			},

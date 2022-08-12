@@ -130,7 +130,7 @@
 						"{{host}}"
 					],
 					"path": [
-						"user"
+						"users"
 					]
 				}
 			},

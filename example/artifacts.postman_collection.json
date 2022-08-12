@@ -705,7 +705,7 @@
 						"{{host}}"
 					],
 					"path": [
-						"user"
+						"users"
 					]
 				}
 			},
