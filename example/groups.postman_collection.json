@@ -67,10 +67,12 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
+                            "pm.test(\"response has 1 group\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.groups.length).to.eql(1);",
+                            "    pm.expect(jsonData.groups[0]['name']).to.include('localgroup')",
+                            "});"
+                        ],
 						"type": "text/javascript"
 					}
 				}
