@@ -206,10 +206,14 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"there's at least 1 group\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.groups).to.include('localgroup');",
-							"});"
+                            "pm.test(\"More than 1 group exists\", () => {",
+                            "    const response = pm.response.json();",
+                            "    const expectedObject = {",
+                            "    name: \"test\"",
+                            "};",
+                            "pm.expect(response.groups.length).to.be.greaterThan(1);",
+                            "pm.expect(_.some(response.groups, expectedObject)).to.be.true;"
+                            "});"
 						],
 						"type": "text/javascript"
 					}
