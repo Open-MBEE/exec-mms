@@ -76,19 +76,34 @@
 				}
 			],
 			"request": {
-				"method": "PUT",
-				"header": [],
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
 				"url": {
-					"raw": "{{host}}/groups/localgroup",
+					"raw": "{{host}}/groups",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						"groups",
-						"localgroup"
+						"groups"
 					]
-				}
-			},
+				},
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"name\" : \"localgroup\",\n\t\"type\" : \"local\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                }
+            },
+
 			"response": []
 		},
 		{
