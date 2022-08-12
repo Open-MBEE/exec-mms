@@ -212,7 +212,7 @@
                             "    name: \"test\"",
                             "};",
                             "pm.expect(response.groups.length).to.be.greaterThan(1);",
-                            "pm.expect(_.some(response.groups, expectedObject)).to.be.true;"
+                            "pm.expect(_.some(response.groups, expectedObject)).to.be.true;",
                             "});"
 						],
 						"type": "text/javascript"
