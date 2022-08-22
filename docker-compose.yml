@@ -28,9 +28,8 @@ services:
           - 9000:9000
 
   mms:
-#    build: .
-#    container_name: mms
-    image: docker.io/library/mms:latest
+    build: .
+    container_name: mms
     hostname: mms
     environment:
         - "SPRING_PROFILES_ACTIVE=local"
