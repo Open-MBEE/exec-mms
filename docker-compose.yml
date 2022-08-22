@@ -28,11 +28,12 @@ services:
           - 9000:9000
 
   mms:
-    build: .
-    container_name: mms
+#    build: .
+#    container_name: mms
+    image: docker.io/library/mms:latest
     hostname: mms
     environment:
-        - "SPRING_PROFILES_ACTIVE=test"
+        - "SPRING_PROFILES_ACTIVE=local"
     depends_on:
         - postgres
         - elasticsearch

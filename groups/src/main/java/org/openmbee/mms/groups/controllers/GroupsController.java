@@ -112,15 +112,19 @@ public class GroupsController {
                 throw new BadRequestException(response.addMessage("No type provided for group:" + group.getName()));
             }
 
-            Group g = groupRepository.findByName(group.getName())
-                .orElse(new Group());
+            Optional<Group> optG = groupRepository.findByName(group.getName());
             boolean newGroup = true;
-            if (g.getId() != null) {
+            Group g = new Group();
+            if (optG.isPresent()) {
+                newGroup = false;
+                g = optG.get();
                 if (!mss.hasGroupPrivilege(auth, g.getName(), Privileges.GROUP_EDIT.name(), false)) {
-                    response.addRejection(new Rejection(group, 403, "No permission to update group"));
+                    response.addRejection(new Rejection(group, 403, GroupConstants.NO_PERMISSSION));
                     continue;
                 }
-                newGroup = false;
+                if (!group.getType().equals(g.getTypeString()) && !(g.getUsers() == null || g.getUsers().isEmpty())) {
+                    response.addRejection(new Rejection(group, 403, GroupConstants.GROUP_NOT_EMPTY));
+                }
             }
             g.setName(group.getName());
             g.setType(group.getType());
