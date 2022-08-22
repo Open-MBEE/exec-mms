@@ -4,6 +4,9 @@ mms.admin.password=test
 
 mms.stream.batch.size=100000
 
+#Comma Separated list of allowed cross site origins
+cors.allowed.origins=*
+
 jwt.secret=make_me_something_really_long
 jwt.expiration=86400
 jwt.header=Authorization
