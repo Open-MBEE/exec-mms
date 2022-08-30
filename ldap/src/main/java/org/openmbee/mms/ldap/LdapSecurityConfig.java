@@ -117,7 +117,7 @@ public class LdapSecurityConfig {
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
-            SpringSecurityLdapTemplate ldapTemplate;
+            final SpringSecurityLdapTemplate ldapTemplate;
 
             private CustomLdapAuthoritiesPopulator(BaseLdapPathContextSource ldapContextSource) {
                 ldapTemplate = new SpringSecurityLdapTemplate(ldapContextSource);
@@ -128,9 +128,9 @@ public class LdapSecurityConfig {
                 DirContextOperations userData, String username) {
                 Optional<User> userOptional = userRepository.findByUsername(username);
 
-                if (!userOptional.isPresent()) {
+                if (userOptional.isEmpty()) {
+                    logger.info("No user record for {} in the userRepository, creating...", userData.getDn());
                     User newUser = createLdapUser(userData);
-
                     userOptional = Optional.of(newUser);
                 }
 
@@ -154,6 +154,8 @@ public class LdapSecurityConfig {
                 andFilter.and(groupsFilter);
                 andFilter.and(orFilter);
 
+                logger.debug("Generated LDAP query filter for groups: " + andFilter);
+
                 Set<String> memberGroups = ldapTemplate
                     .searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""},
                         groupRoleAttribute);
@@ -163,6 +165,17 @@ public class LdapSecurityConfig {
                     Optional<Group> group = groupRepository.findByName(memberGroup);
                     group.ifPresent(addGroups::add);
                 }
+
+                if (logger.isDebugEnabled()) {
+                    if ((long) addGroups.size() > 0) {
+                        addGroups.forEach(group -> {
+                            logger.debug("Group received: " + group.getName());
+                        });
+                    } else {
+                        logger.debug("No configured groups returned from LDAP");
+                    }
+                }
+
                 user.setGroups(addGroups);
                 userRepository.save(user);
 
@@ -183,10 +196,17 @@ public class LdapSecurityConfig {
     @Bean
     public LdapContextSource contextSource() {
         LdapContextSource contextSource = new LdapContextSource();
+
+        logger.debug("Initializing LDAP ContextSource with the following values: ");
+
         contextSource.setUrl(providerUrl);
         contextSource.setBase(providerBase);
         contextSource.setUserDn(providerUserDn);
         contextSource.setPassword(providerPassword);
+
+        logger.debug("BaseLdapPath: " + contextSource.getBaseLdapPathAsString());
+        logger.debug("UserDn: " + contextSource.getUserDn());
+
         return contextSource;
     }
 
