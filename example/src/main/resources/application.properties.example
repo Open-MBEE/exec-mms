@@ -12,18 +12,18 @@ jwt.expiration=86400
 jwt.header=Authorization
 
 # See ldap module for example configuration
-ldap.provider.base=ou=something,dc=openmbee,dc=org
-ldap.provider.url=ldaps://ldap.openmbee.org/${ldap.provider.base}
+ldap.provider.base=dc=directory,dc=openmbee,dc=org
+ldap.provider.url=ldaps://ldap.openmbee.org
 ldap.provider.userdn=
 ldap.provider.password=
-ldap.user.dn.pattern=uid={0}
+ldap.user.dn.pattern=uid={0},ou=personnel
 ldap.user.attributes.username=
 ldap.user.attributes.email=
 ldap.user.attributes.firstname=
 ldap.user.attributes.lastname=
 ldap.user.attributes.update=24
 ldap.group.role.attribute=cn
-ldap.group.search.base=
+ldap.group.search.base=ou=groups
 ldap.group.search.filter=uniqueMember={0}
 
 # See core module for example configuration
