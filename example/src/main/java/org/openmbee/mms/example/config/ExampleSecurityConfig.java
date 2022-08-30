@@ -2,6 +2,7 @@ package org.openmbee.mms.example.config;
 
 import org.openmbee.mms.authenticator.config.AuthSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -31,6 +32,9 @@ import static org.springframework.http.HttpMethod.*;
 @EnableAsync
 public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
+    @Value("${cors.allowed.origins:*}")
+    private String allowedOrigins;
+
     @Autowired
     AuthSecurityConfig authSecurityConfig;
 
@@ -57,7 +61,7 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE");
+        registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
     }
 
     private CorsFilter corsFilter() {
@@ -70,7 +74,9 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
 
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
+        for(String origin: allowedOrigins.split(",")) {
+            config.addAllowedOrigin(origin);
+        }
         config.addAllowedHeader(ORIGIN);
         config.addAllowedHeader(CONTENT_TYPE);
         config.addAllowedHeader(ACCEPT);
