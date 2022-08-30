@@ -184,6 +184,7 @@ public class LdapSecurityConfig {
     public BaseLdapPathContextSource contextSource() {
         DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
             providerUrl);
+        contextSource.afterPropertiesSet();
         contextSource.setUserDn(providerUserDn);
         contextSource.setPassword(providerPassword);
         return contextSource;
