@@ -91,7 +91,7 @@ public class LdapSecurityConfig {
 
     @Autowired
     public void configureLdapAuth(AuthenticationManagerBuilder auth,
-                                  LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
+        LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
         throws Exception {
         if (providerUrl != null) {
             logger.info("LDAP Module is loading...");
