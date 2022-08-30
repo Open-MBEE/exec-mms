@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
-import org.openmbee.mms.data.domains.global.Base;
 import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
@@ -26,7 +25,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
