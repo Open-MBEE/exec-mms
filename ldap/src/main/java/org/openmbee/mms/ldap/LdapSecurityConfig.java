@@ -163,7 +163,6 @@ public class LdapSecurityConfig {
 
                 String filter = andFilter.encode();
                 logger.debug("Searching LDAP with filter: {}", filter);
-                logger.debug("Generated LDAP query filter for groups: " + andFilter);
 
                 Set<String> memberGroups = ldapTemplate
                     .searchForSingleAttributeValues(groupSearchBase, filter, new Object[]{""}, groupRoleAttribute);
@@ -178,7 +177,7 @@ public class LdapSecurityConfig {
                 if (logger.isDebugEnabled()) {
                     if ((long) addGroups.size() > 0) {
                         addGroups.forEach(group -> {
-                            logger.debug("Group received: " + group.getName());
+                            logger.debug("Group received: {}", group.getName());
                         });
                     } else {
                         logger.debug("No configured groups returned from LDAP");
