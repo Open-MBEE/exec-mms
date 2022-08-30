@@ -20,12 +20,12 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.*;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -91,7 +91,7 @@ public class LdapSecurityConfig {
 
     @Autowired
     public void configureLdapAuth(AuthenticationManagerBuilder auth,
-        LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
+                                  LdapAuthoritiesPopulator ldapAuthoritiesPopulator, @Qualifier("contextSource") BaseLdapPathContextSource contextSource)
         throws Exception {
         if (providerUrl != null) {
             logger.info("LDAP Module is loading...");
@@ -181,10 +181,10 @@ public class LdapSecurityConfig {
     }
 
     @Bean
-    public BaseLdapPathContextSource contextSource() {
-        DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
-            providerUrl);
-        contextSource.afterPropertiesSet();
+    public LdapContextSource contextSource() {
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl(providerUrl);
+        contextSource.setBase(providerBase);
         contextSource.setUserDn(providerUserDn);
         contextSource.setPassword(providerPassword);
         return contextSource;
