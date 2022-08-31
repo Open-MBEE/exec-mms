@@ -19,8 +19,7 @@ public class AuthSecurityConfig {
     private static Logger logger = LoggerFactory.getLogger(AuthSecurityConfig.class);
 
     @Autowired
-    public void setAuthProvider(AuthenticationManagerBuilder auth,
-            JwtAuthenticationProvider provider) {
+    public void setAuthProvider(AuthenticationManagerBuilder auth, JwtAuthenticationProvider provider) {
         auth.authenticationProvider(provider);
     }
 
