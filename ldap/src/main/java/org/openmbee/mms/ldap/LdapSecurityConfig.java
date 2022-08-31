@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
-import org.openmbee.mms.data.domains.global.Base;
 import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
@@ -20,12 +19,12 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.*;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -113,11 +112,11 @@ public class LdapSecurityConfig {
 
         /*
           Specificity here : we don't get the Role by reading the members of available groups (which is implemented by
-          default in Spring security LDAP), but we retrieve the groups from the field memberOf of the user.
+          default in Spring security LDAP), but we retrieve the groups the user belongs to.
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
-            SpringSecurityLdapTemplate ldapTemplate;
+            final SpringSecurityLdapTemplate ldapTemplate;
 
             private CustomLdapAuthoritiesPopulator(BaseLdapPathContextSource ldapContextSource) {
                 ldapTemplate = new SpringSecurityLdapTemplate(ldapContextSource);
@@ -126,11 +125,12 @@ public class LdapSecurityConfig {
             @Override
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
+                logger.debug("Populating authorities using LDAP");
                 Optional<User> userOptional = userRepository.findByUsername(username);
 
-                if (!userOptional.isPresent()) {
+                if (userOptional.isEmpty()) {
+                    logger.info("No user record for {} in the userRepository, creating...", userData.getDn());
                     User newUser = createLdapUser(userData);
-
                     userOptional = Optional.of(newUser);
                 }
 
@@ -139,13 +139,20 @@ public class LdapSecurityConfig {
                     saveLdapUser(userData, user);
                 }
                 user.setPassword(null);
-                String userDn = userAttributesUsername + "=" + user.getUsername() + "," + providerBase;
+
+                StringBuilder userDnBuilder = new StringBuilder();
+                userDnBuilder.append(userData.getDn().toString());
+                if (providerBase != null && !providerBase.isEmpty()) {
+                    userDnBuilder.append(',');
+                    userDnBuilder.append(providerBase);
+                }
+                String userDn = userDnBuilder.toString();
 
                 List<Group> definedGroups = groupRepository.findAll();
                 OrFilter orFilter = new OrFilter();
 
-                for (int i = 0; i < definedGroups.size(); i++) {
-                    orFilter.or(new EqualsFilter(groupRoleAttribute, definedGroups.get(i).getName()));
+                for (Group definedGroup : definedGroups) {
+                    orFilter.or(new EqualsFilter(groupRoleAttribute, definedGroup.getName()));
                 }
 
                 AndFilter andFilter = new AndFilter();
@@ -154,15 +161,29 @@ public class LdapSecurityConfig {
                 andFilter.and(groupsFilter);
                 andFilter.and(orFilter);
 
+                String filter = andFilter.encode();
+                logger.debug("Searching LDAP with filter: {}", filter);
+
                 Set<String> memberGroups = ldapTemplate
-                    .searchForSingleAttributeValues("", andFilter.encode(), new Object[]{""},
-                        groupRoleAttribute);
+                    .searchForSingleAttributeValues(groupSearchBase, filter, new Object[]{""}, groupRoleAttribute);
+                logger.debug("LDAP search result: {}", Arrays.toString(memberGroups.toArray()));
 
                 Set<Group> addGroups = new HashSet<>();
                 for (String memberGroup : memberGroups) {
                     Optional<Group> group = groupRepository.findByName(memberGroup);
                     group.ifPresent(addGroups::add);
                 }
+
+                if (logger.isDebugEnabled()) {
+                    if ((long) addGroups.size() > 0) {
+                        addGroups.forEach(group -> {
+                            logger.debug("Group received: {}", group.getName());
+                        });
+                    } else {
+                        logger.debug("No configured groups returned from LDAP");
+                    }
+                }
+
                 user.setGroups(addGroups);
                 userRepository.save(user);
 
@@ -181,11 +202,19 @@ public class LdapSecurityConfig {
     }
 
     @Bean
-    public BaseLdapPathContextSource contextSource() {
-        DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
-            providerUrl);
+    public LdapContextSource contextSource() {
+        LdapContextSource contextSource = new LdapContextSource();
+
+        logger.debug("Initializing LDAP ContextSource with the following values: ");
+
+        contextSource.setUrl(providerUrl);
+        contextSource.setBase(providerBase);
         contextSource.setUserDn(providerUserDn);
         contextSource.setPassword(providerPassword);
+
+        logger.debug("BaseLdapPath: " + contextSource.getBaseLdapPathAsString());
+        logger.debug("UserDn: " + contextSource.getUserDn());
+
         return contextSource;
     }
 
@@ -210,12 +239,13 @@ public class LdapSecurityConfig {
     }
 
     private User createLdapUser(DirContextOperations userData) {
+        String username = userData.getStringAttribute(userAttributesUsername);
+        logger.debug("Creating user for {} using LDAP", username);
         User user = saveLdapUser(userData, new User());
-        user.setUsername(userData.getStringAttribute(userAttributesUsername));
+        user.setUsername(username);
         user.setEnabled(true);
         user.setAdmin(false);
         userRepository.save(user);
-
 
         return user;
     }
