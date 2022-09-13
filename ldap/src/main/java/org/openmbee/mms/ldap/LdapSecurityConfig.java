@@ -48,8 +48,8 @@ public class LdapSecurityConfig {
     @Value("${ldap.provider.base:#{null}}")
     private String providerBase;
 
-    @Value("${ldap.user.dn.pattern:uid={0}}")
-    private String userDnPattern;
+    @Value("#{'${ldap.user.dn.pattern:uid={0}}'.split(';')}")
+    private List<String> userDnPattern;
 
     @Value("${ldap.user.attributes.username:uid}")
     private String userAttributesUsername;
@@ -99,7 +99,8 @@ public class LdapSecurityConfig {
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
             We need to delegate the creation of the contextSource out of the builder-configuration.
         */
-            auth.ldapAuthentication().userDnPatterns(userDnPattern).groupSearchBase(groupSearchBase)
+            String[] a = userDnPattern.toArray(new String[0]);
+            auth.ldapAuthentication().userDnPatterns(a).groupSearchBase(groupSearchBase)
                 .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
                 .rolePrefix("")
                 .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator)
