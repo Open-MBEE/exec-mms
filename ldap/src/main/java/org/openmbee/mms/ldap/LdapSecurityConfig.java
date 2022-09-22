@@ -21,11 +21,15 @@ import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.*;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.ldap.LdapAuthenticationProviderConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -35,6 +39,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class LdapSecurityConfig {
 
     private static Logger logger = LoggerFactory.getLogger(LdapSecurityConfig.class);
+
+    @Value("${ldap.ad.enabled:false}")
+    private Boolean adEnabled;
+
+    @Value("${ldap.ad.domain:#{null}}")
+    private String adDomain;
 
     @Value("${ldap.provider.url:#{null}}")
     private String providerUrl;
@@ -75,6 +85,12 @@ public class LdapSecurityConfig {
     @Value("${ldap.group.search.filter:(uniqueMember={0})}")
     private String groupSearchFilter;
 
+    @Value("${ldap.user.search.base:#{''}}")
+    private String userSearchBase;
+
+    @Value("${ldap.user.search.filter:(uid={0})}")
+    private String userSearchFilter;
+
     private UserRepository userRepository;
     private GroupRepository groupRepository;
 
@@ -99,12 +115,21 @@ public class LdapSecurityConfig {
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
             We need to delegate the creation of the contextSource out of the builder-configuration.
         */
-            String[] a = userDnPattern.toArray(new String[0]);
-            auth.ldapAuthentication().userDnPatterns(a).groupSearchBase(groupSearchBase)
-                .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
-                .rolePrefix("")
-                .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator)
-                .contextSource(contextSource);
+            if (adEnabled) {
+                auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
+            } else {
+                String[] userPatterns = userDnPattern.toArray(new String[0]);
+                LdapAuthenticationProviderConfigurer<AuthenticationManagerBuilder> authProviderConfigurer = auth.ldapAuthentication();
+                authProviderConfigurer.userDnPatterns(userPatterns);
+                authProviderConfigurer.userSearchBase(userSearchBase);
+                authProviderConfigurer.userSearchFilter(userSearchFilter);
+                authProviderConfigurer.groupSearchBase(groupSearchBase);
+                authProviderConfigurer.groupRoleAttribute(groupRoleAttribute);
+                authProviderConfigurer.groupSearchFilter(groupSearchFilter);
+                authProviderConfigurer.rolePrefix("");
+                authProviderConfigurer.ldapAuthoritiesPopulator(ldapAuthoritiesPopulator);
+                authProviderConfigurer.contextSource(contextSource);
+            }
         }
     }
 
@@ -200,6 +225,15 @@ public class LdapSecurityConfig {
 
         return new CustomLdapAuthoritiesPopulator(baseContextSource);
 
+    }
+
+    @Bean
+    public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
+        ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(adDomain, providerUrl, providerBase);
+        provider.setSearchFilter(userSearchFilter);
+        provider.setConvertSubErrorCodesToExceptions(true);
+        provider.setUseAuthenticationRequestCredentials(true);
+        return provider;
     }
 
     @Bean
