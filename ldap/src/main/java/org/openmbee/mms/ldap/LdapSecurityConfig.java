@@ -33,6 +33,8 @@ import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAu
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.naming.Context;
+
 @Configuration
 @Conditional(LdapCondition.class)
 @EnableTransactionManagement
@@ -230,6 +232,16 @@ public class LdapSecurityConfig {
     @Bean
     public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
         ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(adDomain, providerUrl, providerBase);
+
+        Hashtable<String, Object> env = new Hashtable<>();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, providerUrl);
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_PRINCIPAL, providerUserDn);
+        env.put(Context.SECURITY_CREDENTIALS, providerPassword);
+
+        provider.setContextEnvironmentProperties(env);
+
         provider.setSearchFilter(userSearchFilter);
         provider.setConvertSubErrorCodesToExceptions(true);
         provider.setUseAuthenticationRequestCredentials(true);
