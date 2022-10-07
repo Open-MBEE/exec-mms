@@ -21,6 +21,7 @@ import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.*;
+import org.springframework.ldap.support.LdapEncoder;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.ldap.LdapAuthenticationProviderConfigurer;
@@ -185,7 +186,7 @@ public class LdapSecurityConfig {
 
                 AndFilter andFilter = new AndFilter();
                 HardcodedFilter groupsFilter = new HardcodedFilter(
-                    groupSearchFilter.replace("{0}", userDn));
+                    groupSearchFilter.replace("{0}", LdapEncoder.filterEncode(userDn)));
                 andFilter.and(groupsFilter);
                 andFilter.and(orFilter);
 
