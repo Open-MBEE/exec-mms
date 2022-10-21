@@ -91,6 +91,10 @@ public class NodePostHelper extends NodeOperation {
                     }
                 } else {
                     updated = true;
+                    String ARTIFACTS = "_artifacts";
+                    if (indexElement.containsKey(ARTIFACTS) && !element.containsKey(ARTIFACTS)) {
+                        element.put(ARTIFACTS, indexElement.get(ARTIFACTS));
+                    }
                     element.setCreated(indexElement.getCreated());
                     element.setCreator(indexElement.getCreator());
                 }
