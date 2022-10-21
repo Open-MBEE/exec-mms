@@ -20,8 +20,7 @@ public class ArtifactsElementsHookSubscriber implements EmbeddedHookSubscriber {
         }
 
         ElementUpdateHook elementUpdateHook = (ElementUpdateHook) payload;
-        if(elementUpdateHook.getElements() != null &&
-            elementUpdateHook.getParams().getOrDefault("overwrite", "false").equals("false")) {
+        if(elementUpdateHook.getElements() != null) {
             //Ignore any artifact changes coming in outside of the Artifacts Controller
             elementUpdateHook.getElements().parallelStream().forEach(v -> {
                 v.remove(ArtifactJson.ARTIFACTS);
