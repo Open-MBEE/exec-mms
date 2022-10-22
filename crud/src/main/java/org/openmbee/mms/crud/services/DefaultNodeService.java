@@ -208,7 +208,8 @@ public class DefaultNodeService implements NodeService {
         ElementsCommitResponse response = new ElementsCommitResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
-        if(!info.getUpdatedMap().isEmpty()) {
+        response.setDeleted(new ArrayList<>(info.getDeletedMap().values()));
+        if(!info.getUpdatedMap().isEmpty() || !info.getDeletedMap().isEmpty()) {
             response.setCommitId(info.getCommitJson().getId());
         }
         return response;
