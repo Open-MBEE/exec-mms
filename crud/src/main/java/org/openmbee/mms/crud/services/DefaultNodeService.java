@@ -194,12 +194,22 @@ public class DefaultNodeService implements NodeService {
             .processPostJson(req.getElements(), overwriteJson,
                 createCommit(user, refId, projectId, req, commitId), this);
 
+        if (req.getDeletes() != null && !req.getDeletes().isEmpty()) {
+            NodeChangeInfo delete = nodeDeleteHelper.processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
+            info.getCommitJson().getDeleted().addAll(delete.getCommitJson().getDeleted());
+            info.getDeletedMap().putAll(delete.getDeletedMap());
+            info.getToSaveNodeMap().putAll(delete.getToSaveNodeMap());
+            info.getOldDocIds().addAll(delete.getOldDocIds());
+            info.getRejected().putAll(delete.getRejected());
+        }
+
         commitChanges(info);
 
         ElementsCommitResponse response = new ElementsCommitResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
-        if(!info.getUpdatedMap().isEmpty()) {
+        response.setDeleted(new ArrayList<>(info.getDeletedMap().values()));
+        if(!info.getUpdatedMap().isEmpty() || !info.getDeletedMap().isEmpty()) {
             response.setCommitId(info.getCommitJson().getId());
         }
         return response;

@@ -3563,6 +3563,237 @@
                 }
             },
             "response": []
+        },
+        {
+            "name": "create project zz",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"projects\": [\n\t\t{\n\t\t\t\"id\": \"zz\", \n\t\t\t\"name\": \"zz\",\n\t\t\t\"orgId\": \"a\",\n\t\t\t\"schema\": \"default\"\n\t\t}\n\t]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "add elements to project zz",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects/zz/refs/master/elements",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "zz",
+                        "refs",
+                        "master",
+                        "elements"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "update and delete elements in same commit",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"response has elements\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.elements.length).to.eql(2);",
+                            "    pm.expect(jsonData.deleted.length).to.eql(1);",
+                            "});",
+                            "",
+                            "pm.environment.set(\"hybridCommit\", pm.response.json().commitId);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"xx\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"yy\"\n\t\t}\n\t],\n    \"deletes\": [{\"id\": \"z\"}]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects/zz/refs/master/elements",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "zz",
+                        "refs",
+                        "master",
+                        "elements"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "get deleted element",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 410\", function () {",
+                            "    pm.response.to.have.status(410);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"xx\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"yy\"\n\t\t}\n\t],\n    \"deletes\": [{\"id\": \"z\"}]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects/zz/refs/master/elements/z",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "zz",
+                        "refs",
+                        "master",
+                        "elements",
+                        "z"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "get commit object",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"commit has right data\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.commits[0].updated.length).to.eql(2);",
+                            "    pm.expect(jsonData.commits[0].deleted.length).to.eql(1);",
+                            "",
+                            "});",
+                            "",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "protocolProfileBehavior": {
+                "disableBodyPruning": true
+            },
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "type": "text",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"xx\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"yy\"\n\t\t}\n\t],\n    \"deletes\": [{\"id\": \"z\"}]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects/zz/commits/{{hybridCommit}}",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "zz",
+                        "commits",
+                        "{{hybridCommit}}"
+                    ]
+                }
+            },
+            "response": []
         }
 	],
 	"auth": {
