@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.NodeChangeInfo;
 import org.openmbee.mms.core.services.NodeGetInfo;
@@ -90,6 +91,11 @@ public class NodeOperation {
         }
         // bulk read existing elements in elastic
         List<ElementJson> existingElements = nodeIndex.findAllById(indexIds);
+        // set the _refId of the element json to be the ref it's 'found/requested' in,
+        String ref = ContextHolder.getContext().getBranchId();
+        for (ElementJson e: existingElements) {
+            e.setRefId(ref);
+        }
         Map<String, ElementJson> existingElementMap = convertJsonToMap(existingElements);
 
         Instant now = Instant.now();

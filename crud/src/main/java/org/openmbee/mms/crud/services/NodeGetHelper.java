@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.*;
 
 import java.util.stream.Collectors;
+
+import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.NodeGetInfo;
 import org.openmbee.mms.core.exceptions.BadRequestException;
@@ -100,7 +102,7 @@ public class NodeGetHelper extends NodeOperation {
             }
             Instant modified = Instant.from(formatter.parse(indexElement.getModified()));
             Instant created = Instant.from(formatter.parse(indexElement.getCreated()));
-
+            indexElement.setRefId(ContextHolder.getContext().getBranchId());
             if (commitId.equals(indexElement.getCommitId())) { //exact match
                 info.getActiveElementMap().put(nodeId, indexElement);
             } else if (created.isAfter(time)) { // element created after commit
@@ -108,6 +110,7 @@ public class NodeGetHelper extends NodeOperation {
             } else if (modified.isAfter(time)) { // latest element is after commit
                 Optional<ElementJson> tryExact = nodeIndex.getByCommitId(commitId, nodeId);
                 if (tryExact.isPresent()) {
+                    tryExact.get().setRefId(ContextHolder.getContext().getBranchId());
                     info.getActiveElementMap().put(nodeId, tryExact.get());
                     continue; // found exact match at commit
                 }
@@ -118,6 +121,7 @@ public class NodeGetHelper extends NodeOperation {
                     formatter.format(time), refCommitIds);
                 if (e.isPresent()) { // found version of element at commit time
                     //TODO determine if element was deleted at the time?
+                    e.get().setRefId(ContextHolder.getContext().getBranchId());
                     info.getActiveElementMap().put(nodeId, e.get());
                 } else {
                     rejectNotFound(info, nodeId); // element not found at commit time
@@ -150,7 +154,12 @@ public class NodeGetHelper extends NodeOperation {
         for (Node node : existingNodes) {
             indexIds.add(node.getDocId());
         }
-        return nodeIndex.findAllById(indexIds);
+        List<ElementJson> els = nodeIndex.findAllById(indexIds);
+        String ref = ContextHolder.getContext().getBranchId();
+        for (ElementJson el: els) {
+            el.setRefId(ref);
+        }
+        return els;
     }
 
     public List<ElementJson> processGetAll(String commitId, NodeService service) {
