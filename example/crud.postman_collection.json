@@ -1074,6 +1074,7 @@
 							"    var jsonData = pm.response.json();",
 							"    jsonData.elements.forEach(function(e) {",
 							"        pm.expect(e._inRefIds).to.include('refa');",
+                            "        pm.expect(e._refId).to.equal('refa');",
 							"    })",
 							"});"
 						],
@@ -1100,6 +1101,44 @@
 			},
 			"response": []
 		},
+        {
+            "name": "check response element _refId matches request",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"return element in new ref have right _refId\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    jsonData.elements.forEach(function(e) {",
+                            "        pm.expect(e._refId).to.equal('refa');",
+                            "    })",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{host}}/projects/aa/refs/refa/elements/x",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "aa",
+                        "refs",
+                        "refa",
+                        "elements",
+                        "x"
+                    ]
+                }
+            },
+            "response": []
+        },
 		{
 			"name": "update x and y on refa",
 			"event": [
