@@ -23,6 +23,8 @@ public class NodeGetInfo {
 
     Map<String, Rejection> rejected;
 
+    String commitId;
+
 
     public Set<String> getReqIndexIds() {
         return reqIndexIds;
@@ -85,6 +87,14 @@ public class NodeGetInfo {
             this.rejected = new HashMap<>();
         }
         this.rejected.put(id, rejection);
+    }
+
+    public void setCommitId(String commitId) {
+        this.commitId = commitId;
+    }
+
+    public String getCommitId() {
+        return this.commitId;
     }
 
 }

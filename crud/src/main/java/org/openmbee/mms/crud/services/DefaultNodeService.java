@@ -162,6 +162,11 @@ public class DefaultNodeService implements NodeService {
             ElementsResponse response = new ElementsResponse();
             String commitId = params.getOrDefault("commitId", null);
             response.getElements().addAll(nodeGetHelper.processGetAll(commitId, this));
+            if (commitId != null) {
+                response.setCommitId(commitId);
+            } else {
+                response.setCommitId(nodeGetHelper.getLatestRefCommitId());
+            }
             return response;
         }
     }
@@ -178,6 +183,7 @@ public class DefaultNodeService implements NodeService {
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
+        response.setCommitId(info.getCommitId());
         return response;
     }
 
@@ -189,10 +195,11 @@ public class DefaultNodeService implements NodeService {
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
         nodePostHelper.setPreserveTimestamps(Boolean.parseBoolean(params.get("preserveTimestamps")));
         String commitId = params.get("commitId");
+        String lastCommitId = req.getLastCommitId();
 
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,
-                createCommit(user, refId, projectId, req, commitId), this);
+                createCommit(user, refId, projectId, req, commitId), this, lastCommitId);
 
         if (req.getDeletes() != null && !req.getDeletes().isEmpty()) {
             NodeChangeInfo delete = nodeDeleteHelper.processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
