@@ -19,6 +19,7 @@ import org.openmbee.mms.core.services.NodeGetInfo;
 import org.openmbee.mms.core.dao.BranchDAO;
 import org.openmbee.mms.core.dao.CommitDAO;
 import org.openmbee.mms.data.domains.scoped.Branch;
+import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
 import org.openmbee.mms.core.dao.NodeDAO;
 import org.openmbee.mms.core.dao.NodeIndexDAO;
@@ -278,6 +279,11 @@ public class NodeOperation {
 
     public String getLatestRefCommitId() {
         Optional<Branch> branch =  branchRepository.findByBranchId(ContextHolder.getContext().getBranchId());
-        return commitRepository.findLatestByRef(branch.get()).get().getCommitId();
+        Optional<Commit> commit = commitRepository.findLatestByRef(branch.get());
+        if (commit.isPresent()) {
+            return commit.get().getCommitId();
+        } else {
+            return null;
+        }
     }
 }

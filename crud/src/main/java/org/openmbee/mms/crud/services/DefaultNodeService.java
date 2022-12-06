@@ -118,7 +118,7 @@ public class DefaultNodeService implements NodeService {
         }
         String separator = "\n";
         if (!"application/x-ndjson".equals(accept)) {
-            String intro = "{\"commitId\":\"" + resCommitId + "\",\"elements\":[";
+            String intro = "{\"commitId\":" + (resCommitId == null ? "null" : "\"" + resCommitId + "\"") + ",\"elements\":[";
             stream.write(intro.getBytes(StandardCharsets.UTF_8));
             separator = ",";
         }
