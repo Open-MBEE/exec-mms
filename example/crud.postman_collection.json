@@ -412,6 +412,95 @@
 			},
 			"response": []
 		},
+        {
+            "name": "get all elements returns last commitId",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"response has 3 elements and correct commitId\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.elements.length).to.eql(3);",
+                            "    pm.expect(jsonData.commitId).to.eql(pm.environment.get(\"commitId1\"))",
+                            "});",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text",
+                        "disabled": true
+                    }
+                ],
+                "url": {
+                    "raw": "{{host}}/projects/aa/refs/master/elements",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "aa",
+                        "refs",
+                        "master",
+                        "elements"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "post elements with wrong lastCommitId results in 409",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"response code is 409\", function () {",
+                            "    pm.response.to.have.status(409);",
+                            "});",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{   \"lastCommitId\": \"blah\",\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"x\"\n\t\t}, {\n\t\t\t\"id\": \"y\", \n\t\t\t\"name\": \"y\"\n\t\t}, {\n\t\t\t\"id\": \"z\",\n\t\t\t\"name\": \"z\"\n\t\t}\n\t]\n}"
+                },
+                "url": {
+                    "raw": "{{host}}/projects/aa/refs/master/elements",
+                    "host": [
+                        "{{host}}"
+                    ],
+                    "path": [
+                        "projects",
+                        "aa",
+                        "refs",
+                        "master",
+                        "elements"
+                    ]
+                }
+            },
+            "response": []
+        },
 		{
 			"name": "update x",
 			"event": [
