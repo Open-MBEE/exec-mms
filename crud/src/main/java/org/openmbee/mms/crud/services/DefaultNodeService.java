@@ -105,17 +105,21 @@ public class DefaultNodeService implements NodeService {
         String commitId = params.getOrDefault("commitId", null);
         ContextHolder.setContext(projectId, refId);
         List<Node> nodes;
+        String resCommitId;
         if (commitId != null && !commitId.isEmpty()) {
             if (!commitRepository.findByCommitId(commitId).isPresent()) {
                 throw new BadRequestException("commit id is invalid");
             }
             nodes = nodeRepository.findAll();
+            resCommitId = commitId;
         } else {
             nodes = nodeRepository.findAllByDeleted(false);
+            resCommitId = nodeGetHelper.getLatestRefCommitId();
         }
         String separator = "\n";
         if (!"application/x-ndjson".equals(accept)) {
-            stream.write("{\"elements\":[".getBytes(StandardCharsets.UTF_8));
+            String intro = "{\"commitId\":\"" + resCommitId + "\",\"elements\":[";
+            stream.write(intro.getBytes(StandardCharsets.UTF_8));
             separator = ",";
         }
         final String sep = separator;
