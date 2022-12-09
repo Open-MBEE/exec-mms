@@ -12,6 +12,8 @@ public class ElementsRequest extends BaseRequest {
 
     private List<ElementJson> deletes;
 
+    private String lastCommitId;
+
     public List<ElementJson> getElements() {
         return elements;
     }
@@ -26,5 +28,13 @@ public class ElementsRequest extends BaseRequest {
 
     public void setDeletes(List<ElementJson> deletes) {
         this.deletes = deletes;
+    }
+
+    public String getLastCommitId() {
+        return lastCommitId;
+    }
+
+    public void setLastCommitId(String lastCommitId) {
+        this.lastCommitId = lastCommitId;
     }
 }

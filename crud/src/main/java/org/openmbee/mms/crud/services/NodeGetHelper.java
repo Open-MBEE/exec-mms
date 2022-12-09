@@ -52,6 +52,7 @@ public class NodeGetHelper extends NodeOperation {
             }
             info.getActiveElementMap().put(nodeId, indexElement);
         }
+        info.setCommitId(getLatestRefCommitId());
         return info;
     }
 
@@ -76,6 +77,7 @@ public class NodeGetHelper extends NodeOperation {
         if (!commit.isPresent() ) {
             throw new BadRequestException("commitId is invalid");
         }
+        info.setCommitId(commitId);
         Instant time = commit.get().getTimestamp(); //time of commit
         List<String> refCommitIds = null; //get it later if needed
         for (String nodeId : info.getReqElementMap().keySet()) {

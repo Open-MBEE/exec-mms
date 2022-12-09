@@ -105,17 +105,21 @@ public class DefaultNodeService implements NodeService {
         String commitId = params.getOrDefault("commitId", null);
         ContextHolder.setContext(projectId, refId);
         List<Node> nodes;
+        String resCommitId;
         if (commitId != null && !commitId.isEmpty()) {
             if (!commitRepository.findByCommitId(commitId).isPresent()) {
                 throw new BadRequestException("commit id is invalid");
             }
             nodes = nodeRepository.findAll();
+            resCommitId = commitId;
         } else {
             nodes = nodeRepository.findAllByDeleted(false);
+            resCommitId = nodeGetHelper.getLatestRefCommitId();
         }
         String separator = "\n";
         if (!"application/x-ndjson".equals(accept)) {
-            stream.write("{\"elements\":[".getBytes(StandardCharsets.UTF_8));
+            String intro = "{\"commitId\":" + (resCommitId == null ? "null" : "\"" + resCommitId + "\"") + ",\"elements\":[";
+            stream.write(intro.getBytes(StandardCharsets.UTF_8));
             separator = ",";
         }
         final String sep = separator;
@@ -162,6 +166,11 @@ public class DefaultNodeService implements NodeService {
             ElementsResponse response = new ElementsResponse();
             String commitId = params.getOrDefault("commitId", null);
             response.getElements().addAll(nodeGetHelper.processGetAll(commitId, this));
+            if (commitId != null) {
+                response.setCommitId(commitId);
+            } else {
+                response.setCommitId(nodeGetHelper.getLatestRefCommitId());
+            }
             return response;
         }
     }
@@ -178,6 +187,7 @@ public class DefaultNodeService implements NodeService {
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
+        response.setCommitId(info.getCommitId());
         return response;
     }
 
@@ -189,10 +199,11 @@ public class DefaultNodeService implements NodeService {
         boolean overwriteJson = Boolean.parseBoolean(params.get("overwrite"));
         nodePostHelper.setPreserveTimestamps(Boolean.parseBoolean(params.get("preserveTimestamps")));
         String commitId = params.get("commitId");
+        String lastCommitId = req.getLastCommitId();
 
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,
-                createCommit(user, refId, projectId, req, commitId), this);
+                createCommit(user, refId, projectId, req, commitId), this, lastCommitId);
 
         if (req.getDeletes() != null && !req.getDeletes().isEmpty()) {
             NodeChangeInfo delete = nodeDeleteHelper.processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
