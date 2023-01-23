@@ -52,7 +52,7 @@ Permissions acceptable values
 
   {
     "users / groups": {
-      "action": "ADD / REMOVE",
+      "action": "MODIFY / REPLACE / REMOVE",
       "permissions": [
         {
           "name": "USERNAME",

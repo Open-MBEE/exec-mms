@@ -12,20 +12,20 @@ import static org.openmbee.mms.core.config.AuthorizationConstants.MMSADMIN;
 @Service
 public class GroupValidationService {
 
-    private static final Set<String> RESTRICTED_NAMES =  Set.of(MMSADMIN, EVERYONE);
-    private Pattern VALID_GROUP_NAME_PATTERN = Pattern.compile("^[\\w-]+");
+    private static final Set<String> RESTRICTED_NAMES = Set.of(MMSADMIN, EVERYONE);
+    private final Pattern VALID_GROUP_NAME_PATTERN = Pattern.compile("^[ -~]+");
 
     public boolean isRestrictedGroup(String groupName) {
         return RESTRICTED_NAMES.contains(groupName);
     }
 
-    public boolean isValidGroupName(String groupName){
+    public boolean isValidGroupName(String groupName) {
         return groupName != null &&
             !isRestrictedGroup(groupName) &&
             VALID_GROUP_NAME_PATTERN.matcher(groupName).matches();
     }
 
-    public boolean canDeleteGroup(Group group){
+    public boolean canDeleteGroup(Group group) {
         return !isRestrictedGroup(group.getName()) &&
             ((group.getType() == Group.VALID_GROUP_TYPES.REMOTE) || (group.getUsers() == null || group.getUsers().isEmpty()));
     }
