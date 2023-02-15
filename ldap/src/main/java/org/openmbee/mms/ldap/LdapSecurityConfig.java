@@ -238,8 +238,12 @@ public class LdapSecurityConfig {
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, providerUrl);
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, providerUserDn);
-        env.put(Context.SECURITY_CREDENTIALS, providerPassword);
+        if (providerUserDn != null) {
+            env.put(Context.SECURITY_PRINCIPAL, providerUserDn);
+        }
+        if (providerPassword != null) {
+            env.put(Context.SECURITY_CREDENTIALS, providerPassword);
+        }
 
         provider.setContextEnvironmentProperties(env);
 
