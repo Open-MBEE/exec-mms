@@ -126,7 +126,7 @@ public class LocalGroupsController {
         response.setGroup(group);
 
         groupUpdateRequest.getUsers().forEach(newUser -> {
-            User user = userRepository.findByUsername(newUser).orElse(null);
+            User user = userRepository.findByUsernameIgnoreCase(newUser).orElse(null);
             if (user != null) {
 
                 if (groupUpdateRequest.getAction() == Action.ADD) {
