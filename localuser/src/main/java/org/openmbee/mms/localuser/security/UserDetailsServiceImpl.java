@@ -31,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
 
         if (!user.isPresent()) {
             throw new UsernameNotFoundException(
@@ -59,7 +59,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Transactional
     public void changeUserPassword(String username, String password, boolean asAdmin) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
+        Optional<User> userOptional = userRepository.findByUsernameIgnoreCase(username);
         if(! userOptional.isPresent()) {
             throw new UsernameNotFoundException(
                     String.format("No user found with username '%s'.", username));
