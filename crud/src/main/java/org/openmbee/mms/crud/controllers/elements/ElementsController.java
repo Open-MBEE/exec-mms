@@ -19,6 +19,7 @@ import org.openmbee.mms.core.objects.ElementsCommitResponse;
 import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
 import org.openmbee.mms.core.services.CommitService;
+import org.openmbee.mms.crud.CrudConstants;
 import org.openmbee.mms.crud.controllers.BaseController;
 import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.services.NodeService;
@@ -124,7 +125,7 @@ public class ElementsController extends BaseController {
             NodeService nodeService = getNodeService(projectId);
             return nodeService.createOrUpdate(projectId, refId, req, params, auth.getName());
         }
-        throw new BadRequestException(response.addMessage("Empty"));
+        throw new BadRequestException(response.addMessage(CrudConstants.EMPTY));
     }
     /*
     @PostMapping(value = "/stream", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -190,7 +191,7 @@ public class ElementsController extends BaseController {
             NodeService nodeService = getNodeService(projectId);
             return nodeService.read(projectId, refId, req, params);
         }
-        throw new BadRequestException(response.addMessage("Empty"));
+        throw new BadRequestException(response.addMessage(CrudConstants.EMPTY));
     }
 
     @DeleteMapping(value = "/{elementId}")

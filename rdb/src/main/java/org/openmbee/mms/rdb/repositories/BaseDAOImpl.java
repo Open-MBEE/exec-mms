@@ -15,7 +15,7 @@ import static org.openmbee.mms.core.config.Constants.BRANCH_ID_VALID_PATTERN;
 public abstract class BaseDAOImpl {
 
     private CrudDataSources crudDataSources;
-    public PlatformTransactionManager transactionManager;
+    private PlatformTransactionManager transactionManager;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired

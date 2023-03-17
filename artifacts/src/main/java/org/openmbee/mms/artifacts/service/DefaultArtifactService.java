@@ -3,7 +3,7 @@ package org.openmbee.mms.artifacts.service;
 import org.openmbee.mms.artifacts.storage.ArtifactStorage;
 import org.openmbee.mms.artifacts.ArtifactConstants;
 import org.openmbee.mms.artifacts.objects.ArtifactResponse;
-import org.openmbee.mms.core.dao.ProjectDAO;
+import org.openmbee.mms.core.dao.ProjectPersistence;
 import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.exceptions.ConflictException;
 import org.openmbee.mms.core.exceptions.NotFoundException;
@@ -11,9 +11,9 @@ import org.openmbee.mms.core.objects.ElementsRequest;
 import org.openmbee.mms.core.objects.ElementsResponse;
 import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.crud.services.ServiceFactory;
-import org.openmbee.mms.data.domains.global.Project;
 import org.openmbee.mms.artifacts.json.ArtifactJson;
 import org.openmbee.mms.json.ElementJson;
+import org.openmbee.mms.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -30,7 +30,7 @@ public class DefaultArtifactService implements ArtifactService {
 
     private ArtifactStorage artifactStorage;
     private ServiceFactory serviceFactory;
-    private ProjectDAO projectRepository;
+    private ProjectPersistence projectPersistence;
 
     @Autowired
     public void setArtifactStorage(ArtifactStorage artifactStorage) {
@@ -43,16 +43,19 @@ public class DefaultArtifactService implements ArtifactService {
     }
 
     @Autowired
-    public void setProjectRepository(ProjectDAO projectRepository) {
-        this.projectRepository = projectRepository;
+    public void setProjectPersistence(ProjectPersistence projectPersistence) {
+        this.projectPersistence = projectPersistence;
     }
 
     @Override
     public ArtifactResponse get(String projectId, String refId, String id, Map<String, String> params) {
         NodeService nodeService = getNodeService(projectId);
         ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
-
-        ArtifactJson artifact = getExistingArtifact(ArtifactJson.getArtifacts(elementJson), params, elementJson);
+        List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
+        ArtifactJson artifact = new ArtifactJson();
+        if (artifacts != null) {
+            artifact = getExistingArtifact(artifacts, params);
+        }
         byte[] data = artifactStorage.get(artifact.getLocation(), elementJson, artifact.getMimeType());
         ArtifactResponse response = new ArtifactResponse();
         response.setData(data);
@@ -99,7 +102,10 @@ public class DefaultArtifactService implements ArtifactService {
         ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
 
         List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
-        ArtifactJson artifact = getExistingArtifact(artifacts, params, elementJson);
+        if (artifacts == null) {
+            throw new NotFoundException("Artifacts not found");
+        } 
+        ArtifactJson artifact = getExistingArtifact(artifacts, params);
         artifacts.remove(artifact);
         ArtifactJson.setArtifacts(elementJson, artifacts);
         ElementsRequest elementsRequest = new ElementsRequest();
@@ -110,9 +116,9 @@ public class DefaultArtifactService implements ArtifactService {
     private ElementJson getElement(NodeService nodeService, String projectId, String refId, String id, Map<String, String> params) {
 
         ElementsResponse elementsResponse = nodeService.read(projectId, refId, id, params);
-        if(elementsResponse.getElements() == null || elementsResponse.getElements().isEmpty()) {
+        if (elementsResponse.getElements() == null || elementsResponse.getElements().isEmpty()) {
             throw new NotFoundException("Element not found");
-        } else if(elementsResponse.getElements().size() > 1) {
+        } else if (elementsResponse.getElements().size() > 1) {
             throw new ConflictException("Multiple elements found with id " + id);
         } else {
             return elementsResponse.getElements().get(0);
@@ -124,10 +130,18 @@ public class DefaultArtifactService implements ArtifactService {
         List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
         ArtifactJson artifact;
         try {
-            artifact = getExistingArtifact(artifacts, mimeType, null, elementJson);
+            //nested try/nullcheck OK?
+            if (artifacts != null) {
+                artifact = getExistingArtifact(artifacts, mimeType, null);
+            } else {
+                throw new NotFoundException("Null artifact exception");
+            }
+            
         } catch(NotFoundException ex) {
             artifact = new ArtifactJson();
-            artifacts.add(artifact);
+            if (artifacts != null) {
+                artifacts.add(artifact);
+            }
         }
 
         artifact.setLocation(artifactLocation);
@@ -140,29 +154,29 @@ public class DefaultArtifactService implements ArtifactService {
         return elementJson;
     }
 
-    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, Map<String, String> params, ElementJson element) {
-        return getExistingArtifact(artifacts, params.get(ArtifactConstants.MIMETYPE_PARAM), params.get(ArtifactConstants.EXTENSION_PARAM), element);
+    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, Map<String, String> params) {
+        return getExistingArtifact(artifacts, params.get(ArtifactConstants.MIMETYPE_PARAM), params.get(ArtifactConstants.EXTENSION_PARAM));
     }
 
-    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, String mimeType, String extension, ElementJson element) {
-        if(mimeType == null && extension == null) {
+    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, String mimeType, String extension) {
+        if (mimeType == null && extension == null) {
             throw new BadRequestException("Missing mimetype or extension");
         }
         //Element representation is unique by mimeType and extension
-        Optional<ArtifactJson> existing = artifacts.stream().filter(v -> {
-            return (mimeType != null && mimeType.equals(v.getMimeType())) || (extension != null && extension.equals(v.getExtension()));
-        }).findFirst();
-        if(existing.isPresent()) {
+        Optional<ArtifactJson> existing = artifacts.stream().filter(v ->
+            (mimeType != null && mimeType.equals(v.getMimeType())) || (extension != null && extension.equals(v.getExtension()))
+        ).findFirst();
+        if (existing.isPresent()) {
             return existing.get();
         }
-        throw new NotFoundException(element);
+        throw new NotFoundException("Artifact not found");
     }
 
     private String getFileExtension(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
-        if(originalFilename != null) {
+        if (originalFilename != null) {
             int inx = originalFilename.lastIndexOf('.');
-            if(inx > 0) {
+            if (inx > 0) {
                 return originalFilename.substring(inx + 1);
             }
         }
@@ -191,8 +205,8 @@ public class DefaultArtifactService implements ArtifactService {
         return getProject(projectId).getProjectType();
     }
 
-    private Project getProject(String projectId) {
-        Optional<Project> p = projectRepository.findByProjectId(projectId);
+    private ProjectJson getProject(String projectId) {
+        Optional<ProjectJson> p = projectPersistence.findById(projectId);
         if (p.isPresent()) {
             return p.get();
         }

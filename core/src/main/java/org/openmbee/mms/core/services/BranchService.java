@@ -11,5 +11,7 @@ public interface BranchService {
 
     RefJson createBranch(String projectId, RefJson branch);
 
+    RefJson updateBranch(String projectId, RefJson branch);
+
     RefsResponse deleteBranch(String projectId, String id);
 }

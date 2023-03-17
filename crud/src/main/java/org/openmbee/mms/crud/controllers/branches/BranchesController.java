@@ -1,6 +1,8 @@
 package org.openmbee.mms.crud.controllers.branches;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.Optional;
 import java.util.UUID;
 import org.openmbee.mms.core.config.Privileges;
 import org.openmbee.mms.core.exceptions.BadRequestException;
@@ -40,6 +42,8 @@ public class BranchesController extends BaseController {
     public RefsResponse getAllRefs(
         @PathVariable String projectId,
         Authentication auth) {
+
+        getProjectType(projectId);
 
         RefsResponse res = branchService.getBranches(projectId);
         if (!permissionService.isProjectPublic(projectId)) {
@@ -94,7 +98,14 @@ public class BranchesController extends BaseController {
                 RefJson res;
                 branch.setCreator(auth.getName());
                 if (branch.getParentCommitId() == null || branch.getParentCommitId().isEmpty()) {
-                    res = branchService.createBranch(projectId, branch);
+                    Optional<RefJson> existingOptional = branchPersistence.findById(projectId, branch.getId());
+                    if (existingOptional.isPresent()) {
+                        //Branch exists, should merge the json
+                        branch.merge(existingOptional.get());
+                        res = branchService.updateBranch(projectId, branch);
+                    } else {
+                        res = branchService.createBranch(projectId, branch);
+                    }
                 } else {
                     //TODO implement branching from historical commit
                     response.addRejection(new Rejection(branch, 400, "Branching from historical commits is not implemented."));
