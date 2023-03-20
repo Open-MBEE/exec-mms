@@ -187,7 +187,6 @@ public class DefaultNodeService implements NodeService {
 
 
         changes = nodePersistence.commitChanges(changes);
-        commitPersistence.save(changes.getCommitJson(), changes.getInstant());
         ElementsCommitResponse response = new ElementsCommitResponse();
         response.getElements().addAll(changes.getDeletedMap().values());
         response.setRejected(new ArrayList<>(changes.getRejected().values()));
