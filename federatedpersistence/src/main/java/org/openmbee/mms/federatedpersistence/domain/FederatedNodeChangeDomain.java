@@ -48,6 +48,7 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
         return new FederatedNodeChangeInfoImpl();
     }
 
+    @Override
     public NodeChangeInfo initInfo(CommitJson commitJson, boolean overwrite, boolean preserveTimestamps) {
         commitJson.setId(UUID.randomUUID().toString());
         commitJson.setDocId(commitJson.getId()); 

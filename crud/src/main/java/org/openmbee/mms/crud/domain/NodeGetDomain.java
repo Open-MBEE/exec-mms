@@ -34,12 +34,6 @@ public class NodeGetDomain extends JsonDomain {
         return info;
     }
 
-    public NodeGetInfo processGetJson(String projectId, String refId, String commitId, List<ElementJson> elements, NodeService service) {
-        NodeGetInfo info = initInfo(null);
-        //TODO do we need to do anything here?
-        return info;
-    }
-
     protected void rejectNotFound(NodeGetInfo info, String elementId) {
         info.addRejection(elementId, new Rejection(elementId, 404, "Not Found"));
     }

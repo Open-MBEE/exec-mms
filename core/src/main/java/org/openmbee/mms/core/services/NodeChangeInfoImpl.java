@@ -64,6 +64,7 @@ public class NodeChangeInfoImpl extends NodeGetInfoImpl implements NodeChangeInf
         return this;
     }
 
+    @Override
     public boolean getPreserveTimestamps() {
         return preserveTimestamps;
     }

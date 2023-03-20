@@ -21,8 +21,6 @@ public interface CommitPersistence {
 
     Optional<CommitJson> findLatestByProjectAndRef(String projectId, String refId);
 
-    Optional<CommitJson> findByProjectAndRefAndTimestamp(String projectId, String refId, Instant timestamp);
-
     List<CommitJson> findByProjectAndRefAndTimestampAndLimit(String projectId, String refId, Instant timestamp, int limit);
 
     List<CommitJson> elementHistory(String projectId, String elementId, Set<String> commitDocIds);

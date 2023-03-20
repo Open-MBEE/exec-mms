@@ -141,11 +141,6 @@ public class FederatedCommitPersistence implements CommitPersistence {
     }
 
     @Override
-    public Optional<CommitJson> findByProjectAndRefAndTimestamp(String projectId, String refId, Instant timestamp) {
-        return Optional.empty();
-    }
-
-    @Override
     public List<CommitJson> findByProjectAndRefAndTimestampAndLimit(String projectId, String refId, Instant timestamp, int limit) {
         ContextHolder.setContext(projectId);
         Set<String> commitIds = new HashSet<>();
