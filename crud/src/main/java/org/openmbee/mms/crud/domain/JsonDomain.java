@@ -18,7 +18,7 @@ public class JsonDomain {
             if (elem == null) {
                 continue;
             }
-            if (elem.getId() != null && !elem.getId().equals("")) {
+            if (elem.getId() != null && !elem.getId().isEmpty()) {
                 result.put(elem.getId(), elem);
             }
         }

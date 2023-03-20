@@ -48,12 +48,7 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
 
     public NodeGetInfo initInfoFromNodes(List<Node> existingNodes, CommitJson commitJson) {
         NodeGetInfo nodeGetInfo =  super.initInfo(commitJson, this::createNodeGetInfo);
-        Set<String> indexIds = new HashSet<>();
-        Map<String, Node> existingNodeMap = new HashMap<>();
-        for (Node node : existingNodes) {
-            indexIds.add(node.getDocId());
-            existingNodeMap.put(node.getNodeId(), node);
-        }
+        Set<String> indexIds = existingNodes.stream().map(Node::getDocId).collect(Collectors.toSet());
         // bulk read existing elements in elastic
         List<ElementJson> existingElements = nodeIndex.findAllById(indexIds);
         addExistingElements(nodeGetInfo, existingElements); // handeled in addExistingElements
@@ -178,6 +173,7 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
         return commitIds;
     }
 
+    @Override
     public void addExistingElements(NodeGetInfo info, List<ElementJson> elements) {
         super.addExistingElements(info, elements);
 

@@ -71,7 +71,8 @@ public class DefaultOrgPermissionsDelegate extends AbstractDefaultPermissionsDel
     @Override
     public boolean hasGroupPermissions(String group, String privilege) {
         for (OrgGroupPerm perm: orgGroupPermRepo.findAllByOrganization_OrganizationId(organization.getOrganizationId())) {
-            if (perm.getGroup().getName().equals(group) && perm.getRole().equals(privilege)) {
+            if (perm.getGroup().getName().equals(group) && perm.getRole().getPrivileges().stream()
+                    .anyMatch(v -> v.getName().equals(privilege))) {
                 return true;
             }
         }

@@ -6,7 +6,7 @@ import java.util.*;
 
 public class PermissionUpdateResponseBuilder {
 
-    protected class PermissionUpdateWrapper {
+    protected static class PermissionUpdateWrapper {
 
         private PermissionUpdateResponse.PermissionUpdate permissionUpdate;
 

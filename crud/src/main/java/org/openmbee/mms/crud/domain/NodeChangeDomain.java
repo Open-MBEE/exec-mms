@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -119,8 +120,9 @@ public abstract class NodeChangeDomain extends JsonDomain {
         Object existingModified = existing.get(BaseJson.MODIFIED);
         if (jsonModified != null && !jsonModified.isEmpty()) {
             try {
-                Date jsonModDate = Formats.SIMPLE_DATE_FORMAT.parse(jsonModified);
-                Date existingModDate = Formats.SIMPLE_DATE_FORMAT.parse(existingModified.toString());
+                SimpleDateFormat dateFormat = new SimpleDateFormat(Formats.DATE_FORMAT);
+                Date jsonModDate = dateFormat.parse(jsonModified);
+                Date existingModDate = dateFormat.parse(existingModified.toString());
                 if (jsonModDate.before(existingModDate)) {
                     info.addRejection(element.getId(), new Rejection(element, 409, "Conflict Detected"));
                     return false;

@@ -86,7 +86,8 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     @Override
     public boolean hasGroupPermissions(String group, String privilege) {
         for (BranchGroupPerm perm: branchGroupPermRepo.findAllByBranch(branch)) {
-            if (perm.getGroup().getName().equals(group) && perm.getRole().equals(privilege)) {
+            if (perm.getGroup().getName().equals(group) && perm.getRole().getPrivileges().stream()
+                    .anyMatch(v -> v.getName().equals(privilege))) {
                 return true;
             }
         }

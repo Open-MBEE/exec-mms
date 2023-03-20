@@ -87,6 +87,7 @@ public class CameoNodeService extends DefaultNodeService implements Hierarchical
         element.remove(CameoConstants.CHILDVIEWS);
     }
 
+    @Override
     public MountJson getProjectUsages(String projectId, String refId, String commitId, List<Pair<String, String>> saw,
             boolean restrictOnPermissions) {
         saw.add(Pair.of(projectId, refId));

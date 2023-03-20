@@ -42,10 +42,6 @@ public class FederatedNodePersistence implements NodePersistence {
 
     protected CommitPersistence commitPersistence;
 
-    @Autowired
-    public void setCommitPersistence(CommitPersistence commitPersistence) {
-    }
-
     @Value("${mms.stream.batch.size:100000}")
     protected int streamLimit;
     protected final ObjectMapper objectMapper = new ObjectMapper();

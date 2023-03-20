@@ -1,6 +1,7 @@
 package org.openmbee.mms.crud.services;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -40,7 +41,7 @@ public class DefaultCommitService implements CommitService {
         }
         if (params.containsKey("maxTimestamp")) {
             try {
-                timestamp = Formats.SIMPLE_DATE_FORMAT.parse(params.get("maxTimestamp")).toInstant();
+                timestamp = new SimpleDateFormat(Formats.DATE_FORMAT).parse(params.get("maxTimestamp")).toInstant();
             } catch (ParseException e) {
                 e.printStackTrace();
                 throw new BadRequestException("maxTimestamp parse error, use " +

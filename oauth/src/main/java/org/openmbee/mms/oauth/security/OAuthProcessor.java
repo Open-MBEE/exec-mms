@@ -85,7 +85,7 @@ public class OAuthProcessor {
 
 
     OAuth2Authentication validateAuthToken(String accessToken) {
-        Boolean isAuthenticated = true;
+        boolean isAuthenticated = true;
         OAuth2Authentication oauth = null;
         try {
             if (accessToken == null) {

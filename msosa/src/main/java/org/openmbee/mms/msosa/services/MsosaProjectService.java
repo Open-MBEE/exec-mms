@@ -46,6 +46,7 @@ public class MsosaProjectService extends DefaultProjectService implements Projec
         return projectJson;
     }
 
+    @Override
     public RefJson createMasterRefJson(ProjectJson project){
         RefJson branchJson = super.createMasterRefJson(project);
         branchJson.put("twcId",Constants.MASTER_BRANCH);

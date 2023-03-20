@@ -103,14 +103,14 @@ public class FederatedProjectPersistence implements ProjectPersistence {
         try {
             ContextHolder.setContext(projectId);
             projectIndexDAO.delete(projectId);
-            if(!message.equals("")) {
+            if(!message.isEmpty()) {
                 message = message.concat("Project index DAO deleted ");
             }
         } catch (Exception ex){
             message = message.concat("Project index DAO, cannot delete. ");
         }
 
-        if(!message.equals("")) {
+        if(!message.isEmpty()) {
             throw new NotFoundException(message);
         }
     }

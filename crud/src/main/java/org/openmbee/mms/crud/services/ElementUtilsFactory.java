@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class ElementUtilsFactory implements ApplicationContextAware {
     private ApplicationContext context;
 
+    @Override
     public void setApplicationContext(ApplicationContext context) {
         this.context = context;
     }

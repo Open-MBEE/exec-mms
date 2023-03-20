@@ -82,7 +82,8 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
     @Override
     public boolean hasGroupPermissions(String group, String privilege) {
         for (ProjectGroupPerm perm: projectGroupPermRepo.findAllByProject_ProjectId(project.getProjectId())) {
-            if (perm.getGroup().getName().equals(group) && perm.getRole().equals(privilege)) {
+            if (perm.getGroup().getName().equals(group) && perm.getRole().getPrivileges().stream().
+                    anyMatch(v -> v.getName().equals(privilege))) {
                 return true;
             }
         }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service("twcRevisionMmsCommitMapService")
@@ -100,8 +101,9 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
         @Override
         public int compare(CommitJson o, CommitJson t1) {
             try {
-                Date d1 = Formats.SIMPLE_DATE_FORMAT.parse((String) o.get(CommitJson.CREATED));
-                Date d2 = Formats.SIMPLE_DATE_FORMAT.parse((String) t1.get(CommitJson.CREATED));
+                SimpleDateFormat dateFormat = new SimpleDateFormat(Formats.DATE_FORMAT);
+                Date d1 = dateFormat.parse((String) o.get(CommitJson.CREATED));
+                Date d2 = dateFormat.parse((String) t1.get(CommitJson.CREATED));
                 return ascending ? d1.compareTo(d2) : d2.compareTo(d1);
             } catch (ParseException e) {
                 logger.error("Error parsing commit dates: " + e.getMessage());

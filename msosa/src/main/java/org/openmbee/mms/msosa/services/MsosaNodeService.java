@@ -78,6 +78,7 @@ public class MsosaNodeService extends DefaultNodeService implements Hierarchical
         element.remove(MsosaConstants.CHILDVIEWS);
     }
 
+    @Override
     public MountJson getProjectUsages(String projectId, String refId, String commitId, List<Pair<String, String>> saw,
             boolean restrictOnPermissions) {
         ContextHolder.setContext(projectId, refId);

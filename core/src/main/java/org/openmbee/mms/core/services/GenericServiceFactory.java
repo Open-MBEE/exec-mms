@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class GenericServiceFactory implements ApplicationContextAware{
+public class GenericServiceFactory implements ApplicationContextAware {
 
     private ApplicationContext context;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
+    @Override
     public void setApplicationContext(ApplicationContext context) {
         this.context = context;
     }
