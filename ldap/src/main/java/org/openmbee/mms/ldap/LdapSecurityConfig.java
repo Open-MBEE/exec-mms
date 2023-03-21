@@ -29,7 +29,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -155,7 +154,7 @@ public class LdapSecurityConfig {
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
                 logger.debug("Populating authorities using LDAP");
-                Optional<User> userOptional = userRepository.findByUsername(username);
+                Optional<User> userOptional = userRepository.findByUsernameIgnoreCase(username);
 
                 if (userOptional.isEmpty()) {
                     logger.info("No user record for {} in the userRepository, creating...", userData.getDn());
