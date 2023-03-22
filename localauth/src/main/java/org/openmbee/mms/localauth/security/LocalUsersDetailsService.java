@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Primary
+
 @Service
 public class LocalUsersDetailsService extends AbstractUsersDetailsService implements UsersDetailsService {
 
@@ -67,6 +67,4 @@ public class LocalUsersDetailsService extends AbstractUsersDetailsService implem
     public String encodePassword(String password) {
         return (password != null && !password.isEmpty()) ? passwordEncoder.encode(password) : null;
     }
-
-
 }

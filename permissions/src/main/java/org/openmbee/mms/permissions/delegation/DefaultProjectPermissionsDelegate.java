@@ -95,7 +95,7 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
 
     @Override
     public void initializePermissions(String creator, boolean inherit) {
-        Optional<User> user = getUserRepo().findByUsername(creator);
+        Optional<User> user = getUserRepo().findByUsernameIgnoreCase(creator);
         Optional<Role> role = getRoleRepo().findByName("ADMIN");
 
         if (!user.isPresent()) {
@@ -133,7 +133,7 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
         switch(req.getAction()) {
             case MODIFY:
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<User> user = getUserRepo().findByUsernameIgnoreCase(p.getName());
                     Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
@@ -162,7 +162,7 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
                     projectUserPermRepo.findAllByProjectAndInherited(project, false));
                 projectUserPermRepo.deleteByProjectAndInherited(project, false);
                 for (PermissionUpdateRequest.Permission p: req.getPermissions()) {
-                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<User> user = getUserRepo().findByUsernameIgnoreCase(p.getName());
                     Optional<Role> role = getRoleRepo().findByName(p.getRole());
                     if (!user.isPresent() || !role.isPresent()) {
                         //throw exception or skip
@@ -176,7 +176,7 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
             case REMOVE:
                 Set<String> users = new HashSet<>();
                 req.getPermissions().forEach(p -> {
-                    Optional<User> user = getUserRepo().findByUsername(p.getName());
+                    Optional<User> user = getUserRepo().findByUsernameIgnoreCase(p.getName());
                     if(! user.isPresent()) {
                         //throw or skip;
                         return;
