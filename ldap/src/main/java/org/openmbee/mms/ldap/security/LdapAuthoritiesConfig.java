@@ -14,14 +14,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
-import org.springframework.ldap.filter.AndFilter;
-import org.springframework.ldap.filter.EqualsFilter;
-import org.springframework.ldap.filter.HardcodedFilter;
-import org.springframework.ldap.filter.OrFilter;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.ldap.filter.*;
+import org.springframework.ldap.support.LdapEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Configuration
 public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
 
-    private static Logger logger = LoggerFactory.getLogger(LdapAuthoritiesConfig.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${ldap.user.attributes.username:uid}")
     private String userAttributesUsername;
@@ -60,6 +57,8 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
     @Value("${ldap.provider.base:#{null}}")
     private String providerBase;
 
+    @Value("#{'${ldap.user.dn.pattern:uid={0}}'.split(';')}")
+    private List<String> userDnPattern;
 
     @Value("${ldap.user.attributes.update:24}")
     private int userAttributesUpdate;
@@ -73,6 +72,7 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
     @Value("${ldap.group.search.base:#{''}}")
     private String groupSearchBase;
 
+
     @Bean
     LdapAuthoritiesPopulator ldapAuthoritiesPopulator(@Qualifier("contextSource") BaseLdapPathContextSource baseContextSource) {
 
@@ -82,7 +82,7 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
-            SpringSecurityLdapTemplate ldapTemplate;
+            final SpringSecurityLdapTemplate ldapTemplate;
 
             private CustomLdapAuthoritiesPopulator(BaseLdapPathContextSource ldapContextSource) {
                 ldapTemplate = new SpringSecurityLdapTemplate(ldapContextSource);
@@ -92,7 +92,7 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
                 logger.debug("Populating authorities using LDAP");
-                Optional<User> userOptional = getUserRepo().findByUsername(username);
+                Optional<User> userOptional = getUserRepo().findByUsernameIgnoreCase(username);
 
                 if (userOptional.isEmpty()) {
                     User newUser = register(parseLdapRegister(userData));
@@ -123,12 +123,13 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
 
                 AndFilter andFilter = new AndFilter();
                 HardcodedFilter groupsFilter = new HardcodedFilter(
-                    groupSearchFilter.replace("{0}", userDn));
+                    groupSearchFilter.replace("{0}", LdapEncoder.filterEncode(userDn)));
                 andFilter.and(groupsFilter);
                 andFilter.and(orFilter);
 
                 String filter = andFilter.encode();
                 logger.debug("Searching LDAP with filter: {}", filter);
+
                 Set<String> memberGroups = ldapTemplate
                     .searchForSingleAttributeValues(groupSearchBase, filter, new Object[]{""}, groupRoleAttribute);
                 logger.debug("LDAP search result: {}", Arrays.toString(memberGroups.toArray()));
@@ -139,7 +140,21 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                     Optional<Group> group = getGroupRepo().findByName(memberGroup);
                     group.ifPresent(addGroups::add);
                 }
-                List<GrantedAuthority> auths = AuthorityUtils
+
+                if (logger.isDebugEnabled()) {
+                    if ((long) addGroups.size() > 0) {
+                        addGroups.forEach(group -> {
+                            logger.debug("Group received: {}", group.getName());
+                        });
+                    } else {
+                        logger.debug("No configured groups returned from LDAP");
+                    }
+                }
+
+                user.setGroups(addGroups);
+                getUserRepo().save(user);
+
+               List<GrantedAuthority> auths = AuthorityUtils
                     .createAuthorityList(addGroups.stream().map(Group::getName).distinct().toArray(String[]::new));
                 if (user.isAdmin()) {
                     auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
@@ -154,13 +169,22 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
 
     }
 
+
+
     @Bean
-    public BaseLdapPathContextSource contextSource() {
-        DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
-            providerUrl);
+    public LdapContextSource contextSource() {
+        LdapContextSource contextSource = new LdapContextSource();
+
+        logger.debug("Initializing LDAP ContextSource with the following values: ");
+
+        contextSource.setUrl(providerUrl);
+        contextSource.setBase(providerBase);
         contextSource.setUserDn(providerUserDn);
         contextSource.setPassword(providerPassword);
-        contextSource.setBase(providerBase);
+
+        logger.debug("BaseLdapPath: " + contextSource.getBaseLdapPathAsString());
+        logger.debug("UserDn: " + contextSource.getUserDn());
+
         return contextSource;
     }
 

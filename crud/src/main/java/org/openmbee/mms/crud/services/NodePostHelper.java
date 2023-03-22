@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.openmbee.mms.core.config.Formats;
+import org.openmbee.mms.core.exceptions.ConflictException;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.NodeChangeInfo;
 import org.openmbee.mms.core.services.NodeService;
@@ -54,8 +55,12 @@ public class NodePostHelper extends NodeOperation {
 
     // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
     public NodeChangeInfo processPostJson(List<ElementJson> elements, boolean overwriteJson,
-                                          CommitJson cmjs, NodeService service) {
-
+                                          CommitJson cmjs, NodeService service, String lastCommitId) {
+        if (lastCommitId != null && !lastCommitId.isEmpty()) {
+            if (!lastCommitId.equals(getLatestRefCommitId())) {
+                throw new ConflictException("Given commitId " + lastCommitId + " is not the latest");
+            }
+        }
         NodeChangeInfo info = initInfo(elements, cmjs);
 
         // Logic for update/add
@@ -91,6 +96,10 @@ public class NodePostHelper extends NodeOperation {
                     }
                 } else {
                     updated = true;
+                    String ARTIFACTS = "_artifacts";
+                    if (indexElement.containsKey(ARTIFACTS) && !element.containsKey(ARTIFACTS)) {
+                        element.put(ARTIFACTS, indexElement.get(ARTIFACTS));
+                    }
                     element.setCreated(indexElement.getCreated());
                     element.setCreator(indexElement.getCreator());
                 }
