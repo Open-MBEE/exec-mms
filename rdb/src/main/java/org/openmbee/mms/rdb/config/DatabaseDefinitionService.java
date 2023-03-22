@@ -91,6 +91,7 @@ public class DatabaseDefinitionService {
         try (Connection connection = crudDataSources.getDataSource(ContextObject.DEFAULT_PROJECT).getConnection();
                 Statement statement = connection.createStatement()) {
             if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
+                statement.setQueryTimeout(60);
                 statement.execute(connection.nativeSQL(
                     "SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '"
                         + databaseProjectString(projectId) + "';"));
