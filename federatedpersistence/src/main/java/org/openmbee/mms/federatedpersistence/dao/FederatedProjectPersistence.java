@@ -96,6 +96,7 @@ public class FederatedProjectPersistence implements ProjectPersistence {
     public void hardDelete(String projectId) {
         String message = "";
         try {
+            ContextHolder.clearContext();
             projectDAO.delete(projectId);
         } catch (Exception ex){
             message = message.concat("Project DAO, cannot delete. ");

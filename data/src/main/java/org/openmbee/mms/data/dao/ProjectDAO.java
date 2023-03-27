@@ -12,12 +12,10 @@ public interface ProjectDAO {
 
     Optional<Project> findByProjectName(String name);
 
-    public List<Project> findAllByOrgId(String id);
+    List<Project> findAllByOrgId(String id);
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
     Project save(Project p);
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
     void delete(String projectId);
 
     List<Project> findAll();

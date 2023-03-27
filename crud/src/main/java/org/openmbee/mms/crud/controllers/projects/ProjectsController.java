@@ -176,7 +176,6 @@ public class ProjectsController extends BaseController {
 
 
     @DeleteMapping(value = "/{projectId}")
-    @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_DELETE', false)")
     public ProjectsResponse deleteProject(
         @PathVariable String projectId,
