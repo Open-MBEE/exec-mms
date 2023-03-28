@@ -56,7 +56,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public void initOrgPerms(String orgId, String creator) {
         OrgJson organization = getOrganization(orgId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(organization);
@@ -64,7 +63,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public void initProjectPerms(String projectId, boolean inherit, String creator) {
         ProjectJson project = getProject(projectId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(project);
@@ -75,7 +73,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public void initBranchPerms(String projectId, String branchId, boolean inherit, String creator) {
         RefJson branch = getBranch(projectId, branchId, BRANCH_NOTFOUND_BEHAVIOR.CREATE);
         if(branch == null) {
@@ -89,7 +86,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdatesResponse updateOrgUserPerms(PermissionUpdateRequest req, String orgId) {
         OrgJson organization = getOrganization(orgId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(organization);
@@ -106,7 +102,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdatesResponse updateOrgGroupPerms(PermissionUpdateRequest req, String orgId) {
         OrgJson organization = getOrganization(orgId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(organization);
@@ -122,7 +117,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdatesResponse updateProjectUserPerms(PermissionUpdateRequest req, String projectId) {
         ProjectJson project = getProject(projectId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(project);
@@ -138,7 +132,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdatesResponse updateProjectGroupPerms(PermissionUpdateRequest req, String projectId) {
         ProjectJson project = getProject(projectId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(project);
@@ -154,7 +147,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdateResponse updateBranchUserPerms(PermissionUpdateRequest req, String projectId, String branchId) {
         RefJson branch = getBranch(projectId, branchId, BRANCH_NOTFOUND_BEHAVIOR.THROW);
         if(branch == null) {
@@ -165,7 +157,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdateResponse updateBranchGroupPerms(PermissionUpdateRequest req, String projectId, String branchId) {
         RefJson branch = getBranch(projectId, branchId, BRANCH_NOTFOUND_BEHAVIOR.THROW);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(branch);
@@ -173,7 +164,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdatesResponse setProjectInherit(boolean isInherit, String projectId) {
         PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
         responseBuilder.setInherit(true);
@@ -186,7 +176,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionUpdatesResponse setBranchInherit(boolean isInherit, String projectId, String branchId) {
         PermissionUpdatesResponseBuilder responseBuilder = new PermissionUpdatesResponseBuilder();
         responseBuilder.setInherit(isInherit);
@@ -199,7 +188,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public boolean setOrgPublic(boolean isPublic, String orgId) {
         OrgJson organization = getOrganization(orgId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(organization);
@@ -208,7 +196,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public boolean setProjectPublic(boolean isPublic, String projectId) {
         ProjectJson project = getProject(projectId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(project);
@@ -217,7 +204,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public boolean hasOrgPrivilege(String privilege, String user, Set<String> groups, String orgId) {
         if (groups.contains(AuthorizationConstants.MMSADMIN)) return true;
 
@@ -227,7 +213,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public boolean hasProjectPrivilege(String privilege, String user, Set<String> groups, String projectId) {
         if (groups.contains(AuthorizationConstants.MMSADMIN)) return true;
 
@@ -237,7 +222,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public boolean hasBranchPrivilege(String privilege, String user, Set<String> groups, String projectId, String branchId) {
         if (groups.contains(AuthorizationConstants.MMSADMIN)) return true;
 
@@ -247,31 +231,26 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public boolean isProjectInherit(String projectId) {
         return projectPersistence.inheritsPermissions(projectId);
     }
 
     @Override
-    @Transactional
     public boolean isBranchInherit(String projectId, String branchId) {
         return branchPersistence.inheritsPermissions(projectId, branchId);
     }
 
     @Override
-    @Transactional
     public boolean isOrgPublic(String orgId) {
         return orgPersistence.hasPublicPermissions(orgId);
     }
 
     @Override
-    @Transactional
     public boolean isProjectPublic(String projectId) {
         return projectPersistence.hasPublicPermissions(projectId);
     }
 
     @Override
-    @Transactional
     public PermissionResponse getOrgGroupRoles(String orgId) {
         OrgJson organization = getOrganization(orgId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(organization);
@@ -279,7 +258,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionResponse getOrgUserRoles(String orgId) {
         OrgJson organization = getOrganization(orgId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(organization);
@@ -287,7 +265,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionResponse getProjectGroupRoles(String projectId) {
         ProjectJson project = getProject(projectId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(project);
@@ -295,7 +272,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionResponse getProjectUserRoles(String projectId) {
         ProjectJson project = getProject(projectId);
         PermissionsDelegate permissionsDelegate = permissionsDelegateUtil.getPermissionsDelegate(project);
@@ -303,7 +279,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionResponse getBranchGroupRoles(String projectId, String branchId) {
         RefJson branch = getBranch(projectId, branchId, BRANCH_NOTFOUND_BEHAVIOR.IGNORE);
 
@@ -316,7 +291,6 @@ public class DefaultPermissionService implements PermissionService {
     }
 
     @Override
-    @Transactional
     public PermissionResponse getBranchUserRoles(String projectId, String branchId) {
         RefJson branch = getBranch(projectId, branchId, BRANCH_NOTFOUND_BEHAVIOR.IGNORE);
 
