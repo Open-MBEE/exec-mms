@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -58,7 +57,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userPersistence.findAll();
     }
 
-    @Transactional
     public UserJson register(UserCreateRequest req) {
         UserJson user = new UserJson();
         user.setUsername(req.getUsername());
@@ -71,7 +69,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userPersistence.save(user);
     }
 
-    @Transactional
     public void changeUserPassword(String username, String password, boolean asAdmin) {
         Optional<UserJson> userOptional = userPersistence.findByUsername(username);
         if(userOptional.isEmpty()) {

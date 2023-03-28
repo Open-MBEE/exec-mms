@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +44,6 @@ public class OrgsController extends BaseController {
     }
 
     @GetMapping
-    @Transactional
     public OrganizationsResponse getAllOrgs( Authentication auth) {
 
         OrganizationsResponse response = new OrganizationsResponse();
@@ -59,7 +57,6 @@ public class OrgsController extends BaseController {
     }
 
     @GetMapping(value = "/{orgId}")
-    @Transactional
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_READ', true)")
     public OrganizationsResponse getOrg(
         @PathVariable String orgId) {
@@ -74,7 +71,6 @@ public class OrgsController extends BaseController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
     @PreAuthorize("isAuthenticated()")
     public OrganizationsResponse createOrUpdateOrgs(
         @RequestBody OrganizationsRequest orgPost,
@@ -124,7 +120,6 @@ public class OrgsController extends BaseController {
     }
 
     @DeleteMapping(value = "/{orgId}")
-    @Transactional
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_DELETE', false)")
     public OrganizationsResponse deleteOrg(
         @PathVariable String orgId) {

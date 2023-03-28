@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.core.dao.GroupPersistence;
 import org.openmbee.mms.core.dao.UserGroupsPersistence;
-import org.openmbee.mms.core.dao.UserPersistence;
 import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.exceptions.ConflictException;
 import org.openmbee.mms.core.exceptions.NotFoundException;
@@ -20,14 +19,12 @@ import org.openmbee.mms.json.GroupJson;
 import org.openmbee.mms.json.UserJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/groups")
 @Tag(name = "Groups")
-@Transactional
 public class LocalGroupsController {
 
     private GroupPersistence groupPersistence;
@@ -78,7 +75,6 @@ public class LocalGroupsController {
 
     @GetMapping("/{group}")
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
-    @Transactional
     public GroupResponse getGroup(@PathVariable String group) {
         if(groupValidationService.isRestrictedGroup(group)) {
             throw new BadRequestException(GroupConstants.RESTRICTED_GROUP);
@@ -90,7 +86,6 @@ public class LocalGroupsController {
     @DeleteMapping("/{group}")
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
     @ResponseBody
-    @Transactional
     public void deleteLocalGroup(@PathVariable String group) {
         GroupJson groupJson = groupPersistence.findByName(group).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
         if (groupValidationService.canDeleteGroup(groupJson)) {
@@ -102,7 +97,6 @@ public class LocalGroupsController {
 
     @PostMapping("/{group}/users")
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
-    @Transactional
     public GroupUpdateResponse updateGroupUsers(@PathVariable String group,
             @RequestBody GroupUpdateRequest groupUpdateRequest) {
 

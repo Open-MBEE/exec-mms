@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -74,7 +73,6 @@ public class BranchesController extends BaseController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_CREATE_BRANCH', false)")
     public RefsResponse createRefs(
         @PathVariable String projectId,
@@ -125,7 +123,6 @@ public class BranchesController extends BaseController {
     }
 
     @DeleteMapping("/{refId}")
-    @Transactional
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_DELETE', false)")
     public RefsResponse deleteRef(
         @PathVariable String projectId,

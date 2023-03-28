@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -46,7 +45,6 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping
-    @Transactional(readOnly = true)
     public ProjectsResponse getAllProjects(Authentication auth) {
 
         ProjectsResponse response = new ProjectsResponse();
@@ -66,7 +64,6 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping(value = "/{projectId}")
-    @Transactional(readOnly = true)
     @PreAuthorize("@mss.hasProjectPrivilege(authentication, #projectId, 'PROJECT_READ', true)")
     public ProjectsResponse getProject(
         @PathVariable String projectId) {
@@ -85,7 +82,6 @@ public class ProjectsController extends BaseController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
     @PreAuthorize("isAuthenticated()")
     public ProjectsResponse createOrUpdateProjects(
         @RequestBody ProjectsRequest projectsPost,

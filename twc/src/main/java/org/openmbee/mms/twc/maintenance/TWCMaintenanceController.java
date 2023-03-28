@@ -10,7 +10,6 @@ import org.openmbee.mms.twc.metadata.TwcMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -33,7 +32,6 @@ public class TWCMaintenanceController {
         this.twcMetadataService = twcMetadataService;
     }
 
-    @Transactional
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
     @GetMapping(value = "/project/twcmetadata/{id}")
     @ResponseBody
@@ -43,7 +41,6 @@ public class TWCMaintenanceController {
     }
 
 
-    @Transactional
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
     @PostMapping(value = "/project/twcmetadata/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -58,7 +55,6 @@ public class TWCMaintenanceController {
         }
     }
 
-    @Transactional
     @PreAuthorize(AuthorizationConstants.IS_MMSADMIN)
     @DeleteMapping(value = "/project/twcmetadata/{id}")
     @ResponseBody
