@@ -47,6 +47,8 @@ public class NodeGetDomain extends JsonDomain {
     }
 
     public void addExistingElements(NodeGetInfo info, List<ElementJson> elements) {
-        elements.forEach(e -> info.getExistingElementMap().put(e.getId(), e));
+        elements.forEach(e -> {
+            info.getExistingElementMap().put(e.getId(), e);
+        });
     }
 }

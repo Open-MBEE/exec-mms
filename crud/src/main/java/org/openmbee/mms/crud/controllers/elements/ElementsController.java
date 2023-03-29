@@ -76,11 +76,11 @@ public class ElementsController extends BaseController {
         @Content(mediaType = "application/x-ndjson")
     })
     public ResponseEntity<StreamingResponseBody> getAllElements(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @RequestParam(required = false) String commitId,
-        @RequestParam(required = false) Map<String, String> params,
-        @Parameter(hidden = true) @RequestHeader(value = "Accept", defaultValue = "application/json") String accept) {
+            @PathVariable String projectId,
+            @PathVariable String refId,
+            @RequestParam(required = false) String commitId,
+            @RequestParam(required = false) Map<String, String> params,
+            @Parameter(hidden = true) @RequestHeader(value = "Accept", defaultValue = "application/json") String accept) {
 
         NodeService nodeService = getNodeService(projectId);
         if (commitId != null && !commitId.isEmpty()) {
@@ -95,11 +95,11 @@ public class ElementsController extends BaseController {
     @GetMapping(value = "/{elementId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ElementsResponse getElement(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @PathVariable String elementId,
-        @RequestParam(required = false) String commitId,
-        @RequestParam(required = false) Map<String, String> params) {
+            @PathVariable String projectId,
+            @PathVariable String refId,
+            @PathVariable String elementId,
+            @RequestParam(required = false) String commitId,
+            @RequestParam(required = false) Map<String, String> params) {
 
         NodeService nodeService = getNodeService(projectId);
         ElementsResponse res = nodeService.read(projectId, refId, elementId, params);
@@ -110,12 +110,12 @@ public class ElementsController extends BaseController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ElementsCommitResponse createOrUpdateElements(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @RequestBody ElementsRequest req,
-        @RequestParam(required = false) String overwrite,
-        @RequestParam(required = false) Map<String, String> params,
-        Authentication auth) {
+            @PathVariable String projectId,
+            @PathVariable String refId,
+            @RequestBody ElementsRequest req,
+            @RequestParam(required = false) String overwrite,
+            @RequestParam(required = false) Map<String, String> params,
+            Authentication auth) {
 
         embeddedHookService.hook(new ElementUpdateHook(ElementUpdateHook.Action.ADD_UPDATE, projectId, refId,
             req.getElements(), params, auth));
@@ -132,12 +132,12 @@ public class ElementsController extends BaseController {
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     */
     public ResponseEntity<StreamingResponseBody> createOrUpdateElementsStream(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @RequestParam(required = false) Map<String, String> params,
-        @Parameter(hidden = true) @RequestHeader(value = "Accept", defaultValue = "application/json") String accept,
-        Authentication auth,
-        HttpEntity<byte[]> requestEntity) {
+            @PathVariable String projectId,
+            @PathVariable String refId,
+            @RequestParam(required = false) Map<String, String> params,
+            @Parameter(hidden = true) @RequestHeader(value = "Accept", defaultValue = "application/json") String accept,
+            Authentication auth,
+            HttpEntity<byte[]> requestEntity) {
 
         String commitId = UUID.randomUUID().toString(); // Generate a commitId from the start
         params.put("commitId", commitId);
@@ -180,11 +180,11 @@ public class ElementsController extends BaseController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_READ', true)")
     public ElementsResponse getElements(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @RequestBody ElementsRequest req,
-        @RequestParam(required = false) String commitId,
-        @RequestParam(required = false) Map<String, String> params) {
+            @PathVariable String projectId,
+            @PathVariable String refId,
+            @RequestBody ElementsRequest req,
+            @RequestParam(required = false) String commitId,
+            @RequestParam(required = false) Map<String, String> params) {
 
         ElementsResponse response = new ElementsResponse();
         if (!req.getElements().isEmpty()) {
@@ -197,10 +197,10 @@ public class ElementsController extends BaseController {
     @DeleteMapping(value = "/{elementId}")
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ElementsCommitResponse deleteElement(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @PathVariable String elementId,
-        Authentication auth) {
+            @PathVariable String projectId,
+            @PathVariable String refId,
+            @PathVariable String elementId,
+            Authentication auth) {
 
         ElementsCommitResponse res = getNodeService(projectId).delete(projectId, refId, elementId, auth.getName());
         handleSingleResponse(res);
@@ -210,10 +210,10 @@ public class ElementsController extends BaseController {
     @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@mss.hasBranchPrivilege(authentication, #projectId, #refId, 'BRANCH_EDIT_CONTENT', false)")
     public ElementsResponse deleteElements(
-        @PathVariable String projectId,
-        @PathVariable String refId,
-        @RequestBody ElementsRequest req,
-        Authentication auth) {
+            @PathVariable String projectId,
+            @PathVariable String refId,
+            @RequestBody ElementsRequest req,
+            Authentication auth) {
 
         return getNodeService(projectId).delete(projectId, refId, req, auth.getName());
     }

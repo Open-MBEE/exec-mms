@@ -45,10 +45,11 @@ public class ProjectsController extends BaseController {
     }
 
     @GetMapping
-    public ProjectsResponse getAllProjects(Authentication auth) {
+    public ProjectsResponse getAllProjects(Authentication auth, @RequestParam(required = false) String orgId) {
 
         ProjectsResponse response = new ProjectsResponse();
-        List<ProjectJson> allProjects = projectPersistence.findAll();
+        Collection<ProjectJson> allProjects =
+            orgId == null ? projectPersistence.findAll() : projectPersistence.findAllByOrgId(orgId);
         for (ProjectJson projectJson : allProjects) {
             try {
                 if (mss.hasProjectPrivilege(auth, projectJson.getProjectId(), Privileges.PROJECT_READ.name(), true)

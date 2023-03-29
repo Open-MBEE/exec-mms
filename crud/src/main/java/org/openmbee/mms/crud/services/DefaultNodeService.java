@@ -2,6 +2,7 @@ package org.openmbee.mms.crud.services;
 
 import org.openmbee.mms.core.dao.*;
 import org.openmbee.mms.core.exceptions.BadRequestException;
+import org.openmbee.mms.core.exceptions.ConflictException;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.core.objects.ElementsCommitResponse;
 import org.openmbee.mms.core.objects.ElementsRequest;
@@ -75,7 +76,8 @@ public class DefaultNodeService implements NodeService {
 
         String separator = "\n";
         if (!"application/x-ndjson".equals(accept)) {
-            stream.write("{\"elements\":[".getBytes(StandardCharsets.UTF_8));
+            String intro = "{\"commitId\":\"" + commitId + "\",\"elements\":[";
+            stream.write(intro.getBytes(StandardCharsets.UTF_8));
             separator = ",";
         }
 
@@ -106,9 +108,9 @@ public class DefaultNodeService implements NodeService {
             logger.debug("ElementId given: {}", id);
 
             NodeGetInfo getInfo = nodePersistence.findById(projectId, refId, commitId, id);
-            if(!getInfo.getRejected().isEmpty()){
+            if (!getInfo.getRejected().isEmpty()) {
                 response.addRejection(getInfo.getRejected().get(id));
-            }else{
+            } else {
                 response.getElements().add(getInfo.getActiveElementMap().get(id));
             }
 
@@ -119,6 +121,7 @@ public class DefaultNodeService implements NodeService {
             List<ElementJson> nodes = nodePersistence.findAll(projectId, refId, commitId);
             response.getElements().addAll(nodes);
         }
+        response.getElements().forEach(v -> v.setRefId(refId));
         return response;
     }
 
@@ -142,6 +145,14 @@ public class DefaultNodeService implements NodeService {
         boolean overwriteJson = Boolean.parseBoolean(params.get(CrudConstants.OVERWRITE));
         boolean preserveTimestamps = Boolean.parseBoolean(params.get(CrudConstants.PRESERVETIMESTAMPS));
         String commitId = params.getOrDefault(CrudConstants.COMMITID, null);
+        String lastCommitId = req.getLastCommitId();
+
+        if (lastCommitId != null && !lastCommitId.isEmpty()) {
+            Optional<CommitJson> latestCommit = commitPersistence.findLatestByProjectAndRef(projectId, refId);
+            if (latestCommit.isEmpty() || !lastCommitId.equals(latestCommit.get().getId())) {
+                throw new ConflictException("Given commitId " + lastCommitId + " is not the latest");
+            }
+        }
 
         NodeChangeInfo changes = nodePersistence.prepareChange(createCommit(user, refId, projectId, commitId, req),
             overwriteJson, preserveTimestamps);
@@ -149,6 +160,9 @@ public class DefaultNodeService implements NodeService {
 
         for(ElementJson element : changes.getUpdatedMap().values()) {
             extraProcessPostedElement(changes, element);
+        }
+        if(req.getDeletes() != null) {
+            changes = nodePersistence.prepareDeletes(changes, req.getDeletes());
         }
 
         changes = nodePersistence.commitChanges(changes);
@@ -158,8 +172,9 @@ public class DefaultNodeService implements NodeService {
 
         ElementsCommitResponse response = new ElementsCommitResponse();
         response.getElements().addAll(changes.getUpdatedMap().values());
+        response.setDeleted(new ArrayList<>(changes.getDeletedMap().values()));
         response.setRejected(new ArrayList<>(changes.getRejected().values()));
-        if(!changes.getUpdatedMap().isEmpty()) {
+        if(!changes.getUpdatedMap().isEmpty() || !changes.getDeletedMap().isEmpty()) {
             response.setCommitId(changes.getCommitJson().getId());
         }
         return response;

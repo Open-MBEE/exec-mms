@@ -20,6 +20,8 @@ public class NodeGetInfoImpl  implements NodeGetInfo {
 
     private CommitJson commitJson;
 
+    private String refId;
+
     @Override
     public Map<String, ElementJson> getReqElementMap() {
         return reqElementMap;
@@ -83,5 +85,16 @@ public class NodeGetInfoImpl  implements NodeGetInfo {
     public NodeGetInfo setCommitJson(CommitJson commitJson) {
         this.commitJson = commitJson;
         return this;
+    }
+
+
+    @Override
+    public void setRefId(String refId) {
+        this.refId = refId;
+    }
+
+    @Override
+    public String getRefId() {
+        return this.refId;
     }
 }

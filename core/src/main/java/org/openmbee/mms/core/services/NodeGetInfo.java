@@ -30,4 +30,7 @@ public interface NodeGetInfo {
 
     void addRejection(String id, Rejection rejection);
 
+    void setRefId(String refId);
+    String getRefId();
+
 }

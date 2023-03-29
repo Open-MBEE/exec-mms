@@ -1,5 +1,6 @@
 package org.openmbee.mms.federatedpersistence.domain;
 
+import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.config.Formats;
 import org.openmbee.mms.core.dao.CommitPersistence;
 import org.openmbee.mms.data.dao.NodeDAO;
@@ -118,6 +119,12 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
                 continue;
             }
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
+            if(info.getCommitJson() != null && info.getCommitJson().getRefId() != null) {
+                indexElement.setRefId(info.getCommitJson().getRefId());
+            } else {
+                indexElement.setRefId(ContextHolder.getContext().getBranchId());
+            }
+
             Instant modified = Instant.from(Formats.FORMATTER.parse(indexElement.getModified()));
             Instant created = Instant.from(Formats.FORMATTER.parse(indexElement.getCreated()));
 

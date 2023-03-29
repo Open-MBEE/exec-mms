@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,6 +79,7 @@ public class FederatedProjectPersistence implements ProjectPersistence {
     }
 
     @Override
+    @Transactional
     public Collection<ProjectJson> findAllByOrgId(String orgId) {
         Optional<Organization> org = orgRepository.findByOrganizationId(orgId);
         if(org.isEmpty()) {

@@ -121,8 +121,7 @@ public class OrgsController extends BaseController {
 
     @DeleteMapping(value = "/{orgId}")
     @PreAuthorize("@mss.hasOrgPrivilege(authentication, #orgId, 'ORG_DELETE', false)")
-    public OrganizationsResponse deleteOrg(
-        @PathVariable String orgId) {
+    public OrganizationsResponse deleteOrg(@PathVariable String orgId) {
 
         OrganizationsResponse response = new OrganizationsResponse();
         Optional<OrgJson> orgOption = organizationRepository.findById(orgId);

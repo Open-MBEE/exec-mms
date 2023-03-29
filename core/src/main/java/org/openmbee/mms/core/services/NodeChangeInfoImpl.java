@@ -74,4 +74,5 @@ public class NodeChangeInfoImpl extends NodeGetInfoImpl implements NodeChangeInf
         this.preserveTimestamps = preserveTimestamps;
         return this;
     }
+
 }
