@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
@@ -66,6 +67,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
+    @Transactional
     public boolean hasPermission(String user, Set<String> groups, String privilege) {
 
         Optional<Privilege> priv = getPrivRepo().findByName(privilege);
@@ -84,6 +86,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
+    @Transactional
     public boolean hasGroupPermissions(String group, String privilege) {
         for (BranchGroupPerm perm: branchGroupPermRepo.findAllByBranch(branch)) {
             if (perm.getGroup().getName().equals(group) && perm.getRole().getPrivileges().stream()
@@ -145,6 +148,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
+    @Transactional
     public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
         FederatedPermissionsUpdateResponseBuilder responseBuilder = new FederatedPermissionsUpdateResponseBuilder();
 
@@ -211,6 +215,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
+    @Transactional
     public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
         FederatedPermissionsUpdateResponseBuilder responseBuilder = new FederatedPermissionsUpdateResponseBuilder();
 
@@ -273,6 +278,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
+    @Transactional
     public PermissionResponse getUserRoles() {
         PermissionResponse res = PermissionResponse.getDefaultResponse();
         for (BranchUserPerm perm: branchUserPermRepo.findAllByBranch(branch)) {
@@ -286,6 +292,7 @@ public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissions
     }
 
     @Override
+    @Transactional
     public PermissionResponse getGroupRoles() {
         PermissionResponse res = PermissionResponse.getDefaultResponse();
         for (BranchGroupPerm perm: branchGroupPermRepo.findAllByBranch(branch)) {
