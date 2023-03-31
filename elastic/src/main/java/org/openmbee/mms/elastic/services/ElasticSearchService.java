@@ -209,20 +209,20 @@ public class ElasticSearchService implements SearchService {
         sourceBuilder.query(query);
         sourceBuilder.size(resultLimit);
         searchRequest.source(sourceBuilder);
-        searchRequest.scroll(TimeValue.timeValueMillis(scrollTimeout));
+        searchRequest.scroll(TimeValue.timeValueSeconds(scrollTimeout));
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         String scrollId = null;
-
         do {
-            for(SearchHit hit : searchResponse.getHits()) {
+            for (SearchHit hit : searchResponse.getHits()) {
                 ElementJson ob = parseResult(hit);
-                if(allNodeDocIds.contains(ob.getDocId())) {
+                if (allNodeDocIds.contains(ob.getDocId())) {
                     result.add(ob);
                 }
             }
             scrollId = searchResponse.getScrollId();
             if (scrollId != null) {
                 SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+                scrollRequest.scroll(TimeValue.timeValueSeconds(scrollTimeout));
                 searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
             }
 
@@ -255,8 +255,6 @@ public class ElasticSearchService implements SearchService {
                 } else if(showDeletedAsRejected) {
                     deletedElements.add(new OrderedResult<>(new Rejection(currentJson.getWrapped(), 410, SearchConstants.ELEMENT_DELETED_INFO), currentJson.getOrder()));
                 }
-            } else { // node found in DB not found in the index
-                logger.warn(SearchConstants.POSSIBLE_ELASTIC_DISCREPANCY, n.getNodeId());
             }
         }
 
