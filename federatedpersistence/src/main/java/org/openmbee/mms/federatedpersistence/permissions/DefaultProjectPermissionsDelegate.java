@@ -15,11 +15,16 @@ import org.openmbee.mms.rdb.repositories.ProjectGroupPermRepository;
 import org.openmbee.mms.rdb.repositories.ProjectRepository;
 import org.openmbee.mms.rdb.repositories.ProjectUserPermRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
+@Component
+@Scope(value = "prototype")
 public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
 
     private ProjectUserPermRepository projectUserPermRepo;
@@ -60,6 +65,7 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
     }
 
     @Override
+    @Transactional
     public boolean hasPermission(String user, Set<String> groups, String privilege) {
 
         Optional<Privilege> priv = getPrivRepo().findByName(privilege);
@@ -141,6 +147,7 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
     }
 
     @Override
+    @Transactional
     public PermissionUpdateResponse updateUserPermissions(PermissionUpdateRequest req) {
         FederatedPermissionsUpdateResponseBuilder responseBuilder = new FederatedPermissionsUpdateResponseBuilder();
 
@@ -207,6 +214,7 @@ public class DefaultProjectPermissionsDelegate extends AbstractDefaultPermission
     }
 
     @Override
+    @Transactional
     public PermissionUpdateResponse updateGroupPermissions(PermissionUpdateRequest req) {
         FederatedPermissionsUpdateResponseBuilder responseBuilder = new FederatedPermissionsUpdateResponseBuilder();
 

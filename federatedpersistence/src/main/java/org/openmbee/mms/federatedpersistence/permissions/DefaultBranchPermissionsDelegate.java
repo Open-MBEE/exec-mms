@@ -22,12 +22,16 @@ import org.openmbee.mms.rdb.repositories.BranchUserPermRepository;
 import org.openmbee.mms.rdb.repositories.ProjectGroupPermRepository;
 import org.openmbee.mms.rdb.repositories.ProjectUserPermRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.*;
 
+@Component
+@Scope(value = "prototype")
 public class DefaultBranchPermissionsDelegate extends AbstractDefaultPermissionsDelegate {
 
     private BranchRepository branchRepo;

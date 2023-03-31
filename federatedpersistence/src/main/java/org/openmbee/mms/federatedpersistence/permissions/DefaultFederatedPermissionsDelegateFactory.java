@@ -53,7 +53,7 @@ public class DefaultFederatedPermissionsDelegateFactory implements PermissionsDe
             throw new NotFoundException("project not found");
         }
 
-        return autowire(new DefaultProjectPermissionsDelegate(projectOptional.get()));
+        return applicationContext.getBean(DefaultProjectPermissionsDelegate.class, projectOptional.get());
     }
 
     @Override
@@ -62,7 +62,7 @@ public class DefaultFederatedPermissionsDelegateFactory implements PermissionsDe
         if(orgOptional.isEmpty()) {
             throw new NotFoundException("org not found");
         }
-        return autowire(new DefaultOrgPermissionsDelegate(orgOptional.get()));
+        return applicationContext.getBean(DefaultOrgPermissionsDelegate.class, orgOptional.get());
     }
 
     @Override
@@ -72,12 +72,6 @@ public class DefaultFederatedPermissionsDelegateFactory implements PermissionsDe
         if(branchOptional.isEmpty()) {
             throw new NotFoundException("branch not found");
         }
-        return autowire(new DefaultBranchPermissionsDelegate(branchOptional.get()));
+        return applicationContext.getBean(DefaultBranchPermissionsDelegate.class, branchOptional.get());
     }
-
-    private PermissionsDelegate autowire(PermissionsDelegate permissionsDelegate) {
-        applicationContext.getAutowireCapableBeanFactory().autowireBean(permissionsDelegate);
-        return permissionsDelegate;
-    }
-
 }
