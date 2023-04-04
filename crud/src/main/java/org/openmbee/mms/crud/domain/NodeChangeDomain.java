@@ -10,6 +10,7 @@ import org.openmbee.mms.json.CommitJson;
 import org.openmbee.mms.json.ElementJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,9 +23,12 @@ public abstract class NodeChangeDomain extends JsonDomain {
     private NodeGetDomain nodeGetDomain;
     private CommitDomain commitDomain;
 
-    public NodeChangeDomain(NodeGetDomain nodeGetDomain, CommitDomain commitDomain) {
+    private List<NodeUpdateFilter> nodeUpdateFilters;
+
+    public NodeChangeDomain(NodeGetDomain nodeGetDomain, CommitDomain commitDomain, List<NodeUpdateFilter> nodeUpdateFilters) {
         this.nodeGetDomain = nodeGetDomain;
         this.commitDomain = commitDomain;
+        this.nodeUpdateFilters = nodeUpdateFilters;
     }
 
     public NodeChangeInfo initInfo(CommitJson commitJson, boolean overwrite, boolean preserveTimestamps) {
@@ -54,7 +58,10 @@ public abstract class NodeChangeDomain extends JsonDomain {
         element.setCreated(commitJson.getCreated());
     }
 
-    public void processElementUpdated(NodeChangeInfo info, ElementJson element) {
+    public void processElementUpdated(NodeChangeInfo info, ElementJson element, ElementJson existing) {
+        if(nodeUpdateFilters.stream().anyMatch(f -> !f.filterUpdate(info, element, existing))) {
+            return;
+        }
         processElementAddedOrUpdated(info, element);
     }
 
@@ -105,35 +112,6 @@ public abstract class NodeChangeDomain extends JsonDomain {
         info.addRejection(elementId, new Rejection(elementId, 404, "Not Found"));
     }
 
-    protected boolean isUpdated(BaseJson<?> element, Map<String, Object> existing, NodeChangeInfo info) {
-
-        if (element.isPartialOf(existing)) {
-            info.addRejection(element.getId(), new Rejection(element, 304, "Is Equivalent"));
-            return false;
-        }
-        return true;
-    }
-
-    protected boolean diffUpdateJson(BaseJson element, Map<String, Object> existing, NodeChangeInfo info) {
-
-        String jsonModified = element.getModified();
-        Object existingModified = existing.get(BaseJson.MODIFIED);
-        if (jsonModified != null && !jsonModified.isEmpty()) {
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(Formats.DATE_FORMAT);
-                Date jsonModDate = dateFormat.parse(jsonModified);
-                Date existingModDate = dateFormat.parse(existingModified.toString());
-                if (jsonModDate.before(existingModDate)) {
-                    info.addRejection(element.getId(), new Rejection(element, 409, "Conflict Detected"));
-                    return false;
-                }
-            } catch (ParseException e) {
-                logger.info("date parse exception: {} {}", jsonModified, existingModified);
-            }
-        }
-        element.merge(existing);
-        return true;
-    }
 
     // create new elastic id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
     public abstract NodeChangeInfo processPostJson(NodeChangeInfo nodeChangeInfo, Collection<ElementJson> elements);

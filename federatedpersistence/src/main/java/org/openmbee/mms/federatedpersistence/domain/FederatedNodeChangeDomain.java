@@ -1,5 +1,7 @@
 package org.openmbee.mms.federatedpersistence.domain;
 
+import org.openmbee.mms.core.config.Constants;
+import org.openmbee.mms.crud.domain.NodeUpdateFilter;
 import org.openmbee.mms.data.dao.NodeDAO;
 import org.openmbee.mms.data.dao.NodeIndexDAO;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
@@ -35,8 +37,9 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
 
     @Autowired
     public FederatedNodeChangeDomain(NodeGetDomain nodeGetDomain, CommitDomain commitDomain,
-            FederatedNodeGetDomain getDomain, NodeDAO nodeRepository, NodeIndexDAO nodeIndex, FederatedElementDomain elementDomain) {
-        super(nodeGetDomain, commitDomain);
+            FederatedNodeGetDomain getDomain, NodeDAO nodeRepository, NodeIndexDAO nodeIndex, FederatedElementDomain elementDomain,
+            List<NodeUpdateFilter> nodeUpdateFilters) {
+        super(nodeGetDomain, commitDomain, nodeUpdateFilters);
         this.getDomain = getDomain;
         this.nodeRepository = nodeRepository;
         this.nodeIndex = nodeIndex;
@@ -90,7 +93,7 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
     }
 
     @Override
-    public void processElementUpdated(NodeChangeInfo info, ElementJson element) {
+    public void processElementUpdated(NodeChangeInfo info, ElementJson element, ElementJson existing) {
         if(!(info instanceof FederatedNodeChangeInfo)) {
             throw new InternalErrorException("Unexpected NodeChangeInfo type in FederatedNodeChangeDomain");
         }
@@ -99,11 +102,14 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
         if(n != null) {
             previousDocId = n.getDocId();
             ((FederatedNodeChangeInfo) info).getOldDocIds().add(previousDocId);
+            if(n.isDeleted()) {
+                existing.setIsDeleted(Constants.TRUE);
+            }
         } else {
             return;
         }
 
-        super.processElementUpdated(info, element);
+        super.processElementUpdated(info, element, existing);
         ElementVersion newObj= new ElementVersion()
             .setPreviousDocId(previousDocId)
             .setDocId(element.getDocId())
@@ -212,7 +218,6 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
                 continue;
             }
             boolean added = false;
-            boolean updated = false;
             if (element.getId() == null || element.getId().isEmpty()) {
                 element.setId(UUID.randomUUID().toString());
             }
@@ -226,21 +231,11 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
                 continue;
             }
 
-            if (!added) {
-                if (!info.getOverwrite()) {
-                    if (n.isDeleted() || isUpdated(element, indexElement, info)) {
-                        updated = diffUpdateJson(element, indexElement, info);
-                    }
-                } else {
-                    updated = true;
-                }
-            }
-
             // create new doc id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
             if (added) {
                 processElementAdded(info, element);
-            } else if (updated) {
-                processElementUpdated(info, element);
+            } else {
+                processElementUpdated(info, element, indexElement);
             }
         }
         return federatedInfo;
