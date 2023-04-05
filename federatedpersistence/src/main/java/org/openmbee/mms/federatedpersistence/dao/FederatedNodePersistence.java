@@ -219,6 +219,7 @@ public class FederatedNodePersistence implements NodePersistence {
         }
         //TODO: Test rollback on IndexDAO failure
         //TODO: move transaction stuff out into transaction service
+        ContextHolder.setContext(info.getCommitJson().getProjectId(), info.getCommitJson().getRefId());
         TransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = nodeDAO.getTransactionManager().getTransaction(def);
 
@@ -229,13 +230,12 @@ public class FederatedNodePersistence implements NodePersistence {
         Instant now = federatedInfo.getInstant();
         if (!nodes.isEmpty()) {
             try {
-                nodeDAO.saveAll(new ArrayList<>(nodes.values()));
                 if (json != null && !json.isEmpty()) {
                     nodeIndexDAO.indexAll(json.values());
                 }
-                nodeIndexDAO.removeFromRef(federatedInfo.getOldDocIds());
+                nodeDAO.saveAll(new ArrayList<>(nodes.values()));
                 commitPersistence.save(cmjs,now);
-
+                nodeIndexDAO.removeFromRef(federatedInfo.getOldDocIds());
                 nodeDAO.getTransactionManager().commit(status);
             } catch (Exception e) {
                 logger.error("commitChanges error: ", e);

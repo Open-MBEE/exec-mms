@@ -24,8 +24,7 @@ public abstract class BaseDAOImpl {
     }
 
     @Autowired
-    public void setTransactionManager(
-        PlatformTransactionManager transactionManager) {
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
