@@ -11,6 +11,7 @@ import org.openmbee.mms.rdb.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class FederatedUserGroupsPersistence implements UserGroupsPersistence {
     }
 
     @Override
+    @Transactional
     public boolean addUserToGroup(String groupName, String username) {
         Optional<User> userOptional = userRepository.findByUsernameIgnoreCase(username);
         if(userOptional.isEmpty()) {
@@ -58,6 +60,7 @@ public class FederatedUserGroupsPersistence implements UserGroupsPersistence {
     }
 
     @Override
+    @Transactional
     public boolean removeUserFromGroup(String groupName, String username) {
         Optional<User> userOptional = userRepository.findByUsernameIgnoreCase(username);
         if(userOptional.isEmpty()) {
@@ -78,6 +81,7 @@ public class FederatedUserGroupsPersistence implements UserGroupsPersistence {
     }
 
     @Override
+    @Transactional
     public Collection<UserJson> findUsersInGroup(String groupName) {
         Optional<Group> groupOptional = groupRepository.findByName(groupName);
         if(groupOptional.isEmpty()){
@@ -87,6 +91,7 @@ public class FederatedUserGroupsPersistence implements UserGroupsPersistence {
     }
 
     @Override
+    @Transactional
     public Collection<GroupJson> findGroupsAssignedToUser(String username) {
         Optional<User> userOptional = userRepository.findByUsernameIgnoreCase(username);
         if(userOptional.isEmpty()) {
