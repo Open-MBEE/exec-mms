@@ -91,7 +91,6 @@ public class CameoHelper {
         res.put(CameoConstants.ASSOCIATIONID, assocId);
         List<String> asIds = new ArrayList<>();
         res.put(CameoConstants.APPLIEDSTEREOTYPEIDS, asIds);
-        res.put(CameoConstants.OLDAPPLIEDSTEREOTYPEIDS, asIds);
         res.put(CameoConstants.DOCUMENTATION, "");
         res.put(CameoConstants.MDEXTENSIONSIDS, new ArrayList());
         res.put(CameoConstants.SYNCELEMENTID, null);
