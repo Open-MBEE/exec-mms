@@ -91,7 +91,7 @@ public class TwcPermissionUtils {
 		// TODO:: add distributed caching for performance
 
 		List<String> users = null;
-		ResponseEntity<String> respEntity = getRestResponse(
+		ResponseEntity<String> respEntity = restUtils.getRestResponse(
 				TeamworkCloudEndpoints.GETPROJECTUSERS.buildUrl(twc, workspaceId, resourceId, roleId), twc);
 
 		if (respEntity == null || respEntity.getBody() == null)
@@ -116,7 +116,7 @@ public class TwcPermissionUtils {
 		//TODO:: add distributed caching for performance
 
 		Map<String, String> roleNameIDMap = new HashMap<String, String>();
-		ResponseEntity<String> respEntity = getRestResponse(TeamworkCloudEndpoints.GETROLESID.buildUrl(twc, resourceId),
+		ResponseEntity<String> respEntity = restUtils.getRestResponse(TeamworkCloudEndpoints.GETROLESID.buildUrl(twc, resourceId),
 				twc);
 
 		if (respEntity == null || respEntity.getBody() == null)
@@ -133,27 +133,6 @@ public class TwcPermissionUtils {
 		return roleNameIDMap;
 	}
 
-	/**
-	 * This method is used to establish connection twc Rest API's by calling
-	 * Teamwork cloud endpoints Time being added Admin account .Later need to
-	 * implement secure methods like CyberArk
-	 * 
-	 * @param twcRestUrl
-	 * @return
-	 */
-	private ResponseEntity<String> getRestResponse(String twcRestUrl, TeamworkCloud twc) {
-		RestTemplate restTemplate = restUtils.getRestTemplate();
-		HttpHeaders headers = restUtils.basicAuthHeader(twc.getAdminUsername(), twc.getAdminPwd());
-		ResponseEntity<String> respEntity = null;
 
-		try {
-			HttpEntity<String> entityReq = new HttpEntity<>(null, headers);
-			respEntity = restTemplate.exchange(twcRestUrl, HttpMethod.GET, entityReq, String.class);
-
-		} catch (Exception Ex) {
-			return null;
-		}
-		return respEntity;
-	}
 
 }

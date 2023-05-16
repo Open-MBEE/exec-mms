@@ -28,7 +28,7 @@ import static org.openmbee.mms.core.config.Constants.BRANCH_ID_VALID_PATTERN;
 @Tag(name = "Refs")
 public class BranchesController extends BaseController {
 
-    private BranchService branchService;
+    private final BranchService branchService;
 
     @Autowired
     public BranchesController(BranchService branchService) {

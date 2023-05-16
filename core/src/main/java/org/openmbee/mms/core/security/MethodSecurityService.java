@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import org.openmbee.mms.core.dao.GroupDAO;
 import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.dao.BranchDAO;
@@ -11,6 +12,7 @@ import org.openmbee.mms.core.dao.OrgDAO;
 import org.openmbee.mms.core.dao.ProjectDAO;
 import org.openmbee.mms.core.services.PermissionService;
 import org.openmbee.mms.core.utils.AuthenticationUtils;
+import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.data.domains.global.Organization;
 import org.openmbee.mms.data.domains.global.Project;
 import org.openmbee.mms.data.domains.scoped.Branch;
@@ -26,6 +28,7 @@ public class MethodSecurityService {
     private ProjectDAO projectRepository;
     private BranchDAO branchRepository;
     private OrgDAO orgRepository;
+    private GroupDAO groupRepository;
 
     @Autowired
     public void setPermissionService(PermissionService permissionService) {
@@ -47,6 +50,10 @@ public class MethodSecurityService {
         this.branchRepository = branchRepository;
     }
 
+    @Autowired
+    public void setGroupRepository(GroupDAO groupRepository) {
+        this.groupRepository = groupRepository;
+    }
 
     public boolean hasOrgPrivilege(Authentication authentication, String orgId, String privilege, boolean allowAnonIfPublic) {
         CompletableFuture<Boolean> permissionsFuture = CompletableFuture.supplyAsync(() ->
@@ -105,6 +112,25 @@ public class MethodSecurityService {
         return completeFutures(permissionsFuture, existsFuture, "Branch");
     }
 
+    public boolean hasGroupPrivilege(Authentication authentication, String groupName, String privilege, boolean allowAnonIfPublic) {
+        CompletableFuture<Boolean> permissionsFuture = CompletableFuture.supplyAsync(() ->
+        {
+            if (allowAnonIfPublic && permissionService.isGroupPublic(groupName)) {
+                return true;
+            }
+            if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+                return false;
+            }
+            if (permissionService.hasGroupPrivilege(privilege, authentication.getName(), AuthenticationUtils.getGroups(authentication), groupName)) {
+                return true;
+            }
+            return false;
+        });
+
+        CompletableFuture<Boolean> existsFuture = CompletableFuture.supplyAsync(() -> groupExists(groupName));
+        return completeFutures(permissionsFuture, existsFuture, "Group");
+    }
+
     private boolean orgExists(String orgId) {
         Optional<Organization> o = orgRepository.findByOrganizationId(orgId);
         return o.isPresent();
@@ -122,6 +148,11 @@ public class MethodSecurityService {
         }
         Optional<Branch> branchesOption = branchRepository.findByBranchId(branchId);
         return branchesOption.isPresent();
+    }
+
+    private boolean groupExists(String groupName) {
+        Optional<Group> g = groupRepository.findByGroupName(groupName);
+        return g.isPresent();
     }
 
     private boolean completeFutures(CompletableFuture<Boolean> permissionsFuture, CompletableFuture<Boolean> existsFuture, String context) {

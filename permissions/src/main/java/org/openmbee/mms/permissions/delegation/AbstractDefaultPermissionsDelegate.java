@@ -59,10 +59,10 @@ public abstract class AbstractDefaultPermissionsDelegate implements PermissionsD
     protected Pair<Group, Role> getGroupAndRole(PermissionUpdateRequest.Permission p) {
         Optional<Group> group = getGroupRepo().findByName(p.getName());
         Optional<Role> role = getRoleRepo().findByName(p.getRole());
-        if (!role.isPresent()) {
+        if (role.isEmpty()) {
             return Pair.of(group.orElse(null), null);
         }
-        if (!group.isPresent()) {
+        if (group.isEmpty()) {
             group = Optional.of(new Group(p.getName()));
             getGroupRepo().save(group.get());
         }
