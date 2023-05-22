@@ -6,7 +6,8 @@ import org.openmbee.mms.core.objects.PermissionUpdateRequest;
 import org.openmbee.mms.core.objects.PermissionUpdateResponse;
 import org.openmbee.mms.core.objects.PermissionUpdatesResponse;
 import org.openmbee.mms.data.domains.global.Group;
-import org.openmbee.mms.twc.TeamworkCloud;
+import org.openmbee.mms.federatedpersistence.permissions.AbstractDefaultPermissionsDelegate;
+import org.openmbee.mms.json.GroupJson;
 import org.openmbee.mms.twc.exceptions.TwcConfigurationException;
 import org.springframework.http.HttpStatus;
 
@@ -14,14 +15,19 @@ import java.util.Set;
 
 
 public class TwcGroupPermissionsDelegate implements PermissionsDelegate {
-    private final Group group;
+    private final GroupJson group;
 
-    public TwcGroupPermissionsDelegate(Group group) {
+    public TwcGroupPermissionsDelegate(GroupJson group) {
         this.group = group;
     }
 
     @Override
     public boolean hasPermission(String user, Set<String> groups, String privilege) {
+        return false;
+    }
+
+    @Override
+    public boolean hasGroupPermissions(String group, String privilege) {
         return false;
     }
 
@@ -40,7 +46,16 @@ public class TwcGroupPermissionsDelegate implements PermissionsDelegate {
 
     @Override
     public boolean setInherit(boolean isInherit) {
+        if(isInherit) {
+            throw new IllegalArgumentException("Cannot inherit permissions for a Group");
+        }
         return false;
+    }
+
+    @Override
+    public PermissionResponse getInherit() {
+        //Groups will not inherit
+        return PermissionResponse.getDefaultResponse();
     }
 
     @Override

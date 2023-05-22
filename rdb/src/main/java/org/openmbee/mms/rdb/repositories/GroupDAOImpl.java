@@ -1,6 +1,6 @@
 package org.openmbee.mms.rdb.repositories;
 
-import org.openmbee.mms.core.dao.GroupDAO;
+import org.openmbee.mms.data.dao.GroupDAO;
 import org.openmbee.mms.data.domains.global.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

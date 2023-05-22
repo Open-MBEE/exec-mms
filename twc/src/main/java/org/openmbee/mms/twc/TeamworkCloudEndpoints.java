@@ -4,7 +4,7 @@ public enum TeamworkCloudEndpoints {
     LOGIN("login"),
     GETUSER("admin/users/%s"),
     GETROLESID("resources/%s/roles"),
-    GETPROJECTUSERS("workspaces/%s/resources/%s/roles/%s/users");
+    GETPROJECTUSERS("resources/%s/roles/%s/users");
 
     private String path;
 

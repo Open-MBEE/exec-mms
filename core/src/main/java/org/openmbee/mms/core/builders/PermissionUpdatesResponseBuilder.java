@@ -62,6 +62,9 @@ public class PermissionUpdatesResponseBuilder {
         if(a == null) {
             return b;
         }
+        if(b == null) {
+            return a;
+        }
         return a || b;
     }
 }

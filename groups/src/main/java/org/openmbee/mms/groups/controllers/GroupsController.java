@@ -11,54 +11,52 @@ import java.util.stream.Stream;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.core.config.Privileges;
+import org.openmbee.mms.core.dao.GroupPersistence;
+import org.openmbee.mms.core.dao.UserGroupsPersistence;
 import org.openmbee.mms.core.exceptions.*;
 import org.openmbee.mms.core.objects.*;
 import org.openmbee.mms.core.security.MethodSecurityService;
 import org.openmbee.mms.core.services.PermissionService;
-import org.openmbee.mms.data.domains.global.Group;
-import org.openmbee.mms.data.domains.global.User;
 import org.openmbee.mms.groups.constants.GroupConstants;
 import org.openmbee.mms.groups.objects.*;
 import org.openmbee.mms.groups.services.GroupValidationService;
 import org.openmbee.mms.json.GroupJson;
-import org.openmbee.mms.rdb.repositories.GroupRepository;
-import org.openmbee.mms.rdb.repositories.UserRepository;
+import org.openmbee.mms.json.UserJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/groups")
 @Tag(name = "Groups")
-@Transactional
 public class GroupsController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected ObjectMapper om;
 
-    private GroupRepository groupRepository;
+
+    private GroupPersistence groupPersistence;
+    private UserGroupsPersistence userGroupsPersistence;
     private GroupValidationService groupValidationService;
-    private UserRepository userRepository;
 
     protected PermissionService permissionService;
 
     protected MethodSecurityService mss;
 
-    public Map<String, Object> convertToMap(Object obj) {
-        return om.convertValue(obj, new TypeReference<Map<String, Object>>() {});
+    @Autowired
+    public void setGroupPersistence(GroupPersistence groupPersistence) {
+        this.groupPersistence = groupPersistence;
     }
 
     @Autowired
-    public void setGroupRepository(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
+    public void setUserGroupsPersistence(UserGroupsPersistence userGroupsPersistence) {
+        this.userGroupsPersistence = userGroupsPersistence;
     }
 
     @Autowired
@@ -81,13 +79,7 @@ public class GroupsController {
         this.om = om;
     }
 
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
     @PreAuthorize("isAuthenticated()")
     public GroupsResponse createOrUpdateGroups(
         @RequestBody GroupsRequest groupPost,
@@ -99,7 +91,7 @@ public class GroupsController {
         }
 
         for (GroupJson group : groupPost.getGroups()) {
-
+            
             if (group.getName() == null || group.getName().isEmpty()) {
                 group.setName(UUID.randomUUID().toString());
             }
@@ -112,9 +104,9 @@ public class GroupsController {
                 throw new BadRequestException(response.addMessage("No type provided for group:" + group.getName()));
             }
 
-            Optional<Group> optG = groupRepository.findByName(group.getName());
+            Optional<GroupJson> optG = groupPersistence.findByName(group.getName());
             boolean newGroup = true;
-            Group g = new Group();
+            GroupJson g = new GroupJson();
             if (optG.isPresent()) {
                 newGroup = false;
                 g = optG.get();
@@ -122,18 +114,17 @@ public class GroupsController {
                     response.addRejection(new Rejection(group, 403, GroupConstants.NO_PERMISSSION));
                     continue;
                 }
-                if (!group.getType().equals(g.getTypeString()) && !(g.getUsers() == null || g.getUsers().isEmpty())) {
+                if (!group.getType().equals(g.getType()) && !(userGroupsPersistence.findUsersInGroup(group.getName()).isEmpty())) {
                     response.addRejection(new Rejection(group, 403, GroupConstants.GROUP_NOT_EMPTY));
                 }
             }
             g.setName(group.getName());
             g.setType(group.getType());
             logger.info("Saving group: {}", g.getName());
-            Group saved = groupRepository.save(g);
+            groupPersistence.save(g);
             if (newGroup) {
                 permissionService.initGroupPerms(group.getName(), auth.getName());
             }
-            group.merge(convertToMap(saved));
             response.getGroups().add(group);
         }
         if (groupPost.getGroups().size() == 1) {
@@ -143,67 +134,51 @@ public class GroupsController {
     }
 
     @GetMapping
-    @Transactional
     public GroupsResponse getAllGroups(
         @RequestParam(required = false) boolean users,
         Authentication auth) {
 
         GroupsResponse response = new GroupsResponse();
-        List<Group> allGroups = groupRepository.findAll();
-        for (Group group : allGroups) {
+        Collection<GroupJson> allGroups = groupPersistence.findAll();
+        for (GroupJson group : allGroups) {
             if (mss.hasGroupPrivilege(auth, group.getName(), Privileges.GROUP_READ.name(), false)) {
 
-                GroupJson groupJson = new GroupJson();
-                groupJson.merge(convertToMap(group));
-                groupJson.remove("users");
                 if (users) {
-                    Set<User> userSet = group.getUsers();
-                    Set<String> usernames = userSet.stream().map(User::getUsername).collect(Collectors.toSet());
-                    groupJson.put("users", usernames);
+                    Collection<UserJson> userSet = userGroupsPersistence.findUsersInGroup(group.getName());
+                    Set<String> usernames = userSet.stream().map(UserJson::getUsername).collect(Collectors.toSet());
+                    group.put("users", usernames);
                 }
-                response.getGroups().add(groupJson);
+                response.getGroups().add(group);
             }
         }
         return response;
     }
 
+
+
     @GetMapping(value = "/{groupName}")
-    @Transactional
     @PreAuthorize("@mss.hasGroupPrivilege(authentication, #groupName, 'GROUP_READ', true)")
-    public GroupsResponse getGroup(
+    public GroupResponse getGroup(
         @PathVariable String groupName,
         @RequestParam(required = false) boolean users
     ) {
-
-        GroupsResponse response = new GroupsResponse();
-        Optional<Group> groupOption = groupRepository.findByName(groupName);
-        if (groupOption.isEmpty()) {
-            throw new NotFoundException(response.addMessage("Group not found."));
-        }
-        Group group = groupOption.get();
-        GroupJson groupJson = new GroupJson();
-        groupJson.merge(convertToMap(group));
-        groupJson.remove("users");
         if (users) {
-            Set<User> userSet = group.getUsers();
-            Set<String> usernames = userSet.stream().map(User::getUsername).collect(Collectors.toSet());
-            groupJson.put("users", usernames);
+            return new GroupResponse(groupPersistence.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND)),
+                userGroupsPersistence.findUsersInGroup(groupName).stream().map(UserJson::getUsername).collect(Collectors.toList()));
         }
-        response.getGroups().add(groupJson);
-        return response;
+        return new GroupResponse(groupPersistence.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND)));
     }
 
     @DeleteMapping("/{groupName}")
     @PreAuthorize("@mss.hasGroupPrivilege(authentication, #groupName, 'GROUP_DELETE', false)")
     @ResponseBody
-    @Transactional
     public void deleteLocalGroup(@PathVariable String groupName) {
-        Group groupObj = groupRepository.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
+        GroupJson groupObj = groupPersistence.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
         if (groupValidationService.isRestrictedGroup(groupObj.getName())) {
             throw new BadRequestException(GroupConstants.NO_DELETE_RESTRICTED);
         }
         if (groupValidationService.canDeleteGroup(groupObj)) {
-            this.groupRepository.delete(groupObj);
+            groupPersistence.delete(groupObj);
         } else {
             throw new BadRequestException(GroupConstants.GROUP_NOT_EMPTY);
         }
@@ -211,24 +186,17 @@ public class GroupsController {
 
     @GetMapping("/{groupName}/users")
     @PreAuthorize("@mss.hasGroupPrivilege(authentication, #groupName, 'GROUP_READ', true)")
-    @Transactional
     public GroupUsersResponse getAllGroupUsers( @PathVariable String groupName) {
 
         GroupUsersResponse response = new GroupUsersResponse();
-        Set<String> usernames = new HashSet<>();
-        Group groupObj = groupRepository.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
-        if (groupObj.getType() == Group.VALID_GROUP_TYPES.REMOTE) {
-            usernames.addAll(userRepository.findAll().stream().filter(user -> (user.getGroups().contains(groupObj))).map(User::getUsername).collect(Collectors.toSet()));
-        }else {
-            usernames.addAll(groupObj.getUsers().stream().map(User::getUsername).collect(Collectors.toSet()));
-        }
+        groupPersistence.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
+        Set<String> usernames = userGroupsPersistence.findUsersInGroup(groupName).stream().map(UserJson::getUsername).collect(Collectors.toSet());
         response.getUsers().addAll(usernames);
         return response;
     }
 
     @PostMapping("/{groupName}/users")
     @PreAuthorize("@mss.hasGroupPrivilege(authentication, #groupName, 'GROUP_EDIT', true)")
-    @Transactional
     public GroupUpdateResponse updateGroupUsers(@PathVariable String groupName,
             @RequestBody GroupUpdateRequest groupUpdateRequest) {
 
@@ -245,9 +213,13 @@ public class GroupsController {
             throw new BadRequestException(GroupConstants.RESTRICTED_GROUP);
         }
 
-        Group groupObj = groupRepository.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
+        if(groupPersistence.findByName(groupName).isEmpty()) {
+            throw new NotFoundException(GroupConstants.GROUP_NOT_FOUND);
+        }
 
-        if (groupObj.getType() == Group.VALID_GROUP_TYPES.REMOTE) {
+        GroupJson groupObj = groupPersistence.findByName(groupName).orElseThrow(() -> new NotFoundException(GroupConstants.GROUP_NOT_FOUND));
+
+        if (!groupObj.getType().equals("local")) {
             throw new BadRequestException(GroupConstants.REMOTE_GROUP);
         }
 
@@ -257,29 +229,19 @@ public class GroupsController {
         response.setRejected(new ArrayList<>());
         response.setGroup(groupName);
 
-        groupUpdateRequest.getUsers().forEach(newUser -> {
-            User user = userRepository.findByUsername(newUser).orElse(null);
-            if (user != null) {
-
-                if (groupUpdateRequest.getAction() == Action.ADD) {
-                    if(groupObj.getUsers().contains(user)){
-                        response.getRejected().add(newUser);
-                        return;
-                    }
-                    user.getGroups().add(groupObj);
-                    response.getAdded().add(user.getUsername());
-                } else { //REMOVE
-                    if(!groupObj.getUsers().contains(user)){
-                        response.getRejected().add(newUser);
-                        return;
-                    }
-                    user.getGroups().remove(groupObj);
-                    response.getRemoved().add(user.getUsername());
+        groupUpdateRequest.getUsers().forEach(user -> {
+            if (groupUpdateRequest.getAction() == Action.ADD) {
+                if (!userGroupsPersistence.addUserToGroup(groupName, user)) {
+                    response.getRejected().add(user);
+                    return;
                 }
-                userRepository.save(user);
-            } else {
-                //Reject users that don't exist
-                response.getRejected().add(newUser);
+                response.getAdded().add(user);
+            } else { //REMOVE
+                if (!userGroupsPersistence.removeUserFromGroup(groupName, user)) {
+                    response.getRejected().add(user);
+                    return;
+                }
+                response.getRemoved().add(user);
             }
         });
         return response;

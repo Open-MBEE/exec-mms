@@ -5,32 +5,36 @@ import org.openmbee.mms.core.objects.PermissionResponse;
 import org.openmbee.mms.core.objects.PermissionUpdateRequest;
 import org.openmbee.mms.core.objects.PermissionUpdateResponse;
 import org.openmbee.mms.core.objects.PermissionUpdatesResponse;
-import org.openmbee.mms.data.domains.global.Branch;
+import org.openmbee.mms.json.RefJson;
 import org.openmbee.mms.twc.TeamworkCloud;
 import org.openmbee.mms.twc.exceptions.TwcConfigurationException;
 import org.openmbee.mms.twc.utilities.TwcPermissionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+@Component
+@Scope(value = "prototype")
 public class TwcBranchPermissionsDelegate implements PermissionsDelegate{
 
-	private Branch branch;
+	private RefJson branch;
 	private TeamworkCloud teamworkCloud;
 	private String workspaceId;
 	private String resourceId;
 
-	@Autowired
-	private TwcPermissionUtils twcPermissionUtils;
 
+	private TwcPermissionUtils twcPermissionUtils;
 	
-	public TwcBranchPermissionsDelegate(Branch branch, TeamworkCloud teamworkCloud, String workspaceId,
+	public TwcBranchPermissionsDelegate(RefJson branch, TeamworkCloud teamworkCloud, String workspaceId,
 			String resourceId) {
 		this.branch = branch;
 		this.teamworkCloud = teamworkCloud;
 		this.workspaceId = workspaceId;
 		this.resourceId = resourceId;
+		this.twcPermissionUtils = new TwcPermissionUtils();
 	}
 
 	@Override
@@ -45,6 +49,13 @@ public class TwcBranchPermissionsDelegate implements PermissionsDelegate{
 		
 		return hasPermission;
 	}
+
+    @Override
+    public boolean hasGroupPermissions(String group, String privilege) {
+        throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
+            "Cannot Query Group Roles.  Permissions for this branch are controlled by Teamwork Cloud ("
+                + teamworkCloud.getUrl() + ")");
+    }
 
     @Override
     public void initializePermissions(String creator) {
@@ -62,7 +73,12 @@ public class TwcBranchPermissionsDelegate implements PermissionsDelegate{
         return false;
     }
 
-	@Override
+    @Override
+    public PermissionResponse getInherit() {
+        return PermissionResponse.getDefaultResponse();
+    }
+
+    @Override
 	public void setPublic(boolean isPublic) {
 		throw new TwcConfigurationException(HttpStatus.BAD_REQUEST,
 				"Cannot Modify Permissions.  Permissions for this branch are controlled by Teamwork Cloud ("
@@ -103,7 +119,7 @@ public class TwcBranchPermissionsDelegate implements PermissionsDelegate{
 		return null;
 	}
 
-    public Branch getBranch() {
+    public RefJson getBranch() {
         return branch;
     }
 

@@ -5,7 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openmbee.mms.twc.config.TwcConfig;
-import org.openmbee.mms.users.security.DefaultUsersDetails;
+import org.openmbee.mms.users.security.DefaultUserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.servlet.FilterChain;
@@ -147,7 +147,7 @@ public class TwcAuthenticationFilterTest {
 		FilterChain chain = mock(FilterChain.class);
 		when(twcConfig.getAuthNProvider(anyString())).thenReturn(twcAuthProvider);
 		when(twcAuthProvider.getAuthentication(anyString())).thenReturn("twcUser");
-		when(twcUserDetailsService.loadUserByUsername("twcUser")).thenReturn(mock(DefaultUsersDetails.class));
+		when(twcUserDetailsService.loadUserByUsername("twcUser")).thenReturn(mock(DefaultUserDetails.class));
 
 		try {
 

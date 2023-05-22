@@ -2,16 +2,21 @@ package org.openmbee.mms.twc.security;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.openmbee.mms.data.domains.global.User;
+import org.openmbee.mms.core.exceptions.ForbiddenException;
+import org.openmbee.mms.json.GroupJson;
 import org.openmbee.mms.twc.TeamworkCloud;
 import org.openmbee.mms.twc.config.TwcConfig;
 import org.openmbee.mms.twc.exceptions.TwcConfigurationException;
 import org.openmbee.mms.twc.utilities.AdminUtils;
 import org.openmbee.mms.users.objects.UsersCreateRequest;
-import org.openmbee.mms.users.security.AbstractUsersDetailsService;
-import org.openmbee.mms.users.security.DefaultUsersDetails;
-import org.openmbee.mms.users.security.UsersDetails;
-import org.openmbee.mms.users.security.UsersDetailsService;
+import org.openmbee.mms.users.security.AbstractUserDetailsService;
+import org.openmbee.mms.users.security.DefaultUserDetails;
+import org.openmbee.mms.users.security.UserDetails;
+import org.openmbee.mms.users.security.UserDetailsService;
+import org.openmbee.mms.core.dao.UserGroupsPersistence;
+import org.openmbee.mms.core.dao.UserPersistence;
+import org.openmbee.mms.json.UserJson;
+import org.openmbee.mms.users.objects.UsersCreateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,8 +27,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 @Service
-public class TwcUserDetailsService extends AbstractUsersDetailsService implements UsersDetailsService {
-
+public class TwcUserDetailsService extends AbstractUserDetailsService implements UserDetailsService {
     private AdminUtils adminUtils;
     private TwcConfig twcConfig;
 
@@ -31,17 +35,15 @@ public class TwcUserDetailsService extends AbstractUsersDetailsService implement
     public void setTwcConfig(TwcConfig twcConfig) {
         this.twcConfig = twcConfig;
     }
-
-    @Autowired
     public void setAdminUtils(AdminUtils adminUtils) {
         this.adminUtils = adminUtils;
     }
 
     @Override
-    public UsersDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<TeamworkCloud> twcs = twcConfig.getInstances();
         JSONObject twcUser = null;
-        for (TeamworkCloud twc: twcs) {
+        for (TeamworkCloud twc : twcs) {
             twcUser = adminUtils.getUserByUsername(username, twc);
             if (twcUser != null) {
                 break;
@@ -49,22 +51,22 @@ public class TwcUserDetailsService extends AbstractUsersDetailsService implement
         }
 
         if (twcUser != null) {
-            Optional<User> user = getUserRepo().findByUsername(twcUser.getString("username"));
-            if (user.isEmpty()) {
-                User newUser = register(parseTwcRegister(twcUser));
-                user = Optional.of(newUser);
+            Optional<UserJson> userOpt = getUserPersistence().findByUsername(twcUser.getString("username"));
+            if (userOpt.isEmpty()) {
+                UserJson newUser = register(parseTwcRegister(twcUser));
+                userOpt = Optional.of(newUser);
             }
-            User u = user.get();
-            return new DefaultUsersDetails(u);
+            UserJson user = userOpt.get();
+            Collection<GroupJson> groups = getUserGroupPersistence().findGroupsAssignedToUser(username);
+            return new DefaultUserDetails(user, groups);
         }
 
         throw new UsernameNotFoundException("Username not found on any connected TWC Servers");
     }
-
-    @Override
+//    @Override
     @Transactional
-    public User register(UsersCreateRequest req) {
-        User user = new User();
+    public UserJson register(UsersCreateRequest req) {
+        UserJson user = new UserJson();
         user.setEmail(req.getEmail());
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
@@ -73,11 +75,6 @@ public class TwcUserDetailsService extends AbstractUsersDetailsService implement
         user.setAdmin(req.isAdmin());
         user.setType(req.getType());
         return saveUser(user);
-    }
-
-    @Override
-    public User saveUser(User user) {
-        return null;
     }
 
     public void changeUserPassword(String username, String password, boolean asAdmin) {
@@ -91,18 +88,8 @@ public class TwcUserDetailsService extends AbstractUsersDetailsService implement
     }
 
     @Override
-    public List<User> getUsers() {
-        return null;
-    }
-
-    @Transactional
-    public User addUser(String username) {
-        User user = new User();
-        user.setUsername(username);
-        //TODO: fill in user details from TWC
-        user.setEnabled(true);
-        user.setType("twc");
-        return saveUser(user);
+    public UserJson update(UsersCreateRequest req, UserJson user) {
+        throw new ForbiddenException("Cannot Modify User. Users for this server are controlled by Teamwork Cloud");
     }
 
     public UsersCreateRequest parseTwcRegister(JSONObject userData) {

@@ -2,10 +2,17 @@ package org.openmbee.mms.ldap.security;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
 import org.openmbee.mms.core.exceptions.ForbiddenException;
-import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.data.domains.global.User;
+import org.openmbee.mms.json.GroupJson;
+import org.openmbee.mms.json.UserJson;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
 import org.openmbee.mms.users.objects.UsersCreateRequest;
-import org.openmbee.mms.users.security.AbstractUsersDetailsService;
+import org.openmbee.mms.users.security.AbstractUserDetailsService;
+import org.openmbee.mms.users.security.UserDetails;
+import org.openmbee.mms.users.security.UserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,14 +29,9 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
 
 @Configuration
-public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
+public class LdapAuthoritiesConfig extends AbstractUserDetailsService implements UserDetailsService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -92,17 +94,17 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
                 logger.debug("Populating authorities using LDAP");
-                Optional<User> userOptional = getUserRepo().findByUsernameIgnoreCase(username);
+                Optional<UserJson> userOptional = getUserPersistence().findByUsername(username);
 
                 if (userOptional.isEmpty()) {
-                    User newUser = register(parseLdapRegister(userData));
-
+                    logger.info("No user record for {} in the userRepository, creating...", userData.getDn());
+                    UserJson newUser = register(parseLdapRegister(userData));
                     userOptional = Optional.of(newUser);
                 }
 
-                User user = userOptional.get();
-                if (user.getModified().isBefore(Instant.now().minus(userAttributesUpdate, ChronoUnit.HOURS))) {
-                    parseLdapUser(userData, user);
+                UserJson user = userOptional.get();
+                if (user.getModified() != null && Instant.parse(user.getModified()).isBefore(Instant.now().minus(userAttributesUpdate, ChronoUnit.HOURS))) {
+                    saveLdapUser(userData, user);
                 }
                 user.setPassword(null);
 
@@ -113,11 +115,10 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                     userDnBuilder.append(providerBase);
                 }
                 String userDn = userDnBuilder.toString();
-
-                List<Group> definedGroups = getGroupRepo().findAll();
+                Collection<GroupJson> definedGroups = getGroupPersistence().findAll();
                 OrFilter orFilter = new OrFilter();
 
-                for (Group definedGroup : definedGroups) {
+                for (GroupJson definedGroup : definedGroups) {
                     orFilter.or(new EqualsFilter(groupRoleAttribute, definedGroup.getName()));
                 }
 
@@ -134,33 +135,34 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
                     .searchForSingleAttributeValues(groupSearchBase, filter, new Object[]{""}, groupRoleAttribute);
                 logger.debug("LDAP search result: {}", Arrays.toString(memberGroups.toArray()));
 
-                Set<Group> addGroups = new HashSet<>();
+                getUserPersistence().save(user);
+                //Add groups to user
+
+                Set<GroupJson> addGroups = new HashSet<>();
 
                 for (String memberGroup : memberGroups) {
-                    Optional<Group> group = getGroupRepo().findByName(memberGroup);
+                    Optional<GroupJson> group = getGroupPersistence().findByName(memberGroup);
+                    group.ifPresent(g -> getUserGroupPersistence().addUserToGroup(g.getName(), user.getUsername()));
                     group.ifPresent(addGroups::add);
                 }
 
                 if (logger.isDebugEnabled()) {
                     if ((long) addGroups.size() > 0) {
-                        addGroups.forEach(group -> {
-                            logger.debug("Group received: {}", group.getName());
-                        });
+                        addGroups.forEach(group -> logger.debug("Group received: {}", group.getName()));
                     } else {
                         logger.debug("No configured groups returned from LDAP");
                     }
                 }
 
-                user.setGroups(addGroups);
-                getUserRepo().save(user);
+//                user.setGroups(addGroups);
+//                getUserRepo().save(user);
 
-               List<GrantedAuthority> auths = AuthorityUtils
-                    .createAuthorityList(addGroups.stream().map(Group::getName).distinct().toArray(String[]::new));
-                if (user.isAdmin()) {
+                List<GrantedAuthority> auths = AuthorityUtils
+                    .createAuthorityList(memberGroups.toArray(new String[0]));
+                if (Boolean.TRUE.equals(user.isAdmin())) {
                     auths.add(new SimpleGrantedAuthority(AuthorizationConstants.MMSADMIN));
                 }
                 auths.add(new SimpleGrantedAuthority(AuthorizationConstants.EVERYONE));
-
                 return auths;
             }
         }
@@ -188,16 +190,10 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
         return contextSource;
     }
 
-    @Override
-    public void changeUserPassword(String username, String password, boolean asAdmin) {
-            throw new ForbiddenException("Cannot change or set passwords for external users.");
-    }
-
 
     @Override
-    @Transactional
-    public User register(UsersCreateRequest req) {
-        User user = new User();
+    public UserJson register(UsersCreateRequest req) {
+        UserJson user = new UserJson();
         user.setEmail(req.getEmail());
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
@@ -208,7 +204,7 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
         return saveUser(user);
     }
 
-    public void parseLdapUser(DirContextOperations userData, User saveUser) {
+    private UserJson saveLdapUser(DirContextOperations userData, UserJson saveUser) {
         if (saveUser.getEmail() == null ||
             !saveUser.getEmail().equals(userData.getStringAttribute(userAttributesEmail))
         ) {
@@ -228,6 +224,8 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
         if (saveUser.getType() == null) {
             saveUser.setType("ldap");
         }
+
+        return saveUser;
     }
 
     public UsersCreateRequest parseLdapRegister(DirContextOperations userData) {
@@ -245,5 +243,20 @@ public class LdapAuthoritiesConfig extends AbstractUsersDetailsService {
     @Override
     public String encodePassword(String password) {
         throw new ForbiddenException("Cannot Modify Password. Users for this server are controlled by LDAP");
+    }
+
+    @Override
+    public UserJson update(UsersCreateRequest req, UserJson user) {
+        throw new ForbiddenException("Cannot Modify User. Users for this server are controlled by LDAP");
+    }
+
+    private UserJson createLdapUser(DirContextOperations userData) {
+        String username = userData.getStringAttribute(userAttributesUsername);
+        logger.debug("Creating user for {} using LDAP", username);
+        UserJson user = saveLdapUser(userData, new UserJson());
+        user.setUsername(username);
+        user.setEnabled(true);
+        user.setAdmin(false);
+        return getUserPersistence().save(user);
     }
 }
