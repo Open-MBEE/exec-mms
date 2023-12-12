@@ -1,7 +1,11 @@
 
 MMS Structured Data Version Control
 ===================================
- 
+
+.. image:: https://sonarcloud.io/api/project_badges/measure?project=Open-MBEE_exec-mms&metric=alert_status
+   :target: https://sonarcloud.io/summary/new_code?id=Open-MBEE_exec-mms
+   :alt: SonarCloud
+
 .. image:: https://circleci.com/gh/Open-MBEE/exec-mms.svg?style=svg
    :target: https://circleci.com/gh/Open-MBEE/exec-mms
    :alt: CircleCI
