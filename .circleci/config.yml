@@ -48,8 +48,7 @@ jobs:
                 - mms/*
 
   scan:
-      executor:
-          name: docker/docker
+      executor: openjdk_executor
       working_directory: /home/circleci/mms
       steps:
           - checkout
