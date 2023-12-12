@@ -1,14 +1,9 @@
 
 MMS Structured Data Version Control
 ===================================
-
-
-.. image:: https://img.shields.io/lgtm/grade/java/g/Open-MBEE/mms.svg?logo=lgtm&logoWidth=18
-   :target: https://lgtm.com/projects/g/Open-MBEE/mms/context:java
-   :alt: Language grade: Java
  
-.. image:: https://circleci.com/gh/Open-MBEE/mms.svg?style=svg
-   :target: https://circleci.com/gh/Open-MBEE/mms
+.. image:: https://circleci.com/gh/Open-MBEE/exec-mms.svg?style=svg
+   :target: https://circleci.com/gh/Open-MBEE/exec-mms
    :alt: CircleCI
 
 .. image:: https://readthedocs.org/projects/model-management-system/badge/?version=latest
