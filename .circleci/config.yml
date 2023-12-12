@@ -80,7 +80,7 @@ workflows:
     version: 2
     build-test-deploy:
       jobs:
-        - build_and_test:
+        - build_and_test
         - scan:
               requires:
                   - build_and_test
