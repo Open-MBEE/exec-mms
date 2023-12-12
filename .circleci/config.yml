@@ -26,7 +26,6 @@ jobs:
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose up --build -d
             docker run --network container:mms curlimages/curl --retry 8 --retry-delay 10 --retry-max-time 90 --retry-connrefused http://mms:8080/healthcheck
-            docker cp mms:/app.jar /home/circleci/mms/
 
       - run: 
           name: "Run and test Postman Collection"
@@ -54,8 +53,6 @@ jobs:
       working_directory: /home/circleci/mms
       steps:
           - checkout
-          - attach_workspace:
-                at: ~/
           - sonarcloud/scan
 
   deploy_snapshot:
@@ -86,8 +83,6 @@ workflows:
                   tags:
                       only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
         - scan:
-              requires:
-                  - build_and_test
               filters:
                   tags:
                       only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
