@@ -54,7 +54,7 @@ jobs:
           - checkout
           - run:
                 name: Build classes to scan
-                command: ./gradlew build
+                command: ./gradlew build -x test
           - sonarcloud/scan
 
   deploy_snapshot:
