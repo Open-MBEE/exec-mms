@@ -1,7 +1,9 @@
 package org.openmbee.mms.crud.services;
 
-import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -57,8 +59,8 @@ public class DefaultCommitService implements CommitService {
         }
         if (params.containsKey("maxTimestamp")) {
             try {
-                timestamp = Formats.SDF.parse(params.get("maxTimestamp")).toInstant();
-            } catch (ParseException e) {
+                timestamp = LocalDateTime.parse(params.get("maxTimestamp"), Formats.FORMATTER).toInstant(ZoneOffset.ofHours(0));
+            } catch (DateTimeParseException e) {
                 e.printStackTrace();
                 throw new BadRequestException("maxTimestamp parse error, use " +
                     Formats.FORMATTER.format(Instant.now()) + " as example");

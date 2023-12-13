@@ -56,11 +56,11 @@ public class PermissionUpdatesResponseBuilder {
     }
 
     private Boolean or(Boolean a, Boolean b) {
-        if(a == b) {
-            return a;
-        }
         if(a == null) {
             return b;
+        }
+        if(a.equals(b) {
+            return a;
         }
         return a || b;
     }

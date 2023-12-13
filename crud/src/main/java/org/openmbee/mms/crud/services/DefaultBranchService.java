@@ -92,13 +92,13 @@ public class DefaultBranchService implements BranchService {
         ContextHolder.setContext(projectId);
         RefsResponse branchesResponse = new RefsResponse();
         Optional<Branch> branchesOption = this.branchRepository.findByBranchId(id);
-        if (!branchesOption.isPresent()) {
+        if (branchesOption.isEmpty()) {
             throw new NotFoundException(branchesResponse);
         }
         Branch b = branchesOption.get();
         List<RefJson> refs = new ArrayList<>();
         Optional<RefJson> refOption = branchIndex.findById(b.getDocId());
-        if (!refOption.isPresent()) {
+        if (refOption.isEmpty()) {
             logger.error("DefaultBranchService: JSON Not found for {} with docId: {}",
                 b.getBranchId(), b.getDocId());
             throw new NotFoundException(branchesResponse);
@@ -171,7 +171,7 @@ public class DefaultBranchService implements BranchService {
             for (Node n: nodeRepository.findAllByDeleted(false)) {
                 docIds.add(n.getDocId());
             }
-            try { nodeIndex.addToRef(docIds); } catch(Exception e) {}
+            try { nodeIndex.addToRef(docIds); } catch(Exception ignored) {}
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(projectId, branch.getId(), "branch_created", branch)));
             return branch;
@@ -189,7 +189,7 @@ public class DefaultBranchService implements BranchService {
             throw new BadRequestException(branchesResponse.addMessage("Cannot delete master"));
         }
         Optional<Branch> branch = this.branchRepository.findByBranchId(id);
-        if (!branch.isPresent()) {
+        if (branch.isEmpty()) {
             throw new NotFoundException(branchesResponse);
         }
         Branch b = branch.get();

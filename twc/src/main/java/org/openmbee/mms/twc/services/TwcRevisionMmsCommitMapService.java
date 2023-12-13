@@ -15,7 +15,8 @@ import org.openmbee.mms.twc.constants.TwcConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service("twcRevisionMmsCommitMapService")
@@ -68,7 +69,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
         List<CommitJson> commits = new ArrayList<>();
         ContextHolder.setContext(projectId);
         Optional<Branch> ref = branchRepository.findByBranchId(refId);
-        if (!ref.isPresent()) {
+        if (ref.isEmpty()) {
             throw new NotFoundException("Branch not found");
         }
         try {
@@ -78,7 +79,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
                 commitIds.add(commit.getCommitId());
             });
             List<CommitJson> commitJsonList = commitIndex.findAllById(commitIds);
-            if (null != commitJsonList && commitJsonList.size() > 0) {
+            if (null != commitJsonList && !commitJsonList.isEmpty()) {
                 commitJsonList.stream().forEach(commitJsonData -> {
                     if (commitJsonData.containsKey(TwcConstants.TWCREVISIONID)) {
                         commits.add(commitJsonData);
@@ -109,10 +110,10 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
         @Override
         public int compare(CommitJson o, CommitJson t1) {
             try {
-                Date d1 = Formats.SDF.parse((String) o.get(CommitJson.CREATED));
-                Date d2 = Formats.SDF.parse((String) t1.get(CommitJson.CREATED));
+                LocalDateTime d1 = LocalDateTime.parse((String) o.get(CommitJson.CREATED), Formats.FORMATTER);
+                LocalDateTime d2 = LocalDateTime.parse((String) t1.get(CommitJson.CREATED), Formats.FORMATTER);
                 return ascending ? d1.compareTo(d2) : d2.compareTo(d1);
-            } catch (ParseException e) {
+            } catch (DateTimeParseException e) {
                 logger.error("Error parsing commit dates: " + e.getMessage());
                 throw new InternalErrorException("Invalid commit created dates.");
             }
