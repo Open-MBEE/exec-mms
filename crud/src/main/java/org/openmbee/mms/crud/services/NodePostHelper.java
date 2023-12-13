@@ -1,7 +1,7 @@
 package org.openmbee.mms.crud.services;
 
-import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,13 +39,13 @@ public class NodePostHelper extends NodeOperation {
         Object existingModified = existing.get(BaseJson.MODIFIED);
         if (jsonModified != null && !jsonModified.isEmpty() && existingModified != null) {
             try {
-                Date jsonModDate = Formats.SDF.parse(jsonModified);
-                Date existingModDate = Formats.SDF.parse(existingModified.toString());
-                if (jsonModDate.before(existingModDate)) {
+                LocalDateTime jsonModDate = LocalDateTime.parse(jsonModified, Formats.FORMATTER);
+                LocalDateTime existingModDate = LocalDateTime.parse(existingModified.toString(), Formats.FORMATTER);
+                if (jsonModDate.isBefore(existingModDate)) {
                     info.addRejection(element.getId(), new Rejection(element, 409, "Conflict Detected"));
                     return false;
                 }
-            } catch (ParseException e) {
+            } catch (DateTimeParseException e) {
                 logger.info("date parse exception:" + jsonModified + " " + existingModified);
             }
         }

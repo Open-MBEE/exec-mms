@@ -15,7 +15,8 @@ import org.openmbee.mms.twc.constants.TwcConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service("twcRevisionMmsCommitMapService")
@@ -109,10 +110,10 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
         @Override
         public int compare(CommitJson o, CommitJson t1) {
             try {
-                Date d1 = Formats.SDF.parse((String) o.get(CommitJson.CREATED));
-                Date d2 = Formats.SDF.parse((String) t1.get(CommitJson.CREATED));
+                LocalDateTime d1 = LocalDateTime.parse((String) o.get(CommitJson.CREATED), Formats.FORMATTER);
+                LocalDateTime d2 = LocalDateTime.parse((String) t1.get(CommitJson.CREATED), Formats.FORMATTER);
                 return ascending ? d1.compareTo(d2) : d2.compareTo(d1);
-            } catch (ParseException e) {
+            } catch (DateTimeParseException e) {
                 logger.error("Error parsing commit dates: " + e.getMessage());
                 throw new InternalErrorException("Invalid commit created dates.");
             }
