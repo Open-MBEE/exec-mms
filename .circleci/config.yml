@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
     docker: circleci/docker@2.1.1
+    sonarcloud: sonarsource/sonarcloud@2.0.0
 executors:
   openjdk_executor:
     docker:
@@ -46,6 +47,16 @@ jobs:
             paths:
                 - mms/*
 
+  scan:
+      executor: openjdk_executor
+      working_directory: /home/circleci/mms
+      steps:
+          - checkout
+          - run:
+                name: Build classes to scan
+                command: ./gradlew build -x test
+          - sonarcloud/scan
+
   deploy_snapshot:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
@@ -73,6 +84,12 @@ workflows:
               filters:
                   tags:
                       only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
+        - scan:
+              filters:
+                  tags:
+                      only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
+              context:
+                  - SonarCloud
         - deploy_snapshot:
               requires:
                   - build_and_test
