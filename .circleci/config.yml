@@ -52,6 +52,9 @@ jobs:
       working_directory: /home/circleci/mms
       steps:
           - checkout
+          - run:
+                name: Build classes to scan
+                command: ./gradlew build
           - sonarcloud/scan
 
   deploy_snapshot:
