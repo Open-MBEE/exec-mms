@@ -69,7 +69,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
         List<CommitJson> commits = new ArrayList<>();
         ContextHolder.setContext(projectId);
         Optional<Branch> ref = branchRepository.findByBranchId(refId);
-        if (!ref.isPresent()) {
+        if (ref.isEmpty()) {
             throw new NotFoundException("Branch not found");
         }
         try {
@@ -79,7 +79,7 @@ public class TwcRevisionMmsCommitMapService extends DefaultNodeService implement
                 commitIds.add(commit.getCommitId());
             });
             List<CommitJson> commitJsonList = commitIndex.findAllById(commitIds);
-            if (null != commitJsonList && commitJsonList.size() > 0) {
+            if (null != commitJsonList && !commitJsonList.isEmpty()) {
                 commitJsonList.stream().forEach(commitJsonData -> {
                     if (commitJsonData.containsKey(TwcConstants.TWCREVISIONID)) {
                         commits.add(commitJsonData);
