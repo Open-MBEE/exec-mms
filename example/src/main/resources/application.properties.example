@@ -51,6 +51,8 @@ spring.main.allow-circular-references=true
 spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #Configuration for Elasticsearch
+# elasticsearch.username=
+# elasticsearch.password=
 elasticsearch.host=localhost
 elasticsearch.port=9200
 elasticsearch.http=http
