@@ -1,3 +1,5 @@
+# elasticsearch.username=
+# elasticsearch.password=
 elasticsearch.host=localhost
 elasticsearch.port=9200
 elasticsearch.http=http
