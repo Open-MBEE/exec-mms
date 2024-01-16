@@ -1,0 +1,10 @@
+# opensearch.username=
+# opensearch.password=
+opensearch.host=localhost
+opensearch.port=9200
+opensearch.http=http
+opensearch.limit.result=100
+opensearch.limit.term=100
+opensearch.limit.scrollTimeout=1000
+opensearch.limit.get=100000
+opensearch.limit.index=5000

@@ -1,0 +1,70 @@
+{
+
+        "properties": {
+            "added": {
+                "properties": {
+                    "id": {
+                        "type": "keyword"
+                    },
+                    "_docId": {
+                        "type": "keyword"
+                    },
+                    "type": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "updated": {
+                "properties": {
+                    "id": {
+                        "type": "keyword"
+                    },
+                    "_docId": {
+                        "type" :"keyword"
+                    },
+                    "_previousDocId": {
+                        "type": "keyword"
+                    },
+                    "type": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "deleted": {
+                "properties": {
+                    "id": {
+                        "type": "keyword"
+                    },
+                    "_previousDocId": {
+                        "type": "keyword"
+                    },
+                    "type": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "id": {
+                "type": "keyword"
+            },
+            "_refId": {
+                "type": "keyword"
+            },
+            "_creator": {
+                "type": "keyword"
+            },
+            "_created": {
+                "type": "date",
+                "format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            },
+            "_projectId": {
+                "type": "keyword"
+            },
+            "_docId": {
+                "type": "keyword"
+            },
+            "type": {
+                "type": "keyword"
+            }
+        }
+
+}

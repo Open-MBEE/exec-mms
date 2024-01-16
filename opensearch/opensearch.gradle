@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':core')
+    implementation project(':search')
+
+    implementation "org.opensearch.client:opensearch-rest-high-level-client:$opensearchVersion"
+
+    testImplementation commonDependencies.'spring-boot-starter-test'
+}

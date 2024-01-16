@@ -1,0 +1,156 @@
+{
+
+        "properties": {
+            "metadata": {
+                "properties":{
+                    "kernel_info": {
+                        "properties": {
+                            "name": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "language_info": {
+                        "properties": {
+                            "name": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "scrolled": {
+                        "type": "keyword"
+                    },
+                    "collapsed": {
+                        "type": "boolean"
+                    },
+                    "format": {
+                        "type": "keyword"
+                    },
+                    "authors": {
+                        "properties": {
+                            "name": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "tags": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "nbformat": {
+                "type": "integer"
+            },
+            "nbformat_minor": {
+                "type": "integer"
+            },
+            "cells": {
+                "type": "keyword"
+            },
+
+            "cell_type": {
+                "type": "keyword"
+            },
+            "execution_count": {
+                "type": "integer"
+            },
+            "source": {
+                "type": "text"
+            },
+            "outputs": {
+                "properties": {
+                    "output_type": {
+                        "type": "keyword"
+                    },
+                    "name": {
+                        "type": "keyword"
+                    },
+                    "text": {
+                        "type": "text"
+                    },
+                    "execution_count": {
+                        "type": "integer"
+                    },
+                    "data": {
+                        "properties": {
+                            "text/plain": {
+                                "type": "text"
+                            },
+                            "image/png": {
+                                "type": "binary"
+                            },
+                            "application/json": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "metadata": {
+                        "properties": {
+                            "image/png": {
+                                "properties": {
+                                    "width": {
+                                        "type": "integer"
+                                    },
+                                    "height": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "ename": {
+                        "type": "keyword"
+                    },
+                    "evalue": {
+                        "type": "text"
+                    },
+                    "traceback": {
+                        "type": "text"
+                    }
+                }
+            },
+            "attachments": {
+                "type": "object"
+            },
+
+            "id": {
+                "type": "keyword"
+            },
+            "type": {
+                "type": "keyword"
+            },
+            "_creator": {
+                "type": "keyword"
+            },
+            "_modifier": {
+                "type": "keyword"
+            },
+            "_created": {
+                "type": "date",
+                "format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            },
+            "_modified": {
+                "type": "date",
+                "format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            },
+            "_docId": {
+                "type": "keyword"
+            },
+            "_projectId": {
+                "type": "keyword"
+            },
+            "_refId": {
+                "type": "keyword"
+            },
+            "_inRefIds": {
+                "type": "keyword"
+            },
+            "_commitId": {
+                "type": "keyword"
+            }
+        }
+
+}
