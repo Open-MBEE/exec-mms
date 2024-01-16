@@ -51,8 +51,6 @@ spring.main.allow-circular-references=true
 spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #Configuration for Elasticsearch
-# elasticsearch.username=
-# elasticsearch.password=
 elasticsearch.host=localhost
 elasticsearch.port=9200
 elasticsearch.http=http
@@ -64,6 +62,10 @@ elasticsearch.limit.scrollTimeout=1000
 elasticsearch.limit.get=100000
 elasticsearch.limit.index=5000
 elasticsearch.limit.commit=100000
+
+#optional Elasticsearch Basic Authentication Credentials
+elasticsearch.username=
+elasticsearch.password=
 
 #Configuration for TWC
 #port is for REST interface
