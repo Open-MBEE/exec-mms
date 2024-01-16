@@ -37,7 +37,7 @@ public class ElasticsearchConfig {
         RestClientBuilder builder = RestClient.builder(new HttpHost(elasticsearchHost, elasticsearchPort, elasticsearchHttp));
         builder.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(10000).setSocketTimeout(1000000));
 
-        if (! elasticsearchPassword.isEmpty() && ! elasticsearchUsername.isEmpty()) {
+        if (elasticsearchPassword != null && elasticsearchUsername != null && !elasticsearchPassword.isEmpty() && !elasticsearchUsername.isEmpty()) {
             final CredentialsProvider credentialsProvider =
                 new BasicCredentialsProvider();
             credentialsProvider.setCredentials(AuthScope.ANY,
@@ -53,7 +53,8 @@ public class ElasticsearchConfig {
         }
         
 
-        return new RestHighLevelClient(builder);
+        RestHighLevelClient client = new RestHighLevelClient(builder);
+        return client;
     }
 
 }
