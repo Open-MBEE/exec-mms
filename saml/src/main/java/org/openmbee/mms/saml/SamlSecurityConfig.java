@@ -1,5 +1,6 @@
 package org.openmbee.mms.saml;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,10 @@ public class SamlSecurityConfig {
 
         return (responseToken) -> {
             Saml2Authentication authentication = delegate.convert(responseToken);
+            if (authentication == null || authentication.getPrincipal() == null) {
+                return new Saml2Authentication(() -> null, null, null);
+            }
+
             Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) authentication.getPrincipal();
             List<String> groups = principal.getAttribute("groups");
             Set<GrantedAuthority> authorities = new HashSet<>();
