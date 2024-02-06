@@ -114,7 +114,12 @@ public class DefaultBranchService implements BranchService {
     public RefJson createBranch(String projectId, RefJson branch) {
         Instant now = Instant.now();
         ContextHolder.setContext(projectId);
-        Branch b = new Branch();
+
+        Optional<Branch> branchesOption = this.branchRepository.findByBranchId(branch.getId());
+        Branch b = branchesOption.orElseGet(Branch::new);
+        if (b.isDeleted()) {
+            throw new BadRequestException("Bad Request Error: Branch was previously deleted.");
+        }
 
         b.setBranchId(branch.getId());
         b.setBranchName(branch.getName());

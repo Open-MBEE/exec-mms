@@ -52,7 +52,7 @@ public class DefaultArtifactService implements ArtifactService {
         NodeService nodeService = getNodeService(projectId);
         ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
 
-        ArtifactJson artifact = getExistingArtifact(ArtifactJson.getArtifacts(elementJson), params);
+        ArtifactJson artifact = getExistingArtifact(ArtifactJson.getArtifacts(elementJson), params, elementJson);
         byte[] data = artifactStorage.get(artifact.getLocation(), elementJson, artifact.getMimeType());
         ArtifactResponse response = new ArtifactResponse();
         response.setData(data);
@@ -99,7 +99,7 @@ public class DefaultArtifactService implements ArtifactService {
         ElementJson elementJson = getElement(nodeService, projectId, refId, id, params);
 
         List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
-        ArtifactJson artifact = getExistingArtifact(artifacts, params);
+        ArtifactJson artifact = getExistingArtifact(artifacts, params, elementJson);
         artifacts.remove(artifact);
         ArtifactJson.setArtifacts(elementJson, artifacts);
         ElementsRequest elementsRequest = new ElementsRequest();
@@ -124,7 +124,7 @@ public class DefaultArtifactService implements ArtifactService {
         List<ArtifactJson> artifacts = ArtifactJson.getArtifacts(elementJson);
         ArtifactJson artifact;
         try {
-            artifact = getExistingArtifact(artifacts, mimeType, null);
+            artifact = getExistingArtifact(artifacts, mimeType, null, elementJson);
         } catch(NotFoundException ex) {
             artifact = new ArtifactJson();
             artifacts.add(artifact);
@@ -140,11 +140,11 @@ public class DefaultArtifactService implements ArtifactService {
         return elementJson;
     }
 
-    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, Map<String, String> params) {
-        return getExistingArtifact(artifacts, params.get(ArtifactConstants.MIMETYPE_PARAM), params.get(ArtifactConstants.EXTENSION_PARAM));
+    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, Map<String, String> params, ElementJson element) {
+        return getExistingArtifact(artifacts, params.get(ArtifactConstants.MIMETYPE_PARAM), params.get(ArtifactConstants.EXTENSION_PARAM), element);
     }
 
-    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, String mimeType, String extension) {
+    private ArtifactJson getExistingArtifact(List<ArtifactJson> artifacts, String mimeType, String extension, ElementJson element) {
         if(mimeType == null && extension == null) {
             throw new BadRequestException("Missing mimetype or extension");
         }
@@ -155,7 +155,7 @@ public class DefaultArtifactService implements ArtifactService {
         if(existing.isPresent()) {
             return existing.get();
         }
-        throw new NotFoundException("Artifact not found");
+        throw new NotFoundException(element);
     }
 
     private String getFileExtension(MultipartFile file) {

@@ -19,14 +19,14 @@ sys.setrecursionlimit(1500)
 
 # -- Project information -----------------------------------------------------
 
-project = 'Model Management System'
+project = 'Model Management System (MMS 4)'
 copyright = '2020, OpenMBEE'
 author = 'OpenMBEE'
 
 master_doc = 'index'
 
 # The full version, including alpha/beta/rc tags
-release = '4.0.0'
+release = '4.0.19'
 
 
 # -- General configuration ---------------------------------------------------

@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.openmbee.mms.core.config.AuthorizationConstants;
-import org.openmbee.mms.data.domains.global.Base;
 import org.openmbee.mms.data.domains.global.Group;
 import org.openmbee.mms.rdb.repositories.GroupRepository;
 import org.openmbee.mms.rdb.repositories.UserRepository;
@@ -20,15 +19,21 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.*;
+import org.springframework.ldap.support.LdapEncoder;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.ldap.LdapAuthenticationProviderConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
+import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.naming.Context;
 
 @Configuration
 @Conditional(LdapCondition.class)
@@ -36,6 +41,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class LdapSecurityConfig {
 
     private static Logger logger = LoggerFactory.getLogger(LdapSecurityConfig.class);
+
+    @Value("${ldap.ad.enabled:false}")
+    private Boolean adEnabled;
+
+    @Value("${ldap.ad.domain:#{null}}")
+    private String adDomain;
 
     @Value("${ldap.provider.url:#{null}}")
     private String providerUrl;
@@ -49,8 +60,8 @@ public class LdapSecurityConfig {
     @Value("${ldap.provider.base:#{null}}")
     private String providerBase;
 
-    @Value("${ldap.user.dn.pattern:uid={0}}")
-    private String userDnPattern;
+    @Value("#{'${ldap.user.dn.pattern:uid={0}}'.split(';')}")
+    private List<String> userDnPattern;
 
     @Value("${ldap.user.attributes.username:uid}")
     private String userAttributesUsername;
@@ -76,6 +87,12 @@ public class LdapSecurityConfig {
     @Value("${ldap.group.search.filter:(uniqueMember={0})}")
     private String groupSearchFilter;
 
+    @Value("${ldap.user.search.base:#{''}}")
+    private String userSearchBase;
+
+    @Value("${ldap.user.search.filter:(uid={0})}")
+    private String userSearchFilter;
+
     private UserRepository userRepository;
     private GroupRepository groupRepository;
 
@@ -100,11 +117,21 @@ public class LdapSecurityConfig {
             We  redefine our own LdapAuthoritiesPopulator which need ContextSource().
             We need to delegate the creation of the contextSource out of the builder-configuration.
         */
-            auth.ldapAuthentication().userDnPatterns(userDnPattern).groupSearchBase(groupSearchBase)
-                .groupRoleAttribute(groupRoleAttribute).groupSearchFilter(groupSearchFilter)
-                .rolePrefix("")
-                .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator)
-                .contextSource(contextSource);
+            if (adEnabled) {
+                auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
+            } else {
+                String[] userPatterns = userDnPattern.toArray(new String[0]);
+                LdapAuthenticationProviderConfigurer<AuthenticationManagerBuilder> authProviderConfigurer = auth.ldapAuthentication();
+                authProviderConfigurer.userDnPatterns(userPatterns);
+                authProviderConfigurer.userSearchBase(userSearchBase);
+                authProviderConfigurer.userSearchFilter(userSearchFilter);
+                authProviderConfigurer.groupSearchBase(groupSearchBase);
+                authProviderConfigurer.groupRoleAttribute(groupRoleAttribute);
+                authProviderConfigurer.groupSearchFilter(groupSearchFilter);
+                authProviderConfigurer.rolePrefix("");
+                authProviderConfigurer.ldapAuthoritiesPopulator(ldapAuthoritiesPopulator);
+                authProviderConfigurer.contextSource(contextSource);
+            }
         }
     }
 
@@ -117,7 +144,7 @@ public class LdapSecurityConfig {
          */
         class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
-            SpringSecurityLdapTemplate ldapTemplate;
+            final SpringSecurityLdapTemplate ldapTemplate;
 
             private CustomLdapAuthoritiesPopulator(BaseLdapPathContextSource ldapContextSource) {
                 ldapTemplate = new SpringSecurityLdapTemplate(ldapContextSource);
@@ -127,9 +154,10 @@ public class LdapSecurityConfig {
             public Collection<? extends GrantedAuthority> getGrantedAuthorities(
                 DirContextOperations userData, String username) {
                 logger.debug("Populating authorities using LDAP");
-                Optional<User> userOptional = userRepository.findByUsername(username);
+                Optional<User> userOptional = userRepository.findByUsernameIgnoreCase(username);
 
                 if (userOptional.isEmpty()) {
+                    logger.info("No user record for {} in the userRepository, creating...", userData.getDn());
                     User newUser = createLdapUser(userData);
                     userOptional = Optional.of(newUser);
                 }
@@ -157,12 +185,13 @@ public class LdapSecurityConfig {
 
                 AndFilter andFilter = new AndFilter();
                 HardcodedFilter groupsFilter = new HardcodedFilter(
-                    groupSearchFilter.replace("{0}", userDn));
+                    groupSearchFilter.replace("{0}", LdapEncoder.filterEncode(userDn)));
                 andFilter.and(groupsFilter);
                 andFilter.and(orFilter);
 
                 String filter = andFilter.encode();
                 logger.debug("Searching LDAP with filter: {}", filter);
+
                 Set<String> memberGroups = ldapTemplate
                     .searchForSingleAttributeValues(groupSearchBase, filter, new Object[]{""}, groupRoleAttribute);
                 logger.debug("LDAP search result: {}", Arrays.toString(memberGroups.toArray()));
@@ -172,6 +201,17 @@ public class LdapSecurityConfig {
                     Optional<Group> group = groupRepository.findByName(memberGroup);
                     group.ifPresent(addGroups::add);
                 }
+
+                if (logger.isDebugEnabled()) {
+                    if ((long) addGroups.size() > 0) {
+                        addGroups.forEach(group -> {
+                            logger.debug("Group received: {}", group.getName());
+                        });
+                    } else {
+                        logger.debug("No configured groups returned from LDAP");
+                    }
+                }
+
                 user.setGroups(addGroups);
                 userRepository.save(user);
 
@@ -190,12 +230,38 @@ public class LdapSecurityConfig {
     }
 
     @Bean
-    public BaseLdapPathContextSource contextSource() {
-        DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
-            providerUrl);
+    public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
+        ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(adDomain, providerUrl, providerBase);
+
+        Hashtable<String, Object> env = new Hashtable<>();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, providerUrl);
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_PRINCIPAL, providerUserDn);
+        env.put(Context.SECURITY_CREDENTIALS, providerPassword);
+
+        provider.setContextEnvironmentProperties(env);
+
+        provider.setSearchFilter(userSearchFilter);
+        provider.setConvertSubErrorCodesToExceptions(true);
+        provider.setUseAuthenticationRequestCredentials(true);
+        return provider;
+    }
+
+    @Bean
+    public LdapContextSource contextSource() {
+        LdapContextSource contextSource = new LdapContextSource();
+
+        logger.debug("Initializing LDAP ContextSource with the following values: ");
+
+        contextSource.setUrl(providerUrl);
+        contextSource.setBase(providerBase);
         contextSource.setUserDn(providerUserDn);
         contextSource.setPassword(providerPassword);
-        contextSource.setBase(providerBase);
+
+        logger.debug("BaseLdapPath: " + contextSource.getBaseLdapPathAsString());
+        logger.debug("UserDn: " + contextSource.getUserDn());
+
         return contextSource;
     }
 
