@@ -1,18 +1,19 @@
 version: 2.1
 orbs:
-  node: circleci/node@1.1.6
+    docker: circleci/docker@2.1.1
+    sonarcloud: sonarsource/sonarcloud@2.0.0
 executors:
-    openjdk_executor:
-        docker:
-            - image: circleci/openjdk:11.0.8-jdk
-        environment:
-            _JAVA_OPTIONS: "-Xmx3g"
-            GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  openjdk_executor:
+    docker:
+      - image: cimg/openjdk:17.0.3
+    environment:
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 jobs:
   build_and_test:
     executor:
-      name: node/default
+      name: docker/docker
     working_directory: /home/circleci/mms
     steps:
       - checkout
@@ -23,7 +24,7 @@ jobs:
           name: "Create and start all services from the docker-compose configuration"
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            docker-compose up -d
+            docker-compose up --build -d
             docker run --network container:mms curlimages/curl --retry 8 --retry-delay 10 --retry-max-time 90 --retry-connrefused http://mms:8080/healthcheck
 
       - run: 
@@ -46,6 +47,16 @@ jobs:
             paths:
                 - mms/*
 
+  scan:
+      executor: openjdk_executor
+      working_directory: /home/circleci/mms
+      steps:
+          - checkout
+          - run:
+                name: Build classes to scan
+                command: ./gradlew build -x test
+          - sonarcloud/scan
+
   deploy_snapshot:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
@@ -54,7 +65,7 @@ jobs:
                 at: ~/
           - run:
                 name: Deploy snapshot to sonatype
-                command: echo "CircleCI publishing not implemented yet."
+                command: ./gradlew -PossrhUsername=$OSSRH_USERNAME -PossrhPassword=$OSSRH_PASSWORD -PsigningKey="$SIGNING_KEY" -PsigningPassword=$SIGNING_PASSWORD publish
   deploy_release:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
@@ -62,8 +73,8 @@ jobs:
           - attach_workspace:
                 at: ~/
           - run:
-                name: Deploy release to Bintray
-                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY --info --stacktrace bintrayUpload
+                name: Deploy release to sonatype
+                command: ./gradlew -PbuildNumber=$CIRCLE_BUILD_NUM -PbuildTag=$CIRCLE_TAG -PossrhUsername=$OSSRH_USERNAME -PossrhPassword=$OSSRH_PASSWORD -PsigningKey="$SIGNING_KEY" -PsigningPassword=$SIGNING_PASSWORD --info --stacktrace publish
 
 workflows:
     version: 2
@@ -73,6 +84,12 @@ workflows:
               filters:
                   tags:
                       only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
+        - scan:
+              filters:
+                  tags:
+                      only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
+              context:
+                  - SonarCloud
         - deploy_snapshot:
               requires:
                   - build_and_test

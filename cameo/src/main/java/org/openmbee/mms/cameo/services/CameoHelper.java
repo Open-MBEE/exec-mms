@@ -49,6 +49,9 @@ public class CameoHelper {
 
     public boolean isView(ElementJson e) {
         List<String> sids = (List)e.get(CameoConstants.APPLIEDSTEREOTYPEIDS);
+        if (sids == null) {
+            sids = (List)e.get(CameoConstants.OLDAPPLIEDSTEREOTYPEIDS);
+        }
         if (sids != null && !sids.isEmpty()) {
             Set<String> ids = new HashSet<>(sids);
             ids.retainAll(CameoConstants.VIEWSIDS);
@@ -59,6 +62,9 @@ public class CameoHelper {
 
     public boolean isDocument(ElementJson e) {
         List<String> sids = (List)e.get(CameoConstants.APPLIEDSTEREOTYPEIDS);
+        if (sids == null) {
+            sids = (List)e.get(CameoConstants.OLDAPPLIEDSTEREOTYPEIDS);
+        }
         if (sids != null && sids.contains(CameoConstants.DOCUMENTSID)) {
             return true;
         }
@@ -88,7 +94,6 @@ public class CameoHelper {
         res.put(CameoConstants.DOCUMENTATION, "");
         res.put(CameoConstants.MDEXTENSIONSIDS, new ArrayList());
         res.put(CameoConstants.SYNCELEMENTID, null);
-        res.put(CameoConstants.APPLIEDSTEREOTYPEINSTANCEID, null);
         res.put(CameoConstants.CLIENTDEPENDENCYIDS, new ArrayList());
         res.put(CameoConstants.SUPPLIERDEPENDENCYIDS, new ArrayList());
         res.put(CameoConstants.VISIBILITY, "private");
@@ -135,7 +140,6 @@ public class CameoHelper {
         association.put(CameoConstants.MDEXTENSIONSIDS, new ArrayList());
         association.put(CameoConstants.SYNCELEMENTID, null);
         association.put(CameoConstants.APPLIEDSTEREOTYPEIDS, new ArrayList());
-        association.put(CameoConstants.APPLIEDSTEREOTYPEINSTANCEID, null);
         association.put(CameoConstants.CLIENTDEPENDENCYIDS, new ArrayList());
         association.put(CameoConstants.SUPPLIERDEPENDENCYIDS, new ArrayList());
         association.put(CameoConstants.NAMEEXPRESSION, null);

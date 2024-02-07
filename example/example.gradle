@@ -46,4 +46,7 @@ configurations {
         it.outgoing.artifact(bootJar)
     }
 }
+bootJar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
 ext['elasticsearch.version'] = "$elasticVersion"

@@ -118,17 +118,21 @@ public class DefaultNodeService implements NodeService {
         String commitId = params.getOrDefault("commitId", null);
         ContextHolder.setContext(projectId, refId);
         List<Node> nodes;
+        String resCommitId;
         if (commitId != null && !commitId.isEmpty()) {
             if (!commitRepository.findByCommitId(commitId).isPresent()) {
                 throw new BadRequestException("commit id is invalid");
             }
             nodes = nodeRepository.findAll();
+            resCommitId = commitId;
         } else {
             nodes = nodeRepository.findAllByDeleted(false);
+            resCommitId = nodeGetHelper.getLatestRefCommitId();
         }
         String separator = "\n";
         if (!"application/x-ndjson".equals(accept)) {
-            stream.write("{\"elements\":[".getBytes(StandardCharsets.UTF_8));
+            String intro = "{\"commitId\":" + (resCommitId == null ? "null" : "\"" + resCommitId + "\"") + ",\"elements\":[";
+            stream.write(intro.getBytes(StandardCharsets.UTF_8));
             separator = ",";
         }
         final String sep = separator;
@@ -146,6 +150,7 @@ public class DefaultNodeService implements NodeService {
                     .getBytes(StandardCharsets.UTF_8));
             } catch (IOException ioe) {
                 logger.error("Error writing to stream", ioe);
+                throw new InternalErrorException("Error writing to stream.");
             }
         });
         if (!"application/x-ndjson".equals(accept)) {
@@ -173,7 +178,12 @@ public class DefaultNodeService implements NodeService {
 
             ElementsResponse response = new ElementsResponse();
             String commitId = params.getOrDefault("commitId", null);
-            response.getElements().addAll(getNodeGetHelper().processGetAll(commitId, this));
+            response.getElements().addAll(nodeGetHelper.processGetAll(commitId, this));
+            if (commitId != null) {
+                response.setCommitId(commitId);
+            } else {
+                response.setCommitId(nodeGetHelper.getLatestRefCommitId());
+            }
             return response;
         }
     }
@@ -190,6 +200,7 @@ public class DefaultNodeService implements NodeService {
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
+        response.setCommitId(info.getCommitId());
         return response;
     }
 
@@ -202,17 +213,28 @@ public class DefaultNodeService implements NodeService {
         NodePostHelper nodePostHelper = getNodePostHelper();
         nodePostHelper.setPreserveTimestamps(Boolean.parseBoolean(params.get("preserveTimestamps")));
         String commitId = params.get("commitId");
+        String lastCommitId = req.getLastCommitId();
 
         NodeChangeInfo info = nodePostHelper
             .processPostJson(req.getElements(), overwriteJson,
-                createCommit(user, refId, projectId, req, commitId), this);
+                createCommit(user, refId, projectId, req, commitId), this, lastCommitId);
+
+        if (req.getDeletes() != null && !req.getDeletes().isEmpty()) {
+            NodeChangeInfo delete = nodeDeleteHelper.processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
+            info.getCommitJson().getDeleted().addAll(delete.getCommitJson().getDeleted());
+            info.getDeletedMap().putAll(delete.getDeletedMap());
+            info.getToSaveNodeMap().putAll(delete.getToSaveNodeMap());
+            info.getOldDocIds().addAll(delete.getOldDocIds());
+            info.getRejected().putAll(delete.getRejected());
+        }
 
         commitChanges(info);
 
         ElementsCommitResponse response = new ElementsCommitResponse();
         response.getElements().addAll(info.getUpdatedMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
-        if(!info.getUpdatedMap().isEmpty()) {
+        response.setDeleted(new ArrayList<>(info.getDeletedMap().values()));
+        if(!info.getUpdatedMap().isEmpty() || !info.getDeletedMap().isEmpty()) {
             response.setCommitId(info.getCommitJson().getId());
         }
         return response;
@@ -248,7 +270,7 @@ public class DefaultNodeService implements NodeService {
                     });
                 this.nodeRepository.saveAll(new ArrayList<>(nodes.values()));
             } catch (Exception e) {
-                logger.error("commitChanges error: {}", e.getMessage());
+                logger.error("Error in commitChanges: ", e);
                 throw new InternalErrorException("Error committing changes: " + e.getMessage());
             }
             eventPublisher.forEach((pub) -> pub.publish(

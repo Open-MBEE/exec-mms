@@ -206,6 +206,7 @@
 							"    pm.expect(jsonData.elements.length).to.eql(1);",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
                             "    pm.expect(jsonData.elements[0]['_artifacts'][0].location).to.include('arta/x/jpg/')",
+                            "    pm.expect(jsonData.elements[0]['_artifacts'][0].checksum).to.include('c946d2fc350ad561fdb3c23c86a81343')",
                             "    pm.environment.set(\"commit-1-loc\", pm.response.json().elements[0]['_artifacts'][0].location);",
                             "    pm.environment.set(\"x-commit-1\", jsonData.elements[0][\"_commitId\"]);",
 							"});",
@@ -310,7 +311,8 @@
 							"pm.test(\"response element has 1 artifact\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.elements[0]['_artifacts'].length).to.eq(1);",
-							"});"
+                            "    pm.expect(jsonData.elements[0]['_artifacts'][0].checksum).to.include('5407655262fcca873c2f407f2dead2cf')",
+                            "});"
 						],
 						"type": "text/javascript"
 					}
@@ -669,12 +671,63 @@
 			"response": []
 		},
 		{
+			"name": "overwriting element json without _artifacts won't remove it",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"element artifact persists\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.elements[0]._artifacts.length).to.eql(1);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"elements\": [\n\t\t{\n\t\t\t\"id\": \"x\",\n\t\t\t\"name\": \"overwrite x\"\n\t\t\t \n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/arta/refs/master/elements?overwrite=true",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"arta",
+						"refs",
+						"master",
+						"elements"
+					],
+					"query": [
+						{
+							"key": "overwrite",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "create other user",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "3e68a393-9a9f-4759-b8ec-a7e51917ee62",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",

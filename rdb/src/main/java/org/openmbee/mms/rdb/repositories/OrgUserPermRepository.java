@@ -22,6 +22,8 @@ public interface OrgUserPermRepository extends JpaRepository<OrgUserPerm, Long> 
 
     List<OrgUserPerm> findAllByOrganizationAndRole_Name(Organization org, String r);
 
+    List<OrgUserPerm> findAllByUser_Username(String username);
+
     boolean existsByOrganizationAndUser_UsernameAndRoleIn(Organization org, String user, Set<Role> roles);
 
     void deleteByOrganizationAndUser_UsernameIn(Organization org, Set<String> users);

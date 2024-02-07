@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.openmbee.mms.core.dao.ProjectDAO;
 import org.openmbee.mms.core.exceptions.BadRequestException;
+import org.openmbee.mms.core.exceptions.ConflictException;
 import org.openmbee.mms.core.exceptions.DeletedException;
 import org.openmbee.mms.core.exceptions.ForbiddenException;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.core.exceptions.NotFoundException;
 import org.openmbee.mms.core.exceptions.NotModifiedException;
 import org.openmbee.mms.core.exceptions.UnauthorizedException;
@@ -95,8 +97,12 @@ public abstract class BaseController {
                     throw new ForbiddenException(res);
                 case 404:
                     throw new NotFoundException(res);
+                case 409:
+                    throw new ConflictException(res);
                 case 410:
                     throw new DeletedException(res);
+                case 500:
+                    throw new InternalErrorException(res);
                 default:
                     break;
             }

@@ -1,7 +1,10 @@
 package org.openmbee.mms.elastic.services;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.search.ClearScrollRequest;
+import org.elasticsearch.action.search.ClearScrollResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
@@ -37,7 +40,7 @@ import java.util.stream.Stream;
 
 @Service
 public class ElasticSearchService implements SearchService {
-    private final Logger logger = LogManager.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${elasticsearch.limit.result}")
     protected int resultLimit;
@@ -45,6 +48,19 @@ public class ElasticSearchService implements SearchService {
     protected long scrollTimeout;
     protected RestHighLevelClient client;
     protected NodeDAO nodeRepository;
+
+    protected ActionListener<ClearScrollResponse> listener = new ActionListener<>() {
+        @Override
+        public void onResponse(ClearScrollResponse clearScrollResponse) {
+            logger.debug("Cleared: " + clearScrollResponse.getNumFreed());
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            logger.error("Scroll clear failure: ");
+            logger.error(e.getMessage());
+        }
+    };
 
     @Autowired
     public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
@@ -88,7 +104,14 @@ public class ElasticSearchService implements SearchService {
                 showDeletedAsRejected = true;
             }
 
-            performRecursiveSearch(allNodeDocIds, params, recurse, elementJsonMap,0);
+            Map<String, List<String>> normalizedParams = new HashMap<>();
+            params.forEach((k, v) -> {
+                List<String> values = new ArrayList<>();
+                values.add(v);
+                normalizedParams.put(k, values);
+            });
+
+            performRecursiveSearch(allNodeDocIds, normalizedParams, recurse, elementJsonMap,0);
             Collection<OrderedResult<ElementJson>> filteredElementJson = filterIndexedElementsUsingDatabaseNodes(allNodes, elementJsonMap, deletedElements, showDeletedAsRejected);
             return prepareResponse(filteredElementJson, deletedElements, from, size);
         } catch (IOException e) {
@@ -98,7 +121,7 @@ public class ElasticSearchService implements SearchService {
 
     }
 
-    private void performRecursiveSearch(Set<String> allNodeDocIds, Map<String, String> params, Map<String, String> recurse,
+    private void performRecursiveSearch(Set<String> allNodeDocIds, Map<String, List<String>> params, Map<String, String> recurse,
                                         Map<String, OrderedResult<ElementJson>> elementJsonMap, Integer count) throws IOException {
         Set<String> fields = new HashSet<>(params.keySet());
         if(recurse != null) {
@@ -106,14 +129,16 @@ public class ElasticSearchService implements SearchService {
         }
         SearchConfiguration searchConfiguration = getSearchConfiguration(fields);
         List<ElementJson> elementJsonList = doSearch(searchConfiguration, allNodeDocIds, params);
+        List<ElementJson> obList = new ArrayList<>();
         for(ElementJson ob : elementJsonList) {
             if(!elementJsonMap.containsKey(ob.getId())) {
                 elementJsonMap.put(ob.getId(), new OrderedResult<>(ob, count++));
-                Map<String, String> recursiveParams = buildRecursiveParams(ob, recurse);
-                if(!recursiveParams.isEmpty()) {
-                    performRecursiveSearch(allNodeDocIds, recursiveParams, recurse, elementJsonMap, count);
-                }
+                obList.add(ob);
             }
+        }
+        Map<String, List<String>> recursiveParams = buildRecursiveParams(obList, recurse);
+        if(!recursiveParams.isEmpty()) {
+            performRecursiveSearch(allNodeDocIds, recursiveParams, recurse, elementJsonMap, count);
         }
     }
 
@@ -143,30 +168,36 @@ public class ElasticSearchService implements SearchService {
         }
     }
 
-    private Map<String, String> buildRecursiveParams(ElementJson ob, Map<String, String> recurse) {
-        Map<String, String> recursiveParams = new HashMap<>();
+    private Map<String, List<String>> buildRecursiveParams(List<ElementJson> obList, Map<String, String> recurse) {
+        Map<String, List<String>> recursiveParams = new HashMap<>();
 
         if(recurse == null || recurse.isEmpty()) {
             return recursiveParams;
         }
 
         for(Map.Entry<String, String> e : recurse.entrySet()) {
-            Object o = ob.get(e.getKey());
-            if(o == null) {
-                continue;
+            List<String> oList = new ArrayList<>();
+            for (ElementJson ob : obList) {
+                Object o = ob.get(e.getKey());
+                if (o == null) {
+                    continue;
+                }
+                oList.add(o.toString());
             }
-            recursiveParams.put(e.getValue(), o.toString());
+            if (!oList.isEmpty()) {
+                recursiveParams.put(e.getValue(), oList);
+            }
         }
         return recursiveParams;
     }
 
 
-    private List<ElementJson> doSearch(SearchConfiguration searchConfiguration, Set<String> allNodeDocIds, Map<String, String> params) throws IOException {
+    private List<ElementJson> doSearch(SearchConfiguration searchConfiguration, Set<String> allNodeDocIds, Map<String, List<String>> params) throws IOException {
         SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
 
-        for(Map.Entry<String, String> e : params.entrySet()) {
-           searchConfiguration.addQueryForField(query, e.getKey(), e.getValue());
+        for(Map.Entry<String, List<String>> e : params.entrySet()) {
+            searchConfiguration.addQueryForField(query, e.getKey(), e.getValue());
         }
 
         return performElasticQuery(allNodeDocIds, searchRequest, query);
@@ -178,24 +209,30 @@ public class ElasticSearchService implements SearchService {
         sourceBuilder.query(query);
         sourceBuilder.size(resultLimit);
         searchRequest.source(sourceBuilder);
-        searchRequest.scroll(TimeValue.timeValueMillis(scrollTimeout));
+        searchRequest.scroll(TimeValue.timeValueSeconds(scrollTimeout));
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         String scrollId = null;
-
         do {
-            for(SearchHit hit : searchResponse.getHits()) {
+            for (SearchHit hit : searchResponse.getHits()) {
                 ElementJson ob = parseResult(hit);
-                if(allNodeDocIds.contains(ob.getDocId())) {
+                if (allNodeDocIds.contains(ob.getDocId())) {
                     result.add(ob);
                 }
             }
             scrollId = searchResponse.getScrollId();
             if (scrollId != null) {
                 SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+                scrollRequest.scroll(TimeValue.timeValueSeconds(scrollTimeout));
                 searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
             }
 
         } while (scrollId != null && searchResponse.getHits().getHits() != null && searchResponse.getHits().getHits().length != 0);
+
+        if (scrollId != null) {
+            ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.addScrollId(scrollId);
+            client.clearScrollAsync(clearScrollRequest, RequestOptions.DEFAULT, listener);
+        }
 
         return result;
     }
@@ -218,8 +255,6 @@ public class ElasticSearchService implements SearchService {
                 } else if(showDeletedAsRejected) {
                     deletedElements.add(new OrderedResult<>(new Rejection(currentJson.getWrapped(), 410, SearchConstants.ELEMENT_DELETED_INFO), currentJson.getOrder()));
                 }
-            } else { // node found in DB not found in the index
-                logger.warn(SearchConstants.POSSIBLE_ELASTIC_DISCREPANCY, n.getNodeId());
             }
         }
 

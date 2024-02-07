@@ -55,6 +55,9 @@ public class CameoViewService extends CameoNodeService {
         for (ElementJson element: res.getElements()) {
             if (cameoHelper.isView(element)) {
                 List<String> ownedAttributeIds = (List) element.get(CameoConstants.OWNEDATTRIBUTEIDS);
+                if (ownedAttributeIds == null) {
+                    ownedAttributeIds = new ArrayList<>();
+                }
                 ElementsResponse ownedAttributes = this.read(element.getProjectId(), element.getRefId(),
                     buildRequest(ownedAttributeIds), params);
                 NodeGetHelper nodeGetHelper = getNodeGetHelper();

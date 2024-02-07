@@ -17,4 +17,5 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findAllByOrganizationOrganizationId(String id);
 
+    List<Project> findAllByIsPublicTrue();
 }

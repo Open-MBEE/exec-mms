@@ -12,11 +12,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.NodeChangeInfo;
 import org.openmbee.mms.core.services.NodeGetInfo;
 import org.openmbee.mms.core.dao.BranchDAO;
 import org.openmbee.mms.core.dao.CommitDAO;
+import org.openmbee.mms.data.domains.scoped.Branch;
+import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
 import org.openmbee.mms.core.dao.NodeDAO;
 import org.openmbee.mms.core.dao.NodeIndexDAO;
@@ -91,6 +94,11 @@ public class NodeOperation {
         }
         // bulk read existing elements in elastic
         List<ElementJson> existingElements = nodeIndex.findAllById(indexIds);
+        // set the _refId of the element json to be the ref it's 'found/requested' in,
+        String ref = ContextHolder.getContext().getBranchId();
+        for (ElementJson e: existingElements) {
+            e.setRefId(ref);
+        }
         Map<String, ElementJson> existingElementMap = convertJsonToMap(existingElements);
 
         Instant now = Instant.now();
@@ -273,5 +281,14 @@ public class NodeOperation {
 
     protected boolean validateOperation(Operation operation, Map<String, Object> newElement, Map<String, Object> existingElement, boolean overwrite) {
         return true;
+
+    public String getLatestRefCommitId() {
+        Optional<Branch> branch =  branchRepository.findByBranchId(ContextHolder.getContext().getBranchId());
+        Optional<Commit> commit = commitRepository.findLatestByRef(branch.get());
+        if (commit.isPresent()) {
+            return commit.get().getCommitId();
+        } else {
+            return null;
+        }
     }
 }
