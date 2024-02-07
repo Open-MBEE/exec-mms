@@ -123,7 +123,7 @@ public class DefaultNodeService implements NodeService {
             resCommitId = commitId;
         } else {
             nodes = nodeRepository.findAllByDeleted(false);
-            resCommitId = .getLatestRefCommitId();
+            resCommitId = getNodeGetHelper().getLatestRefCommitId();
         }
         String separator = "\n";
         if (!"application/x-ndjson".equals(accept)) {
@@ -140,7 +140,7 @@ public class DefaultNodeService implements NodeService {
                 } else {
                     stream.write(sep.getBytes(StandardCharsets.UTF_8));
                 }
-                Collection<ElementJson> result = get().processGetJsonFromNodes(ns, commitId, this)
+                Collection<ElementJson> result = getNodeGetHelper().processGetJsonFromNodes(ns, commitId, this)
                     .getActiveElementMap().values();
                 stream.write(result.stream().map(this::toJson).collect(Collectors.joining(sep))
                     .getBytes(StandardCharsets.UTF_8));
