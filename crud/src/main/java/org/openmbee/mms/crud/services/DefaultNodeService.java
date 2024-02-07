@@ -98,6 +98,15 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
+    public void setNodeGetHelperFactory(ObjectFactory<NodeGetHelper> nodeGetHelperFactory) {
+        this.nodeGetHelperFactory = nodeGetHelperFactory;
+    }
+
+    public NodeGetHelper getNodeGetHelper() {
+        return this.nodeGetHelperFactory.getObject();
+    }
+
+    @Autowired
     public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
