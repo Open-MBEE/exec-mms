@@ -280,7 +280,8 @@ public class NodeOperation {
 
 
     protected boolean validateOperation(Operation operation, Map<String, Object> newElement, Map<String, Object> existingElement, boolean overwrite) {
-        return true;
+        return true; //?
+    }
 
     public String getLatestRefCommitId() {
         Optional<Branch> branch =  branchRepository.findByBranchId(ContextHolder.getContext().getBranchId());
