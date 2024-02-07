@@ -102,10 +102,6 @@ public class DefaultNodeService implements NodeService {
         this.Factory = Factory;
     }
 
-    public  get() {
-        return this.Factory.getObject();
-    }
-
     @Autowired
     public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
