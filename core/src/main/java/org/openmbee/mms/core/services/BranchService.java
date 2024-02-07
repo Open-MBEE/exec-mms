@@ -10,6 +10,7 @@ public interface BranchService {
     RefsResponse getBranch(String projectId, String id);
 
     RefJson createBranch(String projectId, RefJson branch);
+    RefJson createBranchfromCommit(String projectId, RefJson parentCommitId, NodeService nodeService);
 
     RefsResponse deleteBranch(String projectId, String id);
 }

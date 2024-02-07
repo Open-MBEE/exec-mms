@@ -5,11 +5,7 @@ import java.util.Collection;
 import org.openmbee.mms.core.config.Constants;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.config.Formats;
-import org.openmbee.mms.core.dao.BranchDAO;
-import org.openmbee.mms.core.dao.BranchIndexDAO;
-import org.openmbee.mms.core.dao.CommitDAO;
-import org.openmbee.mms.core.dao.NodeDAO;
-import org.openmbee.mms.core.dao.NodeIndexDAO;
+import org.openmbee.mms.core.dao.*;
 import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.exceptions.DeletedException;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
@@ -18,6 +14,7 @@ import org.openmbee.mms.core.objects.EventObject;
 import org.openmbee.mms.core.objects.RefsResponse;
 import org.openmbee.mms.core.services.BranchService;
 import org.openmbee.mms.core.services.EventService;
+import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.data.domains.scoped.Branch;
 import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
@@ -45,6 +42,15 @@ public class DefaultBranchService implements BranchService {
     private NodeIndexDAO nodeIndex;
 
     protected Collection<EventService> eventPublisher;
+    protected NodeGetHelper nodeGetHelper;
+
+
+
+    @Autowired
+    public void setNodeGetHelper(NodeGetHelper nodeGetHelper) {
+        this.nodeGetHelper = nodeGetHelper;
+    }
+
 
     @Autowired
     public void setBranchRepository(BranchDAO branchRepository) {
@@ -145,11 +151,6 @@ public class DefaultBranchService implements BranchService {
             b.setParentRefId(Constants.MASTER_BRANCH);
         }
 
-        //This service cannot create branches from historic versions
-        if (branch.getParentCommitId() != null) {
-            throw new BadRequestException("Internal Error: Invalid branch creation logic.");
-        }
-
         Optional<Branch> refOption = branchRepository.findByBranchId(b.getParentRefId());
         if (refOption.isPresent()) {
             Optional<Commit> parentCommit = commitRepository.findLatestByRef(refOption.get());
@@ -180,6 +181,52 @@ public class DefaultBranchService implements BranchService {
             //TODO should clean up any created tables/rows?
             throw new InternalErrorException(e);
         }
+    }
+
+    public RefJson createBranchfromCommit(String projectId, RefJson branch, NodeService nodeService) {
+        Instant now = Instant.now();
+        ContextHolder.setContext(projectId);
+        // Check commit exists
+        // Create a new branch, from the branch that the commit was made under
+        // Get all elements in the commit and update the branch.
+        // Get all deleted elements and remove them from branch
+        // Return branch
+//        for (Node n: nodeRepository.findAll()) {
+//            System.out.println(n.getNodeId());
+//        }
+
+//         Optional<Commit> parentCommit = commitRepository.findByCommitId(branch.getParentCommitId());
+//         String parentCommitID = parentCommit.map(Commit::getCommitId).orElse("UNKNOWN");  // TODO: Need to remove UNKNOWN else
+//
+//         String parentRef = parentCommit.map(Commit::getBranchId).orElse("UNKNOWN"); // TODO: Need to remove UNKNOWN else
+//
+//         RefJson newBranch = this.createBranch(projectId, branch);
+
+//        List<Node> nodes = nodeRepository.findAll(); // database table
+//        try {
+//            Collection<ElementJson> result = nodeGetHelper.processGetJsonFromNodes(nodes, parentCommitID, nodeService)
+//                .getActiveElementMap().values(); // elastic search
+//            result.forEach(res ->{
+//                System.out.println(res.getDocId());
+//            });
+//        } catch (Exception e) {
+//            logger.error("Error in commitChanges: ", e);
+//            throw new InternalErrorException("Error committing changes: " + e.getMessage());
+//        }
+
+        // database table needs to match elastic search docIDs
+//
+//        nodeRepository.saveAll(nodes);
+//        for (Node n: nodeRepository.findAll()) {
+//            System.out.println(n.getNodeId());
+//        }
+//
+//        for (Node n: nodeRepository.findAll()) {
+//            nodes.add(n.getNodeId());
+//        }
+
+        RefJson b = new RefJson();
+        return b;
     }
 
     public RefsResponse deleteBranch(String projectId, String id) {
