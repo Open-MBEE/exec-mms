@@ -98,11 +98,6 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
-    public void setFactory(ObjectFactory<> Factory) {
-        this.Factory = Factory;
-    }
-
-    @Autowired
     public void setEventPublisher(Collection<EventService> eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
