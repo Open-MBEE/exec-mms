@@ -46,6 +46,7 @@ public class NodeOperation {
 
     private boolean preserveTimestamps = false;
 
+    protected enum Operation {GET, ADD, UPDATE, REMOVE}
 
     @Autowired
     public void setNodeRepository(NodeDAO nodeRepository) {
@@ -275,6 +276,11 @@ public class NodeOperation {
 
     public void setPreserveTimestamps(boolean preserveTimestamps) {
         this.preserveTimestamps = preserveTimestamps;
+    }
+
+
+    protected boolean validateOperation(Operation operation, Map<String, Object> newElement, Map<String, Object> existingElement, boolean overwrite) {
+        return true; //?
     }
 
     public String getLatestRefCommitId() {
