@@ -80,7 +80,8 @@ public class CameoConstants {
     public static final String USECASEIDS = "useCaseIds";
     public static final String VALUEID = "valueId";
     public static final String VISIBILITY = "visibility";
-    public static final String APPLIEDSTEREOTYPEIDS = "_appliedStereotypeIds";
+    public static final String APPLIEDSTEREOTYPEIDS = "appliedStereotypeIds";
+    public static final String OLDAPPLIEDSTEREOTYPEIDS = "_appliedStereotypeIds";
     public static final String CHILDVIEWS = "_childViews";
     public static final String CONTENTS = "_contents";
     public static final String ISGROUP = "_isGroup";

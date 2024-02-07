@@ -12,6 +12,9 @@ If s3.access_key or s3.secret_key are omitted, will follow the `default credenti
 Configuration
 ^^^^^^^^^^^^^
 
+  s3.endpoint
+    Endpoint of S3 compliant storage service
+
   s3.access_key
     This is the access key for the S3 bucket. Required.
 
