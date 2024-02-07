@@ -220,7 +220,7 @@ public class DefaultNodeService implements NodeService {
                 createCommit(user, refId, projectId, req, commitId), this, lastCommitId);
 
         if (req.getDeletes() != null && !req.getDeletes().isEmpty()) {
-            NodeChangeInfo delete = getnodeDeleteHelper().processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
+            NodeChangeInfo delete = getNodeDeleteHelper().processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
             info.getCommitJson().getDeleted().addAll(delete.getCommitJson().getDeleted());
             info.getDeletedMap().putAll(delete.getDeletedMap());
             info.getToSaveNodeMap().putAll(delete.getToSaveNodeMap());
