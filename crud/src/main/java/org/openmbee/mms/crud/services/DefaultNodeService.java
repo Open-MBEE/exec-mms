@@ -98,12 +98,12 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Autowired
-    public void setNodeGetHelperFactory(ObjectFactory<NodeGetHelper> nodeGetHelperFactory) {
-        this.nodeGetHelperFactory = nodeGetHelperFactory;
+    public void setFactory(ObjectFactory<> Factory) {
+        this.Factory = Factory;
     }
 
-    public NodeGetHelper getNodeGetHelper() {
-        return this.nodeGetHelperFactory.getObject();
+    public  get() {
+        return this.Factory.getObject();
     }
 
     @Autowired
@@ -127,7 +127,7 @@ public class DefaultNodeService implements NodeService {
             resCommitId = commitId;
         } else {
             nodes = nodeRepository.findAllByDeleted(false);
-            resCommitId = nodeGetHelper.getLatestRefCommitId();
+            resCommitId = .getLatestRefCommitId();
         }
         String separator = "\n";
         if (!"application/x-ndjson".equals(accept)) {
@@ -144,7 +144,7 @@ public class DefaultNodeService implements NodeService {
                 } else {
                     stream.write(sep.getBytes(StandardCharsets.UTF_8));
                 }
-                Collection<ElementJson> result = getNodeGetHelper().processGetJsonFromNodes(ns, commitId, this)
+                Collection<ElementJson> result = get().processGetJsonFromNodes(ns, commitId, this)
                     .getActiveElementMap().values();
                 stream.write(result.stream().map(this::toJson).collect(Collectors.joining(sep))
                     .getBytes(StandardCharsets.UTF_8));
@@ -178,11 +178,11 @@ public class DefaultNodeService implements NodeService {
 
             ElementsResponse response = new ElementsResponse();
             String commitId = params.getOrDefault("commitId", null);
-            response.getElements().addAll(nodeGetHelper.processGetAll(commitId, this));
+            response.getElements().addAll(getNodeGetHelper().processGetAll(commitId, this));
             if (commitId != null) {
                 response.setCommitId(commitId);
             } else {
-                response.setCommitId(nodeGetHelper.getLatestRefCommitId());
+                response.setCommitId(getNodeGetHelper().getLatestRefCommitId());
             }
             return response;
         }
@@ -195,7 +195,7 @@ public class DefaultNodeService implements NodeService {
         String commitId = params.getOrDefault("commitId", null);
         ContextHolder.setContext(projectId, refId);
 
-        NodeGetInfo info = getNodeGetHelper().processGetJson(req.getElements(), commitId, this);
+        NodeGetInfo info = getnodeDeleteHelper().processGetJson(req.getElements(), commitId, this);
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
@@ -220,7 +220,7 @@ public class DefaultNodeService implements NodeService {
                 createCommit(user, refId, projectId, req, commitId), this, lastCommitId);
 
         if (req.getDeletes() != null && !req.getDeletes().isEmpty()) {
-            NodeChangeInfo delete = nodeDeleteHelper.processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
+            NodeChangeInfo delete = getnodeDeleteHelper().processDeleteJson(req.getDeletes(), createCommit(user, refId, projectId, req, info.getCommitJson().getCommitId()), this);
             info.getCommitJson().getDeleted().addAll(delete.getCommitJson().getDeleted());
             info.getDeletedMap().putAll(delete.getDeletedMap());
             info.getToSaveNodeMap().putAll(delete.getToSaveNodeMap());
