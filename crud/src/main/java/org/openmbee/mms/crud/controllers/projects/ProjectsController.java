@@ -142,22 +142,23 @@ public class ProjectsController extends BaseController {
                         continue;
                     }
                     if (json.getOrgId() != null && !json.getOrgId().isEmpty()) {
-                        projectPersistence.findById(json.getProjectId()).ifPresent(projectJson -> {
+                        Optional<ProjectJson> projectJsonOption = projectPersistence.findById(json.getProjectId());
+                        if (projectJsonOption.isPresent()) {
+                            ProjectJson projectJson = projectJsonOption.get();
                             String existingOrg = projectJson.getOrgId();
                             if (!json.getOrgId().equals(existingOrg)) {
                                 if (!mss.hasProjectPrivilege(auth, json.getProjectId(), Privileges.PROJECT_DELETE.name(), false) ||
                                         !mss.hasOrgPrivilege(auth, json.getOrgId(), Privileges.ORG_CREATE_PROJECT.name(), false)) {
                                     response.addRejection(
                                         new Rejection(json, 403, "No permission to move project org"));
+                                    continue;
                                 }
                                 if (projectPersistence.inheritsPermissions(projectJson.getProjectId())) {
                                     permissionService.setProjectInherit(false, json.getProjectId());
                                     permissionService.setProjectInherit(true, json.getProjectId());
                                 }
                             }
-
-                            }
-                            );
+                        }
                     }
                     response.getProjects().add(ps.update(json));
                 }
