@@ -63,6 +63,10 @@ elasticsearch.limit.get=100000
 elasticsearch.limit.index=5000
 elasticsearch.limit.commit=100000
 
+#optional Elasticsearch Basic Authentication Credentials
+elasticsearch.username=
+elasticsearch.password=
+
 #Configuration for TWC
 #port is for REST interface
 #aliases are for clustered usages
