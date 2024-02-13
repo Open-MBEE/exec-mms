@@ -94,7 +94,7 @@ public class CameoViewService extends CameoNodeService implements ViewService {
         }
         return res;
 }
-
+/*
     @Override
     public void extraProcessPostedElement(NodeChangeInfo info, ElementJson element) {
         //handle _childViews
@@ -232,7 +232,7 @@ public class CameoViewService extends CameoNodeService implements ViewService {
         NodeGetInfo assocPropInfo = getNodePersistence().findAll(projectId, refId, null, buildRequest(assocPropToDelete).getElements());
         getNodePersistence().prepareDeletes(info, assocPropInfo.getActiveElementMap().values());
     }
-
+*/
     //find first element of type in types following e's relkey (assuming relkey's value is an element id)
     private Optional<ElementJson> getFirstRelationshipOfType(String projectId, String refId, String commitId,
             ElementJson e, List<Integer> types, String relkey) {
