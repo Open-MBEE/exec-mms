@@ -85,12 +85,7 @@ public class DefaultCommitService implements CommitService {
         if (!ref.isPresent()) {
             throw new NotFoundException("Branch not found");
         }
-        List<CommitJson> refCommits = commitPersistence.findByProjectAndRefAndTimestampAndLimit(projectId, refId, null, 0);
-        Set<String> commitIds = new LinkedHashSet<>();
-        for (CommitJson commit: refCommits) {
-            commitIds.add(commit.getId());
-        }
-        res.getCommits().addAll(commitPersistence.elementHistory(projectId, elementId, commitIds));
+        res.getCommits().addAll(commitPersistence.elementHistory(projectId, refId, elementId));
         return res;
     }
 

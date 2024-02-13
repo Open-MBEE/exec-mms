@@ -157,9 +157,19 @@ public class FederatedCommitPersistence implements CommitPersistence {
     }
 
     @Override
-    public List<CommitJson> elementHistory(String projectId, String elementId, Set<String> commitDocIds) {
+    public List<CommitJson> elementHistory(String projectId, String refId, String elementId) {
         ContextHolder.setContext(projectId);
-        List<CommitJson> commits = commitIndexDAO.elementHistory(elementId, commitDocIds);
+        Optional<Branch> branchOptional = branchDAO.findByBranchId(refId);
+        if(!branchOptional.isPresent()) {
+            return new ArrayList<>();
+        }
+        Branch b = branchOptional.get();
+        List<Commit> commitList = commitDAO.findByRefAndTimestampAndLimit(b, null, 0);
+        Set<String> commitIds = new HashSet<>();
+        for (Commit commit: commitList) {
+            commitIds.add(commit.getCommitId());
+        }
+        List<CommitJson> commits = commitIndexDAO.elementHistory(elementId, commitIds);
         commits.sort(Comparator.comparing(CommitJson::getCreated).reversed());
         return commits;
     }
