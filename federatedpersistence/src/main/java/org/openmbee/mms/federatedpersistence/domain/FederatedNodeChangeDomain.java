@@ -36,10 +36,10 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
     protected NodeIndexDAO nodeIndex;
 
     @Autowired
-    public FederatedNodeChangeDomain(NodeGetDomain nodeGetDomain, CommitDomain commitDomain,
+    public FederatedNodeChangeDomain(CommitDomain commitDomain,
             FederatedNodeGetDomain getDomain, NodeDAO nodeRepository, NodeIndexDAO nodeIndex, FederatedElementDomain elementDomain,
             List<NodeUpdateFilter> nodeUpdateFilters) {
-        super(nodeGetDomain, commitDomain, nodeUpdateFilters);
+        super(getDomain, commitDomain, nodeUpdateFilters);
         this.getDomain = getDomain;
         this.nodeRepository = nodeRepository;
         this.nodeIndex = nodeIndex;
