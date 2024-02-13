@@ -86,8 +86,8 @@ public class CameoViewService extends CameoNodeService implements ViewService {
         List<ElementJson> groups = getNodePersistence().findAllByNodeType(projectId, refId, commitId,
             CameoNodeType.GROUP.getValue());
 
-        ElementsResponse res = this.read(projectId, refId, buildRequestFromJsons(groups), params);
-        for (ElementJson e: res.getElements()) {
+        ElementsResponse res = new ElementsResponse().setElements(groups);
+        for (ElementJson e: groups) {
             Optional<ElementJson> parent = getFirstRelationshipOfType(projectId, refId, commitId, e,
                 List.of(CameoNodeType.GROUP.getValue()), CameoConstants.OWNERID);
             parent.ifPresent(elementJson -> e.put(CameoConstants.PARENTID, elementJson.getId()));
