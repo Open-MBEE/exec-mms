@@ -151,10 +151,7 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
             throw new InternalErrorException("Unexpected NodeChangeInfo type in FederatedNodeChangeDomain");
         }
         Node n = ((FederatedNodeChangeInfo) info).getExistingNodeMap().get(element.getId());
-        if(n != null) {
-            n.setNodeId(element.getId());
-            n.setInitialCommit(element.getDocId());
-        } else {
+        if (n == null) {
             return;
         }
 
