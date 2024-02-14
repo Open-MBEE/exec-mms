@@ -3,12 +3,16 @@ package org.openmbee.mms.federatedpersistence.domain;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.config.Formats;
 import org.openmbee.mms.core.dao.CommitPersistence;
+import org.openmbee.mms.data.dao.BranchDAO;
+import org.openmbee.mms.data.dao.CommitDAO;
 import org.openmbee.mms.data.dao.NodeDAO;
 import org.openmbee.mms.data.dao.NodeIndexDAO;
 import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.core.services.NodeGetInfo;
 import org.openmbee.mms.crud.domain.NodeGetDomain;
+import org.openmbee.mms.data.domains.scoped.Branch;
+import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
 import org.openmbee.mms.federatedpersistence.dao.FederatedNodeGetInfo;
 import org.openmbee.mms.federatedpersistence.dao.FederatedNodeGetInfoImpl;
@@ -26,15 +30,18 @@ import static org.openmbee.mms.core.config.ContextHolder.getContext;
 @Component
 public class FederatedNodeGetDomain extends NodeGetDomain {
 
-    private CommitPersistence commitPersistence;
     private NodeDAO nodeDAO;
     private NodeIndexDAO nodeIndex;
+    private CommitDAO commitDAO;
+    private BranchDAO branchDAO;
 
     @Autowired
-    public FederatedNodeGetDomain(CommitPersistence commitPersistence, NodeDAO nodeDAO, NodeIndexDAO nodeIndex) {
-        this.commitPersistence = commitPersistence;
+    public FederatedNodeGetDomain(NodeDAO nodeDAO, NodeIndexDAO nodeIndex,
+                                  CommitDAO commitDAO, BranchDAO branchDAO) {
         this.nodeDAO = nodeDAO;
         this.nodeIndex = nodeIndex;
+        this.commitDAO = commitDAO;
+        this.branchDAO = branchDAO;
     }
 
     public NodeGetInfo initInfo(List<ElementJson> elements, CommitJson commitJson) {
@@ -44,12 +51,22 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
         NodeGetInfo nodeGetInfo = initInfoFromNodes(existingNodes, commitJson);
         nodeGetInfo.getReqElementMap().putAll(convertJsonToMap(elements));
         return nodeGetInfo;
-        
+
     }
 
     public NodeGetInfo initInfoFromNodes(List<Node> existingNodes, CommitJson commitJson) {
         NodeGetInfo nodeGetInfo =  super.initInfo(commitJson, this::createNodeGetInfo);
         Set<String> indexIds = existingNodes.stream().map(Node::getDocId).collect(Collectors.toSet());
+        if (nodeGetInfo instanceof FederatedNodeGetInfo) {
+            FederatedNodeGetInfo federatedInfo = (FederatedNodeGetInfo)nodeGetInfo;
+            federatedInfo.setExistingNodeMap(new HashMap<>());
+            federatedInfo.setReqIndexIds(new HashSet<>());
+            for (Node node : existingNodes) {
+                federatedInfo.getReqIndexIds().add(node.getDocId());
+                federatedInfo.getExistingNodeMap().put(node.getNodeId(), node);
+                federatedInfo.getReqElementMap().put(node.getNodeId(), new ElementJson().setId(node.getNodeId()));
+            }
+        }
         // bulk read existing elements in elastic
         List<ElementJson> existingElements = nodeIndex.findAllById(indexIds);
         addExistingElements(nodeGetInfo, existingElements); // handeled in addExistingElements
@@ -108,11 +125,11 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
             throw new InternalErrorException("Invalid use of FederatedNodeGetDomain");
         }
         FederatedNodeGetInfo federatedInfo = (FederatedNodeGetInfo) info;
-        Optional<CommitJson> commit = commitPersistence.findById(getContext().getProjectId(), commitId);
+        Optional<Commit> commit = commitDAO.findByCommitId(commitId);
         if (!commit.isPresent() ) {
             throw new BadRequestException("commitId is invalid");
         }
-        Instant time = Instant.from(Formats.FORMATTER.parse(commit.get().getCreated())); //time of commit
+        Instant time = commit.get().getTimestamp(); //time of commit
         List<String> refCommitIds = null; //get it later if needed
         for (String nodeId : info.getReqElementMap().keySet()) {
             if (!existingNodeContainsNodeId(federatedInfo, nodeId)) { // nodeId not found
@@ -173,34 +190,23 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
     protected List<String> getRefCommitIds(Instant time) {
         List<String> commitIds = new ArrayList<>();
 
-        List<CommitJson> refCommits = commitPersistence.findByProjectAndRefAndTimestampAndLimit(getContext().getProjectId(), getContext().getBranchId(), time, 0);
-        for (CommitJson c : refCommits) {
-            commitIds.add(c.getId());
-        }
+        Optional<Branch> ref = branchDAO.findByBranchId(getContext().getBranchId());
+        ref.ifPresent(current -> {
+            List<Commit> refCommits = commitDAO.findByRefAndTimestampAndLimit(current, time, 0);
+            for (Commit c : refCommits) {
+                commitIds.add(c.getCommitId());
+            }
+        });
         return commitIds;
     }
 
     @Override
     public void addExistingElements(NodeGetInfo info, List<ElementJson> elements) {
         super.addExistingElements(info, elements);
-
-        if(info instanceof FederatedNodeGetInfo) {
-            FederatedNodeGetInfo federatedInfo = (FederatedNodeGetInfo)info;
-            Set<String> elementIds = elements.stream().map(ElementJson::getId).collect(Collectors.toSet());
-            List<Node> existingNodes = nodeDAO.findAllByNodeIds(elementIds);
-            //ToDo : could also be done in get functions in respective classes to prevent extra null checks and NPE 
-            federatedInfo.setExistingNodeMap(new HashMap<>());
-            federatedInfo.setReqIndexIds(new HashSet<>());
-            for (Node node : existingNodes) {
-                federatedInfo.getReqIndexIds().add(node.getDocId());
-                federatedInfo.getExistingNodeMap().put(node.getNodeId(), node);
-                federatedInfo.getReqElementMap().put(node.getNodeId(), new ElementJson().setId(node.getNodeId()));
-            }
-        }
     }
 
     @Override
-    public NodeGetInfo createNodeGetInfo() {  //ToDo :: check 
+    public NodeGetInfo createNodeGetInfo() {  //ToDo :: check
         return new FederatedNodeGetInfoImpl();
     }
 }

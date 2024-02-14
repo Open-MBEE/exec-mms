@@ -16,7 +16,7 @@ public class JsonDomain {
         }
         return ret;
     }
-    public static Map<String, ElementJson> convertJsonToMap(List<ElementJson> elements) {
+    public static Map<String, ElementJson> convertJsonToMap(Collection<ElementJson> elements) {
         if (elements == null || elements.isEmpty()) {
             return Collections.emptyMap();
         }
