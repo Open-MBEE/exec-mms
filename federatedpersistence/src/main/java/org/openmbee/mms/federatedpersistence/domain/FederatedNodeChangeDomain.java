@@ -80,7 +80,7 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
         ((FederatedNodeChangeInfo) info).getExistingNodeMap().put(element.getId(), node);
         super.processElementAdded(info, element);
 
-        node.setInitialCommit(element.getDocId());
+        node.setInitialCommit(element.getCommitId());
 
         CommitJson commitJson = info.getCommitJson();
         ElementVersion newObj = new ElementVersion()
@@ -118,6 +118,7 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
             .setId(element.getId())
             .setType("Element");
         info.getCommitJson().getUpdated().add(newObj);
+        return true;
     }
 
     @Override
