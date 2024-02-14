@@ -247,29 +247,4 @@ public class DefaultNodeService implements NodeService {
         }
         return cmjs;
     }
-
-    protected List<ElementJson> filter(List<String> ids, List<ElementJson> orig) {
-        Map<String, ElementJson> map = convertJsonToMap(orig);
-        List<ElementJson> ret = new ArrayList<>();
-        for (String id: ids) {
-            if (map.containsKey(id)) {
-                ret.add(map.get(id));
-            }
-        }
-        return ret;
-    }
-
-    protected Map<String, ElementJson> convertJsonToMap(List<ElementJson> elements) {
-        Map<String, ElementJson> result = new HashMap<>();
-        for (ElementJson elem : elements) {
-            if (elem == null) {
-                continue;
-            }
-            if (elem.getId() != null && !elem.getId().isBlank()) {
-                result.put(elem.getId(), elem);
-            }
-        }
-        return result;
-    }
-
 }
