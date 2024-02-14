@@ -10,6 +10,7 @@ import org.openmbee.mms.core.security.MethodSecurityService;
 import org.openmbee.mms.core.services.HierarchicalNodeService;
 import org.openmbee.mms.core.services.NodeChangeInfo;
 import org.openmbee.mms.core.services.NodeGetInfo;
+import org.openmbee.mms.crud.CrudConstants;
 import org.openmbee.mms.crud.services.DefaultNodeService;
 import org.openmbee.mms.json.CommitJson;
 import org.openmbee.mms.json.ElementJson;
@@ -42,17 +43,17 @@ public class CameoNodeService extends DefaultNodeService implements Hierarchical
     public ElementsResponse read(String projectId, String refId, ElementsRequest req,
             Map<String, String> params) {
 
-        String commitId = params.getOrDefault(CameoConstants.COMMITID, null);
+        String commitId = params.getOrDefault(CrudConstants.COMMITID, null);
         if (commitId == null) {
             Optional<CommitJson> commitJson = commitPersistence.findLatestByProjectAndRef(projectId, refId);
             if (!commitJson.isPresent()) {
                 throw new InternalErrorException("Could not find latest commit for project and ref");
             }
-            commitId = commitJson.get().getId();   
+            commitId = commitJson.get().getId();
         }
 
         NodeGetInfo info = getNodePersistence().findAll(projectId, refId, commitId, req.getElements());
-        
+
         if (!info.getRejected().isEmpty()) {
             //continue looking in visible mounted projects for elements if not all found
             NodeGetInfo curInfo = info;
@@ -78,6 +79,7 @@ public class CameoNodeService extends DefaultNodeService implements Hierarchical
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
         response.setRejected(new ArrayList<>(info.getRejected().values()));
+        response.setCommitId(commitId);
         return response;
     }
 
