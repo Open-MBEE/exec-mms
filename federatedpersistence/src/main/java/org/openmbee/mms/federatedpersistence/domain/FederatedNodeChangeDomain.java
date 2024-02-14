@@ -93,7 +93,7 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
     }
 
     @Override
-    public void processElementUpdated(NodeChangeInfo info, ElementJson element, ElementJson existing) {
+    public boolean processElementUpdated(NodeChangeInfo info, ElementJson element, ElementJson existing) {
         if(!(info instanceof FederatedNodeChangeInfo)) {
             throw new InternalErrorException("Unexpected NodeChangeInfo type in FederatedNodeChangeDomain");
         }
@@ -106,10 +106,12 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
                 existing.setIsDeleted(Constants.TRUE);
             }
         } else {
-            return;
+            return false;
         }
 
-        super.processElementUpdated(info, element, existing);
+        if (!super.processElementUpdated(info, element, existing)) {
+            return false;
+        }
         ElementVersion newObj= new ElementVersion()
             .setPreviousDocId(previousDocId)
             .setDocId(element.getDocId())

@@ -58,11 +58,12 @@ public abstract class NodeChangeDomain extends JsonDomain {
         element.setCreated(commitJson.getCreated());
     }
 
-    public void processElementUpdated(NodeChangeInfo info, ElementJson element, ElementJson existing) {
-        if(nodeUpdateFilters.stream().anyMatch(f -> !f.filterUpdate(info, element, existing))) {
-            return;
+    public boolean processElementUpdated(NodeChangeInfo info, ElementJson element, ElementJson existing) {
+        if (nodeUpdateFilters.stream().anyMatch(f -> !f.filterUpdate(info, element, existing))) {
+            return false;
         }
         processElementAddedOrUpdated(info, element);
+        return true;
     }
 
     protected void processElementAddedOrUpdated(NodeChangeInfo info, ElementJson element) {
