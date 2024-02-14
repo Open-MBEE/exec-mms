@@ -107,7 +107,8 @@ public class DefaultCommitService implements CommitService {
 
     @Override
     public boolean isProjectNew(String projectId) {
-        List<CommitJson> commits = commitPersistence.findAllByProjectId(projectId);
+        // if project is not new, there must be at least 1 commit to master
+        List<CommitJson> commits = commitPersistence.findByProjectAndRefAndTimestampAndLimit(projectId, "master", null, 1);
         return commits == null || commits.isEmpty();
     }
 }
