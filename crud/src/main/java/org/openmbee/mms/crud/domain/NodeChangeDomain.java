@@ -118,9 +118,6 @@ public abstract class NodeChangeDomain extends JsonDomain {
     public abstract NodeChangeInfo processPostJson(NodeChangeInfo nodeChangeInfo, Collection<ElementJson> elements);
 
 
-    public void addExistingElements(NodeChangeInfo nodeChangeInfo, List<ElementJson> existingElements) {
-        nodeGetDomain.addExistingElements(nodeChangeInfo, existingElements);
-    }
 
     public abstract void primeNodeChangeInfo(NodeChangeInfo nodeChangeInfo, Collection<ElementJson> transactedElements);
 }

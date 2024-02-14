@@ -241,10 +241,6 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
         return federatedInfo;
     }
 
-    @Override
-    public void addExistingElements(NodeChangeInfo nodeChangeInfo, List<ElementJson> existingElements) {
-        getDomain.addExistingElements(nodeChangeInfo, existingElements);
-    }
 
     //ToDo :: Check
     @Override
@@ -258,23 +254,22 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
         for (Node node : existingNodes) {
             indexIds.add(node.getDocId());
             existingNodeMap.put(node.getNodeId(), node);
-            // reqElementMap.put(node.getNodeId(), new ElementJson().setId(node.getNodeId()));
         }
         if(!transactedElements.isEmpty()){
-            reqElementMap.putAll(convertJsonToMap(transactedElements.parallelStream().collect(Collectors.toList())));
+            reqElementMap.putAll(convertJsonToMap(transactedElements));
         }
 
         // bulk read existing elements in elastic
         List<ElementJson> existingElements = nodeIndex.findAllById(indexIds);
         Map<String, ElementJson> existingElementMap = convertJsonToMap(existingElements);
 
+        nodeChangeInfo.setExistingElementMap(existingElementMap);
+        nodeChangeInfo.setReqElementMap(reqElementMap);
+        nodeChangeInfo.setRejected(new HashMap<>());
+        nodeChangeInfo.setActiveElementMap(new HashMap<>());
         if (nodeChangeInfo instanceof FederatedNodeChangeInfo) {
-            ((FederatedNodeChangeInfo) nodeChangeInfo).setExistingElementMap(existingElementMap);
             ((FederatedNodeChangeInfo) nodeChangeInfo).setExistingNodeMap(existingNodeMap);
-            ((FederatedNodeChangeInfo) nodeChangeInfo).setReqElementMap(reqElementMap);
             ((FederatedNodeChangeInfo) nodeChangeInfo).setReqIndexIds(indexIds);
-            ((FederatedNodeChangeInfo) nodeChangeInfo).setRejected(new HashMap<>());
-            ((FederatedNodeChangeInfo) nodeChangeInfo).setActiveElementMap(new HashMap<>());
         }
 	}
 
