@@ -242,8 +242,9 @@ public class DefaultNodeService implements NodeService {
         cmjs.setSource(req.getSource());
         cmjs.setRefId(refId);
         cmjs.setProjectId(projectId);
-        if(commitId != null) {
-            cmjs.setCommitId(commitId);
+        if (commitId != null) {
+            cmjs.setId(commitId);
+            cmjs.setDocId(commitId);
         }
         return cmjs;
     }
