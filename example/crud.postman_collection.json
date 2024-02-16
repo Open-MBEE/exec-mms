@@ -1388,8 +1388,9 @@
 						"exec": [
 							"pm.test(\"branch created from parentCommitId\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.refs[0].id).to.eql('branch_from_commit');",
+							"    pm.expect(jsonData.refs[0].id).to.eql('branch_from_commit_id');",
 							"    pm.expect(jsonData.refs[0].parentRefId).to.eql('refa');",
+							"    pm.expect(jsonData.refs[0].type).to.eql('Branch');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1407,7 +1408,52 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"refs\": [\n    {\n      \"name\": \"branch_from_commit\",\n      \"type\": \"Branch\",\n      \"parentCommitId\": \"{{commitXYRef}}\",\n      \"id\": \"branch_from_commit\"\n    }\n  ]\n}"
+					"raw": "{\n  \"refs\": [\n    {\n      \"name\": \"branch_from_commit\",\n      \"type\": \"Branch\",\n      \"parentCommitId\": \"{{commitXYRef}}\",\n      \"id\": \"branch_from_commit_id\"\n    }\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/projects/aa/refs",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create tag from commit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"branch created from parentCommitId\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.refs[0].id).to.eql('tag_from_commit_id');",
+							"    pm.expect(jsonData.refs[0].parentRefId).to.eql('refa');",
+							"    pm.expect(jsonData.refs[0].type).to.eql('Tag');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"refs\": [\n    {\n      \"name\": \"tag_from_commit\",\n      \"type\": \"Tag\",\n      \"parentCommitId\": \"{{commitXYRef}}\",\n      \"id\": \"tag_from_commit_id\"\n    }\n  ]\n}"
 				},
 				"url": {
 					"raw": "{{host}}/projects/aa/refs",
@@ -1448,7 +1494,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/projects/aa/refs/{{branch_from_commit_ref}}/elements",
+					"raw": "{{host}}/projects/aa/refs/branch_from_commit_id/elements",
 					"host": [
 						"{{host}}"
 					],
@@ -1456,7 +1502,47 @@
 						"projects",
 						"aa",
 						"refs",
-						"{{branch_from_commit_ref}}",
+						"branch_from_commit_id",
+						"elements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check elements from tag made from commit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Commit in ref match commit before updating refa\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.commitId).to.eql(pm.environment.get('commitXYRef'));",
+							"});",
+							"",
+							"pm.test(\"Elements made in ref match what was created under commit\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.equal(pm.environment.get('commitXYRefElements'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/projects/aa/refs/tag_from_commit_id/elements",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"projects",
+						"aa",
+						"refs",
+						"tag_from_commit_id",
 						"elements"
 					]
 				}
