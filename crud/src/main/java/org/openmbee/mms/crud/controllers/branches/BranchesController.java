@@ -9,7 +9,6 @@ import org.openmbee.mms.core.objects.RefsRequest;
 import org.openmbee.mms.core.objects.RefsResponse;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.BranchService;
-import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.crud.controllers.BaseController;
 import org.openmbee.mms.json.RefJson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,8 +96,6 @@ public class BranchesController extends BaseController {
                 if (branch.getParentCommitId() == null || branch.getParentCommitId().isEmpty()) {
                     res = branchService.createBranch(projectId, branch);
                 } else {
-                    //TODO implement branching from historical commit
-
                     res = branchService.createBranchfromCommit(projectId, branch, getNodeService(projectId));
                 }
 

@@ -129,6 +129,7 @@ public class NodeGetHelper extends NodeOperation {
                     rejectNotFound(info, nodeId); // element not found at commit time
                 }
             } else if (info.getExistingNodeMap().get(nodeId).isDeleted()) { // latest element is before commit, but deleted
+                // TODO check if time of deletion is after the commit time
                 rejectDeleted(info, nodeId, indexElement);
             } else { // latest element version is version at commit, not deleted
                 info.getActiveElementMap().put(nodeId, indexElement);

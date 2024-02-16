@@ -18,6 +18,7 @@ import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.data.domains.scoped.Branch;
 import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
+import org.openmbee.mms.json.ElementJson;
 import org.openmbee.mms.json.RefJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,11 +154,24 @@ public class DefaultBranchService implements BranchService {
 
         Optional<Branch> refOption = branchRepository.findByBranchId(b.getParentRefId());
         if (refOption.isPresent()) {
-            Optional<Commit> parentCommit = commitRepository.findLatestByRef(refOption.get());
-            parentCommit.ifPresent(parent -> {
-                b.setParentCommit(parent.getId());
-                branch.setParentCommitId(parent.getCommitId()); //commit id is same as its docId
-            });
+            if(branch.getParentCommitId() != null){
+                Optional<Commit> commitRequestId = commitRepository.findByCommitId(branch.getParentCommitId());
+                commitRequestId.ifPresentOrElse(commit -> {
+                    Optional<Commit> parentCommit = commitRepository.findByRefAndTimestamp(refOption.get(), commit.getTimestamp());
+                    parentCommit.ifPresent(parent -> {
+                        b.setParentCommit(parent.getId());
+                        branch.setParentCommitId(parent.getCommitId());
+                    });
+                },
+                    () -> { throw new BadRequestException(new RefsResponse().addMessage("parentCommitId not found " + now.toString()));
+                });
+            } else {
+                Optional<Commit> parentCommit = commitRepository.findLatestByRef(refOption.get());
+                parentCommit.ifPresent(parent -> {
+                    b.setParentCommit(parent.getId());
+                    branch.setParentCommitId(parent.getCommitId()); //commit id is same as its docId
+                });
+            }
         }
 
         if (b.getParentCommit() == null) {
@@ -182,51 +196,54 @@ public class DefaultBranchService implements BranchService {
             throw new InternalErrorException(e);
         }
     }
-
-    public RefJson createBranchfromCommit(String projectId, RefJson branch, NodeService nodeService) {
+    public RefJson createBranchfromCommit(String projectId, RefJson parentCommitIdRef, NodeService nodeService) {
         Instant now = Instant.now();
+
+        if(parentCommitIdRef.getParentCommitId().isEmpty()){
+            throw new BadRequestException(new RefsResponse().addMessage("parentCommitId not provided " + now.toString()));
+        }
+
         ContextHolder.setContext(projectId);
-        // Check commit exists
-        // Create a new branch, from the branch that the commit was made under
-        // Get all elements in the commit and update the branch.
-        // Get all deleted elements and remove them from branch
-        // Return branch
-//        for (Node n: nodeRepository.findAll()) {
-//            System.out.println(n.getNodeId());
-//        }
+        Optional<Commit> parentCommit = commitRepository.findByCommitId(parentCommitIdRef.getParentCommitId());
 
-//         Optional<Commit> parentCommit = commitRepository.findByCommitId(branch.getParentCommitId());
-//         String parentCommitID = parentCommit.map(Commit::getCommitId).orElse("UNKNOWN");  // TODO: Need to remove UNKNOWN else
-//
-//         String parentRef = parentCommit.map(Commit::getBranchId).orElse("UNKNOWN"); // TODO: Need to remove UNKNOWN else
-//
-//         RefJson newBranch = this.createBranch(projectId, branch);
+        // Get Commit object
+        String parentCommitID = parentCommit.map(Commit::getCommitId).orElseThrow(() ->
+            new BadRequestException(new RefsResponse().addMessage("parentCommitId not found " + now.toString())));
 
-//        List<Node> nodes = nodeRepository.findAll(); // database table
-//        try {
-//            Collection<ElementJson> result = nodeGetHelper.processGetJsonFromNodes(nodes, parentCommitID, nodeService)
-//                .getActiveElementMap().values(); // elastic search
-//            result.forEach(res ->{
-//                System.out.println(res.getDocId());
-//            });
-//        } catch (Exception e) {
-//            logger.error("Error in commitChanges: ", e);
-//            throw new InternalErrorException("Error committing changes: " + e.getMessage());
-//        }
+        // Get Commit parentRef, the branch will be created from this
+        String parentRef = parentCommit.map(Commit::getBranchId).orElseThrow(() ->
+            new BadRequestException(new RefsResponse().addMessage("Ref from parentCommitId not found"  + now.toString())));
 
-        // database table needs to match elastic search docIDs
-//
-//        nodeRepository.saveAll(nodes);
-//        for (Node n: nodeRepository.findAll()) {
-//            System.out.println(n.getNodeId());
-//        }
-//
-//        for (Node n: nodeRepository.findAll()) {
-//            nodes.add(n.getNodeId());
-//        }
+        parentCommitIdRef.setParentRefId(parentRef);
+        ContextHolder.setContext(projectId, parentRef);
 
-        RefJson b = new RefJson();
-        return b;
+        RefJson branchFromCommit = this.createBranch(projectId, parentCommitIdRef);
+
+        ContextHolder.setContext(projectId, branchFromCommit.getRefId());
+
+        // Get current nodes from database
+        List<Node> nodes = nodeRepository.findAll();
+        // Get elements from index
+        Collection<ElementJson> result = nodeGetHelper.processGetJsonFromNodes(nodes, parentCommitID, nodeService)
+            .getActiveElementMap().values();
+
+        Map<String, ElementJson> nodeCommitData = new HashMap<>();
+        for (ElementJson element : result) {
+            nodeCommitData.put(element.getId(), element);
+        }
+
+        // Update database table to match index
+        for (Node node : nodes) {
+            if(nodeCommitData.containsKey(node.getNodeId())){
+                node.setDocId(nodeCommitData.get(node.getNodeId()).getDocId());
+                node.setDeleted(false);
+            } else {
+                node.setDeleted(true);
+            }
+        }
+        nodeRepository.updateAll(nodes);
+
+        return branchFromCommit;
     }
 
     public RefsResponse deleteBranch(String projectId, String id) {
