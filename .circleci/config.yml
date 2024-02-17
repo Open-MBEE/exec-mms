@@ -20,19 +20,20 @@ jobs:
 
       - setup_remote_docker
 
-      - run: 
+      - run:
           name: "Create and start all services from the docker-compose configuration"
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
             docker-compose up --build -d
             docker run --network container:mms curlimages/curl --retry 8 --retry-delay 10 --retry-max-time 90 --retry-connrefused http://mms:8080/healthcheck
 
-      - run: 
+      - run:
           name: "Run and test Postman Collection"
           command: |
             docker create -v /etc/newman --name mms_test_configs alpine:3.4 /bin/true
             docker cp example/. mms_test_configs:/etc/newman
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 500
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run getAtCommits.postman_collection.json -e test-env.json --delay-request 500  
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run cameo.postman_collection.json -e test-env.json --delay-request 1000
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run jupyter.postman_collection.json -e test-env.json --delay-request 500
             docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run localauth.postman_collection.json -e test-env.json --delay-request 500
