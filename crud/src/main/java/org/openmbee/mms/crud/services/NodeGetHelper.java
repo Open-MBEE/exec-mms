@@ -133,9 +133,8 @@ public class NodeGetHelper extends NodeOperation {
                     formatter.format(time), refCommitIds);
                 if (e.isPresent()) { // found version of element at commit time
                     Instant realModified = Instant.from(formatter.parse(e.get().getModified()));
-                    boolean isDeleted = elementDeleted(nodeId, commitId, time, realModified, refCommitIds);
-                    if (isDeleted) {
-                        rejectDeleted(info, nodeId, indexElement);
+                    if (elementDeleted(nodeId, commitId, time, realModified, refCommitIds)) {
+                        rejectDeleted(info, nodeId, e.get());
                     } else {
                         e.get().setRefId(ContextHolder.getContext().getBranchId());
                         info.getActiveElementMap().put(nodeId, e.get());
@@ -147,8 +146,7 @@ public class NodeGetHelper extends NodeOperation {
                 if (refCommitIds == null) { // need list of commitIds of current ref to filter on
                     refCommitIds = getRefCommitIds(time);
                 }
-                boolean isDeleted = elementDeleted(nodeId, commitId, time, modified, refCommitIds);
-                if (isDeleted) {
+                if (elementDeleted(nodeId, commitId, time, modified, refCommitIds)) {
                     rejectDeleted(info, nodeId, indexElement);
                 } else {
                     info.getActiveElementMap().put(nodeId, indexElement);
@@ -162,17 +160,15 @@ public class NodeGetHelper extends NodeOperation {
 
     private boolean elementDeleted(String nodeId, String commitId, Instant time, Instant modified, List<String> refCommitIds) {
         List<CommitJson> commits = commitIndex.elementDeletedHistory(nodeId, refCommitIds);
-        boolean isDeleted = false;
         for (CommitJson c: commits) {
             Instant deletedTime = Instant.from(formatter.parse(c.getCreated()));
             if ((deletedTime.isBefore(time) || c.getId().equals(commitId)) && deletedTime.isAfter(modified)) {
                 //there's a delete between element last modified time and requested commit time
                 //or element is deleted at commit
-                isDeleted = true;
-                break;
+                return true;
             }
         }
-        return isDeleted;
+        return false;
     }
 
     public NodeGetInfo processGetJson(List<ElementJson> elements, Instant time, NodeService service) {
