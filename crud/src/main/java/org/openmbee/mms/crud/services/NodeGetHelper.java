@@ -13,13 +13,23 @@ import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.data.domains.scoped.Branch;
 import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
+import org.openmbee.mms.core.dao.CommitIndexDAO;
+import org.openmbee.mms.json.CommitJson;
 import org.openmbee.mms.json.ElementJson;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.openmbee.mms.core.config.ContextHolder.getContext;
 
 @Service
 public class NodeGetHelper extends NodeOperation {
+
+    protected CommitIndexDAO commitIndex;
+
+    @Autowired
+    public void setCommitIndex(CommitIndexDAO commitIndex) {
+        this.commitIndex = commitIndex;
+    }
 
     public NodeGetInfo processGetJsonFromNodes(List<Node> nodes, NodeService service) {
         NodeGetInfo info = initInfoFromNodes(nodes, null);
@@ -129,7 +139,24 @@ public class NodeGetHelper extends NodeOperation {
                     rejectNotFound(info, nodeId); // element not found at commit time
                 }
             } else if (info.getExistingNodeMap().get(nodeId).isDeleted()) { // latest element is before commit, but deleted
-                rejectDeleted(info, nodeId, indexElement);
+                if (refCommitIds == null) { // need list of commitIds of current ref to filter on
+                    refCommitIds = getRefCommitIds(time);
+                }
+                List<CommitJson> commits = commitIndex.elementDeletedHistory(nodeId, refCommitIds);
+                boolean isDeleted = false;
+                for (CommitJson c: commits) {
+                    Instant deletedTime = Instant.from(formatter.parse(c.getCreated()));
+                    if ((deletedTime.isBefore(time) || c.getId().equals(commitId)) && deletedTime.isAfter(modified)) {
+                        //there's a delete between element last modified time and requested commit time
+                        //or element is deleted at commit
+                        isDeleted = true;
+                    }
+                }
+                if (isDeleted) {
+                    rejectDeleted(info, nodeId, indexElement);
+                } else {
+                    info.getActiveElementMap().put(nodeId, indexElement);
+                }
             } else { // latest element version is version at commit, not deleted
                 info.getActiveElementMap().put(nodeId, indexElement);
             }
