@@ -41,7 +41,7 @@ public class FederatedCommitPersistence implements CommitPersistence {
         ContextHolder.setContext(commitJson.getProjectId());
         Commit commit = new Commit();
         commit.setComment(commitJson.getComment());
-        commit.setCommitId(commitJson.getDocId());
+        commit.setCommitId(commitJson.getId());
         commit.setCreator(commitJson.getCreator());
         commit.setBranchId(commitJson.getRefId());
         commit.setCommitType(CommitType.COMMIT);
