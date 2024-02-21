@@ -103,8 +103,12 @@ public class ProjectsController extends BaseController {
                 }
 
                 Optional<ProjectJson> existingOptional = projectPersistence.findById(json.getProjectId());
-                if(existingOptional.isPresent()) {
-                    //Project exists, should merge the json
+                if (existingOptional.isPresent()) {
+                    //Project exists, should merge the json, but not if schema is different
+                    if (json.getProjectType() != null && !json.getProjectType().equals(existingOptional.get().getProjectType())) {
+                        response.addRejection(new Rejection(json, 400, "Cannot change existing project schema"));
+                        continue;
+                    }
                     json.merge(existingOptional.get());
                 } else {
                     //New Project
