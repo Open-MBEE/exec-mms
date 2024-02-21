@@ -106,7 +106,7 @@ public class FederatedCommitPersistence implements CommitPersistence {
             }
         });
         List<CommitJson> commits = commitIndexDAO.findAllById(foundCommitIds);
-        commits.sort(Comparator.comparing(BaseJson::getCreated));
+        commits.sort(Comparator.comparing(CommitJson::getCreated).reversed());
         return commits;
     }
 
