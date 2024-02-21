@@ -44,7 +44,7 @@ public class FederatedBranchPersistence implements BranchPersistence {
     @Override
     public RefJson save(RefJson refJson) {
         //Master branch special case
-        boolean isMasterBranch = refJson.getName().equals(Constants.MASTER_BRANCH);
+        boolean isMasterBranch = refJson.getId().equals(Constants.MASTER_BRANCH);
 
         //Fill in docId
         if (refJson.getDocId() == null || refJson.getDocId().isEmpty()) {
@@ -109,7 +109,12 @@ public class FederatedBranchPersistence implements BranchPersistence {
 
     @Override
     public RefJson update(RefJson refJson) {
-        return save(refJson);
+        ContextHolder.setContext(refJson.getProjectId());
+        Optional<Branch> existing = branchDAO.findByBranchId(refJson.getId());
+        existing.get().setDeleted(refJson.isDeleted());
+        branchDAO.save(existing.get());
+        branchIndexDAO.update(refJson);
+        return refJson;
     }
 
     @Override
