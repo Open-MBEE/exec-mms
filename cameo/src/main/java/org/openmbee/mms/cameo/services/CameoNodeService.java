@@ -53,7 +53,7 @@ public class CameoNodeService extends DefaultNodeService implements Hierarchical
         }
 
         NodeGetInfo info = getNodePersistence().findAll(projectId, refId, commitId, req.getElements());
-
+        info.getActiveElementMap().values().forEach((e) -> e.setRefId(refId));
         if (!info.getRejected().isEmpty()) {
             //continue looking in visible mounted projects for elements if not all found
             NodeGetInfo curInfo = info;
@@ -62,9 +62,11 @@ public class CameoNodeService extends DefaultNodeService implements Hierarchical
 
             int i = 1; //0 is entry project, already gotten
             while (!curInfo.getRejected().isEmpty() && i < usages.size()) {
+                final int j = i;
                 ElementsRequest reqNext = buildRequest(curInfo.getRejected().keySet());
                 //TODO use the right commitId in child if commitId is present in params :: same commit Id is not working for child
                 curInfo = getNodePersistence().findAll(usages.get(i).getFirst(), usages.get(i).getSecond(), "", reqNext.getElements());
+                curInfo.getActiveElementMap().values().forEach((e) -> e.setRefId(usages.get(j).getSecond()));
                 info.getActiveElementMap().putAll(curInfo.getActiveElementMap());
                 curInfo.getActiveElementMap().forEach((id, json) -> info.getRejected().remove(id));
                 curInfo.getRejected().forEach((id, rejection) -> {
