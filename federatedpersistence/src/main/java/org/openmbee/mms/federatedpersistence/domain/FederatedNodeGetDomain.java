@@ -2,7 +2,6 @@ package org.openmbee.mms.federatedpersistence.domain;
 
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.config.Formats;
-import org.openmbee.mms.core.dao.CommitPersistence;
 import org.openmbee.mms.data.dao.BranchDAO;
 import org.openmbee.mms.data.dao.CommitDAO;
 import org.openmbee.mms.data.dao.NodeDAO;
@@ -18,6 +17,8 @@ import org.openmbee.mms.federatedpersistence.dao.FederatedNodeGetInfo;
 import org.openmbee.mms.federatedpersistence.dao.FederatedNodeGetInfoImpl;
 import org.openmbee.mms.json.CommitJson;
 import org.openmbee.mms.json.ElementJson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,8 @@ import static org.openmbee.mms.core.config.ContextHolder.getContext;
 
 @Component
 public class FederatedNodeGetDomain extends NodeGetDomain {
+
+    protected static final Logger logger = LoggerFactory.getLogger(FederatedNodeGetDomain.class);
 
     private NodeDAO nodeDAO;
     private NodeIndexDAO nodeIndex;
@@ -110,7 +113,12 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
                 continue;
             }
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
-
+            if (indexElement == null) {
+                logger.warn("node db and index mismatch on element get: nodeId: " + nodeId +
+                    ", docId not found: " + federatedInfo.getExistingNodeMap().get(nodeId).getDocId());
+                rejectNotFound(info, nodeId);
+                continue;
+            }
             if (federatedInfo.getExistingNodeMap().get(nodeId).isDeleted()) {
                 rejectDeleted(info, nodeId, indexElement);
                 continue;
@@ -136,7 +144,25 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
                 continue;
             }
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
-            if(info.getCommitJson() != null && info.getCommitJson().getRefId() != null) {
+            if (indexElement == null) {
+                // latest element not found, mock an object to continue
+                Node n = federatedInfo.getExistingNodeMap().get(nodeId);
+                logger.warn("node db and index mismatch on element commit get: nodeId: " + nodeId +
+                    ", docId not found: " + n.getDocId());
+                Optional<Commit> last = commitDAO.findByCommitId(n.getLastCommit());
+                Optional<Commit> first = commitDAO.findByCommitId(n.getInitialCommit());
+                if (!last.isPresent() || !first.isPresent()) {
+                    rejectNotFound(info, nodeId);
+                    continue;
+                }
+                indexElement = new ElementJson().setId(nodeId).setDocId(n.getDocId());
+                indexElement.setModified(Formats.FORMATTER.format(last.get().getTimestamp()));
+                indexElement.setModifier(last.get().getCreator());
+                indexElement.setCommitId(last.get().getCommitId());
+                indexElement.setCreator(first.get().getCreator());
+                indexElement.setCreated(Formats.FORMATTER.format(first.get().getTimestamp()));
+            }
+            if (info.getCommitJson() != null && info.getCommitJson().getRefId() != null) {
                 indexElement.setRefId(info.getCommitJson().getRefId());
             } else {
                 indexElement.setRefId(ContextHolder.getContext().getBranchId());
