@@ -112,40 +112,34 @@ public class FederatedNodePersistence implements NodePersistence {
     @Override
     public List<ElementJson> findAllByNodeType(String projectId, String refId, String commitId, int nodeType) {
         ContextHolder.setContext(projectId, refId);
-        Optional<Branch> branch = branchDAO.findByBranchId(refId);
-        validateBranch(branch);
+        String commitToPass = checkCommit(refId, commitId);
         List<Node> nodes;
-        Optional<Commit> latestCommit = commitDAO.findLatestByRef(branch.get());
-        if (commitId != null && !commitId.isEmpty() && !commitId.equals(latestCommit.<Object>map(Commit::getCommitId).orElse(null))) {
-            validateCommit(commitDAO.findByCommitId(commitId));
+        if (commitToPass != null) {
             nodes = nodeDAO.findAllByNodeType(nodeType);
         } else {
             nodes = nodeDAO.findAllByDeletedAndNodeType(false, nodeType);
         }
-        return new ArrayList<>(getNodeGetDomain().processGetJsonFromNodes(nodes, commitId).getActiveElementMap().values());
+        return new ArrayList<>(getNodeGetDomain().processGetJsonFromNodes(nodes, commitToPass).getActiveElementMap().values());
     }
 
-    
+
     @Override
     public NodeGetInfo findAll(String projectId, String refId, String commitId, List<ElementJson> elements) {
         ContextHolder.setContext(projectId, refId);
-        return getNodeGetDomain().processGetJson(elements, commitId);
+        return getNodeGetDomain().processGetJson(elements, checkCommit(refId, commitId));
     }
 
     @Override
     public List<ElementJson> findAll(String projectId, String refId, String commitId) {
         ContextHolder.setContext(projectId, refId);
-        Optional<Branch> branch = branchDAO.findByBranchId(refId);
-        validateBranch(branch);
         List<Node> nodes;
-        Optional<Commit> latestCommit = commitDAO.findLatestByRef(branch.get());
-        if (commitId != null && !commitId.isEmpty() && !commitId.equals(latestCommit.<Object>map(Commit::getCommitId).orElse(null))) {
-            validateCommit(commitDAO.findByCommitId(commitId));
+        String commitToPass = checkCommit(refId, commitId);
+        if (commitToPass != null) {
             nodes = nodeDAO.findAll();
         } else {
             nodes = nodeDAO.findAllByDeleted(false);
         }
-        return new ArrayList<>(getNodeGetDomain().processGetJsonFromNodes(nodes, commitId).getActiveElementMap().values());
+        return new ArrayList<>(getNodeGetDomain().processGetJsonFromNodes(nodes, commitToPass).getActiveElementMap().values());
     }
 
 
@@ -153,16 +147,12 @@ public class FederatedNodePersistence implements NodePersistence {
     public void streamAllAtCommit(String projectId, String refId, String commitId, OutputStream stream, String separator) {
         ContextHolder.setContext(projectId, refId);
         List<Node> nodes;
-        Optional<Branch> branch = branchDAO.findByBranchId(refId);
-        validateBranch(branch);
-        Optional<Commit> latestCommit = commitDAO.findLatestByRef(branch.get());
-        if (commitId != null && !commitId.isEmpty() && !commitId.equals(latestCommit.<Object>map(Commit::getCommitId).orElse(null))) {
-            validateCommit(commitDAO.findByCommitId(commitId));
+        final String commitToPass = checkCommit(refId, commitId);
+        if (commitToPass != null) {
             nodes = nodeDAO.findAll();
         } else {
             nodes = nodeDAO.findAllByDeleted(false);
         }
-
         AtomicInteger counter = new AtomicInteger();
         batches(nodes, streamLimit).forEach(ns -> {
             try {
@@ -171,7 +161,7 @@ public class FederatedNodePersistence implements NodePersistence {
                 } else {
                     stream.write(separator.getBytes(StandardCharsets.UTF_8));
                 }
-                Collection<ElementJson> result = getNodeGetDomain().processGetJsonFromNodes(ns, commitId)
+                Collection<ElementJson> result = getNodeGetDomain().processGetJsonFromNodes(ns, commitToPass)
                     .getActiveElementMap().values();
                 stream.write(result.stream().map(this::toJson).collect(Collectors.joining(separator))
                     .getBytes(StandardCharsets.UTF_8));
@@ -255,6 +245,19 @@ public class FederatedNodePersistence implements NodePersistence {
     private void validateCommit(Optional<Commit> commit) {
         if (!commit.isPresent()) {
             throw new BadRequestException("commit id is invalid");
+        }
+    }
+
+    // if commitId is latest, return null
+    private String checkCommit(String refId, String commitId) {
+        Optional<Branch> branch = branchDAO.findByBranchId(refId);
+        validateBranch(branch);
+        if (commitId != null && !commitId.isEmpty() && !commitId.equals(
+                commitDAO.findLatestByRef(branch.get()).map(Commit::getCommitId).orElse(null))) {
+            validateCommit(commitDAO.findByCommitId(commitId));
+            return commitId;
+        } else {
+            return null;
         }
     }
 }
