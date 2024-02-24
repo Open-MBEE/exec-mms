@@ -135,6 +135,7 @@ public class DefaultNodeService implements NodeService {
 
         ElementsResponse response = new ElementsResponse();
         response.getElements().addAll(info.getActiveElementMap().values());
+        response.getElements().forEach(v -> v.setRefId(refId));
         response.setRejected(new ArrayList<>(info.getRejected().values()));
         response.setCommitId(commitId);
         return response;

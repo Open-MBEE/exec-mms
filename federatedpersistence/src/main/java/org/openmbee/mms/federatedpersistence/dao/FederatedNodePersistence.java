@@ -163,6 +163,7 @@ public class FederatedNodePersistence implements NodePersistence {
                 }
                 Collection<ElementJson> result = getNodeGetDomain().processGetJsonFromNodes(ns, commitToPass)
                     .getActiveElementMap().values();
+                result.forEach(v -> v.setRefId(refId));
                 stream.write(result.stream().map(this::toJson).collect(Collectors.joining(separator))
                     .getBytes(StandardCharsets.UTF_8));
             } catch (IOException ioe) {
