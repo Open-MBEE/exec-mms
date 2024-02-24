@@ -61,6 +61,7 @@ public class DefaultNodeUpdateFilter implements NodeUpdateFilter {
             }
         }
         element.merge(existing);
+        element.remove(ElementJson.IS_DELETED);
         return true;
     }
 
