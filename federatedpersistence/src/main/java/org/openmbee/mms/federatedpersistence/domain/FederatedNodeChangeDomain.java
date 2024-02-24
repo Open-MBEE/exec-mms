@@ -1,7 +1,9 @@
 package org.openmbee.mms.federatedpersistence.domain;
 
 import org.openmbee.mms.core.config.Constants;
+import org.openmbee.mms.core.config.Formats;
 import org.openmbee.mms.crud.domain.NodeUpdateFilter;
+import org.openmbee.mms.data.dao.CommitDAO;
 import org.openmbee.mms.data.dao.NodeDAO;
 import org.openmbee.mms.data.dao.NodeIndexDAO;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
@@ -9,7 +11,7 @@ import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.NodeChangeInfo;
 import org.openmbee.mms.crud.domain.CommitDomain;
 import org.openmbee.mms.crud.domain.NodeChangeDomain;
-import org.openmbee.mms.crud.domain.NodeGetDomain;
+import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
 import org.openmbee.mms.federatedpersistence.dao.FederatedNodeChangeInfo;
 import org.openmbee.mms.federatedpersistence.dao.FederatedNodeChangeInfoImpl;
@@ -34,16 +36,18 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
     protected FederatedElementDomain elementDomain;
     protected NodeDAO nodeRepository;
     protected NodeIndexDAO nodeIndex;
+    protected CommitDAO commitDAO;
 
     @Autowired
     public FederatedNodeChangeDomain(CommitDomain commitDomain,
             FederatedNodeGetDomain getDomain, NodeDAO nodeRepository, NodeIndexDAO nodeIndex, FederatedElementDomain elementDomain,
-            List<NodeUpdateFilter> nodeUpdateFilters) {
+            List<NodeUpdateFilter> nodeUpdateFilters, CommitDAO commitDAO) {
         super(getDomain, commitDomain, nodeUpdateFilters);
         this.getDomain = getDomain;
         this.nodeRepository = nodeRepository;
         this.nodeIndex = nodeIndex;
         this.elementDomain = elementDomain;
+        this.commitDAO = commitDAO;
     }
 
     @Override
@@ -227,8 +231,12 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
                 added = true;
             } else if (indexElement == null) {
                 logger.warn("node db and index mismatch on element update: nodeId: " + n.getNodeId() + ", docId not found: " + n.getDocId());
-                info.addRejection(element.getId(), new Rejection(element, 500, "Update failed: previous element not found"));
-                continue;
+                indexElement = new ElementJson().setId(n.getNodeId()).setDocId(n.getDocId());
+                Optional<Commit> init = commitDAO.findByCommitId(n.getInitialCommit());
+                if (init.isPresent()) {
+                    indexElement.setCreator(init.get().getCreator());
+                    indexElement.setCreated(Formats.FORMATTER.format(init.get().getTimestamp()));
+                }
             }
 
             // create new doc id for all element json, update modified time, modifier (use dummy for now), set _projectId, _refId, _inRefIds
