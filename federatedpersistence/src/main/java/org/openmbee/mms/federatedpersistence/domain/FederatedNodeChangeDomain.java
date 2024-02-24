@@ -187,8 +187,13 @@ public class FederatedNodeChangeDomain extends NodeChangeDomain {
             ElementJson indexElement = info.getExistingElementMap().get(nodeId);
 
             if (node.isDeleted()) {
-                info.addRejection(nodeId, new Rejection(indexElement, 410, "Already deleted"));  
+                info.addRejection(nodeId, new Rejection(indexElement, 410, "Already deleted"));
                 continue;
+            }
+            if (indexElement == null) {
+                logger.warn("node db and index mismatch on element delete: nodeId: " + nodeId +
+                    ", docId not found: " + federatedInfo.getExistingNodeMap().get(nodeId).getDocId());
+                indexElement = new ElementJson().setId(nodeId).setDocId(node.getDocId());
             }
 
             ElementJson request = info.getReqElementMap().get(nodeId);
