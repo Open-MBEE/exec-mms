@@ -145,6 +145,7 @@ public class ProjectsController extends BaseController {
                         response.addRejection(new Rejection(json, 403, "No permission to change project"));
                         continue;
                     }
+                    boolean updatePermissions = false;
                     if (json.getOrgId() != null && !json.getOrgId().isEmpty()) {
                         Optional<ProjectJson> projectJsonOption = projectPersistence.findById(json.getProjectId());
                         if (projectJsonOption.isPresent()) {
@@ -158,13 +159,16 @@ public class ProjectsController extends BaseController {
                                     continue;
                                 }
                                 if (projectPersistence.inheritsPermissions(projectJson.getProjectId())) {
-                                    permissionService.setProjectInherit(false, json.getProjectId());
-                                    permissionService.setProjectInherit(true, json.getProjectId());
+                                    updatePermissions = true;
                                 }
                             }
                         }
                     }
                     response.getProjects().add(ps.update(json));
+                    if (updatePermissions) {
+                        permissionService.setProjectInherit(false, json.getProjectId());
+                        permissionService.setProjectInherit(true, json.getProjectId());
+                    }
                 }
             } catch (MMSException ex) {
                 response.addRejection(new Rejection(json, ex.getCode().value(), ex.getMessageObject().toString()));
