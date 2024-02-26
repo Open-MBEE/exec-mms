@@ -6,3 +6,7 @@ elasticsearch.limit.term=100
 elasticsearch.limit.scrollTimeout=1000
 elasticsearch.limit.get=100000
 elasticsearch.limit.index=5000
+
+#Optional Elasticsearch Basic Authentication Credentials
+elasticsearch.username=
+elasticsearch.password=

@@ -13,13 +13,23 @@ import org.openmbee.mms.core.services.NodeService;
 import org.openmbee.mms.data.domains.scoped.Branch;
 import org.openmbee.mms.data.domains.scoped.Commit;
 import org.openmbee.mms.data.domains.scoped.Node;
+import org.openmbee.mms.core.dao.CommitIndexDAO;
+import org.openmbee.mms.json.CommitJson;
 import org.openmbee.mms.json.ElementJson;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.openmbee.mms.core.config.ContextHolder.getContext;
 
 @Service
 public class NodeGetHelper extends NodeOperation {
+
+    protected CommitIndexDAO commitIndex;
+
+    @Autowired
+    public void setCommitIndex(CommitIndexDAO commitIndex) {
+        this.commitIndex = commitIndex;
+    }
 
     public NodeGetInfo processGetJsonFromNodes(List<Node> nodes, NodeService service) {
         NodeGetInfo info = initInfoFromNodes(nodes, null);
@@ -122,20 +132,43 @@ public class NodeGetHelper extends NodeOperation {
                 Optional<ElementJson> e = nodeIndex.getElementLessThanOrEqualTimestamp(nodeId,
                     formatter.format(time), refCommitIds);
                 if (e.isPresent()) { // found version of element at commit time
-                    //TODO determine if element was deleted at the time?
-                    e.get().setRefId(ContextHolder.getContext().getBranchId());
-                    info.getActiveElementMap().put(nodeId, e.get());
+                    Instant realModified = Instant.from(formatter.parse(e.get().getModified()));
+                    if (elementDeleted(nodeId, commitId, time, realModified, refCommitIds)) {
+                        rejectDeleted(info, nodeId, e.get());
+                    } else {
+                        e.get().setRefId(ContextHolder.getContext().getBranchId());
+                        info.getActiveElementMap().put(nodeId, e.get());
+                    }
                 } else {
                     rejectNotFound(info, nodeId); // element not found at commit time
                 }
             } else if (info.getExistingNodeMap().get(nodeId).isDeleted()) { // latest element is before commit, but deleted
-                // TODO check if time of deletion is after the commit time
-                rejectDeleted(info, nodeId, indexElement);
+                if (refCommitIds == null) { // need list of commitIds of current ref to filter on
+                    refCommitIds = getRefCommitIds(time);
+                }
+                if (elementDeleted(nodeId, commitId, time, modified, refCommitIds)) {
+                    rejectDeleted(info, nodeId, indexElement);
+                } else {
+                    info.getActiveElementMap().put(nodeId, indexElement);
+                }
             } else { // latest element version is version at commit, not deleted
                 info.getActiveElementMap().put(nodeId, indexElement);
             }
         }
         return info;
+    }
+
+    private boolean elementDeleted(String nodeId, String commitId, Instant time, Instant modified, List<String> refCommitIds) {
+        List<CommitJson> commits = commitIndex.elementDeletedHistory(nodeId, refCommitIds);
+        for (CommitJson c: commits) {
+            Instant deletedTime = Instant.from(formatter.parse(c.getCreated()));
+            if ((deletedTime.isBefore(time) || c.getId().equals(commitId)) && deletedTime.isAfter(modified)) {
+                //there's a delete between element last modified time and requested commit time
+                //or element is deleted at commit
+                return true;
+            }
+        }
+        return false;
     }
 
     public NodeGetInfo processGetJson(List<ElementJson> elements, Instant time, NodeService service) {
