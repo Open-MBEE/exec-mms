@@ -182,11 +182,14 @@ public class DefaultBranchService implements BranchService {
         try {
             branchIndex.update(branch);
             branchRepository.save(b);
-            Set<String> docIds = new HashSet<>();
-            for (Node n: nodeRepository.findAllByDeleted(false)) {
-                docIds.add(n.getDocId());
+            if(branch.getParentCommitId() == null) {
+                Set<String> docIds = new HashSet<>();
+                for (Node n: nodeRepository.findAllByDeleted(false)) {
+                    docIds.add(n.getDocId());
+                }
+
+                try { nodeIndex.addToRef(docIds); } catch(Exception e) {}
             }
-            try { nodeIndex.addToRef(docIds); } catch(Exception e) {}
             eventPublisher.forEach((pub) -> pub.publish(
                 EventObject.create(projectId, branch.getId(), "branch_created", branch)));
             return branch;
