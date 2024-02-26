@@ -236,12 +236,19 @@ public class DefaultBranchService implements BranchService {
         for (Node node : nodes) {
             if(nodeCommitData.containsKey(node.getNodeId())){
                 node.setDocId(nodeCommitData.get(node.getNodeId()).getDocId());
+                node.setLastCommit(nodeCommitData.get(node.getNodeId()).getCommitId());
                 node.setDeleted(false);
             } else {
                 node.setDeleted(true);
             }
         }
         nodeRepository.updateAll(nodes);
+
+        Set<String> docIds = new HashSet<>();
+        for (Node n: nodeRepository.findAllByDeleted(false)) {
+            docIds.add(n.getDocId());
+        }
+        try { nodeIndex.addToRef(docIds); } catch(Exception e) {}
 
         return branchFromCommit;
     }
