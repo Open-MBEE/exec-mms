@@ -137,7 +137,7 @@ public class DefaultBranchService implements BranchService {
         branch.setDeleted(false);
         branch.setProjectId(projectId);
         branch.setStatus("created");
-        boolean fromCommit = !branch.getParentCommitId().isEmpty();
+        boolean fromCommit = branch.getParentCommitId() == null ? false : true;
 
         if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
             String docId = branchIndex.createDocId(branch);
