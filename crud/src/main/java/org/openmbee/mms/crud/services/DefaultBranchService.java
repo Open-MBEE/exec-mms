@@ -137,6 +137,7 @@ public class DefaultBranchService implements BranchService {
         branch.setDeleted(false);
         branch.setProjectId(projectId);
         branch.setStatus("created");
+        boolean fromCommit = !branch.getParentCommitId().isEmpty();
 
         if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
             String docId = branchIndex.createDocId(branch);
@@ -182,7 +183,7 @@ public class DefaultBranchService implements BranchService {
         try {
             branchIndex.update(branch);
             branchRepository.save(b);
-            if(branch.getParentCommitId() == null) {
+            if(!fromCommit) {
                 Set<String> docIds = new HashSet<>();
                 for (Node n: nodeRepository.findAllByDeleted(false)) {
                     docIds.add(n.getDocId());
@@ -222,7 +223,7 @@ public class DefaultBranchService implements BranchService {
 
         RefJson branchFromCommit = this.createBranch(projectId, parentCommitIdRef);
 
-        ContextHolder.setContext(projectId, branchFromCommit.getRefId());
+        ContextHolder.setContext(projectId, branchFromCommit.getId());
 
         // Get current nodes from database
         List<Node> nodes = nodeRepository.findAll();
@@ -236,21 +237,19 @@ public class DefaultBranchService implements BranchService {
         }
 
         // Update database table to match index
+        Set<String> docIds = new HashSet<>();
         for (Node node : nodes) {
             if(nodeCommitData.containsKey(node.getNodeId())){
                 node.setDocId(nodeCommitData.get(node.getNodeId()).getDocId());
                 node.setLastCommit(nodeCommitData.get(node.getNodeId()).getCommitId());
                 node.setDeleted(false);
+                docIds.add(node.getDocId());
             } else {
                 node.setDeleted(true);
             }
         }
         nodeRepository.updateAll(nodes);
 
-        Set<String> docIds = new HashSet<>();
-        for (Node n: nodeRepository.findAllByDeleted(false)) {
-            docIds.add(n.getDocId());
-        }
         try { nodeIndex.addToRef(docIds); } catch(Exception e) {}
 
         return branchFromCommit;
