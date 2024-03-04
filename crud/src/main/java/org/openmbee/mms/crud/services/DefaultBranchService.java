@@ -136,9 +136,8 @@ public class DefaultBranchService implements BranchService {
         branch.setCreated(Formats.FORMATTER.format(now));
         branch.setDeleted(false);
         branch.setProjectId(projectId);
-        branch.setStatus("created");
         boolean fromCommit = branch.getParentCommitId() == null ? false : true;
-
+        branch.setStatus(fromCommit ? "creating" : "created");
         if (branch.getDocId() == null || branch.getDocId().isEmpty()) {
             String docId = branchIndex.createDocId(branch);
             branch.setDocId(docId);
@@ -222,7 +221,6 @@ public class DefaultBranchService implements BranchService {
         ContextHolder.setContext(projectId, parentRef);
 
         RefJson branchFromCommit = this.createBranch(projectId, parentCommitIdRef);
-
         ContextHolder.setContext(projectId, branchFromCommit.getId());
 
         // Get current nodes from database
@@ -249,7 +247,8 @@ public class DefaultBranchService implements BranchService {
             }
         }
         nodeRepository.updateAll(nodes);
-
+        branchFromCommit.setStatus("created");
+        branchIndex.update(branchFromCommit);
         try { nodeIndex.addToRef(docIds); } catch(Exception e) {}
 
         return branchFromCommit;
