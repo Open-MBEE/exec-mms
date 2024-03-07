@@ -29,10 +29,10 @@ ext {
         'spring-aspects'                : "org.springframework:spring-aspects:$springFrameworkVersion",
         'spring-data-commons'           : "org.springframework.data:spring-data-commons:$springDataVersion",
         'spring-data-jpa'               : "org.springframework.data:spring-data-jpa:$springDataVersion",
-        'jackson-annotations'           : "com.fasterxml.jackson.core:jackson-annotations",
-        'jackson-databind'              : "com.fasterxml.jackson.core:jackson-databind",
-        'jackson-datatype-hibernate5'   : "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5",
-        'jackson-datatype-jsr310'       : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
+        'jackson-annotations'           : "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
+        'jackson-databind'              : "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+        'jackson-datatype-hibernate5'   : "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:$jacksonVersion",
+        'jackson-datatype-jsr310'       : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
         'spring-boot-starter-test'      : 'org.springframework.boot:spring-boot-starter-test:2.2.4.RELEASE'
     ]
 }
@@ -146,10 +146,6 @@ subprojects {
         configurations.all {
             exclude group: "org.slf4j", module: "slf4j-log4j12"
             exclude group: "log4j", module: "log4j"
-        }
-
-        dependencies {
-            api platform("com.fasterxml.jackson:jackson-bom:${jacksonVersion}")
         }
     }
 
