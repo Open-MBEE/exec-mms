@@ -62,6 +62,7 @@ subprojects {
 
     group = "org.openmbee.mms"
     version = rootProject.version
+    ext['jackson-bom.version'] = jacksonVersion
 
     Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 
@@ -148,7 +149,7 @@ subprojects {
         }
 
         dependencies {
-            implementation enforcedPlatform("com.fasterxml.jackson:jackson-bom:${jacksonVersion}")
+            api platform("com.fasterxml.jackson:jackson-bom:${jacksonVersion}")
         }
     }
 
