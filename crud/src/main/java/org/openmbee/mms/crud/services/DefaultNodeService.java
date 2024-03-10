@@ -161,10 +161,10 @@ public class DefaultNodeService implements NodeService {
             overwriteJson, preserveTimestamps);
         changes = nodePersistence.prepareAddsUpdates(changes, req.getElements());
 
-        for(ElementJson element : changes.getUpdatedMap().values()) {
+        for (ElementJson element : changes.getUpdatedMap().values()) {
             extraProcessPostedElement(changes, element);
         }
-        if(req.getDeletes() != null) {
+        if (req.getDeletes() != null) {
             changes = nodePersistence.prepareDeletes(changes, req.getDeletes());
         }
 

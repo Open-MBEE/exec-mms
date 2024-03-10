@@ -178,11 +178,29 @@ public class FederatedNodePersistence implements NodePersistence {
         if (parentBranch != null && parentCommit != null && targetBranch != null) {
             String projectId = parentBranch.getProjectId();
             ContextHolder.setContext(projectId, parentBranch.getId());
+            Optional<CommitJson> latest = commitPersistence.findLatestByProjectAndRef(projectId, parentBranch.getId());
             Set<String> docIds = new HashSet<>();
-            for (Node n : nodeDAO.findAllByDeleted(false)) {
-                docIds.add(n.getDocId());
-            }
             ContextHolder.setContext(projectId, targetBranch.getId());
+            if (latest.isPresent() && !latest.get().getId().equals(parentCommit.getId())) {
+                FederatedNodeGetInfo info = (FederatedNodeGetInfo)getNodeGetDomain().processGetJsonFromNodes(nodeDAO.findAll(), parentCommit.getId());
+                for (Node node: info.getExistingNodeMap().values()) {
+                    ElementJson el = info.getActiveElementMap().get(node.getNodeId());
+                    if (el != null) {
+                        node.setDocId(el.getDocId());
+                        node.setLastCommit(el.getCommitId());
+                        docIds.add(el.getDocId());
+                        node.setDeleted(false);
+                    } else {
+                        node.setDeleted(true);
+                    }
+                }
+                nodeDAO.saveAll(info.getExistingNodeMap().values().stream().toList());
+
+            } else {
+                for (Node n : nodeDAO.findAllByDeleted(false)) {
+                    docIds.add(n.getDocId());
+                }
+            }
             nodeIndexDAO.addToRef(docIds);
         } else {
             throw new InternalErrorException("Error committing transaction");

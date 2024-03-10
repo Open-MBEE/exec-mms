@@ -2,10 +2,7 @@ package org.openmbee.mms.federatedpersistence.domain;
 
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.core.config.Formats;
-import org.openmbee.mms.data.dao.BranchDAO;
-import org.openmbee.mms.data.dao.CommitDAO;
-import org.openmbee.mms.data.dao.NodeDAO;
-import org.openmbee.mms.data.dao.NodeIndexDAO;
+import org.openmbee.mms.data.dao.*;
 import org.openmbee.mms.core.exceptions.BadRequestException;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.core.services.NodeGetInfo;
@@ -37,14 +34,16 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
     private NodeIndexDAO nodeIndex;
     private CommitDAO commitDAO;
     private BranchDAO branchDAO;
+    private CommitIndexDAO commitIndex;
 
     @Autowired
     public FederatedNodeGetDomain(NodeDAO nodeDAO, NodeIndexDAO nodeIndex,
-                                  CommitDAO commitDAO, BranchDAO branchDAO) {
+                                  CommitDAO commitDAO, BranchDAO branchDAO, CommitIndexDAO commitIndex) {
         this.nodeDAO = nodeDAO;
         this.nodeIndex = nodeIndex;
         this.commitDAO = commitDAO;
         this.branchDAO = branchDAO;
+        this.commitIndex = commitIndex;
     }
 
     public NodeGetInfo initInfo(List<ElementJson> elements, CommitJson commitJson) {
@@ -129,7 +128,7 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
     }
 
     protected NodeGetInfo processCommit(NodeGetInfo info, String commitId) {
-        if(!(info instanceof FederatedNodeGetInfo)) {
+        if (!(info instanceof FederatedNodeGetInfo)) {
             throw new InternalErrorException("Invalid use of FederatedNodeGetDomain");
         }
         FederatedNodeGetInfo federatedInfo = (FederatedNodeGetInfo) info;
@@ -187,18 +186,42 @@ public class FederatedNodeGetDomain extends NodeGetDomain {
                 Optional<ElementJson> e = nodeIndex.getElementLessThanOrEqualTimestamp(nodeId,
                     Formats.FORMATTER.format(time), refCommitIds);
                 if (e.isPresent()) { // found version of element at commit time
-                    //TODO determine if element was deleted at the time?
-                    addActiveElement(info, nodeId, e.get());
+                    Instant realModified = Instant.from(Formats.FORMATTER.parse(e.get().getModified()));
+                    if (elementDeleted(nodeId, commitId, time, realModified, refCommitIds)) {
+                        rejectDeleted(info, nodeId, e.get());
+                    } else {
+                        addActiveElement(info, nodeId, e.get());
+                    }
                 } else {
                     rejectNotFound(info, nodeId); // element not found at commit time
                 }
             } else if (federatedInfo.getExistingNodeMap().get(nodeId).isDeleted()) { // latest element is before commit, but deleted
-                rejectDeleted(info, nodeId, indexElement);
+                if (refCommitIds == null) { // need list of commitIds of current ref to filter on
+                    refCommitIds = getRefCommitIds(time);
+                }
+                if (elementDeleted(nodeId, commitId, time, modified, refCommitIds)) {
+                    rejectDeleted(info, nodeId, indexElement);
+                } else {
+                    addActiveElement(info, nodeId, indexElement);
+                }
             } else { // latest element version is version at commit, not deleted
                 addActiveElement(info, nodeId, indexElement);
             }
         }
         return info;
+    }
+
+    private boolean elementDeleted(String nodeId, String commitId, Instant time, Instant modified, List<String> refCommitIds) {
+        List<CommitJson> commits = commitIndex.elementDeletedHistory(nodeId, refCommitIds);
+        for (CommitJson c: commits) {
+            Instant deletedTime = Instant.from(Formats.FORMATTER.parse(c.getCreated()));
+            if ((deletedTime.isBefore(time) || c.getId().equals(commitId)) && deletedTime.isAfter(modified)) {
+                //there's a delete between element last modified time and requested commit time
+                //or element is deleted at commit
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean existingNodeContainsNodeId(FederatedNodeGetInfo info, String nodeId) {

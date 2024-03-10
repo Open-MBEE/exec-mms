@@ -109,13 +109,7 @@ public class BranchesController extends BaseController {
                 }
                 RefJson res;
                 branch.setCreator(auth.getName());
-                if (branch.getParentCommitId() == null || branch.getParentCommitId().isEmpty()) {
-                    res = branchService.createBranch(projectId, branch);
-                } else {
-                    //TODO implement branching from historical commit
-                    response.addRejection(new Rejection(branch, 400, "Branching from historical commits is not implemented."));
-                    continue;
-                }
+                res = branchService.createBranch(projectId, branch);
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
                 response.getRefs().add(res);
             } catch (MMSException e) {
