@@ -46,6 +46,6 @@ configurations {
     }
 }
 bootJar {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    duplicatesStrategy = DuplicatesStrategy.WARN
 }
 ext['elasticsearch.version'] = "$elasticVersion"

@@ -96,9 +96,7 @@ public class BranchesController extends BaseController {
                 if (branch.getParentCommitId() == null || branch.getParentCommitId().isEmpty()) {
                     res = branchService.createBranch(projectId, branch);
                 } else {
-                    //TODO implement branching from historical commit
-                    response.addRejection(new Rejection(branch, 400, "Branching from historical commits is not implemented."));
-                    continue;
+                    res = branchService.createBranchfromCommit(projectId, branch, getNodeService(projectId));
                 }
 
                 permissionService.initBranchPerms(projectId, branch.getId(), true, auth.getName());
