@@ -50,7 +50,7 @@ jobs:
             docker stop mms
             mkdir -p jacocoOutput
             docker cp mms:/mms/jacocoOutput/jacoco-it.exec ./jacocoOutput/jacoco-it.exec
-            cp -r */build/classes/* TEMPORARYclassfiles/
+            cp -r ./*/build/classes/* TEMPORARYclassfiles/
             java -jar jacocoJars/jacococli.jar report jacocoOutput/jacoco-it.exec --classfiles TEMPORARYclassfiles/ --xml ./jacocoOutput/jacocoXMLReport
             rm -r TEMPORARYclassfiles
             
