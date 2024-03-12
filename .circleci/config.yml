@@ -50,11 +50,7 @@ jobs:
             docker stop mms
             mkdir -p jacocoOutput
             docker cp mms:/mms/jacocoOutput/jacoco-it.exec ./jacocoOutput/jacoco-it.exec
-            cp -r ./*/build/classes/* TEMPORARYclassfiles/
-            java -jar jacocoJars/jacococli.jar report jacocoOutput/jacoco-it.exec --classfiles TEMPORARYclassfiles/ --xml ./jacocoOutput/jacocoXMLReport
-            rm -r TEMPORARYclassfiles
             
-
       - persist_to_workspace:
             root: /home/circleci/
             paths:
@@ -67,7 +63,12 @@ jobs:
           - checkout
           - run:
                 name: Build classes to scan
-                command: ./gradlew build -x test
+                command: |
+                    ./gradlew build -x test
+                    cp -r */build/classes/java/main/* TEMPORARYclassfiles/
+                    java -jar jacocoJars/jacococli.jar report jacocoOutput/jacoco-it.exec --classfiles TEMPORARYclassfiles/ --xml ./jacocoOutput/jacocoXMLReport
+                    rm -r TEMPORARYclassfiles
+
           - sonarcloud/scan
 
   deploy_snapshot:
@@ -98,6 +99,8 @@ workflows:
                   tags:
                       only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
         - scan:
+              requires:
+                  - build_and_test
               filters:
                   tags:
                       only: /[0-9.]+(-(a|b|rc)[0-9]+)?/
