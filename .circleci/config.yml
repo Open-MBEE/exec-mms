@@ -50,7 +50,7 @@ jobs:
             docker stop mms
             mkdir -p jacocoOutput
             docker cp mms:/mms/jacocoOutput/jacoco-it.exec ./jacocoOutput/jacoco-it.exec
-            
+
       - persist_to_workspace:
             root: /home/circleci/
             paths:
@@ -65,6 +65,7 @@ jobs:
                 name: Build classes to scan
                 command: |
                     ./gradlew build -x test
+                    mkdir -p TEMPORARYclassfiles
                     cp -r */build/classes/java/main/* TEMPORARYclassfiles/
                     java -jar jacocoJars/jacococli.jar report jacocoOutput/jacoco-it.exec --classfiles TEMPORARYclassfiles/ --xml ./jacocoOutput/jacocoXMLReport
                     rm -r TEMPORARYclassfiles
