@@ -24,7 +24,7 @@ jobs:
           name: "Create and start all services from the docker-compose configuration"
           command: |
             cp example/src/main/resources/application.properties.example ./example/src/main/resources/application.properties
-            mkdir jacocoJars
+            mkdir -p jacocoJars
             curl -L -o ./jacocoJars/jacocoagent.jar "https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.7/org.jacoco.agent-0.8.7-runtime.jar"
             curl -L -o ./jacocoJars/jacococli.jar "https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.7/org.jacoco.cli-0.8.7-nodeps.jar"
             docker-compose up --build -d
@@ -60,7 +60,8 @@ jobs:
       executor: openjdk_executor
       working_directory: /home/circleci/mms
       steps:
-          - checkout
+          - attach_workspace:
+                at: ~/
           - run:
                 name: Build classes to scan
                 command: |
