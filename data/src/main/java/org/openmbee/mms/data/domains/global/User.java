@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,11 +16,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
     @UniqueConstraint(columnNames = "email")})
 public class User extends Base {
 
+    @Column(unique = true)
     private String username;
+
     private String email;
     private String firstName;
     private String lastName;
     private boolean admin;
+
+    public enum VALID_USER_TYPES {LOCAL, REMOTE}
+
+    @JsonIgnore
+    private VALID_USER_TYPES type;
+
+    @JsonProperty("type")
+    private String typeString;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
@@ -39,18 +51,21 @@ public class User extends Base {
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
-    private Collection<Group> groups;
+    @JoinTable(name = "users_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), uniqueConstraints=@UniqueConstraint(columnNames={"user_id","group_id"}))
+    private Set<Group> groups;
 
     public User() {
+        this.groups = new HashSet<>();
     }
 
     public User(String email, String username, String password, String firstName, String lastName, boolean admin) {
         this.email = email;
+        this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.admin = admin;
+        this.groups = new HashSet<>();
     }
 
     public String getUsername() {
@@ -59,6 +74,28 @@ public class User extends Base {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public VALID_USER_TYPES getType() {
+        return this.type;
+    }
+
+    public String getTypeString() {
+        return this.typeString;
+    }
+
+    public void setType(VALID_USER_TYPES t) {
+        this.type = t;
+        this.typeString = t.toString().toLowerCase();
+    }
+
+    public void setType(String t) {
+        if (t.equalsIgnoreCase("local")) {
+            this.type = VALID_USER_TYPES.LOCAL;
+        }else {
+            this.type = VALID_USER_TYPES.REMOTE;
+        }
+        this.typeString = t;
     }
 
     public String getEmail() {
@@ -153,7 +190,7 @@ public class User extends Base {
         return groups;
     }
 
-    public void setGroups(Collection<Group> groups) {
+    public void setGroups(Set<Group> groups) {
         this.groups = groups;
     }
 
@@ -164,4 +201,5 @@ public class User extends Base {
     public void setAdmin(boolean admin) {
         this.admin = admin;
     }
+
 }
