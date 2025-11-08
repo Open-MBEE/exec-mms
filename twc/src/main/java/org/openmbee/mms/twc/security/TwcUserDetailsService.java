@@ -35,6 +35,7 @@ public class TwcUserDetailsService extends DefaultUsersDetailsService {
     public UserJson addUser(String username) {
         UserJson user = new UserJson();
         user.setUsername(username);
+        user.setAdmin(false);
         //TODO: fill in user details from TWC
         user.setEnabled(true);
 
