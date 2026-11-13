@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DataSourceBasedMultiTenantConnectionProviderImpl extends
-    AbstractDataSourceBasedMultiTenantConnectionProviderImpl {
+    AbstractDataSourceBasedMultiTenantConnectionProviderImpl<String> {
 
     private static final long serialVersionUID = 1L;
 

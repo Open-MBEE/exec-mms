@@ -1,7 +1,7 @@
 package org.openmbee.mms.data.domains.global;
 
 import java.util.Set;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "privileges")

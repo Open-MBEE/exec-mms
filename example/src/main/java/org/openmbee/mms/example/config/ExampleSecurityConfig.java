@@ -8,10 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
@@ -30,7 +33,7 @@ import static org.springframework.http.HttpMethod.*;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableTransactionManagement
 @EnableAsync
-public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class ExampleSecurityConfig implements WebMvcConfigurer {
 
     @Value("${cors.allowed.origins:*}")
     private String allowedOrigins;
@@ -38,12 +41,15 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
     @Autowired
     AuthSecurityConfig authSecurityConfig;
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests().anyRequest().permitAll().and().httpBasic();
-        http.headers().cacheControl();
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+            .httpBasic(Customizer.withDefaults());
+        http.headers(headers -> headers.cacheControl(Customizer.withDefaults()));
         http.addFilterAfter(corsFilter(), ExceptionTranslationFilter.class);
         authSecurityConfig.setAuthConfig(http);
+        return http.build();
     }
 
     @Bean
@@ -54,9 +60,9 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration)
+        throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Override
