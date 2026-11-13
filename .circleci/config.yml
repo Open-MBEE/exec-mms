@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
     docker: circleci/docker@2.1.1
-    sonarcloud: sonarsource/sonarcloud@2.0.0
+    sonarcloud: sonarsource/sonarcloud@4.0.0
 executors:
   openjdk_executor:
     docker:
