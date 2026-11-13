@@ -64,6 +64,11 @@ subprojects {
     group = "org.openmbee.mms"
     version = rootProject.version
     ext['jackson-bom.version'] = jacksonVersion
+    ext['spring-framework.version'] = springFrameworkVersion
+    ext['spring-security.version'] = springSecurityVersion
+    ext['tomcat.version'] = tomcatVersion
+    ext['logback.version'] = logbackVersion
+    ext['snakeyaml.version'] = snakeyamlVersion
 
     Map<String, String> commonDependencies = rootProject.ext.commonDependencies
 

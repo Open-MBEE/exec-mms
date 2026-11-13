@@ -2,7 +2,7 @@ dependencies {
     api project(':artifacts')
 
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.638'
-    implementation 'org.apache.tika:tika-core:2.9.1'
+    implementation "org.apache.tika:tika-core:$tikaVersion"
     implementation commonDependencies.'servlet-api'
 
     testImplementation commonDependencies.'spring-boot-starter-test'
