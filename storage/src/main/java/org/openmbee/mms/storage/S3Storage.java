@@ -70,12 +70,18 @@ public class S3Storage implements ArtifactStorage {
                 builder.credentialsProvider(DefaultCredentialsProvider.create());
             }
             S3Client client = builder.build();
-            if (!bucketExists(client)) {
-                try {
-                    client.createBucket(request -> request.bucket(getBucket()));
-                } catch (S3Exception e) {
-                    throw new InternalErrorException(e);
+            try {
+                if (!bucketExists(client)) {
+                    try {
+                        client.createBucket(request -> request.bucket(getBucket()));
+                    } catch (S3Exception e) {
+                        throw new InternalErrorException(e);
+                    }
                 }
+            } catch (RuntimeException e) {
+                // The client is rebuilt on the next call, so release this one's connection pool.
+                client.close();
+                throw e;
             }
             s3Client = client;
         }
