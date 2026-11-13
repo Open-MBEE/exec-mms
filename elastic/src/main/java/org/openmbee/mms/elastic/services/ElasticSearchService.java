@@ -1,23 +1,7 @@
 package org.openmbee.mms.elastic.services;
 
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.search.ClearScrollRequest;
-import org.elasticsearch.action.search.ClearScrollResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.elasticsearch.action.fieldcaps.FieldCapabilities;
-import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
-import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchScrollRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.openmbee.mms.core.config.Constants;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.data.dao.NodeDAO;
@@ -26,6 +10,9 @@ import org.openmbee.mms.core.objects.ElementsSearchResponse;
 import org.openmbee.mms.core.objects.Rejection;
 import org.openmbee.mms.core.services.SearchService;
 import org.openmbee.mms.data.domains.scoped.Node;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseListener;
+import org.openmbee.mms.elastic.utils.ElasticClient;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.ElementJson;
 import org.openmbee.mms.search.SearchConstants;
@@ -47,13 +34,17 @@ public class ElasticSearchService implements SearchService {
     protected int resultLimit;
     @Value("${elasticsearch.limit.scrollTimeout}")
     protected long scrollTimeout;
-    protected RestHighLevelClient client;
+    protected ElasticClient client;
     protected NodeDAO nodeRepository;
 
-    protected ActionListener<ClearScrollResponse> listener = new ActionListener<>() {
+    protected ResponseListener listener = new ResponseListener() {
         @Override
-        public void onResponse(ClearScrollResponse clearScrollResponse) {
-            logger.debug("Cleared: " + clearScrollResponse.getNumFreed());
+        public void onSuccess(Response response) {
+            try {
+                logger.debug("Cleared: " + client.parse(response).get("num_freed"));
+            } catch (IOException e) {
+                logger.debug("Cleared scroll");
+            }
         }
 
         @Override
@@ -64,7 +55,7 @@ public class ElasticSearchService implements SearchService {
     };
 
     @Autowired
-    public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
+    public void setElasticClient(@Qualifier("clientElastic") ElasticClient client) {
         this.client = client;
     }
 
@@ -143,24 +134,23 @@ public class ElasticSearchService implements SearchService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private SearchConfiguration getSearchConfiguration(Set<String> fields) {
         SearchConfiguration searchConfiguration = new SearchConfiguration();
-        FieldCapabilitiesRequest fieldsRequest = new FieldCapabilitiesRequest();
-        fieldsRequest.indices(Index.NODE.get());
-        fieldsRequest.fields(fields.toArray(new String[]{}));
         try {
-            FieldCapabilitiesResponse fieldCaps = client.fieldCaps(fieldsRequest, RequestOptions.DEFAULT);
+            Map<String, Object> fieldCaps = client.request("GET",
+                ElasticClient.endpoint(Index.NODE.get(), "_field_caps"),
+                Map.of("fields", String.join(",", fields)), null);
+            Map<String, Map<String, Map<String, Object>>> capsByField =
+                (Map<String, Map<String, Map<String, Object>>>) fieldCaps.get("fields");
             for(String field : fields) {
-                Map<String, FieldCapabilities> fieldMap = fieldCaps.getField(field);
-                if(fieldMap == null) {
+                Map<String, Map<String, Object>> fieldMap = capsByField == null ? null : capsByField.get(field);
+                if(fieldMap == null || fieldMap.isEmpty()) {
                     continue;
                 }
-                for(FieldCapabilities cap : fieldMap.values()) {
-                    if(field.equals(cap.getName())) {
-                        searchConfiguration.addField(field, cap.getType(), cap.isSearchable());
-                        break;
-                    }
-                }
+                Map<String, Object> cap = fieldMap.values().iterator().next();
+                searchConfiguration.addField(field, String.valueOf(cap.get("type")),
+                    Boolean.TRUE.equals(cap.get("searchable")));
             }
             return searchConfiguration;
         } catch (IOException e) {
@@ -194,53 +184,54 @@ public class ElasticSearchService implements SearchService {
 
 
     private List<ElementJson> doSearch(SearchConfiguration searchConfiguration, Set<String> allNodeDocIds, Map<String, List<String>> params) throws IOException {
-        SearchRequest searchRequest = new SearchRequest(Index.NODE.get());
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        List<Map<String, Object>> must = new ArrayList<>();
 
         for(Map.Entry<String, List<String>> e : params.entrySet()) {
-            searchConfiguration.addQueryForField(query, e.getKey(), e.getValue());
+            searchConfiguration.addQueryForField(must, e.getKey(), e.getValue());
         }
 
-        return performElasticQuery(allNodeDocIds, searchRequest, query);
+        Map<String, Object> query = Map.of("bool", must.isEmpty() ? Map.of() : Map.of("must", must));
+        return performElasticQuery(allNodeDocIds, Index.NODE.get(), query);
     }
 
-    private List<ElementJson> performElasticQuery(Set<String> allNodeDocIds, SearchRequest searchRequest, BoolQueryBuilder query) throws IOException {
+    private List<ElementJson> performElasticQuery(Set<String> allNodeDocIds, String index, Map<String, Object> query) throws IOException {
         List<ElementJson> result = new ArrayList<>();
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(query);
-        sourceBuilder.size(resultLimit);
-        searchRequest.source(sourceBuilder);
-        searchRequest.scroll(TimeValue.timeValueSeconds(scrollTimeout));
-        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        String scroll = scrollTimeout + "s";
+        Map<String, Object> searchRequest = new LinkedHashMap<>();
+        searchRequest.put("query", query);
+        searchRequest.put("size", resultLimit);
+        Map<String, Object> searchResponse = client.request("POST", ElasticClient.endpoint(index, "_search"),
+            Map.of("scroll", scroll), searchRequest);
         String scrollId = null;
+        List<Map<String, Object>> hits;
         do {
-            for (SearchHit hit : searchResponse.getHits()) {
-                ElementJson ob = parseResult(hit);
+            for (Map<String, Object> source : ElasticClient.sources(searchResponse)) {
+                ElementJson ob = parseResult(source);
                 if (allNodeDocIds.contains(ob.getDocId())) {
                     result.add(ob);
                 }
             }
-            scrollId = searchResponse.getScrollId();
+            scrollId = (String) searchResponse.get("_scroll_id");
             if (scrollId != null) {
-                SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
-                scrollRequest.scroll(TimeValue.timeValueSeconds(scrollTimeout));
-                searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
+                Map<String, Object> scrollRequest = new LinkedHashMap<>();
+                scrollRequest.put("scroll", scroll);
+                scrollRequest.put("scroll_id", scrollId);
+                searchResponse = client.request("POST", "/_search/scroll", Collections.emptyMap(), scrollRequest);
             }
+            hits = ElasticClient.sources(searchResponse);
 
-        } while (scrollId != null && searchResponse.getHits().getHits() != null && searchResponse.getHits().getHits().length != 0);
+        } while (scrollId != null && !hits.isEmpty());
 
         if (scrollId != null) {
-            ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
-            clearScrollRequest.addScrollId(scrollId);
-            client.clearScrollAsync(clearScrollRequest, RequestOptions.DEFAULT, listener);
+            client.requestAsync("DELETE", "/_search/scroll", Map.of("scroll_id", List.of(scrollId)), listener);
         }
 
         return result;
     }
 
-    private ElementJson parseResult(SearchHit hit) {
+    private ElementJson parseResult(Map<String, Object> source) {
         ElementJson ob = new ElementJson();
-        ob.putAll(hit.getSourceAsMap());
+        ob.putAll(source);
         return ob;
     }
 

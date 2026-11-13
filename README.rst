@@ -56,11 +56,11 @@ or Mysql
 Elasticsearch
 ^^^^^^^^^^^^^
 
-Install Elasticsearch 7.8.  If you use Docker instructions are available here: `Setting up Elasticsearch with Docker <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html>`_
+Install Elasticsearch 9 or OpenSearch 3.  MMS talks to either one over the REST API they share, so the ``elasticsearch.*`` properties select the server by host and port alone.  If you use Docker instructions are available here: `Setting up Elasticsearch with Docker <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html>`_
 
 .. code-block::
 
-   docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.8.1
+   docker run -d -p 9200:9200 -e "discovery.type=single-node" -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:9.5.6
 
 
 Artifacts Storage

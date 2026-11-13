@@ -1,20 +1,19 @@
 package org.openmbee.mms.elastic;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.data.dao.ProjectIndex;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
+import org.openmbee.mms.elastic.utils.ElasticClient;
 import org.openmbee.mms.json.ProjectJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +28,7 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
     }
 
     @Autowired
-    public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
+    public void setElasticClient(@Qualifier("clientElastic") ElasticClient client) {
         this.client = client;
     }
 
@@ -47,15 +46,9 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
             String projectId = project.getProjectId();
             String projectType = project.getProjectType();
             String index = projectId.toLowerCase();
-            CreateIndexRequest commitIndex = new CreateIndexRequest(index + "_commit");
-            commitIndex.mapping(getCommitMapping(), XContentType.JSON);
-            CreateIndexRequest nodeIndex = new CreateIndexRequest(index + "_node");
-            nodeIndex.mapping(getNodeMapping(projectType), XContentType.JSON);
-            CreateIndexRequest metadataIndex = new CreateIndexRequest(index + "_metadata");
-            metadataIndex.mapping(getMetadataMapping(), XContentType.JSON);
-            createIndex(commitIndex);
-            createIndex(nodeIndex);
-            createIndex(metadataIndex);
+            createIndex(index + "_commit", getCommitMapping());
+            createIndex(index + "_node", getNodeMapping(projectType));
+            createIndex(index + "_metadata", getMetadataMapping());
             update(project);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -71,19 +64,17 @@ public class ProjectElasticImpl extends BaseElasticDAOImpl<ProjectJson> implemen
         return this.findAllById(getIndex(), docIds);
     }
 
-    private void createIndex(CreateIndexRequest request) throws IOException {
-        client.indices().create(request, RequestOptions.DEFAULT).isAcknowledged();
+    private void createIndex(String index, String mapping) throws IOException {
+        client.request("PUT", ElasticClient.endpoint(index), Collections.emptyMap(),
+            Map.of("mappings", new ObjectMapper().readTree(mapping)));
     }
 
     @Override
     public void delete(String projectId) {
         try {
-            DeleteIndexRequest request = new DeleteIndexRequest(projectId.toLowerCase() + "_node");
-            DeleteIndexRequest request2 = new DeleteIndexRequest(projectId.toLowerCase() + "_commit");
-            DeleteIndexRequest request3 = new DeleteIndexRequest(projectId.toLowerCase() + "_metadata");
-            client.indices().delete(request, RequestOptions.DEFAULT).isAcknowledged();
-            client.indices().delete(request2, RequestOptions.DEFAULT).isAcknowledged();
-            client.indices().delete(request3, RequestOptions.DEFAULT).isAcknowledged();
+            client.request("DELETE", ElasticClient.endpoint(projectId.toLowerCase() + "_node"));
+            client.request("DELETE", ElasticClient.endpoint(projectId.toLowerCase() + "_commit"));
+            client.request("DELETE", ElasticClient.endpoint(projectId.toLowerCase() + "_metadata"));
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);

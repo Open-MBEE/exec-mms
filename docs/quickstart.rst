@@ -27,10 +27,10 @@ Dependencies
       docker run -d -e MYSQL_ROOT_PASSWORD=test1234 -e MYSQL_DATABASE=mms -p 3306:3306 --name=mysql mysql:5.7
 
   Elasticsearch
-    Install Elasticsearch 7.8.  If you use Docker instructions are available here: `Setting up Elasticsearch with Docker <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html>`_
+    Install Elasticsearch 9 or OpenSearch 3.  MMS talks to either one over the REST API they share, so the ``elasticsearch.*`` properties select the server by host and port alone.  If you use Docker instructions are available here: `Setting up Elasticsearch with Docker <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html>`_
     ::
 
-      docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name=elasticsearch docker.elastic.co/elasticsearch/elasticsearch:7.8.1
+      docker run -d -p 9200:9200 -e "discovery.type=single-node" -e "xpack.security.enabled=false" --name=elasticsearch docker.elastic.co/elasticsearch/elasticsearch:9.5.6
 
   S3 object store
     Any S3 compatible object store works for artifact storage. For local development, `S3Mock <https://github.com/adobe/S3Mock>`_ is enough:

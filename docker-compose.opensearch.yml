@@ -1,0 +1,19 @@
+# Runs the stack against OpenSearch instead of Elasticsearch:
+#   docker compose -f docker-compose.yml -f docker-compose.opensearch.yml up --build --scale elasticsearch=0
+version: '3.8'
+
+services:
+  opensearch:
+    image: opensearchproject/opensearch:3.9.0
+    environment:
+      - "discovery.type=single-node"
+      - "DISABLE_SECURITY_PLUGIN=true"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+    ports:
+        - 9201:9200
+
+  mms:
+    environment:
+        - "ELASTICSEARCH_HOST=opensearch"
+    depends_on:
+        - opensearch

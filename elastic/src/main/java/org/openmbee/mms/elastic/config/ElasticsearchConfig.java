@@ -9,7 +9,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.openmbee.mms.elastic.utils.ElasticClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +30,7 @@ public class ElasticsearchConfig {
     private String elasticsearchUsername;
 
     @Bean(name = "clientElastic", destroyMethod = "close")
-    public RestHighLevelClient restClient() {
-
-
-
+    public ElasticClient restClient() {
         RestClientBuilder builder = RestClient.builder(new HttpHost(elasticsearchHost, elasticsearchPort, elasticsearchHttp));
         builder.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder.setConnectTimeout(10000).setSocketTimeout(1000000));
 
@@ -51,10 +48,8 @@ public class ElasticsearchConfig {
             }
         });
         }
-        
 
-        RestHighLevelClient client = new RestHighLevelClient(builder);
-        return client;
+        return new ElasticClient(builder.build());
     }
 
 }
