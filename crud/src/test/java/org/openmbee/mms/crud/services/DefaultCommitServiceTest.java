@@ -218,7 +218,7 @@ public class DefaultCommitServiceTest {
         when(branchPersistence.findById(projectId, refId)).thenReturn(Optional.of(refJson));
 
         when(commitPersistence.findByProjectAndRefAndTimestampAndLimit(projectId, refId, null, 0)).thenReturn(testCommitList);
-        when(commitPersistence.elementHistory(eq(projectId), eq(elementId), any())).thenReturn(testCommitList);
+        when(commitPersistence.elementHistory(projectId, refId, elementId)).thenReturn(testCommitList);
 
         CommitsResponse response = defaultCommitService.getElementCommits(projectId, refId, elementId, params);
 
@@ -336,7 +336,7 @@ public class DefaultCommitServiceTest {
         List<CommitJson> testCommitList = new ArrayList();
         testCommitList.add(testCommit);
 
-        when(commitPersistence.findAllByProjectId(projectId)).thenReturn(testCommitList);
+        when(commitPersistence.findByProjectAndRefAndTimestampAndLimit(projectId, "master", null, 1)).thenReturn(testCommitList);
 
         assertFalse(defaultCommitService.isProjectNew(projectId));
 
