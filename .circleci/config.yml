@@ -16,7 +16,9 @@ jobs:
       name: docker/docker
     working_directory: /home/circleci/mms
     steps:
-      - checkout
+      # A full clone, because the scan job blames files from the persisted .git.
+      - checkout:
+          method: full
 
       - setup_remote_docker
 
