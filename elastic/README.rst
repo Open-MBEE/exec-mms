@@ -7,6 +7,8 @@ Elasticsearch implementation for json document storage, indexing and search. Imp
 
 The module uses only the REST API that Elasticsearch and OpenSearch share, so the same configuration works for both: point ``elasticsearch.host`` and ``elasticsearch.port`` at either server. It is tested against Elasticsearch 9.5 and OpenSearch 3.9.
 
+Data held in Elasticsearch 7 by an earlier MMS release is moved with ``elastic/scripts/migrate_search_indices.py``; see ``docs/search-migration.rst``.
+
 On project creation, will look for a mapping file based on the project schema prefixed to '_node.json' under $classpath/elastic_mappings, otherwise will use elastic_mappins/default_node.json for field mapping
 
 Configuration
