@@ -18,14 +18,10 @@ services:
         - 9200:9200
         - 9300:9300
 
-  minio:
-      image: cgr.dev/chainguard/minio:latest
-      environment:
-          - "MINIO_ROOT_USER=admintest"
-          - "MINIO_ROOT_PASSWORD=admintest"
-      command: server /tmp/data
+  s3:
+      image: adobe/s3mock:5.2.3
       ports:
-          - 9000:9000
+          - 9000:9090
 
   mms:
     build: .
@@ -37,6 +33,6 @@ services:
     depends_on:
         - postgres
         - elasticsearch
-        - minio
+        - s3
     ports: 
         - 8080:8080

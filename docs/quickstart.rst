@@ -32,11 +32,11 @@ Dependencies
 
       docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name=elasticsearch docker.elastic.co/elasticsearch/elasticsearch:7.8.1
 
-  MinIO
-    Install MinIO for artifact storage. `Instructions for MinIO <https://docs.min.io/>`_
+  S3 object store
+    Any S3 compatible object store works for artifact storage. For local development, `S3Mock <https://github.com/adobe/S3Mock>`_ is enough:
     ::
 
-      docker run -d -p 9000:9000 -e "MINIO_ROOT_USER=admintest" -e "MINIO_ROOT_PASSWORD=admintest" --name=minio cgr.dev/chainguard/minio:latest server /data
+      docker run -d -p 9000:9090 --name=s3mock adobe/s3mock:5.2.3
 
 Running MMS
 -----------
