@@ -68,7 +68,7 @@ Artifacts Storage
 
 .. code-block::
 
-   docker run -d -p 9000:9000 -e "MINIO_ACCESS_KEY=admintest" -e "MINIO_SECRET_KEY=admintest" minio/minio server /data
+   docker run -d -p 9000:9090 adobe/s3mock:5.2.3
 
 
 IntelliJ IDEA

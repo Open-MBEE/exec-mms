@@ -18,14 +18,13 @@ services:
         - 9200:9200
         - 9300:9300
 
-  minio:
-      image: minio/minio:RELEASE.2022-05-26T05-48-41Z.hotfix.15f13935a
+  s3:
+      image: adobe/s3mock:5.2.3
       environment:
-          - "MINIO_ACCESS_KEY=admintest"
-          - "MINIO_SECRET_KEY=admintest"
-      command: server /tmp/data
+          - "COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=/s3mockroot"
+          - "COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true"
       ports:
-          - 9000:9000
+          - 9000:9090
 
   mms:
     build: .
@@ -33,9 +32,10 @@ services:
     hostname: mms
     environment:
         - "SPRING_PROFILES_ACTIVE=test"
+        - "JDK_JAVA_OPTIONS=${MMS_JAVA_OPTIONS:--XX:MaxRAMPercentage=90.0}"
     depends_on:
         - postgres
         - elasticsearch
-        - minio
+        - s3
     ports: 
         - 8080:8080
