@@ -20,6 +20,9 @@ services:
 
   s3:
       image: adobe/s3mock:5.2.3
+      environment:
+          - "COM_ADOBE_TESTING_S3MOCK_STORE_ROOT=/s3mockroot"
+          - "COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT=true"
       ports:
           - 9000:9090
 
