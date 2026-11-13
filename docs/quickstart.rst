@@ -36,7 +36,7 @@ Dependencies
     Install MinIO for artifact storage. `Instructions for MinIO <https://docs.min.io/>`_
     ::
 
-      docker run -d -p 9000:9000 -e "MINIO_ACCESS_KEY=admintest" -e "MINIO_SECRET_KEY=admintest" --name=minio minio/minio server /data
+      docker run -d -p 9000:9000 -e "MINIO_ROOT_USER=admintest" -e "MINIO_ROOT_PASSWORD=admintest" --name=minio cgr.dev/chainguard/minio:latest server /data
 
 Running MMS
 -----------

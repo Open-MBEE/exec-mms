@@ -19,10 +19,10 @@ services:
         - 9300:9300
 
   minio:
-      image: minio/minio:RELEASE.2022-05-26T05-48-41Z.hotfix.15f13935a
+      image: cgr.dev/chainguard/minio:latest
       environment:
-          - "MINIO_ACCESS_KEY=admintest"
-          - "MINIO_SECRET_KEY=admintest"
+          - "MINIO_ROOT_USER=admintest"
+          - "MINIO_ROOT_PASSWORD=admintest"
       command: server /tmp/data
       ports:
           - 9000:9000
@@ -33,6 +33,7 @@ services:
     hostname: mms
     environment:
         - "SPRING_PROFILES_ACTIVE=test"
+        - "JDK_JAVA_OPTIONS=${MMS_JAVA_OPTIONS:--XX:MaxRAMPercentage=90.0}"
     depends_on:
         - postgres
         - elasticsearch

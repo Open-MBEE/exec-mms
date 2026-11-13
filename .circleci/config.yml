@@ -27,6 +27,7 @@ jobs:
             mkdir -p jacocoJars
             curl -L -o ./jacocoJars/jacocoagent.jar "https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.7/org.jacoco.agent-0.8.7-runtime.jar"
             curl -L -o ./jacocoJars/jacococli.jar "https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.7/org.jacoco.cli-0.8.7-nodeps.jar"
+            export MMS_JAVA_OPTIONS="-XX:MaxRAMPercentage=90.0 -javaagent:/mms/jacocoJars/jacocoagent.jar=destfile=/mms/jacocoOutput/jacoco-it.exec,output=file"
             docker-compose up --build -d
             docker run --network container:mms curlimages/curl --retry 8 --retry-delay 10 --retry-max-time 90 --retry-connrefused http://mms:8080/healthcheck
 

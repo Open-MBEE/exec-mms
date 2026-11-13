@@ -68,7 +68,7 @@ Artifacts Storage
 
 .. code-block::
 
-   docker run -d -p 9000:9000 -e "MINIO_ACCESS_KEY=admintest" -e "MINIO_SECRET_KEY=admintest" minio/minio server /data
+   docker run -d -p 9000:9000 -e "MINIO_ROOT_USER=admintest" -e "MINIO_ROOT_PASSWORD=admintest" cgr.dev/chainguard/minio:latest server /data
 
 
 IntelliJ IDEA
