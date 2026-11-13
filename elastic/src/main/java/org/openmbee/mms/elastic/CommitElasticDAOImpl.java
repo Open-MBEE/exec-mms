@@ -4,17 +4,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.mms.data.dao.CommitIndexDAO;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
+import org.openmbee.mms.elastic.utils.ElasticClient;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.CommitJson;
@@ -108,34 +100,27 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
      *
      * @param id the nodeId to add to the term search
      * @param commitIds relevant commit ids
-     * @return QueryBuilder q
+     * @return the query
      */
-    private QueryBuilder getCommitHistoryQuery(String id, Set<String> commitIds) {
-        QueryBuilder addedQuery = QueryBuilders.termQuery("added.id", id);
-        QueryBuilder updatedQuery = QueryBuilders.termQuery("updated.id", id);
-        QueryBuilder deletedQuery = QueryBuilders.termQuery("deleted.id", id);
-        QueryBuilder query = QueryBuilders.boolQuery()
-            .should(addedQuery)
-            .should(updatedQuery)
-            .should(deletedQuery)
-            .filter(QueryBuilders.termsQuery(CommitJson.ID, commitIds))
-            .minimumShouldMatch(1);
-        return query;
+    private Map<String, Object> getCommitHistoryQuery(String id, Set<String> commitIds) {
+        Map<String, Object> bool = new LinkedHashMap<>();
+        bool.put("should", List.of(
+            Map.of("term", Map.of("added.id", id)),
+            Map.of("term", Map.of("updated.id", id)),
+            Map.of("term", Map.of("deleted.id", id))));
+        bool.put("filter", List.of(Map.of("terms", Map.of(CommitJson.ID, commitIds))));
+        bool.put("minimum_should_match", 1);
+        return Map.of("bool", bool);
     }
 
     @Override
     public List<CommitJson> elementDeletedHistory(String id, Collection<String> commitIds) {
-        QueryBuilder query = QueryBuilders.boolQuery()
-            .filter(QueryBuilders.termQuery("deleted.id", id))
-            .filter(QueryBuilders.termsQuery(CommitJson.ID, commitIds));
+        Map<String, Object> query = Map.of("bool", Map.of("filter", List.of(
+            Map.of("term", Map.of("deleted.id", id)),
+            Map.of("terms", Map.of(CommitJson.ID, commitIds)))));
         try {
             List<CommitJson> commits = new ArrayList<>();
-            SearchHits hits = getCommitResults(query);
-            if (hits.getTotalHits().value == 0) {
-                return new ArrayList<>();
-            }
-            for (SearchHit hit : hits.getHits()) {
-                Map<String, Object> source = hit.getSourceAsMap();// gets "_source"
+            for (Map<String, Object> source : getCommitResults(query)) {
                 CommitJson ob = newInstance();
                 ob.putAll(source);
                 ob.remove(CommitJson.ADDED);
@@ -164,13 +149,8 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
     public List<CommitJson> elementHistory(String nodeId, Set<String> commitIds) {
         try {
             List<CommitJson> commits = new ArrayList<>();
-            QueryBuilder query = getCommitHistoryQuery(nodeId, commitIds);
-            SearchHits hits = getCommitResults(query);
-            if (hits.getTotalHits().value == 0) {
-                return new ArrayList<>();
-            }
-            for (SearchHit hit : hits.getHits()) {
-                Map<String, Object> source = hit.getSourceAsMap();// gets "_source"
+            Map<String, Object> query = getCommitHistoryQuery(nodeId, commitIds);
+            for (Map<String, Object> source : getCommitResults(query)) {
                 CommitJson ob = newInstance();
                 ob.putAll(source);
                 ob.remove(CommitJson.ADDED);
@@ -197,16 +177,13 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
 
     private List<CommitJson> getDocs(String commitId) {
         try {
-            QueryBuilder commitQuery = QueryBuilders.boolQuery()
-                .filter(QueryBuilders.termQuery(CommitJson.ID, commitId));
-            SearchHits hits = getCommitResults(commitQuery);
+            Map<String, Object> commitQuery = Map.of("bool", Map.of("filter", List.of(
+                Map.of("term", Map.of(CommitJson.ID, commitId)))));
             List<CommitJson> rawCommits = new ArrayList<>();
-            if (hits.getTotalHits().value > 0) {
-                for (SearchHit hit : hits.getHits()) {
-                    CommitJson ob = new CommitJson();
-                    ob.putAll(hit.getSourceAsMap());
-                    rawCommits.add(ob); // gets "_source"
-                }
+            for (Map<String, Object> source : getCommitResults(commitQuery)) {
+                CommitJson ob = new CommitJson();
+                ob.putAll(source);
+                rawCommits.add(ob);
             }
             if (rawCommits.isEmpty()) {
                 //try getting directly using id
@@ -233,15 +210,12 @@ public class CommitElasticDAOImpl extends BaseElasticDAOImpl<CommitJson> impleme
         return Optional.of(mungCommits(commits));
     }
 
-    private SearchHits getCommitResults(QueryBuilder query) throws IOException {
-        SearchRequest searchRequest = new SearchRequest(getIndex());
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(query);
-        sourceBuilder.size(this.resultLimit); // TODO handle paging requests
-        sourceBuilder.sort(new FieldSortBuilder(CommitJson.CREATED).order(SortOrder.DESC));
-        searchRequest.source(sourceBuilder);
-        SearchResponse searchResponse = client.search(searchRequest, REQUEST_OPTIONS);
-        return searchResponse.getHits();
+    private List<Map<String, Object>> getCommitResults(Map<String, Object> query) throws IOException {
+        Map<String, Object> searchRequest = new LinkedHashMap<>();
+        searchRequest.put("query", query);
+        searchRequest.put("size", this.resultLimit); // TODO handle paging requests
+        searchRequest.put("sort", List.of(Map.of(CommitJson.CREATED, Map.of("order", "desc"))));
+        return ElasticClient.sources(search(getIndex(), searchRequest));
     }
 
     private static CommitJson mungCommits(List<CommitJson> commits) {

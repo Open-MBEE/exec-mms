@@ -1,60 +1,105 @@
 package org.openmbee.mms.elastic.utils;
 
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.openmbee.mms.core.exceptions.InternalErrorException;
-
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.openmbee.mms.core.exceptions.InternalErrorException;
 
 public class BulkProcessor {
 
     protected int bulkLimit;
-    RestHighLevelClient client;
-    RequestOptions options;
-    BulkRequest bulkRequest = new BulkRequest();
+    ElasticClient client;
+    StringBuilder actions = new StringBuilder();
+    int numberOfActions = 0;
 
-    public BulkProcessor(RestHighLevelClient client, RequestOptions options, int bulkLimit) {
+    public BulkProcessor(ElasticClient client, int bulkLimit) {
         this.client = client;
-        this.options = options;
         this.bulkLimit = bulkLimit;
     }
 
-    public void add(IndexRequest action) {
-        bulkRequest.add(action);
-        clear();
+    public void index(String index, String docId, Object source) {
+        add("index", index, docId, source);
     }
 
-    public void add(UpdateRequest action) {
-        bulkRequest.add(action);
+    public void update(String index, String docId, Object update) {
+        add("update", index, docId, update);
+    }
+
+    public void delete(String index, String docId) {
+        add("delete", index, docId, null);
+    }
+
+    private void add(String operation, String index, String docId, Object body) {
+        Map<String, Object> target = new LinkedHashMap<>();
+        target.put("_index", index);
+        if (docId != null) {
+            target.put("_id", docId);
+        }
+        try {
+            actions.append(client.toJson(Map.of(operation, target))).append('\n');
+            if (body != null) {
+                actions.append(client.toJson(body)).append('\n');
+            }
+        } catch (IOException ioe) {
+            throw new InternalErrorException(ioe);
+        }
+        numberOfActions++;
         clear();
     }
 
     public void clear() {
-        if (bulkRequest.numberOfActions() >= bulkLimit) {
+        if (numberOfActions >= bulkLimit) {
             bulkBatchRequests();
         }
     }
 
     public void close() {
-        if (bulkRequest.numberOfActions() > 0) {
+        if (numberOfActions > 0) {
             bulkBatchRequests();
         }
     }
 
+    /**
+     * Sends what has been added without checking the outcome of the individual actions.
+     */
+    public void closeIgnoringFailures() {
+        if (numberOfActions > 0) {
+            send();
+        }
+    }
+
     protected void bulkBatchRequests() {
+        Map<String, Object> response = send();
+        if (Boolean.TRUE.equals(response.get("errors"))) {
+            throw new InternalErrorException(buildFailureMessage(response));
+        }
+    }
+
+    private Map<String, Object> send() {
         try {
-            BulkResponse response = client.bulk(bulkRequest, options);
-            if (response.hasFailures()) {
-                String failure = response.buildFailureMessage();
-                throw new InternalErrorException(failure);
-            }
-            bulkRequest = new BulkRequest();
+            Map<String, Object> response = client.bulk(actions.toString());
+            actions = new StringBuilder();
+            numberOfActions = 0;
+            return response;
         } catch (IOException ioe) {
             throw new InternalErrorException(ioe);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String buildFailureMessage(Map<String, Object> response) {
+        StringBuilder message = new StringBuilder("failure in bulk execution:");
+        List<Map<String, Map<String, Object>>> items = (List<Map<String, Map<String, Object>>>) response.get("items");
+        for (int i = 0; i < items.size(); i++) {
+            for (Map<String, Object> item : items.get(i).values()) {
+                Object error = item.get("error");
+                if (error != null) {
+                    message.append("\n[").append(i).append("]: index [").append(item.get("_index"))
+                        .append("], id [").append(item.get("_id")).append("], message [").append(error).append("]");
+                }
+            }
+        }
+        return message.toString();
     }
 }

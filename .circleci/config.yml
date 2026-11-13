@@ -32,6 +32,7 @@ jobs:
             export MMS_JAVA_OPTIONS="-XX:MaxRAMPercentage=90.0 -javaagent:/mms/jacocoJars/jacocoagent.jar=destfile=/mms/jacocoOutput/jacoco-it.exec,output=file"
             docker-compose up --build -d
             docker run --network container:mms curlimages/curl --retry 8 --retry-delay 10 --retry-max-time 90 --retry-connrefused http://mms:8080/healthcheck
+            docker run --network container:mms curlimages/curl --retry 20 --retry-delay 6 --retry-all-errors http://elasticsearch:9200
 
       - run:
           name: "Run and test Postman Collection"
@@ -53,6 +54,17 @@ jobs:
             docker stop mms
             mkdir -p jacocoOutput
             docker cp mms:/mms/jacocoOutput/jacoco-it.exec ./jacocoOutput/jacoco-it.exec
+
+      - run:
+          name: "Run the search collections against OpenSearch"
+          command: |
+            docker-compose down -v
+            docker-compose -f docker-compose.yml -f docker-compose.opensearch.yml up -d --scale elasticsearch=0
+            docker run --network container:mms curlimages/curl --retry 8 --retry-delay 10 --retry-max-time 90 --retry-connrefused http://mms:8080/healthcheck
+            docker run --network container:mms curlimages/curl --retry 20 --retry-delay 6 --retry-all-errors http://opensearch:9200
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run crud.postman_collection.json -e test-env.json --delay-request 500
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run search.postman_collection.json -e test-env.json --delay-request 1000
+            docker run --volumes-from mms_test_configs --network container:mms -t postman/newman run elastic.postman_collection.json -e test-env.json --delay-request 500
 
       - persist_to_workspace:
             root: /home/circleci/

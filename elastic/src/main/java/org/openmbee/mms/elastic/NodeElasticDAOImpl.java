@@ -3,25 +3,16 @@ package org.openmbee.mms.elastic;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.openmbee.mms.core.config.ContextHolder;
 import org.openmbee.mms.data.dao.NodeIndexDAO;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.elastic.utils.BulkProcessor;
+import org.openmbee.mms.elastic.utils.ElasticClient;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.openmbee.mms.json.ElementJson;
@@ -65,20 +56,16 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
     @Override
     public Optional<ElementJson> getByCommitId(String commitId, String nodeId) {
         try {
-            SearchRequest searchRequest = new SearchRequest(getIndex());
             // searches the elements for the reference with the current commitId and nodeId
-            QueryBuilder query = QueryBuilders.boolQuery()
-                .filter(QueryBuilders.termQuery(ElementJson.COMMITID, commitId))
-                .filter(QueryBuilders.termQuery(ElementJson.ID, nodeId));
-            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-            sourceBuilder.query(query);
-            searchRequest.source(sourceBuilder);
-            SearchResponse searchResponse = client.search(searchRequest, REQUEST_OPTIONS);
-            if (searchResponse.getHits().getTotalHits().value == 0) {
+            Map<String, Object> query = Map.of("bool", Map.of("filter", List.of(
+                Map.of("term", Map.of(ElementJson.COMMITID, commitId)),
+                Map.of("term", Map.of(ElementJson.ID, nodeId)))));
+            List<Map<String, Object>> hits = ElasticClient.sources(search(getIndex(), Map.of("query", query)));
+            if (hits.isEmpty()) {
                 return Optional.empty();
             }
             ElementJson ob = newInstance();
-            ob.putAll(searchResponse.getHits().getAt(0).getSourceAsMap());
+            ob.putAll(hits.get(0));
             return Optional.of(ob);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -106,11 +93,11 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         Map<String, Object> parameters = Collections.singletonMap("refId",
             ContextHolder.getContext().getBranchId());
         for (String docId : docIds) {
-            UpdateRequest request = new UpdateRequest(getIndex(), docId);
-            Script inline = new Script(ScriptType.INLINE, "painless", script,
-                parameters);
-            request.script(inline);
-            bulkProcessor.add(request);
+            Map<String, Object> inline = new LinkedHashMap<>();
+            inline.put("source", script);
+            inline.put("lang", "painless");
+            inline.put("params", parameters);
+            bulkProcessor.update(getIndex(), docId, Map.of("script", inline));
         }
         bulkProcessor.close();
     }
@@ -122,24 +109,19 @@ public class NodeElasticDAOImpl extends BaseElasticDAOImpl<ElementJson> implemen
         while (count < refsCommitIds.size()) {
             try {
                 List<String> sub = refsCommitIds.subList(count, Math.min(refsCommitIds.size(), count + this.termLimit));
-                SearchRequest searchRequest = new SearchRequest(getIndex());
-                SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-                // Query
-                QueryBuilder query = QueryBuilders.boolQuery()
-                    .filter(QueryBuilders
-                        .termsQuery(ElementJson.COMMITID, sub))
-                    .filter(QueryBuilders.termQuery(ElementJson.ID, nodeId))
-                    .filter(QueryBuilders.rangeQuery(ElementJson.MODIFIED).lte(timestamp));
-                searchSourceBuilder.query(query);
-                searchSourceBuilder.sort(new FieldSortBuilder("_modified").order(SortOrder.DESC));
-                searchSourceBuilder.size(1);
-                searchRequest.source(searchSourceBuilder);
+                Map<String, Object> query = Map.of("bool", Map.of("filter", List.of(
+                    Map.of("terms", Map.of(ElementJson.COMMITID, sub)),
+                    Map.of("term", Map.of(ElementJson.ID, nodeId)),
+                    Map.of("range", Map.of(ElementJson.MODIFIED, Map.of("lte", timestamp))))));
+                Map<String, Object> searchRequest = new LinkedHashMap<>();
+                searchRequest.put("query", query);
+                searchRequest.put("sort", List.of(Map.of("_modified", Map.of("order", "desc"))));
+                searchRequest.put("size", 1);
 
-                SearchResponse searchResponse = client.search(searchRequest, REQUEST_OPTIONS);
-                SearchHit[] searchHits = searchResponse.getHits().getHits();
-                if (searchHits != null && searchHits.length > 0) {
+                List<Map<String, Object>> searchHits = ElasticClient.sources(search(getIndex(), searchRequest));
+                if (!searchHits.isEmpty()) {
                     ElementJson elementJson = newInstance();
-                    elementJson.putAll(searchHits[0].getSourceAsMap());
+                    elementJson.putAll(searchHits.get(0));
                     return Optional.of(elementJson);
                 }
                 count += this.termLimit;
