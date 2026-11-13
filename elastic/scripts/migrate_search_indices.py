@@ -84,14 +84,22 @@ class Cluster:
     def count(self, index, refresh=False):
         if refresh:
             self.request("POST", "/" + quote(index) + "/_refresh")
-        return self.request("GET", "/" + quote(index) + "/_count")["count"]
+        return self.complete(index, self.request("GET", "/" + quote(index) + "/_count"))["count"]
+
+    def complete(self, index, response):
+        """Reject an answer that left shards out; it would pass for a smaller index."""
+        shards = response.get("_shards", {})
+        if shards.get("failed") or shards.get("successful", 0) < shards.get("total", 0):
+            raise MigrationError(f"{self.label}: {index} answered from {shards.get('successful')} of "
+                                 f"{shards.get('total')} shards: {json.dumps(shards.get('failures', []))[:2000]}")
+        return response
 
     def scan(self, index, batch_size, keep_alive):
         """Yield every hit of an index, in batches, through the scroll API."""
         page = self.request("POST", "/" + quote(index) + "/_search", {"size": batch_size, "sort": ["_doc"]},
                             {"scroll": keep_alive})
         try:
-            while page["hits"]["hits"]:
+            while self.complete(index, page)["hits"]["hits"]:
                 yield page["hits"]["hits"]
                 page = self.request("POST", "/_search/scroll",
                                     {"scroll": keep_alive, "scroll_id": page["_scroll_id"]})
@@ -185,6 +193,7 @@ def copy_client(source, target, index, args):
             if hit.get("_routing") is not None:
                 action["routing"] = hit["_routing"]
             pair = json.dumps({"index": action}) + "\n" + json.dumps(hit["_source"], ensure_ascii=False) + "\n"
+            pair = pair.encode("utf-8")
             # Stay well under the server's default 100 MB request limit.
             if lines and size + len(pair) > args.max_bulk_bytes:
                 send_bulk(target, index, lines)
@@ -196,7 +205,7 @@ def copy_client(source, target, index, args):
 
 
 def send_bulk(target, index, lines):
-    result = target.request("POST", "/_bulk", "".join(lines).encode("utf-8"), ndjson=True)
+    result = target.request("POST", "/_bulk", b"".join(lines), ndjson=True)
     if result.get("errors"):
         failed = [item["index"] for item in result["items"] if item["index"].get("error")]
         raise MigrationError(f"bulk into {index} rejected {len(failed)} document(s): {json.dumps(failed[:3])[:2000]}")
