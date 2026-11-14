@@ -1,18 +1,18 @@
 package org.openmbee.mms.example.config;
 
-import java.util.List;
+import io.swagger.v3.core.converter.ModelConverters;
 import java.util.Map;
-import java.util.Optional;
-import org.springdoc.core.GenericParameterBuilder;
-import org.springdoc.core.OperationBuilder;
-import org.springdoc.core.RequestBodyBuilder;
-import org.springdoc.core.customizers.OperationCustomizer;
-import org.springdoc.core.customizers.ParameterCustomizer;
-import org.springdoc.webmvc.core.RequestBuilder;
+import org.openmbee.mms.json.ElementVersion;
+import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.customizers.SpringDocCustomizers;
+import org.springdoc.core.discoverer.SpringDocParameterNameDiscoverer;
+import org.springdoc.core.extractor.MethodParameterPojoExtractor;
+import org.springdoc.core.service.GenericParameterService;
+import org.springdoc.core.service.RequestBodyService;
+import org.springdoc.webmvc.core.service.RequestService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.MethodParameter;
 
 @Configuration
@@ -21,27 +21,34 @@ public class OpenAPIConfig {
     @Bean
     @Primary
     SpringDocRequestBuilder myRequestBuilder(
-        GenericParameterBuilder parameterBuilder, RequestBodyBuilder requestBodyBuilder,
-        OperationBuilder operationBuilder, Optional<List<OperationCustomizer>> customizers,
-        Optional<List<ParameterCustomizer>> parameterCustomizers,
-        LocalVariableTableParameterNameDiscoverer localSpringDocParameterNameDiscoverer) {
-        return new SpringDocRequestBuilder(parameterBuilder, requestBodyBuilder, operationBuilder, customizers,
-            parameterCustomizers, localSpringDocParameterNameDiscoverer);
+        GenericParameterService parameterBuilder, RequestBodyService requestBodyBuilder,
+        SpringDocCustomizers customizers,
+        SpringDocParameterNameDiscoverer localSpringDocParameterNameDiscoverer,
+        MethodParameterPojoExtractor methodParameterPojoExtractor) {
+        return new SpringDocRequestBuilder(parameterBuilder, requestBodyBuilder, customizers,
+            localSpringDocParameterNameDiscoverer, methodParameterPojoExtractor);
+    }
+
+    // Commit lists its changes as maps documented as ElementVersion, which the model scan alone never registers.
+    @Bean
+    OpenApiCustomizer elementVersionSchema() {
+        return openApi -> ModelConverters.getInstance().read(ElementVersion.class)
+            .forEach((name, schema) -> openApi.getComponents().addSchemas(name, schema));
     }
 
     //ignore all injected Map types in controller methods
-    public class SpringDocRequestBuilder extends RequestBuilder {
+    public static class SpringDocRequestBuilder extends RequestService {
 
-        public SpringDocRequestBuilder(GenericParameterBuilder parameterBuilder, RequestBodyBuilder requestBodyBuilder,
-            OperationBuilder operationBuilder, Optional<List<OperationCustomizer>> customizers,
-            Optional<List<ParameterCustomizer>> parameterCustomizers,
-            LocalVariableTableParameterNameDiscoverer localSpringDocParameterNameDiscoverer) {
-            super(parameterBuilder, requestBodyBuilder, operationBuilder, customizers,
-                parameterCustomizers, localSpringDocParameterNameDiscoverer);
+        public SpringDocRequestBuilder(GenericParameterService parameterBuilder, RequestBodyService requestBodyBuilder,
+            SpringDocCustomizers customizers,
+            SpringDocParameterNameDiscoverer localSpringDocParameterNameDiscoverer,
+            MethodParameterPojoExtractor methodParameterPojoExtractor) {
+            super(parameterBuilder, requestBodyBuilder, customizers,
+                localSpringDocParameterNameDiscoverer, methodParameterPojoExtractor);
         }
 
         @Override
-        protected boolean isParamToIgnore(MethodParameter parameter) {
+        public boolean isParamToIgnore(MethodParameter parameter) {
             if (Map.class.isAssignableFrom(parameter.getParameterType()))
                 return true;
             return super.isParamToIgnore(parameter);

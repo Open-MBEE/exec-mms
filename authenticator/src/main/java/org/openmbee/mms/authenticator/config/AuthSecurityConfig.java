@@ -24,9 +24,8 @@ public class AuthSecurityConfig {
     }
 
     public void setAuthConfig(HttpSecurity http) throws Exception {
-        http.exceptionHandling()
-            .authenticationEntryPoint(new JwtAuthenticationEntryPoint()).and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.exceptionHandling(handling -> handling.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

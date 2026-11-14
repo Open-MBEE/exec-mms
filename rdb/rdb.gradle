@@ -4,5 +4,8 @@ dependencies {
 
     api commonDependencies.'spring-data-jpa'
 
+    // SchemaExport, which creates the per-project and per-branch tables, lives here since Hibernate 6.
+    implementation 'org.hibernate.orm:hibernate-ant'
+
     runtimeOnly commonDependencies.'spring-aspects'
 }
