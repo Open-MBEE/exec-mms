@@ -1,6 +1,9 @@
 package org.openmbee.mms.example.config;
 
+import io.swagger.v3.core.converter.ModelConverters;
 import java.util.Map;
+import org.openmbee.mms.json.ElementVersion;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.SpringDocCustomizers;
 import org.springdoc.core.discoverer.SpringDocParameterNameDiscoverer;
 import org.springdoc.core.extractor.MethodParameterPojoExtractor;
@@ -24,6 +27,13 @@ public class OpenAPIConfig {
         MethodParameterPojoExtractor methodParameterPojoExtractor) {
         return new SpringDocRequestBuilder(parameterBuilder, requestBodyBuilder, customizers,
             localSpringDocParameterNameDiscoverer, methodParameterPojoExtractor);
+    }
+
+    // Commit lists its changes as maps documented as ElementVersion, which the model scan alone never registers.
+    @Bean
+    OpenApiCustomizer elementVersionSchema() {
+        return openApi -> ModelConverters.getInstance().read(ElementVersion.class)
+            .forEach((name, schema) -> openApi.getComponents().addSchemas(name, schema));
     }
 
     //ignore all injected Map types in controller methods
