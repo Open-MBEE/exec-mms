@@ -50,7 +50,7 @@ public class TwcPermissionUtilsTest {
 		restUtils = mock(RestUtils.class);
 		mockRestTemplate = mock(RestTemplate.class);
 		jsonUtils = mock(JsonUtils.class);
-		httpHeaders = mock(HttpHeaders.class);
+		httpHeaders = new HttpHeaders();
 		resourceId = "resourceID1";
 		workspaceId = "workspaceID1";
 		roleId = "roleID1";
