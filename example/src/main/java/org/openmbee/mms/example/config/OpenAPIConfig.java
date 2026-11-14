@@ -37,7 +37,7 @@ public class OpenAPIConfig {
     }
 
     //ignore all injected Map types in controller methods
-    public class SpringDocRequestBuilder extends RequestService {
+    public static class SpringDocRequestBuilder extends RequestService {
 
         public SpringDocRequestBuilder(GenericParameterService parameterBuilder, RequestBodyService requestBodyBuilder,
             SpringDocCustomizers customizers,

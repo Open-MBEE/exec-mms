@@ -67,7 +67,7 @@ public class S3Storage implements ArtifactStorage {
                 builder.credentialsProvider(StaticCredentialsProvider.create(
                     AwsBasicCredentials.create(ACCESS_KEY.get(), SECRET_KEY.get())));
             } else {
-                builder.credentialsProvider(DefaultCredentialsProvider.create());
+                builder.credentialsProvider(DefaultCredentialsProvider.builder().build());
             }
             S3Client client = builder.build();
             try {
