@@ -75,7 +75,12 @@ public class ExampleSecurityConfig extends WebSecurityConfigurerAdapter implemen
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         for(String origin: allowedOrigins.split(",")) {
-            config.addAllowedOrigin(origin);
+            if (CorsConfiguration.ALL.equals(origin.trim())) {
+                // "*" cannot be an allowed origin when credentials are allowed; as a pattern the caller's origin is echoed.
+                config.addAllowedOriginPattern(CorsConfiguration.ALL);
+            } else {
+                config.addAllowedOrigin(origin);
+            }
         }
         config.addAllowedHeader(ORIGIN);
         config.addAllowedHeader(CONTENT_TYPE);
