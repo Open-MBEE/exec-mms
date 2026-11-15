@@ -18,4 +18,5 @@ Welcome to Model Management System's documentation!
   quickstart
   installation
   deployment
+  search-migration
   modules/index
