@@ -1,7 +1,11 @@
 dependencies {
     api project(':artifacts')
 
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.638'
+    // Synchronous client only: the Apache HTTP client is enough, Netty is left out.
+    implementation("software.amazon.awssdk:s3:$awsSdkVersion") {
+        exclude group: 'software.amazon.awssdk', module: 'netty-nio-client'
+    }
+    runtimeOnly "software.amazon.awssdk:apache-client:$awsSdkVersion"
     implementation "org.apache.tika:tika-core:$tikaVersion"
     implementation commonDependencies.'servlet-api'
 

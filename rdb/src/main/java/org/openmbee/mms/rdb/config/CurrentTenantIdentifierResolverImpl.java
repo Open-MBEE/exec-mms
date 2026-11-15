@@ -3,7 +3,7 @@ package org.openmbee.mms.rdb.config;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.openmbee.mms.core.config.ContextHolder;
 
-public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver {
+public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver<String> {
 
     @Override
     public String resolveCurrentTenantIdentifier() {

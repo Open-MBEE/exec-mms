@@ -32,8 +32,7 @@ dependencies {
         'org.springframework.boot:spring-boot-starter-web',
         "org.postgresql:postgresql:$postgresqlVersion",
         //'mysql:mysql-connector-java:8.0.17',
-        'org.springdoc:springdoc-openapi-ui:1.3.1',
-        'org.springdoc:springdoc-openapi-security:1.3.1'
+        "org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion"
 
     )
     testImplementation(
@@ -51,4 +50,4 @@ configurations {
 bootJar {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
-ext['elasticsearch.version'] = "$elasticVersion"
+ext['elasticsearch-client.version'] = "$elasticVersion"

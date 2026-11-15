@@ -3,7 +3,7 @@ package org.openmbee.mms.data.domains.global;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Collection;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Entity

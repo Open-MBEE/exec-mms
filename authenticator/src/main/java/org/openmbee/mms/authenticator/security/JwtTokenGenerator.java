@@ -86,7 +86,7 @@ public class JwtTokenGenerator implements Serializable, TokenService {
     private Claims getClaimsFromToken(String token) {
         Claims claims = null;
         try {
-            claims = Jwts.parser().setSigningKey(getSecretKey()).parseClaimsJws(token).getBody();
+            claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Error getting claims from token", e);
@@ -133,7 +133,7 @@ public class JwtTokenGenerator implements Serializable, TokenService {
     }
 
     private String generateToken(Map<String, Object> claims) {
-        return Jwts.builder().setClaims(claims).setExpiration(generateExpirationDate())
+        return Jwts.builder().claims(claims).expiration(generateExpirationDate())
             .signWith(getSecretKey())
             .compact();
     }
@@ -145,8 +145,9 @@ public class JwtTokenGenerator implements Serializable, TokenService {
     public String refreshToken(String token) {
         String refreshedToken = null;
         try {
-            final Claims claims = getClaimsFromToken(token);
-            if (claims != null) {
+            final Claims parsed = getClaimsFromToken(token);
+            if (parsed != null) {
+                Map<String, Object> claims = new HashMap<>(parsed);
                 claims.put(CLAIM_KEY_CREATED, new Date());
                 refreshedToken = generateToken(claims);
             }

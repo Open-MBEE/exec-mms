@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
@@ -192,11 +191,10 @@ public class DatabaseDefinitionService {
         properties.put("hibernate.hbm2ddl.auto", "none");
         properties
             .put("hibernate.dialect", env.getProperty("spring.jpa.properties.hibernate.dialect",
-                "org.hibernate.dialect.PostgreSQL10Dialect"));
+                "org.hibernate.dialect.PostgreSQLDialect"));
 
         properties.put("hibernate.jdbc.lob.non_contextual_creation", true);
         properties.put("hibernate.current_session_context_class", "thread");
-        properties.put("hibernate.multiTenancy", MultiTenancyStrategy.DATABASE);
 
         DataSourceBasedMultiTenantConnectionProviderImpl dataSourceProvider = new DataSourceBasedMultiTenantConnectionProviderImpl();
         dataSourceProvider.setCrudDataSources(crudDataSources);

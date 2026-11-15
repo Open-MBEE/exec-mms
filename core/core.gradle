@@ -4,7 +4,7 @@ dependencies {
 
     api commonDependencies.'jackson-annotations'
     api commonDependencies.'jackson-databind'
-    api commonDependencies.'jackson-datatype-hibernate5'
+    api commonDependencies.'jackson-datatype-hibernate6'
     api commonDependencies.'jackson-datatype-jsr310'
 
     api commonDependencies.'spring-data-commons'
