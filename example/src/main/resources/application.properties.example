@@ -5,7 +5,10 @@ mms.admin.password=test
 mms.stream.batch.size=100000
 mms.optimize-for-federated=true
 
-#Comma Separated list of allowed cross site origins
+# Comma separated list of allowed cross site origins, e.g. https://ve.example.org,https://other.example.org
+# Credentials are allowed for every origin listed here. "*" allows any origin: the caller's origin is echoed
+# back, so any website may make credentialed cross-origin requests to MMS. That lets a browser client such as
+# View Editor work out of the box; listing the explicit origins is the stricter setting, use it in production.
 cors.allowed.origins=*
 
 jwt.secret=make_me_something_really_long
