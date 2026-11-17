@@ -177,7 +177,8 @@ public class DefaultNodeService implements NodeService {
             overwriteJson, preserveTimestamps);
         changes = nodePersistence.prepareAddsUpdates(changes, req.getElements());
 
-        for (ElementJson element : changes.getUpdatedMap().values()) {
+        // A view service adds generated elements to the updated map while processing, so iterate a copy.
+        for (ElementJson element : new ArrayList<>(changes.getUpdatedMap().values())) {
             extraProcessPostedElement(changes, element);
         }
         if (req.getDeletes() != null) {
@@ -221,6 +222,11 @@ public class DefaultNodeService implements NodeService {
 
 
         changes = nodePersistence.commitChanges(changes);
+        if (!changes.getDeletedMap().isEmpty()) {
+            CommitJson commitJson = changes.getCommitJson();
+            eventPublisher.forEach(pub -> pub.publish(
+                EventObject.create(commitJson.getProjectId(), commitJson.getRefId(), CrudConstants.COMMIT_SC, commitJson)));
+        }
         ElementsCommitResponse response = new ElementsCommitResponse();
         response.getElements().addAll(changes.getDeletedMap().values());
         response.setRejected(new ArrayList<>(changes.getRejected().values()));

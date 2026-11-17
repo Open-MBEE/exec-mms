@@ -54,6 +54,9 @@ public class FederatedWebhookPersistence implements WebhookPersistence {
         }
 
         Optional<Webhook> existing = getWebhookById(webhookJson.getId());
+        if(existing.isPresent() && !webhookJson.getProjectId().equals(existing.get().getProject().getProjectId())) {
+            throw new InternalErrorException("Webhook belongs to another project");
+        }
         if(existing.isEmpty()) {
             existing = webhookDao.findByProject_ProjectIdAndUrl(webhookJson.getProjectId(), webhookJson.getUrl());
             if(existing.isPresent()) {
@@ -123,6 +126,7 @@ public class FederatedWebhookPersistence implements WebhookPersistence {
         WebhookJson webhookJson = new WebhookJson();
         webhookJson.merge(jsonUtils.convertToMap(webhook));
         webhookJson.setId(webhook.getId().toString());
+        webhookJson.setProjectId(webhook.getProject().getProjectId());
         return webhookJson;
     }
 
