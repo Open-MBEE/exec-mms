@@ -156,15 +156,22 @@ subprojects {
         }
 
         repositories {
-            maven {
-                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
-                    credentials {
-                        username = ossrhUsername
-                        password = ossrhPassword
+            if (version.endsWith('SNAPSHOT')) {
+                maven {
+                    name = 'centralSnapshots'
+                    url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                    if (project.hasProperty('centralUsername') && project.hasProperty('centralPassword')) {
+                        credentials {
+                            username = centralUsername
+                            password = centralPassword
+                        }
                     }
+                }
+            } else {
+                // Maven Central takes a release as one bundle, so releases are staged here and zipped by centralBundle.
+                maven {
+                    name = 'centralStaging'
+                    url = rootProject.layout.buildDirectory.dir('central-staging')
                 }
             }
         }
@@ -183,5 +190,24 @@ subprojects {
             useInMemoryPgpKeys(signingKey, signingPassword)
             sign publishing.publications.mavenJava
         }
+    }
+}
+
+tasks.register('cleanCentralStaging', Delete) {
+    delete layout.buildDirectory.dir('central-staging')
+}
+
+// The deployment bundle the Central Publisher API accepts: the staged Maven layout of every module.
+tasks.register('centralBundle', Zip) {
+    dependsOn subprojects.collect { "${it.path}:publish" }
+    from layout.buildDirectory.dir('central-staging')
+    exclude '**/maven-metadata.xml*'
+    archiveFileName = 'central-bundle.zip'
+    destinationDirectory = layout.buildDirectory.dir('central')
+}
+
+subprojects {
+    tasks.withType(PublishToMavenRepository).configureEach {
+        mustRunAfter rootProject.tasks.named('cleanCentralStaging')
     }
 }
