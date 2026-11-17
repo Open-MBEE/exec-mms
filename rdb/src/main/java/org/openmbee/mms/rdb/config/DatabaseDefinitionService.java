@@ -91,9 +91,12 @@ public class DatabaseDefinitionService {
                 Statement statement = connection.createStatement()) {
             if ("org.postgresql.Driver".equals(env.getProperty("spring.datasource.driver-class-name"))) {
                 statement.setQueryTimeout(60);
-                statement.execute(connection.nativeSQL(
-                    "SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '"
-                        + databaseProjectString(projectId) + "';"));
+                try (PreparedStatement terminate = connection.prepareStatement(
+                    "SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ?")) {
+                    terminate.setQueryTimeout(60);
+                    terminate.setString(1, databaseProjectString(projectId));
+                    terminate.execute();
+                }
             }
             statement.executeUpdate(connection.nativeSQL("DROP DATABASE " + databaseProjectString(projectId)));
 			
@@ -108,7 +111,8 @@ public class DatabaseDefinitionService {
 
     private String databaseProjectString(String projectId) {
         String prefix = env.getProperty("rdb.project.prefix", "");
-        return String.format("\"%s_%s\"", prefix, projectId);
+        //A doubled quote is how SQL escapes a quote inside a quoted identifier.
+        return '"' + (prefix + "_" + projectId).replace("\"", "\"\"") + '"';
     }
 
     public void createBranch() {
