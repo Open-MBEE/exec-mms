@@ -7,6 +7,10 @@ public class ArtifactsContext {
         artifactContext.set(isArtifactContext);
     }
 
+    public static void clearArtifactContext() {
+        artifactContext.remove();
+    }
+
     public static boolean isArtifactContext() {
         return Boolean.TRUE.equals(artifactContext.get());
     }

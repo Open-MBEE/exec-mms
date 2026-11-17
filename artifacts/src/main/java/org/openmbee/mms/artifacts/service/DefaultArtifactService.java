@@ -98,7 +98,7 @@ public class DefaultArtifactService implements ArtifactService {
             ArtifactsContext.setArtifactContext(true);
             return nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
         } finally {
-            ArtifactsContext.setArtifactContext(false);
+            ArtifactsContext.clearArtifactContext();
         }
     }
 
@@ -120,7 +120,7 @@ public class DefaultArtifactService implements ArtifactService {
             ArtifactsContext.setArtifactContext(true);
             return nodeService.createOrUpdate(projectId, refId, elementsRequest, params, user);
         } finally {
-            ArtifactsContext.setArtifactContext(false);
+            ArtifactsContext.clearArtifactContext();
         }
     }
 
