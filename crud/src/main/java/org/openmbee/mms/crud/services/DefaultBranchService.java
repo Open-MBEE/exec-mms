@@ -91,7 +91,7 @@ public class DefaultBranchService implements BranchService {
 
         //Find parent branch
         String parentRefId;
-        Optional<CommitJson> parentCommit = null;
+        Optional<CommitJson> parentCommit = Optional.empty();
         if (branch.getParentCommitId() != null && !branch.getParentCommitId().isEmpty()) {
             parentCommit = commitPersistence.findById(projectId, branch.getParentCommitId());
             if (!parentCommit.isPresent()) {
@@ -112,7 +112,7 @@ public class DefaultBranchService implements BranchService {
 
         //Find parent commit
         // AND the commit federated are expecting the branches to be in PG
-        if (parentCommit == null || !parentCommit.isPresent()) {
+        if (parentCommit.isEmpty()) {
             parentCommit = commitPersistence.findLatestByProjectAndRef(projectId, parentRefId);
             parentCommit.ifPresent(parent ->
                 branch.setParentCommitId(parent.getId())
