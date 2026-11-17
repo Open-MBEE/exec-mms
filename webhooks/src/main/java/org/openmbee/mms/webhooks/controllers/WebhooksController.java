@@ -112,12 +112,10 @@ public class WebhooksController {
 
     private Optional<WebhookJson> webhookExists(WebhookJson json, String projectId) {
         if (json.getId() != null) {
+            // Returned even when it belongs to another project, so the caller refuses the request.
             Optional<WebhookJson> hook = webhookPersistence.findById(json.getId());
-            if(hook.isEmpty()) {
-                hook = webhookPersistence.findByProjectIdAndUrl(projectId, json.getUrl());
-            }
-            if (hook.isPresent() && hook.get().getProjectId().equals(projectId)) {
-                return hook; //ensure hook by id matches the project being requested
+            if (hook.isPresent()) {
+                return hook;
             }
         }
         return webhookPersistence.findByProjectIdAndUrl(projectId, json.getUrl());

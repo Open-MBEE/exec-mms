@@ -69,7 +69,6 @@ public class OAuthProcessor {
     private Set<String> clientIdWhitelist;
 
     private File jks;
-    Map<String, String> grants = new HashMap<String, String>();
 
 
     private OAuthUserDetailsService userDetailsService;
@@ -146,7 +145,7 @@ public class OAuthProcessor {
                         String token = extractToken(response);
                         
                         // If Post successful get the return JSON object and parse if the GSON Java Lib
-                        grants = OAuthTokenUtil.parsesOAuthRSResponse(token);
+                        Map<String, String> grants = OAuthTokenUtil.parsesOAuthRSResponse(token);
                         // If grants are null or empty throw an exception
                         if (grants == null || grants.isEmpty()) {
                             isAuthenticated = false;

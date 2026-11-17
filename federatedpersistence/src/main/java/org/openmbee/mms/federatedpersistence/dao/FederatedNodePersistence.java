@@ -226,15 +226,14 @@ public class FederatedNodePersistence implements NodePersistence {
         //TODO: Test rollback on IndexDAO failure
         //TODO: move transaction stuff out into transaction service
         ContextHolder.setContext(info.getCommitJson().getProjectId(), info.getCommitJson().getRefId());
-        TransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = nodeDAO.getTransactionManager().getTransaction(def);
-
         FederatedNodeChangeInfo federatedInfo = (FederatedNodeChangeInfo) info;
         Map<String, Node> nodes = federatedInfo.getToSaveNodeMap();
         Map<String, ElementJson> json = federatedInfo.getUpdatedMap();
         CommitJson cmjs = federatedInfo.getCommitJson();
         Instant now = federatedInfo.getInstant();
         if (!nodes.isEmpty()) {
+            TransactionDefinition def = new DefaultTransactionDefinition();
+            TransactionStatus status = nodeDAO.getTransactionManager().getTransaction(def);
             try {
                 if (json != null && !json.isEmpty()) {
                     nodeIndexDAO.indexAll(json.values());
