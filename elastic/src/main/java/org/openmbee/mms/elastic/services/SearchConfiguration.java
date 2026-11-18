@@ -1,7 +1,5 @@
 package org.openmbee.mms.elastic.services;
 
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,34 +34,37 @@ public class SearchConfiguration {
         }
     }
 
-    public BoolQueryBuilder addQueryForField(BoolQueryBuilder query, String field, Object value) {
+    /**
+     * Adds the clause for one field to the "must" clauses of a bool query.
+     */
+    public List<Map<String, Object>> addQueryForField(List<Map<String, Object>> must, String field, Object value) {
         if("*".equals(field)) {
-            query.must(QueryBuilders.multiMatchQuery(value.toString(), "*"));
+            must.add(Map.of("multi_match", Map.of("query", value.toString(), "fields", List.of("*"))));
         } else {
             EnumSearchType searchType = config.get(field);
             if(searchType == null) {
                 logger.error("Could not find mapping for field " + field);
-                return query;
+                return must;
             }
             switch (searchType){
                 case TERM:
                     if (value instanceof List) {
-                        query.must(QueryBuilders.termsQuery(field, ((List<?>) value).toArray()));
+                        must.add(Map.of("terms", Map.of(field, value)));
                     } else if (value instanceof String) {
-                        query.must(QueryBuilders.termQuery(field, value));
+                        must.add(Map.of("term", Map.of(field, value)));
                     }
                     break;
                 case MATCH:
                     if (value instanceof List) {
-                        query.must(QueryBuilders.matchQuery(field, ((List)value).get(0)));
+                        must.add(Map.of("match", Map.of(field, ((List<?>) value).get(0))));
                     } else {
-                        query.must(QueryBuilders.matchQuery(field, value));
+                        must.add(Map.of("match", Map.of(field, value)));
                     }
                     break;
                 default:
                     break;
             }
         }
-        return query;
+        return must;
     }
 }

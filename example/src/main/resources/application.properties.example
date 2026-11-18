@@ -3,8 +3,12 @@ mms.admin.username=test
 mms.admin.password=test
 
 mms.stream.batch.size=100000
+mms.optimize-for-federated=true
 
-#Comma Separated list of allowed cross site origins
+# Comma separated list of allowed cross site origins, e.g. https://ve.example.org,https://other.example.org
+# Credentials are allowed for every origin listed here. "*" allows any origin: the caller's origin is echoed
+# back, so any website may make credentialed cross-origin requests to MMS. That lets a browser client such as
+# View Editor work out of the box; listing the explicit origins is the stricter setting, use it in production.
 cors.allowed.origins=*
 
 jwt.secret=make_me_something_really_long
@@ -34,11 +38,11 @@ spring.datasource.username=mmsuser
 spring.datasource.password=test1234
 spring.datasource.driver-class-name=org.postgresql.Driver
 #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.datasource.initialization-mode=always
+spring.sql.init.mode=always
 
 # The SQL dialect makes Hibernate generate better SQL for the chosen database
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL10Dialect
-#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL57Dialect
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 #spring.jpa.properties.hibernate.dialect.storage_engine=innodb
 
 # Hibernate ddl auto (create, create-drop, validate, update)

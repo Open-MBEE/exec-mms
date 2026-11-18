@@ -2,10 +2,12 @@ package org.openmbee.mms.rdb.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Properties;
 import javax.sql.DataSource;
+
+import org.openmbee.mms.core.config.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -99,7 +101,7 @@ public class PersistenceJPAConfig {
                 "org.hibernate.dialect.PostgreSQLDialect"));
         properties.setProperty("hibernate.jdbc.lob.non_contextual_creation",
             env.getProperty("spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation",
-                "true"));
+                Constants.TRUE));
 
         return properties;
     }
@@ -118,7 +120,7 @@ public class PersistenceJPAConfig {
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper objectMapper = builder.build();
         objectMapper.registerModule(
-            new Hibernate5Module().disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION));
+            new Hibernate6Module().disable(Hibernate6Module.Feature.USE_TRANSIENT_ANNOTATION));
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         return objectMapper;

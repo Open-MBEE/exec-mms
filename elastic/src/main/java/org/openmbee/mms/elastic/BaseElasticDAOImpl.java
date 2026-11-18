@@ -3,29 +3,16 @@ package org.openmbee.mms.elastic;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
 
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.get.MultiGetItemResponse;
-import org.elasticsearch.action.get.MultiGetRequest;
-import org.elasticsearch.action.get.MultiGetResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.get.GetResult;
-import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.openmbee.mms.core.exceptions.InternalErrorException;
 import org.openmbee.mms.elastic.utils.BulkProcessor;
+import org.openmbee.mms.elastic.utils.ElasticClient;
 import org.openmbee.mms.elastic.utils.Index;
 import org.openmbee.mms.json.BaseJson;
 import org.slf4j.Logger;
@@ -50,18 +37,10 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     @Value("${elasticsearch.limit.index:5000}")
     protected int bulkLimit;
 
-    protected static int readTimeout = 1000000000;
-    protected RestHighLevelClient client;
-    protected static final RequestOptions REQUEST_OPTIONS;
-    static {
-        RequestOptions.Builder requestBuilder = RequestOptions.DEFAULT.toBuilder();
-        // TODO: Should be configureable
-        requestBuilder.setHttpAsyncResponseConsumerFactory(new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(1024 * 1024 * 1024));
-        REQUEST_OPTIONS = requestBuilder.build();
-    }
+    protected ElasticClient client;
 
     @Autowired
-    public void setRestHighLevelClient(@Qualifier("clientElastic") RestHighLevelClient client) {
+    public void setElasticClient(@Qualifier("clientElastic") ElasticClient client) {
         this.client = client;
     }
 
@@ -73,7 +52,7 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public void deleteById(String index, String docId) {
         try {
-            client.delete(new DeleteRequest(index, docId), REQUEST_OPTIONS);
+            client.requestAllowingNotFound("DELETE", docEndpoint(index, docId), Collections.emptyMap(), null);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
@@ -81,24 +60,16 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
     }
 
     public void deleteAll(String index, Collection<? extends BaseJson> jsons) {
-        try {
-            BulkRequest bulkIndex = new BulkRequest();
-            for (BaseJson json : jsons) {
-                bulkIndex.add(new DeleteRequest(index, json.getDocId()));
-            }
-            client.bulk(bulkIndex, REQUEST_OPTIONS);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new InternalErrorException(e);
+        BulkProcessor bulkProcessor = new BulkProcessor(client, Integer.MAX_VALUE);
+        for (BaseJson json : jsons) {
+            bulkProcessor.delete(index, json.getDocId());
         }
+        bulkProcessor.closeIgnoringFailures();
     }
 
     public boolean existsById(String index, String docId) {
         try {
-            GetRequest getRequest = new GetRequest(index, docId);
-            getRequest.fetchSourceContext(new FetchSourceContext(false));
-            getRequest.storedFields("_none_");
-            return client.exists(getRequest, REQUEST_OPTIONS);
+            return client.exists(docEndpoint(index, docId), Map.of("_source", "false", "stored_fields", "_none_"));
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
@@ -107,15 +78,12 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
 
     public Optional<E> findById(String index, String docId) {
         try {
-            GetResponse res = client
-                .get(new GetRequest(index, docId), REQUEST_OPTIONS);
-            if (res.isExists()) {
-                E ob = newInstance();
-                ob.putAll(res.getSourceAsMap());
-                return Optional.of(ob);
-            } else {
-                return Optional.empty();
+            Map<String, Object> res = client
+                .requestAllowingNotFound("GET", docEndpoint(index, docId), Collections.emptyMap(), null);
+            if (res.containsKey("error")) {
+                throw new IOException(String.valueOf(res.get("error")));
             }
+            return toInstance(res);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
@@ -129,19 +97,16 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
             if (docIds.isEmpty()) {
                 return listOfResponses;
             }
-            int cur = 0;
-            MultiGetRequest request = new MultiGetRequest();
+            List<Map<String, String>> docs = new ArrayList<>();
             for (String eid : docIds) {
-                request.add(index, eid);
-                cur++;
-                if (cur == getLimit) {
-                    getResponses(request, listOfResponses);
-                    cur = 0;
-                    request = new MultiGetRequest();
+                docs.add(Map.of("_index", index, "_id", eid));
+                if (docs.size() == getLimit) {
+                    getResponses(docs, listOfResponses);
+                    docs = new ArrayList<>();
                 }
             }
-            if (cur > 0) {
-                getResponses(request, listOfResponses);
+            if (!docs.isEmpty()) {
+                getResponses(docs, listOfResponses);
             }
             return listOfResponses;
         } catch (IOException e) {
@@ -150,51 +115,53 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         }
     }
 
-    private void getResponses(MultiGetRequest request, List<E> listOfResponses) throws IOException {
-        MultiGetResponse response = client.mget(request, REQUEST_OPTIONS);
+    @SuppressWarnings("unchecked")
+    private void getResponses(List<Map<String, String>> docs, List<E> listOfResponses) throws IOException {
+        Map<String, Object> response = client
+            .request("POST", "/_mget", Collections.emptyMap(), Map.of("docs", docs));
 
-        for (MultiGetItemResponse res : response.getResponses()) {
-            GetResponse item = res.getResponse();
-            if (item != null && item.isExists()) {
-                E ob = newInstance();
-                ob.putAll(item.getSourceAsMap());
-                listOfResponses.add(ob);
-            } else {
-                continue;
-            }
+        for (Map<String, Object> item : (List<Map<String, Object>>) response.get("docs")) {
+            toInstance(item).ifPresent(listOfResponses::add);
         }
     }
 
     public void indexAll(String index, Collection<? extends BaseJson> jsons) {
         BulkProcessor bulkProcessor = getBulkProcessor(client);
         for (BaseJson json : jsons) {
-            bulkProcessor.add(new IndexRequest(index).id(json.getDocId()).source(json));
+            bulkProcessor.index(index, json.getDocId(), json);
         }
         bulkProcessor.close();
     }
 
     public void index(String index, BaseJson<?> json) {
         try {
-            client.index(new IndexRequest(index).id(json.getDocId()).source(json), REQUEST_OPTIONS);
+            if (json.getDocId() == null) {
+                client.request("POST", ElasticClient.endpoint(index, "_doc"), Collections.emptyMap(), json);
+            } else {
+                client.request("PUT", docEndpoint(index, json.getDocId()), Collections.emptyMap(), json);
+            }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new InternalErrorException(e);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public E update(String index, BaseJson json) {
         E response = newInstance();
         response.putAll(json);
         try {
-            UpdateRequest request = new UpdateRequest(index, json.getDocId());
-            request.fetchSource(true);
-            request.docAsUpsert(true).doc(json).upsert(json);
-            UpdateResponse updateResponse = client.update(request, REQUEST_OPTIONS);
-            if (updateResponse.getResult() == DocWriteResponse.Result.CREATED ||
-                updateResponse.getResult() == DocWriteResponse.Result.UPDATED) {
-                GetResult result = updateResponse.getGetResult();
-                if (result.isExists()) {
-                    response.putAll(result.sourceAsMap());
+            Map<String, Object> request = new LinkedHashMap<>();
+            request.put("doc", json);
+            request.put("doc_as_upsert", true);
+            request.put("upsert", json);
+            Map<String, Object> updateResponse = client.request("POST",
+                ElasticClient.endpoint(index, "_update", json.getDocId()), Map.of("_source", "true"), request);
+            Object result = updateResponse.get("result");
+            if ("created".equals(result) || "updated".equals(result)) {
+                Object get = updateResponse.get("get");
+                if (get instanceof Map) {
+                    toInstance((Map<String, Object>) get).ifPresent(response::putAll);
                 }
             }
         } catch (IOException e) {
@@ -204,7 +171,28 @@ public abstract class BaseElasticDAOImpl<E extends Map<String, Object>> {
         return response;
     }
 
-    protected BulkProcessor getBulkProcessor(RestHighLevelClient client) {
-        return new BulkProcessor(client, REQUEST_OPTIONS, bulkLimit);
+    protected Map<String, Object> search(String index, Map<String, Object> body) throws IOException {
+        return client.request("POST", ElasticClient.endpoint(index, "_search"), Collections.emptyMap(), body);
+    }
+
+    protected BulkProcessor getBulkProcessor(ElasticClient client) {
+        return new BulkProcessor(client, bulkLimit);
+    }
+
+    private static String docEndpoint(String index, String docId) {
+        return ElasticClient.endpoint(index, "_doc", docId);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Optional<E> toInstance(Map<String, Object> doc) {
+        if (!Boolean.TRUE.equals(doc.get("found"))) {
+            return Optional.empty();
+        }
+        E ob = newInstance();
+        Object source = doc.get("_source");
+        if (source instanceof Map) {
+            ob.putAll((Map<String, Object>) source);
+        }
+        return Optional.of(ob);
     }
 }

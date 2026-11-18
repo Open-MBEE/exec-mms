@@ -1,8 +1,6 @@
 buildscript {
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
     repositories {
         mavenCentral()
@@ -14,26 +12,30 @@ buildscript {
 description = 'Model Management System Reference Implementation'
 
 ext {
+    // Versions come from the Spring Boot BOM unless stated here.
     commonDependencies = [
-        'swagger-annotations'           : 'io.swagger.core.v3:swagger-annotations:2.1.2',
-        'hibernate-core'                : 'org.hibernate:hibernate-core:5.6.0.Final',
-        'servlet-api'                   : 'javax.servlet:javax.servlet-api:4.0.1',
-        'slf4j-api'                     : 'org.slf4j:slf4j-api:1.7.30',
-        'spring-boot'                   : "org.springframework.boot:spring-boot:$springBootVersion",
-        'spring-security-core'          : "org.springframework.security:spring-security-core:$springSecurityVersion",
-        'spring-security-config'        : "org.springframework.security:spring-security-config:$springSecurityVersion",
-        'spring-security-web'           : "org.springframework.security:spring-security-web:$springSecurityVersion",
-        'spring-security-ldap'          : "org.springframework.security:spring-security-ldap:$springSecurityVersion",
-        'spring-tx'                     : "org.springframework:spring-tx:$springFrameworkVersion",
-        'spring-webmvc'                 : "org.springframework:spring-webmvc:$springFrameworkVersion",
-        'spring-aspects'                : "org.springframework:spring-aspects:$springFrameworkVersion",
-        'spring-data-commons'           : "org.springframework.data:spring-data-commons:$springDataVersion",
-        'spring-data-jpa'               : "org.springframework.data:spring-data-jpa:$springDataVersion",
-        'jackson-annotations'           : "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion",
-        'jackson-databind'              : "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-        'jackson-datatype-hibernate5'   : "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:$jacksonVersion",
-        'jackson-datatype-jsr310'       : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
-        'spring-boot-starter-test'      : 'org.springframework.boot:spring-boot-starter-test:2.2.4.RELEASE'
+        'swagger-annotations'           : 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.36',
+        'hibernate-core'                : 'org.hibernate.orm:hibernate-core',
+        'servlet-api'                   : 'jakarta.servlet:jakarta.servlet-api',
+        'slf4j-api'                     : 'org.slf4j:slf4j-api',
+        'spring-boot'                   : 'org.springframework.boot:spring-boot',
+        'spring-security-core'          : 'org.springframework.security:spring-security-core',
+        'spring-security-config'        : 'org.springframework.security:spring-security-config',
+        'spring-security-web'           : 'org.springframework.security:spring-security-web',
+        'spring-security-ldap'          : 'org.springframework.security:spring-security-ldap',
+        'spring-tx'                     : 'org.springframework:spring-tx',
+        'spring-webmvc'                 : 'org.springframework:spring-webmvc',
+        'spring-aspects'                : 'org.springframework:spring-aspects',
+        'spring-data-commons'           : 'org.springframework.data:spring-data-commons',
+        'spring-data-jpa'               : 'org.springframework.data:spring-data-jpa',
+        'jackson-annotations'           : 'com.fasterxml.jackson.core:jackson-annotations',
+        'jackson-databind'              : 'com.fasterxml.jackson.core:jackson-databind',
+        'jackson-datatype-hibernate6'   : 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6',
+        'jackson-datatype-jsr310'       : 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
+        'jjwt-api'                      : "io.jsonwebtoken:jjwt-api:$jwtTokenVersion",
+        'jjwt-impl'                     : "io.jsonwebtoken:jjwt-impl:$jwtTokenVersion",
+        'jjwt-jackson'                  : "io.jsonwebtoken:jjwt-jackson:$jwtTokenVersion",
+        'spring-boot-starter-test'      : 'org.springframework.boot:spring-boot-starter-test'
     ]
 }
 
@@ -62,9 +64,33 @@ subprojects {
 
     group = "org.openmbee.mms"
     version = rootProject.version
-    ext['jackson-bom.version'] = jacksonVersion
+    ext['tomcat.version'] = tomcatVersion
+    ext['jackson-bom.version'] = jacksonBomVersion
+    ext['httpclient5.version'] = httpclient5Version
+    ext['httpcore5.version'] = httpcore5Version
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
 
     Map<String, String> commonDependencies = rootProject.ext.commonDependencies
+
+    // The existing tests are JUnit 4; they run on the JUnit Platform through the vintage engine.
+    dependencies {
+        testImplementation 'junit:junit'
+        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    // Spring 6 resolves @PathVariable/@RequestParam names and SpEL #arguments from parameter metadata only.
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << '-parameters'
+    }
 
     task javadocJar(type: Jar) {
         archiveClassifier = "javadoc"
@@ -130,15 +156,22 @@ subprojects {
         }
 
         repositories {
-            maven {
-                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
-                    credentials {
-                        username = ossrhUsername
-                        password = ossrhPassword
+            if (version.endsWith('SNAPSHOT')) {
+                maven {
+                    name = 'centralSnapshots'
+                    url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                    if (project.hasProperty('centralUsername') && project.hasProperty('centralPassword')) {
+                        credentials {
+                            username = centralUsername
+                            password = centralPassword
+                        }
                     }
+                }
+            } else {
+                // Maven Central takes a release as one bundle, so releases are staged here and zipped by centralBundle.
+                maven {
+                    name = 'centralStaging'
+                    url = rootProject.layout.buildDirectory.dir('central-staging')
                 }
             }
         }
@@ -157,5 +190,24 @@ subprojects {
             useInMemoryPgpKeys(signingKey, signingPassword)
             sign publishing.publications.mavenJava
         }
+    }
+}
+
+tasks.register('cleanCentralStaging', Delete) {
+    delete layout.buildDirectory.dir('central-staging')
+}
+
+// The deployment bundle the Central Publisher API accepts: the staged Maven layout of every module.
+tasks.register('centralBundle', Zip) {
+    dependsOn subprojects.collect { "${it.path}:publish" }
+    from layout.buildDirectory.dir('central-staging')
+    exclude '**/maven-metadata.xml*'
+    archiveFileName = 'central-bundle.zip'
+    destinationDirectory = layout.buildDirectory.dir('central')
+}
+
+subprojects {
+    tasks.withType(PublishToMavenRepository).configureEach {
+        mustRunAfter rootProject.tasks.named('cleanCentralStaging')
     }
 }

@@ -1,7 +1,5 @@
 package org.openmbee.mms.twc.security;
 
-import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.rest.RestResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmbee.mms.twc.TeamworkCloud;
@@ -46,19 +44,19 @@ public class TwcAuthenticationProviderTest {
     @Test
     public void testSuccessfulAuthentication(){
 
-        ResponseEntity<RestResponse> responseEntity = mock(ResponseEntity.class);
+        ResponseEntity<String> responseEntity = mock(ResponseEntity.class);
 
         when(restUtils.getCookieValue(responseEntity, TwcConstants.TWCCURRENTUSER)).thenReturn(userName);
 
         TwcAuthenticationProvider twcAuthenticationProvider = new TwcAuthenticationProvider(restUtils, twc);
 
-        when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(RestResponse.class)))
+        when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(String.class)))
             .thenAnswer((invocation) -> {
                     Object[] args = invocation.getArguments();
 
                     assertEquals("http://twc.domain.com:8111/osmc/login", args[0]);
 
-                    HttpEntity<RestRequest> req = (HttpEntity<RestRequest>)args[2];
+                    HttpEntity<Void> req = (HttpEntity<Void>)args[2];
                     assertEquals(token, req.getHeaders().get(RestUtils.AUTHORIZATION).get(0));
 
                     return responseEntity;
@@ -70,19 +68,19 @@ public class TwcAuthenticationProviderTest {
 
     @Test
     public void testAuthenticationFailure() {
-        ResponseEntity<RestResponse> responseEntity = mock(ResponseEntity.class);
+        ResponseEntity<String> responseEntity = mock(ResponseEntity.class);
 
         when(restUtils.getCookieValue(responseEntity, TwcConstants.TWCCURRENTUSER)).thenReturn(null);
 
         TwcAuthenticationProvider twcAuthenticationProvider = new TwcAuthenticationProvider(restUtils, twc);
 
-        when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(RestResponse.class)))
+        when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(String.class)))
             .thenAnswer((invocation) -> {
                 Object[] args = invocation.getArguments();
 
                 assertEquals("http://twc.domain.com:8111/osmc/login", args[0]);
 
-                HttpEntity<RestRequest> req = (HttpEntity<RestRequest>)args[2];
+                HttpEntity<Void> req = (HttpEntity<Void>)args[2];
                 assertEquals(token, req.getHeaders().get(RestUtils.AUTHORIZATION).get(0));
 
                 return responseEntity;
@@ -94,13 +92,13 @@ public class TwcAuthenticationProviderTest {
 
     @Test
     public void testAuthenticationException() {
-        ResponseEntity<RestResponse> responseEntity = mock(ResponseEntity.class);
+        ResponseEntity<String> responseEntity = mock(ResponseEntity.class);
 
         when(restUtils.getCookieValue(responseEntity, TwcConstants.TWCCURRENTUSER)).thenReturn(null);
 
         TwcAuthenticationProvider twcAuthenticationProvider = new TwcAuthenticationProvider(restUtils, twc);
 
-        when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(RestResponse.class)))
+        when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(String.class)))
             .thenAnswer((invocation) -> {
                 throw new RuntimeException("Test Exception -- should be caught");
             });

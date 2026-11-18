@@ -1,15 +1,16 @@
 package org.openmbee.mms.data.domains.global;
 
 import java.util.Collection;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "groups")
 public class Group extends Base {
 
+    public static final String NAME_COLUMN = "name";
 
     @Column(unique = true)
     private String name;

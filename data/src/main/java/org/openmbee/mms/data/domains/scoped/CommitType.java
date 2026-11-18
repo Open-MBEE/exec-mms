@@ -1,6 +1,6 @@
 package org.openmbee.mms.data.domains.scoped;
 
-import javax.persistence.Table;
+import jakarta.persistence.Table;
 
 @Table(name = "committypes")
 public enum CommitType {
