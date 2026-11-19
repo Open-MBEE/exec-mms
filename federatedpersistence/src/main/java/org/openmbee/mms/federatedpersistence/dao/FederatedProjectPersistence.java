@@ -96,21 +96,18 @@ public class FederatedProjectPersistence implements ProjectPersistence {
 
     @Override
     public void hardDelete(String projectId) {
-        String message = "";
+        //Both stores are always attempted, so a partially created project can still be cleaned up.
         try {
             ContextHolder.clearContext();
             projectDAO.delete(projectId);
         } catch (Exception e) {
-            message.concat(e.getMessage());
+            logger.error("Couldn't delete project {} from the database", projectId, e);
         }
         try {
             ContextHolder.setContext(projectId);
             projectIndexDAO.delete(projectId);
         } catch (Exception e) {
-            message.concat(e.getMessage());
-        }
-        if (!message.isEmpty()) {
-            throw new InternalErrorException(message);
+            logger.error("Couldn't delete project {} from the index", projectId, e);
         }
     }
 
