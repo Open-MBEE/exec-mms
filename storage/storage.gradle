@@ -7,7 +7,6 @@ dependencies {
     }
     runtimeOnly "software.amazon.awssdk:apache-client:$awsSdkVersion"
     implementation "org.apache.tika:tika-core:$tikaVersion"
-    implementation commonDependencies.'servlet-api'
 
     testImplementation commonDependencies.'spring-boot-starter-test'
 }
