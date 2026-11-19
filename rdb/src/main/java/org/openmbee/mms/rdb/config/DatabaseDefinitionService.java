@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -38,7 +37,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class DatabaseDefinitionService {
 
-    private static final Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
     private static final String COPY_SQL = "INSERT INTO \"%s\" SELECT * FROM \"%s\"";
     private static final String COPY_IDX = "SELECT SETVAL('%s_id_seq', COALESCE((SELECT MAX(id) FROM \"%s\"), 1), true)";
 
