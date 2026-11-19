@@ -8,4 +8,6 @@ dependencies {
     implementation 'org.hibernate.orm:hibernate-ant'
 
     runtimeOnly commonDependencies.'spring-aspects'
+
+    testImplementation commonDependencies.'spring-boot-starter-test'
 }
