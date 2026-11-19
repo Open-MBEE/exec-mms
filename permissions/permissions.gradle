@@ -1,5 +1,3 @@
 dependencies {
     implementation project (":core")
-    implementation project (":data")
-    implementation 'org.apache.commons:commons-lang3'
 }
