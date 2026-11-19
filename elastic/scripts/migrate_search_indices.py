@@ -144,7 +144,8 @@ def shipped_mapping(source, index, mappings_dir):
             return load_mapping(mappings_dir, suffix[1:] + ".json")
     schema = project_schema(source, index[:-len("_node")] + "_metadata") or "default"
     name = schema + "_node.json"
-    if not os.path.isfile(os.path.join(mappings_dir, name)):
+    # The schema comes from the source cluster: it must name a file in the mappings directory itself.
+    if os.path.basename(name) != name or not os.path.isfile(os.path.join(mappings_dir, name)):
         print(f"  warning: no mapping for schema '{schema}', using default_node.json")
         name = "default_node.json"
     return load_mapping(mappings_dir, name)
