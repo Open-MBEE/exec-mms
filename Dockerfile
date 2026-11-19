@@ -1,7 +1,9 @@
 FROM eclipse-temurin:17-jdk AS build
 COPY . /mms
 WORKDIR /mms
-RUN ./gradlew --no-daemon bootJar --warning-mode all
+# Pass the release tag (--build-arg BUILD_TAG=x.y.z) for a release build; without it the jar is versioned -SNAPSHOT.
+ARG BUILD_TAG=
+RUN ./gradlew --no-daemon -PbuildTag="${BUILD_TAG}" bootJar --warning-mode all
 RUN find . -type f -name 'example-*.jar' -not -iname '*javadoc*' -not -iname '*sources*' -not -iname '*plain*' -exec cp '{}' '/app.jar' ';' \
     && mkdir -p jacocoJars
 
