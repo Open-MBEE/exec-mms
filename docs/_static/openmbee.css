@@ -1,0 +1,77 @@
+/* OpenMBEE brand guide: https://www.openmbee.org/brand.html */
+:root {
+  --openmbee-dark-blue: #10052F;
+  --openmbee-light-blue: #64DDFA;
+  --openmbee-grey: #D6D6D6;
+  /* Light blue darkened for readable links on white, as on openmbee.org */
+  --openmbee-link: #0a6f8c;
+  --openmbee-font: "ABeeZee", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body,
+.rst-content .toctree-wrapper > p.caption,
+h1, h2, h3, h4, h5, h6, legend,
+.btn,
+input, select, textarea {
+  font-family: var(--openmbee-font);
+}
+
+h1, h2, h3, h4, h5, h6,
+.rst-content .toctree-wrapper > p.caption {
+  font-weight: 400;
+  color: var(--openmbee-dark-blue);
+}
+
+a,
+a:visited,
+.wy-breadcrumbs a {
+  color: var(--openmbee-link);
+}
+
+a:hover {
+  color: var(--openmbee-dark-blue);
+}
+
+.wy-nav-side,
+.wy-side-nav-search,
+.wy-nav-top {
+  background: var(--openmbee-dark-blue);
+}
+
+/* Clear zone around the logo */
+.wy-side-nav-search > a {
+  padding: 16px;
+  margin-bottom: 0.4em;
+}
+
+.wy-side-nav-search > a img.logo {
+  width: 100%;
+  max-width: 220px;
+  margin: 0;
+}
+
+.wy-side-nav-search > div.version {
+  color: var(--openmbee-grey);
+}
+
+.wy-side-nav-search input[type="text"] {
+  border-color: var(--openmbee-light-blue);
+}
+
+.wy-menu-vertical p.caption,
+.wy-menu-vertical header {
+  color: var(--openmbee-light-blue);
+}
+
+.wy-menu-vertical a {
+  color: var(--openmbee-grey);
+}
+
+.wy-menu-vertical a:hover {
+  background-color: rgba(100, 221, 250, 0.15);
+  color: #fff;
+}
+
+.wy-nav-top a {
+  color: #fff;
+}

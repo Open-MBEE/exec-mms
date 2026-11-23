@@ -58,3 +58,16 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# OpenMBEE brand guide (https://www.openmbee.org/brand.html): logo, favicon,
+# palette and the ABeeZee typeface.
+html_logo = '_static/openmbee-logo-horizontal.svg'
+html_favicon = '_static/favicon.svg'
+html_theme_options = {
+    'logo_only': True,
+    'style_nav_header_background': '#10052F',
+}
+html_css_files = [
+    'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap',
+    'openmbee.css',
+]
